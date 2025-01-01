@@ -27,7 +27,7 @@ public class JSONUtil {
         // Iterate through the commands in the JSON object and add them to the list of commands. 
         // If the command is a Sequential or Parallel, recursively loop through it again.
         //--------------------------------------------------------
-        JSONArray commands = (JSONArray)((JSONObject)((JSONObject)json).get("data")).get("commands");
+        JSONArray commands = (JSONArray)((JSONObject)((JSONObject) jsonCommandObject).get("data")).get("commands");
         for(Object command: commands){
             String commandType = JSONUtil.getCommandType(command);
             if(commandType.equals("sequential") || commandType.equals("parallel")){

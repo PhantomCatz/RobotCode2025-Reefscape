@@ -2,6 +2,12 @@ package frc.robot.Autonomous;
 
 import java.nio.file.Path;
 import java.util.Arrays;
+
+import static frc.robot.CatzSubsystems.DriveAndRobotOrientation.drivetrain.DriveConstants.DRIVE_CONFIG;
+import static frc.robot.CatzSubsystems.DriveAndRobotOrientation.drivetrain.DriveConstants.TRAJECTORY_CONFIG;
+import static frc.robot.CatzSubsystems.DriveAndRobotOrientation.drivetrain.DriveConstants.getNewHolController;
+import static frc.robot.CatzSubsystems.DriveAndRobotOrientation.drivetrain.DriveConstants.getNewPathFollowingController;
+
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
@@ -19,14 +25,12 @@ import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
-import com.pathplanner.lib.commands.FollowPathWithEvents;
+import com.pathplanner.lib.commands.FollowPathCommand;
 import com.pathplanner.lib.commands.PathPlannerAuto;
 import com.pathplanner.lib.path.EventMarker;
 import com.pathplanner.lib.path.GoalEndState;
 import com.pathplanner.lib.path.PathPlannerPath;
-import com.pathplanner.lib.path.PathPlannerTrajectory;
-import com.pathplanner.lib.util.HolonomicPathFollowerConfig;
-import com.pathplanner.lib.util.ReplanningConfig;
+import com.pathplanner.lib.trajectory.PathPlannerTrajectory;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -36,8 +40,6 @@ import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.StringPublisher;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Filesystem;
-import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.FunctionalCommand;
@@ -109,50 +111,45 @@ public class CatzAutonomous extends VirtualSubsystem{
 
         // Path follwing setup
         CatzRobotTracker tracker = CatzRobotTracker.getInstance();
-        HolonomicPathFollowerConfig config = new HolonomicPathFollowerConfig(
-            DriveConstants.driveConfig.maxLinearVelocity() / 2, 
-            DriveConstants.driveConfig.driveBaseRadius(),   
-            new ReplanningConfig()
-        );
 
         //------------------------------------------------------------------------------------------------------------
         // Autonmous questionaire gui configurations
         // ORDER MATTERS! Register named commands first, AutoBuilder second, Trajectories and add autos to dashboard last
         //------------------------------------------------------------------------------------------------------------
-        NamedCommands.registerCommand("noteDetectIntakeToShooter", AutomatedSequenceCmds.noteDetectIntakeToShooter(container));
-        NamedCommands.registerCommand("autonSpeakerShoot", AutomatedSequenceCmds.autonSpeakerShoot(container));
+
         NamedCommands.registerCommand("TestPrint", Commands.print("Bench"));
 
-        BooleanSupplier shouldFlip = ()->AllianceFlipUtil.shouldFlipToRed();
+        BooleanSupplier shouldFlip = () -> AllianceFlipUtil.shouldFlipToRed();
 
-        AutoBuilder.configureHolonomic(
+        AutoBuilder.configure(
             tracker::getEstimatedPose,
             tracker::resetPose,
             tracker::getRobotChassisSpeeds,
             container.getCatzDrivetrain()::drive,
-            config,
+            getNewPathFollowingController(),
+            TRAJECTORY_CONFIG,
             shouldFlip,
             container.getCatzDrivetrain()
         );
         
-        //------------------------------------------------------------------------------------------------------------
-        // Path Configuration
-        //------------------------------------------------------------------------------------------------------------
-        for(File pathFile : choreoPathsDirectory.listFiles()){
-            //to get rid of the extensions trailing the path names
-            String pathName = pathFile.getName().replaceFirst("[.][^.]+$", ""); 
-            PathPlannerPath path = PathPlannerPath.fromChoreoTrajectory(pathName);
-            choreoPaths.put(pathName, new TrajectoryDriveCmd(path, container.getCatzDrivetrain()));
-        }
-        NamedCommands.registerCommands(choreoPaths);
+        // //------------------------------------------------------------------------------------------------------------
+        // // Path Configuration
+        // //------------------------------------------------------------------------------------------------------------ //TODO issues with string conversions
+        // for(File pathFile : choreoPathsDirectory.listFiles()){
+        //     //to get rid of the extensions trailing the path names
+        //     String pathName = pathFile.getName().replaceFirst("[.][^.]+$", ""); 
+        //     PathPlannerPath path = PathPlannerPath.fromChoreoTrajectory(pathName);
+        //     choreoPaths.put(pathName, new TrajectoryDriveCmd(path, container.getCatzDrivetrain()));
+        // }
+        // NamedCommands.registerCommands(choreoPaths);
 
-        for(File pathFile : pathplannerPathsDirectory.listFiles()){
-            //to get rid of the extensions trailing the path names
-            String pathName = pathFile.getName().replaceFirst("[.][^.]+$", ""); 
-            PathPlannerPath path = PathPlannerPath.fromPathFile(pathName);
-            pathplannerPaths.put(pathName, new TrajectoryDriveCmd(path, container.getCatzDrivetrain()));
-        }
-        NamedCommands.registerCommands(pathplannerPaths);
+        // for(File pathFile : pathplannerPathsDirectory.listFiles()){
+        //     //to get rid of the extensions trailing the path names
+        //     String pathName = pathFile.getName().replaceFirst("[.][^.]+$", ""); 
+        //     PathPlannerPath path = PathPlannerPath.fromPathFile(pathName);
+        //     pathplannerPaths.put(pathName, new TrajectoryDriveCmd(path, container.getCatzDrivetrain()));
+        // }
+        // NamedCommands.registerCommands(pathplannerPaths);
         
         addProgram("Speaker",  
             List.of(
@@ -257,17 +254,6 @@ public class CatzAutonomous extends VirtualSubsystem{
 
 
         return Commands.sequence(
-            Commands.select(
-                Map.of(
-                    AutoQuestionResponse.SOURCE,
-                    resetPose(FieldConstants.startingCenter),
-                    AutoQuestionResponse.CENTER,
-                    resetPose(FieldConstants.startingCenter),
-                    AutoQuestionResponse.AMP,
-                    resetPose(FieldConstants.startingAmp)
-                ),
-                () -> lastResponses.get(0) // Starting location
-            ),
             Commands.select(startingChoices, () -> lastResponses.get(0)));
     }
 
@@ -278,11 +264,7 @@ public class CatzAutonomous extends VirtualSubsystem{
     //          Characteration Routines
     //
     //---------------------------------------------------------------------------------------------------------
-    public Command flywheelCharacterization() {
-        CatzShooterFlywheels flywheels = m_container.getCatzShooterFlywheels();
-        return new FeedForwardCharacterization(flywheels, flywheels::runCharacterization, flywheels::getCharacterizationVelocity)
-                        .withName("Flywheels characterization");
-    }
+
     
     //---------------------------------------------------------------------------------------------------------
     //
@@ -291,16 +273,16 @@ public class CatzAutonomous extends VirtualSubsystem{
     //---------------------------------------------------------------------------------------------------------
     public Command autoFindPathAmp() {
         return Commands.either(
-            AutoBuilder.pathfindToPoseFlipped(new Pose2d(1.89, 7.76, Rotation2d.fromDegrees(90)), DriveConstants.autoPathfindingConstraints), 
-            AutoBuilder.pathfindToPose(new Pose2d(1.89, 7.76, Rotation2d.fromDegrees(90)), DriveConstants.autoPathfindingConstraints), 
+            AutoBuilder.pathfindToPoseFlipped(new Pose2d(1.89, 7.76, Rotation2d.fromDegrees(90)), DriveConstants.PATHFINDING_CONSTRAINTS), 
+            AutoBuilder.pathfindToPose(new Pose2d(1.89, 7.76, Rotation2d.fromDegrees(90)), DriveConstants.PATHFINDING_CONSTRAINTS), 
             ()->AllianceFlipUtil.shouldFlipToRed());
 
     }
 
     public Command autoFindPathSpeaker() {
         return Commands.either(
-            AutoBuilder.pathfindToPoseFlipped(new Pose2d(2.74, 6.14, Rotation2d.fromDegrees(180)), DriveConstants.autoPathfindingConstraints), 
-            AutoBuilder.pathfindToPose(new Pose2d(2.74, 6.14, Rotation2d.fromDegrees(180)), DriveConstants.autoPathfindingConstraints), 
+            AutoBuilder.pathfindToPoseFlipped(new Pose2d(2.74, 6.14, Rotation2d.fromDegrees(180)), DriveConstants.PATHFINDING_CONSTRAINTS), 
+            AutoBuilder.pathfindToPose(new Pose2d(2.74, 6.14, Rotation2d.fromDegrees(180)), DriveConstants.PATHFINDING_CONSTRAINTS), 
             ()->AllianceFlipUtil.shouldFlipToRed());
     }
     //---------------------------------------------------------------------------------------------------------
@@ -315,8 +297,12 @@ public class CatzAutonomous extends VirtualSubsystem{
             trajectoriesLoaded = true;
             var trajectory = new PathPlannerTrajectory(
                 segment,
-                CatzRobotTracker.getInstance().getRobotChassisSpeeds(),
-                CatzRobotTracker.getInstance().getEstimatedPose().getRotation());
+                DriveConstants.
+                    SWERVE_KINEMATICS.
+                        toChassisSpeeds(CatzRobotTracker.getInstance().getCurrentModuleStates()),
+                CatzRobotTracker.getInstance().getEstimatedPose().getRotation(),
+                DriveConstants.TRAJECTORY_CONFIG
+            );
         }
     }
 

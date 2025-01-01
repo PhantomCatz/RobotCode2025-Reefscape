@@ -13,7 +13,6 @@ import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.CatzConstants;
-import frc.robot.CatzSubsystems.DriveAndRobotOrientation.drivetrain.ModuleIOInputsAutoLogged;
 import frc.robot.CatzSubsystems.DriveAndRobotOrientation.drivetrain.ModuleIORealFoc;
 import frc.robot.Utilities.Alert;
 import frc.robot.Utilities.CatzMathUtils;
@@ -44,10 +43,10 @@ public class CatzSwerveModule {
     //  CatzServeModule() - Constructor
     //
     //----------------------------------------------------------------------------------------------
-    public CatzSwerveModule(ModuleConfig config, String moduleName) {
+    public CatzSwerveModule(ModuleIDsAndCurrentLimits config, String moduleName) {
         this.m_moduleName = moduleName;
         // Run Subsystem disconnect check
-        if(DriveConstants.isDriveDisabled) { 
+        if(DriveConstants.IS_DRIVE_DISABLED) { 
                 io = new ModuleIONull();
                 System.out.println("Module " + m_moduleName + " Unconfigured");
         } else {

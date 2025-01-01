@@ -10,31 +10,31 @@ import edu.wpi.first.math.geometry.Rotation2d;
 public interface ModuleIO {
  
   @AutoLog
- static class ModuleIOInputs {
-   public boolean isDriveMotorConnected;
-   public double drivePositionUnits;
-   public double driveVelocityRPS;
-   public double driveAppliedVolts;
-   public double driveSupplyCurrentAmps;
-   public double driveTorqueCurrentAmps;
-   
-   public boolean isSteerMotorConnected;
-   public double steerAbsoluteInitPosition;
+  static class ModuleIOInputs {
+    public boolean isDriveMotorConnected;
+    public double drivePositionUnits;
+    public double driveVelocityRPS;
+    public double driveAppliedVolts;
+    public double driveSupplyCurrentAmps;
+    public double driveTorqueCurrentAmps;
+    
+    public boolean isSteerMotorConnected;
+    public double steerAbsoluteInitPosition;
 
-   public Rotation2d rawAbsEncPosition = new Rotation2d();
-   public double     rawAbsEncValueRotation;
-   public Rotation2d steerAbsPosition = new Rotation2d();
+    public Rotation2d rawAbsEncPosition = new Rotation2d();
+    public double     rawAbsEncValueRotation;
+    public Rotation2d steerAbsPosition = new Rotation2d();
 
-   public double steerTorqueCurrentAmps;
-   public double steerSupplyCurrentAmps;
-   public double[] odometryDrivePositionsMeters = new double[0];
-   public Rotation2d[] odometrySteerPositions = new Rotation2d[0];
+    public double steerTorqueCurrentAmps;
+    public double steerSupplyCurrentAmps;
+    public double[] odometryDrivePositionsMeters = new double[0];
+    public Rotation2d[] odometrySteerPositions = new Rotation2d[0];
 
-   // Simulation Inputs
-   public Rotation2d steerPosition = new Rotation2d();
-   public double steerVelocityRadsPerSec;
+    // Simulation Inputs
+    public Rotation2d steerPosition = new Rotation2d();
+    public double steerVelocityRadsPerSec;
 
- }
+  }
 
  /** Updates the set of loggable inputs. */
  public default void updateInputs(ModuleIOInputs inputs) {}

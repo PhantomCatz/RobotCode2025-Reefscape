@@ -3,8 +3,9 @@ package frc.robot;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.util.Color;
 import frc.robot.Utilities.Alert;
-import frc.robot.Utilities.Alert.AlertPriority;
 import frc.robot.Utilities.Alert.AlertType;
+
+
 
 /***
  * CatzConstants
@@ -73,6 +74,12 @@ public final class CatzConstants {
   // COLOR CONSTANTS
   public static final class CatzColorConstants {
     public static final Color PHANTOM_SAPPHIRE = new Color(15, 25, 400);
+  }
+
+  public static enum AlertPriority {
+    ONE, // Includes only critical Error Alerts
+    TWO,  // Includes critical Error and Warning Alerts
+    THREE, // Includes Critical Error, Warning, and Info Alerts
   }
 
 }

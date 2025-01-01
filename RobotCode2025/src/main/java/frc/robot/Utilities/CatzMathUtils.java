@@ -6,7 +6,6 @@ import frc.robot.CatzSubsystems.DriveAndRobotOrientation.drivetrain.DriveConstan
 
 public class CatzMathUtils {
 
-    //TODO swerve specific should be a swerve util? Look for a library?
     public static SwerveModuleState optimize(SwerveModuleState desiredState, Rotation2d currentAngle) {
         double targetAngle = placeInAppropriate0To360Scope(currentAngle.getDegrees(), desiredState.angle.getDegrees());
         double targetSpeed = desiredState.speedMetersPerSecond;
@@ -74,8 +73,8 @@ public class CatzMathUtils {
      * 
      ***********************************************************************************************/
     public class Conversions {
-        private static final double wheelCircumference = DriveConstants.driveConfig.wheelRadius() * 2.0 * Math.PI;
-        private static final double gearRatio = DriveConstants.moduleGainsAndRatios.driveReduction();
+        private static final double wheelCircumference = DriveConstants.DRIVE_CONFIG.wheelRadius() * 2.0 * Math.PI;
+        private static final double gearRatio = DriveConstants.MODULE_GAINS_AND_RATIOS.driveReduction();
     
         public static double RPSToMPS(double rps){
             return rps * wheelCircumference / gearRatio;

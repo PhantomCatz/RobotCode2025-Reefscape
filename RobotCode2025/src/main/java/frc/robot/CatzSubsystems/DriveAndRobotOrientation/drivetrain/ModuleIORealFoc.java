@@ -16,12 +16,17 @@ import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.networktables.NetworkTableInstance.NetworkMode;
+import edu.wpi.first.units.measure.Angle;
+import edu.wpi.first.units.measure.AngularVelocity;
+import edu.wpi.first.units.measure.Current;
+import edu.wpi.first.units.measure.Velocity;
+import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj.AnalogInput;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.DutyCycleEncoder;
 import edu.wpi.first.wpilibj.RobotController;
 import frc.robot.CatzConstants;
-import frc.robot.CatzSubsystems.DriveAndRobotOrientation.drivetrain.DriveConstants.ModuleConfig;
+import frc.robot.CatzSubsystems.DriveAndRobotOrientation.drivetrain.DriveConstants.ModuleIDsAndCurrentLimits;
 
 import static frc.robot.CatzSubsystems.DriveAndRobotOrientation.drivetrain.DriveConstants.*;
 
@@ -37,17 +42,17 @@ public class ModuleIORealFoc implements ModuleIO {
   private final Rotation2d absoluteEncoderOffset;
 
   // Status Signals
-  private final StatusSignal<Double> drivePosition;
-  private final StatusSignal<Double> driveVelocity;
-  private final StatusSignal<Double> driveAppliedVolts;
-  private final StatusSignal<Double> driveSupplyCurrent;
-  private final StatusSignal<Double> driveTorqueCurrent;
+  private final StatusSignal<Angle> drivePosition;
+  private final StatusSignal<AngularVelocity> driveVelocity;
+  private final StatusSignal<Voltage> driveAppliedVolts;
+  private final StatusSignal<Current> driveSupplyCurrent;
+  private final StatusSignal<Current> driveTorqueCurrent;
 
-  private final StatusSignal<Double> steerPosition;
-  private final StatusSignal<Double> steerVelocity;
-  private final StatusSignal<Double> steerAppliedVolts;
-  private final StatusSignal<Double> steerSupplyCurrent;
-  private final StatusSignal<Double> steerTorqueCurrent;
+  private final StatusSignal<Angle> steerPosition;
+  private final StatusSignal<AngularVelocity> steerVelocity;
+  private final StatusSignal<Voltage> steerAppliedVolts;
+  private final StatusSignal<Current> steerSupplyCurrent;
+  private final StatusSignal<Current> steerTorqueCurrent;
 
   // Motor Configs
   private final TalonFXConfiguration driveTalonConfig = new TalonFXConfiguration();
@@ -61,13 +66,13 @@ public class ModuleIORealFoc implements ModuleIO {
   private final VelocityVoltage velocityVoltage = new VelocityVoltage(0).withUpdateFreqHz(0);
   private final PositionDutyCycle positionControl = new PositionDutyCycle(0).withUpdateFreqHz(0);
   private final NeutralOut neutralControl = new NeutralOut().withUpdateFreqHz(0);
-  private final PIDController steerFeedback = new PIDController(moduleGainsAndRatios.steerkP(), 0.0, moduleGainsAndRatios.steerkD());
+  private final PIDController steerFeedback = new PIDController(MODULE_GAINS_AND_RATIOS.steerkP(), 0.0, MODULE_GAINS_AND_RATIOS.steerkD());
 
   // Status Code Initialization
   private StatusCode initializationStatus = StatusCode.StatusCodeNotInitialized;
 
-  ModuleConfig m_config;
-  public ModuleIORealFoc(ModuleConfig config) {
+  ModuleIDsAndCurrentLimits m_config;
+  public ModuleIORealFoc(ModuleIDsAndCurrentLimits config) {
     m_config = config;
     // Init drive controllers from config constants
     driveTalon = new TalonFX(config.driveID());
@@ -82,10 +87,10 @@ public class ModuleIORealFoc implements ModuleIO {
     driveTalonConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
 
     // Gain Setting
-    driveTalonConfig.Slot0.kP = moduleGainsAndRatios.drivekP();
-    driveTalonConfig.Slot0.kD = moduleGainsAndRatios.drivekD();
-    driveTalonConfig.Slot0.kS = moduleGainsAndRatios.driveFFkS();
-    driveTalonConfig.Slot0.kV = moduleGainsAndRatios.driveFFkV();
+    driveTalonConfig.Slot0.kP = MODULE_GAINS_AND_RATIOS.drivekP();
+    driveTalonConfig.Slot0.kD = MODULE_GAINS_AND_RATIOS.drivekD();
+    driveTalonConfig.Slot0.kS = MODULE_GAINS_AND_RATIOS.driveFFkS();
+    driveTalonConfig.Slot0.kV = MODULE_GAINS_AND_RATIOS.driveFFkV();
 
     // Assign 100hz Signals
     drivePosition = driveTalon.getPosition();
@@ -122,8 +127,8 @@ public class ModuleIORealFoc implements ModuleIO {
     steerTalonConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake; //Change back to break
 
     // Gain Setting
-    steerTalonConfig.Slot0.kP = moduleGainsAndRatios.steerkP();
-    steerTalonConfig.Slot0.kD = moduleGainsAndRatios.steerkD();
+    steerTalonConfig.Slot0.kP = MODULE_GAINS_AND_RATIOS.steerkP();
+    steerTalonConfig.Slot0.kD = MODULE_GAINS_AND_RATIOS.steerkD();
 
     // Assign 100hz Signals
     steerPosition = steerTalon.getPosition();
@@ -190,7 +195,7 @@ public class ModuleIORealFoc implements ModuleIO {
     inputs.steerSupplyCurrentAmps = steerSupplyCurrent.getValueAsDouble();
     inputs.steerTorqueCurrentAmps = steerTorqueCurrent.getValueAsDouble();
 
-    inputs.odometryDrivePositionsMeters = new double[] {drivePosition.getValueAsDouble() * driveConfig.wheelRadius()};
+    inputs.odometryDrivePositionsMeters = new double[] {drivePosition.getValueAsDouble() * DRIVE_CONFIG.wheelRadius()};
     inputs.odometrySteerPositions = new Rotation2d[] {inputs.steerAbsPosition};
   }
 

@@ -5,11 +5,13 @@ import edu.wpi.first.networktables.StringArrayPublisher;
 import edu.wpi.first.networktables.StringPublisher;
 import java.util.Arrays;
 import org.littletonrobotics.junction.Logger;
-import org.littletonrobotics.junction.networktables.LoggedDashboardInput;
+import org.littletonrobotics.junction.networktables.LoggedNetworkInput;
 import org.littletonrobotics.junction.networktables.LoggedDashboardString;
+import org.littletonrobotics.junction.networktables.LoggedNetworkString;
+
 
 /** A string chooser for the dashboard where the options can be changed on-the-fly. */
-public class SwitchableChooser implements LoggedDashboardInput {
+public class SwitchableChooser extends LoggedNetworkInput {
   private static final String placeholder = "<NA>";
 
   private String[] options = new String[] {placeholder};
@@ -21,7 +23,7 @@ public class SwitchableChooser implements LoggedDashboardInput {
   private final StringPublisher defaultPublisher;
   private final StringPublisher activePublisher;
   private final StringPublisher selectedPublisher;
-  private final LoggedDashboardString selectedInput;
+  private final LoggedNetworkString selectedInput;
 
   public SwitchableChooser(String name) {
     var table = NetworkTableInstance.getDefault().getTable("SmartDashboard").getSubTable(name);
@@ -31,7 +33,7 @@ public class SwitchableChooser implements LoggedDashboardInput {
     defaultPublisher = table.getStringTopic("default").publish();
     activePublisher = table.getStringTopic("active").publish();
     selectedPublisher = table.getStringTopic("selected").publish();
-    selectedInput = new LoggedDashboardString(name + "/selected");
+    selectedInput = new LoggedNetworkString(name + "/selected");
     Logger.registerDashboardInput(this);
 
     namePublisher.set(name);

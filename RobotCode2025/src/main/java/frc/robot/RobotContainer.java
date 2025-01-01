@@ -120,7 +120,7 @@ public class RobotContainer {
     xboxDrv.start().onTrue(drive.cancelTrajectory());
 
     // Auto Driving
-    xboxDrv.y().onTrue(new FaceTarget(FieldConstants.Speaker.centerSpeakerOpening.toTranslation2d(), drive));
+   // xboxDrv.y().onTrue(new FaceTarget(FieldConstants.Speaker.centerSpeakerOpening.toTranslation2d(), drive));
     xboxDrv.b().onTrue(auto.autoFindPathAmp());
     xboxDrv.x().onTrue(auto.autoFindPathSpeaker());
 

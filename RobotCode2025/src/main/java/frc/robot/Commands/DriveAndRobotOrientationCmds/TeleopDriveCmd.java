@@ -9,6 +9,12 @@ import frc.robot.CatzSubsystems.DriveAndRobotOrientation.drivetrain.DriveConstan
 import frc.robot.Utilities.AllianceFlipUtil;
 
 import java.util.function.Supplier;
+
+import org.littletonrobotics.junction.Logger;
+
+import com.pathplanner.lib.util.DriveFeedforwards;
+
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj2.command.Command;
 
@@ -78,19 +84,17 @@ public class TeleopDriveCmd extends Command {
     }
 
     // Apply deadbands to prevent modules from receiving unintentional pwr due to joysticks having offset
-    m_headingAndVelocity_X =       Math.abs(m_headingAndVelocity_X) > XboxInterfaceConstants.kDeadband ? m_headingAndVelocity_X * DriveConstants.driveConfig.maxLinearVelocity(): 0.0;
-    m_headingAndVelocity_Y =       Math.abs(m_headingAndVelocity_Y) > XboxInterfaceConstants.kDeadband ? m_headingAndVelocity_Y * DriveConstants.driveConfig.maxLinearVelocity(): 0.0;
-    turningVelocity =              Math.abs(turningVelocity) > XboxInterfaceConstants.kDeadband ? turningVelocity * DriveConstants.driveConfig.maxAngularVelocity(): 0.0;
+    m_headingAndVelocity_X =       Math.abs(m_headingAndVelocity_X) > XboxInterfaceConstants.kDeadband ? m_headingAndVelocity_X * DriveConstants.DRIVE_CONFIG.maxLinearVelocity(): 0.0;
+    m_headingAndVelocity_Y =       Math.abs(m_headingAndVelocity_Y) > XboxInterfaceConstants.kDeadband ? m_headingAndVelocity_Y * DriveConstants.DRIVE_CONFIG.maxLinearVelocity(): 0.0;
+    turningVelocity =              Math.abs(turningVelocity) > XboxInterfaceConstants.kDeadband ? turningVelocity * DriveConstants.DRIVE_CONFIG.maxAngularVelocity(): 0.0;
 
     // Construct desired chassis speeds
     // Relative to field
-    chassisSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(
-      m_headingAndVelocity_X, 
-      m_headingAndVelocity_Y, 
-      turningVelocity, 
-      CatzRobotTracker.getInstance().getEstimatedPose().getRotation()
-    );
-
+    chassisSpeeds = ChassisSpeeds.fromRobotRelativeSpeeds(m_headingAndVelocity_X, 
+                                                          m_headingAndVelocity_Y, 
+                                                          turningVelocity, 
+                                                          CatzRobotTracker.getInstance().getEstimatedPose().getRotation());
+    
     // Send new chassisspeeds object to the drivetrain
     m_drivetrain.drive(chassisSpeeds);
   } //end of execute()
@@ -101,12 +105,9 @@ public class TeleopDriveCmd extends Command {
   // 
   //--------------------------------------------------------------------------------------
   public void debugLogsDrive(){
-    Logger.recordOutput("robot xspeed", xSpeed);
-    Logger.recordOutput("robot yspeed", ySpeed);
-    Logger.recordOutput("robot turnspeed", turningSpeed);
-    Logger.recordOutput("robot orientation", m_driveTrain.getRotation2d().getRadians());
-    Logger.recordOutput("chassisspeed x speed mtr sec", chassisSpeeds.vxMetersPerSecond);
-    Logger.recordOutput("chassisspeed y speed mtr sec", chassisSpeeds.vyMetersPerSecond);
+    Logger.recordOutput("Drive/robot orientation rad per sec", chassisSpeeds.omegaRadiansPerSecond);
+    Logger.recordOutput("Drive/chassisspeed x speed mtr sec", chassisSpeeds.vxMetersPerSecond);
+    Logger.recordOutput("Drive/chassisspeed y speed mtr sec", chassisSpeeds.vyMetersPerSecond);
   }
 
   //--------------------------------------------------------------------------------------

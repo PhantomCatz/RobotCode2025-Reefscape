@@ -1,17 +1,27 @@
 package frc.robot.CatzSubsystems.DriveAndRobotOrientation.drivetrain;
 
+import static frc.robot.CatzSubsystems.DriveAndRobotOrientation.drivetrain.DriveConstants.MODULE_GAINS_AND_RATIOS;
+
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.numbers.N1;
+import edu.wpi.first.math.numbers.N2;
+import edu.wpi.first.math.system.LinearSystem;
 import edu.wpi.first.math.system.plant.DCMotor;
+import edu.wpi.first.math.system.plant.LinearSystemId;
 import edu.wpi.first.math.util.Units;
-
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.simulation.DCMotorSim;
 import frc.robot.CatzConstants;
-import frc.robot.CatzSubsystems.DriveAndRobotOrientation.drivetrain.DriveConstants.ModuleConfig;
+import frc.robot.CatzSubsystems.DriveAndRobotOrientation.drivetrain.DriveConstants.ModuleIDsAndCurrentLimits;
 public class ModuleIOSim implements ModuleIO {
-  private final DCMotorSim driveSim = new DCMotorSim(DCMotor.getKrakenX60Foc(1), DriveConstants.moduleGainsAndRatios.driveReduction(), 0.025);
-  private final DCMotorSim steerSim = new DCMotorSim(DCMotor.getKrakenX60Foc(1), DriveConstants.moduleGainsAndRatios.steerReduction(), 0.004);
+  private final LinearSystem<N2, N1, N2> plantDrive = LinearSystemId.createDCMotorSystem(DCMotor.getKrakenX60(1), 0.025, MODULE_GAINS_AND_RATIOS.driveReduction());
+  private final LinearSystem<N2, N1, N2> plantSteer = LinearSystemId.createDCMotorSystem(DCMotor.getKrakenX60(1), 0.004, MODULE_GAINS_AND_RATIOS.steerReduction());
+
+  private final DCMotorSim driveSim = new DCMotorSim(plantDrive, DCMotor.getKrakenX60Foc(1), DriveConstants.MODULE_GAINS_AND_RATIOS.driveReduction());
+  private final DCMotorSim steerSim = new DCMotorSim(plantSteer, DCMotor.getKrakenX60Foc(1), DriveConstants.MODULE_GAINS_AND_RATIOS.steerReduction());
 
   private final PIDController driveFeedback = new PIDController(0.1, 0.0, 0.0, CatzConstants.LOOP_TIME);
   private final PIDController steerFeedback = new PIDController(10.0, 0.0, 0.0, CatzConstants.LOOP_TIME);
@@ -23,7 +33,7 @@ public class ModuleIOSim implements ModuleIO {
   private boolean driveCoast = false;
   private SlewRateLimiter driveVoltsLimiter = new SlewRateLimiter(2.5);
 
-  public ModuleIOSim(ModuleConfig config) {
+  public ModuleIOSim(ModuleIDsAndCurrentLimits config) {
     steerAbsoluteInitPosition = Rotation2d.fromRadians(Units.rotationsToRadians(config.absoluteEncoderOffset()));
     steerFeedback.enableContinuousInput(-Math.PI, Math.PI);
   }
@@ -52,7 +62,7 @@ public class ModuleIOSim implements ModuleIO {
     inputs.steerSupplyCurrentAmps = Math.abs(steerSim.getCurrentDrawAmps());
 
     inputs.odometryDrivePositionsMeters =
-        new double[] {driveSim.getAngularPositionRad() * DriveConstants.driveConfig.wheelRadius()};
+        new double[] {driveSim.getAngularPositionRad() * DriveConstants.DRIVE_CONFIG.wheelRadius()};
     inputs.odometrySteerPositions =
         new Rotation2d[] {Rotation2d.fromRadians(steerSim.getAngularPositionRad())};
 

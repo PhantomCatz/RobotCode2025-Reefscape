@@ -51,8 +51,8 @@ public class Alert {
   }
 
   public Alert(String text, AlertType type, boolean isOnStateChange) {
-    this.isOnStateChange = isOnStateChange;
     this("Alerts", text, type);
+    this.isOnStateChange = isOnStateChange;
   }
 
   /**
@@ -197,12 +197,6 @@ public class Alert {
      * which do not fall under "ERROR" or "WARNING".
      */
     INFO
-  }
-
-  public static enum AlertPriority {
-    ONE, // Includes only critical Error Alerts
-    TWO,  // Includes critical Error and Warning Alerts
-    THREE, // Includes Critical Error, Warning, and Info Alerts
   }
 
 }

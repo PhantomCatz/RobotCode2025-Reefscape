@@ -30,6 +30,7 @@ import edu.wpi.first.networktables.StringSubscriber;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.RobotController;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import frc.robot.CatzConstants.AllianceColor;
@@ -41,7 +42,6 @@ import frc.robot.CatzSubsystems.LEDs.CatzLED;
 import frc.robot.Commands.ControllerModeAbstraction;
 import frc.robot.Utilities.Alert;
 import frc.robot.Utilities.AllianceFlipUtil;
-import frc.robot.Utilities.NoteVisualizer;
 import frc.robot.Utilities.VirtualSubsystem;
 import frc.robot.Utilities.Alert.AlertType;
 import lombok.Getter;
@@ -67,6 +67,8 @@ public class Robot extends LoggedRobot {
   // Can Error Detection variables
   private static final double CAN_ERROR_TIME_THRESHOLD = 0.5; // Seconds to disable alert //TODO
   private static final double CANIVORE_ERROR_TIME_THRESHOLD = 0.5;
+  private static final double LOW_BATTERY_VOLTAGE = 11.8;
+  private static final double LOW_BATTERY_DISABLED_TIME = 1.5;
 
   // Timer related variables
   private double teleStart;
@@ -87,18 +89,18 @@ public class Robot extends LoggedRobot {
   private final Alert sameBatteryAlert = new Alert("The battery has not been changed since the last match.", AlertType.WARNING);
 
   // Garbage Collection Alerts
-  private final Alert gcAlert = new Alert("Please wait to enable, collecting garbage. 🗑️", AlertType.WARNING); //TODO reconfigure on time 
+  private final Alert GC_COLLECTION_ALERT = new Alert("Please wait to enable, collecting garbage. 🗑️", AlertType.WARNING); //TODO reconfigure on time 
   private int garbageCollectionCounter = 0;
 
   // DriverStation related alerts
-  private final Alert driverStationDisconnectAlert = new Alert("Driverstation is not online, alliance selection will not work", AlertType.ERROR);
-  private final Alert fmsDisconnectAlert = new Alert("fms is offline, robot cannot compete in match", AlertType.ERROR);
+  private final Alert DS_DISCONNECT_ALERT = new Alert("Driverstation is not online, alliance selection will not work", AlertType.ERROR);
+  private final Alert FMS_DISCONNECT_ALERT = new Alert("fms is offline, robot cannot compete in match", AlertType.ERROR);
 
   // Last deployment logging
   Date date = Calendar.getInstance().getTime();	
   SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd kk.mm.ss");;
   String dateFormatted = sdf.format(date);
-  private final Alert lastDeploymentAlert = new Alert("Last Deployment: " + dateFormatted , AlertType.INFO);
+  private final Alert LAST_DEPLOYMENT_WARNING = new Alert("Last Deployment: " + dateFormatted , AlertType.INFO);
 
   // reset Position Logging
   public static boolean isResetPositionUsedInAuto = false;
@@ -272,8 +274,8 @@ public class Robot extends LoggedRobot {
     if (DriverStation.isEnabled()) {
       DISABLED_TIMER.reset();
     }
-    if (RobotController.getBatteryVoltage() <= lowBatteryVoltage
-        && DISABLED_TIMER.hasElapsed(lowBatteryDisabledTime)) {
+    if (RobotController.getBatteryVoltage() <= LOW_BATTERY_VOLTAGE
+        && DISABLED_TIMER.hasElapsed(LOW_BATTERY_DISABLED_TIME)) {
       lowBatteryAlert.set(true);
       CatzLED.getInstance().lowBatteryAlert = true;
     }
@@ -296,14 +298,14 @@ public class Robot extends LoggedRobot {
   @Override
   public void disabledPeriodic() {
     // Driver Station Alerts
-    driverStationDisconnectAlert.set(!DriverStation.isDSAttached());
-    fmsDisconnectAlert.set(!DriverStation.isFMSAttached());
+    DS_DISCONNECT_ALERT.set(!DriverStation.isDSAttached());
+    FMS_DISCONNECT_ALERT.set(!DriverStation.isFMSAttached());
 
     // deployment benchmark
-    lastDeploymentAlert.set(false);
+    LAST_DEPLOYMENT_WARNING.set(false);
 
     // Garbage Collection alert
-    gcAlert.set(Timer.getFPGATimestamp() < 45.0);
+    GC_COLLECTION_ALERT.set(Timer.getFPGATimestamp() < 45.0);
     if((garbageCollectionCounter > 5*60*4)) { // 1 second * 60sec * 4 min
       System.gc();
       garbageCollectionCounter = 0;
@@ -326,14 +328,13 @@ public class Robot extends LoggedRobot {
   @Override
   public void autonomousInit() {
     // deployment benchmark
-    lastDeploymentAlert.set(true);
+    LAST_DEPLOYMENT_WARNING.set(true);
     autoStart = Timer.getFPGATimestamp();
     m_autonomousCommand = m_robotContainer.getAutonomousCommand();
 
     if (m_autonomousCommand != null) {
       m_autonomousCommand.schedule();
     }
-    NoteVisualizer.resetAutoNotes();
   }
 
 
@@ -341,7 +342,6 @@ public class Robot extends LoggedRobot {
   @Override
   public void autonomousPeriodic() {
     autoElapsedTime = Timer.getFPGATimestamp() - autoStart;
-    NoteVisualizer.showAutoNotes();
 
   }
 
@@ -359,7 +359,7 @@ public class Robot extends LoggedRobot {
   @Override
   public void teleopInit() {
     // deployment benchmark
-    lastDeploymentAlert.set(true);
+    LAST_DEPLOYMENT_WARNING.set(true);
     if (m_autonomousCommand != null) {
       m_autonomousCommand.cancel();
     }

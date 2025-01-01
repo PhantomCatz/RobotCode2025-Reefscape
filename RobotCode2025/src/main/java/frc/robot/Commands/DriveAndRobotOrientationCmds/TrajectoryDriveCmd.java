@@ -11,12 +11,17 @@ import java.util.Set;
 
 import org.littletonrobotics.junction.Logger;
 
+import com.pathplanner.lib.commands.PathPlannerAuto;
+import com.pathplanner.lib.events.EventScheduler;
 import com.pathplanner.lib.path.EventMarker;
 import com.pathplanner.lib.path.GoalEndState;
 import com.pathplanner.lib.path.PathConstraints;
 import com.pathplanner.lib.path.PathPlannerPath;
-import com.pathplanner.lib.path.PathPlannerTrajectory;
-import com.pathplanner.lib.path.PathPlannerTrajectory.State;
+import com.pathplanner.lib.trajectory.PathPlannerTrajectory;
+import com.pathplanner.lib.trajectory.PathPlannerTrajectoryState;
+import com.pathplanner.lib.util.DriveFeedforwards;
+import com.pathplanner.lib.util.PPLibTelemetry;
+import com.pathplanner.lib.util.PathPlannerLogging;
 
 import edu.wpi.first.math.Pair;
 import edu.wpi.first.math.controller.HolonomicDriveController;
@@ -71,6 +76,7 @@ public class TrajectoryDriveCmd extends Command {
     private Timer timer = new Timer();
 
     // Event Command variables
+    private final EventScheduler eventScheduler;
     private final Map<Command, Boolean> currentEventCommands = new HashMap();
     private final List<Pair<Double, Command>> untriggeredEvents = new ArrayList();
     private boolean isEventCommandRunning = false;
@@ -84,16 +90,19 @@ public class TrajectoryDriveCmd extends Command {
     // 
     //---------------------------------------------------------------------------------------------
     public TrajectoryDriveCmd(PathPlannerPath newPath, CatzDrivetrain drivetrain) {
-        path = newPath;
-        m_driveTrain = drivetrain;
+        this.path = newPath;
+        this.m_driveTrain = drivetrain;
+        this.eventScheduler = new EventScheduler();
+
         addRequirements(m_driveTrain);
 
-        Iterator var10 = this.path.getEventMarkers().iterator();
-        while(var10.hasNext()) {
-            EventMarker marker = (EventMarker)var10.next();
-            Set<Subsystem> reqs = marker.getCommand().getRequirements();
-            this.m_requirements.addAll(reqs);
+        // Add all event scheduler requirements to this command's requirements
+        var eventReqs = EventScheduler.getSchedulerRequirements(this.path);
+        if (!Collections.disjoint(Set.of(m_driveTrain), eventReqs)) {
+        throw new IllegalArgumentException(
+            "Events that are triggered during path following cannot require the drive subsystem");
         }
+        addRequirements(eventReqs);
     }
 
     //---------------------------------------------------------------------------------------------
@@ -111,20 +120,22 @@ public class TrajectoryDriveCmd extends Command {
 
         // Construct trajectory
         this.trajectory = new PathPlannerTrajectory(
-            usePath, 
+            usePath,
             DriveConstants.
-                swerveDriveKinematics.
+                SWERVE_KINEMATICS.
                     toChassisSpeeds(tracker.getCurrentModuleStates()),
-            tracker.getEstimatedPose().getRotation()
+            tracker.getEstimatedPose().getRotation(),
+            DriveConstants.TRAJECTORY_CONFIG
         );
 
         hocontroller = DriveConstants.getNewHolController();                                
         pathTimeOut = trajectory.getTotalTimeSeconds() * TIMEOUT_SCALAR; //TODO do we still need this
 
         // Reset
-        this.currentEventCommands.clear();
-        this.untriggeredEvents.clear();
-        this.untriggeredEvents.addAll(this.trajectory.getEventCommands());
+        PathPlannerLogging.logActivePath(path);
+        PPLibTelemetry.setCurrentPath(path);
+
+        eventScheduler.initialize(trajectory);
         this.timer.reset();
         this.timer.start();
     } //end of initialize()
@@ -137,13 +148,16 @@ public class TrajectoryDriveCmd extends Command {
     @Override
     public void execute() {
         double currentTime = this.timer.get();
+        // Getters from pathplanner and current robot pose
+        PathPlannerTrajectoryState goal = trajectory.sample(Math.min(currentTime, trajectory.getTotalTimeSeconds()));
+        Rotation2d targetOrientation     = goal.heading;
+        Pose2d currentPose               = tracker.getEstimatedPose();
+        ChassisSpeeds currentSpeeds = DriveConstants.SWERVE_KINEMATICS.toChassisSpeeds(m_driveTrain.getModuleStates());
+        double currentVel =
+            Math.hypot(currentSpeeds.vxMetersPerSecond, currentSpeeds.vyMetersPerSecond);
 
         // Trajectory Executor
         if(!atTarget){
-            // Getters from pathplanner and current robot pose
-            PathPlannerTrajectory.State goal = trajectory.sample(Math.min(currentTime, trajectory.getTotalTimeSeconds()));
-            Rotation2d targetOrientation     = goal.targetHolonomicRotation;
-            Pose2d currentPose               = tracker.getEstimatedPose();
                 
             //-------------------------------------------------------------------------------------
             // Convert PP trajectory into a wpilib trajectory type 
@@ -153,61 +167,42 @@ public class TrajectoryDriveCmd extends Command {
             //-------------------------------------------------------------------------------------
             Trajectory.State state = new Trajectory.State(
                 currentTime, 
-                goal.velocityMps,  //made the 
-                goal.accelerationMpsSq, 
-                new Pose2d(goal.positionMeters, goal.heading),
-                goal.curvatureRadPerMeter
+                goal.linearVelocity,  //made the 
+                goal.linearVelocity/goal.timeSeconds, //TODO verify if this does what we want it to do 
+                goal.pose,
+                0.0
             );
     
             //construct chassisspeeds
             ChassisSpeeds adjustedSpeeds = hocontroller.calculate(currentPose, state, targetOrientation);
+            ChassisSpeeds ppAdjustedSpeeds = DriveConstants.getNewPathFollowingController().calculateRobotRelativeSpeeds(currentPose, goal);
+
 
             //send to drivetrain
             m_driveTrain.drive(adjustedSpeeds);
-            tracker.addTrajectorySetpointData(goal.getTargetHolonomicPose());
+            tracker.addTrajectorySetpointData(goal.pose);
 
             // Log desired pose
-            Logger.recordOutput("CatzRobotTracker/Desired Auto Pose", new Pose2d(state.poseMeters.getTranslation(), goal.targetHolonomicRotation));
+            Logger.recordOutput("CatzRobotTracker/Desired Auto Pose", new Pose2d(state.poseMeters.getTranslation(), goal.heading));
         }
         else{
             m_driveTrain.stopDriving();
         } // End of if(!atTarget) else
         
-        //-------------------------------------------------------------------------------------
-        // TODO how does this work?
-        //-------------------------------------------------------------------------------------
-        if (!this.untriggeredEvents.isEmpty() && this.timer.hasElapsed((Double)((Pair)this.untriggeredEvents.get(0)).getFirst())) {
-            Pair<Double, Command> event = (Pair)this.untriggeredEvents.remove(0);
-            Iterator var10 = this.currentEventCommands.entrySet().iterator();
-   
-            while(var10.hasNext()) {
-               Map.Entry<Command, Boolean> runningCommand = (Map.Entry)var10.next();
-               if ((Boolean)runningCommand.getValue() && !Collections.disjoint(((Command)runningCommand.getKey()).getRequirements(), ((Command)event.getSecond()).getRequirements())) {
-                  ((Command)runningCommand.getKey()).end(true);
-                  runningCommand.setValue(false);
-               }
-            }
-   
-            ((Command)event.getSecond()).initialize();
-            this.currentEventCommands.put((Command)event.getSecond(), true);
-            isEventCommandRunning = true;
-         } // end of if (!this.untriggeredEvents.isEmpty())
-   
-        //-------------------------------------------------------------------------------------
-        // TODO how does this work?
-        //-------------------------------------------------------------------------------------
-        Iterator var13 = this.currentEventCommands.entrySet().iterator();
-        while(var13.hasNext()) {
-            Map.Entry<Command, Boolean> runningCommand = (Map.Entry)var13.next();
-            if ((Boolean)runningCommand.getValue()) {
-                ((Command)runningCommand.getKey()).execute();
-                if (((Command)runningCommand.getKey()).isFinished()) {
-                    ((Command)runningCommand.getKey()).end(false);
-                    runningCommand.setValue(false);
-                    isEventCommandRunning = false;
-                }
-            }
-        } // end of while(var13.hasNext()) 
+
+        eventScheduler.execute(currentTime);
+
+        PPLibTelemetry.setCurrentPose(currentPose);
+        PathPlannerLogging.logCurrentPose(currentPose);
+    
+        PPLibTelemetry.setTargetPose(goal.pose);
+        PathPlannerLogging.logTargetPose(goal.pose);
+    
+        PPLibTelemetry.setVelocities(
+            currentVel,
+            goal.linearVelocity,
+            currentSpeeds.omegaRadiansPerSecond,
+            goal.heading.getRadians());
     } //end of execute
 
     //---------------------------------------------------------------------------------------------
@@ -230,23 +225,30 @@ public class TrajectoryDriveCmd extends Command {
         timer.stop(); // Stop timer
         m_driveTrain.stopDriving();
         System.out.println("trajectory done");
+
+        timer.stop();
+        PathPlannerAuto.currentPathName = "";
+        PathPlannerAuto.setCurrentTrajectory(null);
+        PathPlannerLogging.logActivePath(null);
+
+        eventScheduler.end();
     }
 
     @Override
     public boolean isFinished() {
         // Finish command if the total time the path takes is over
-        State endState = trajectory.getEndState();
+        PathPlannerTrajectoryState endState = trajectory.getEndState();
 
         double currentPosX =        tracker.getEstimatedPose().getX();
         double currentPosY =        tracker.getEstimatedPose().getY();
         double currentRotation =    tracker.getEstimatedPose().getRotation().getDegrees();
 
-        double desiredPosX =        endState.positionMeters.getX();
-        double desiredPosY =        endState.positionMeters.getY();
-        double desiredRotation =    endState.targetHolonomicRotation.getDegrees();
+        double desiredPosX =        endState.pose.getX();
+        double desiredPosY =        endState.pose.getY();
+        double desiredRotation =    endState.pose.getRotation().getDegrees();
 
         //Another condition to end trajectory. If end target velocity is zero, then only stop if the robot velocity is also near zero so it doesn't run over its target.
-        double desiredMPS = trajectory.getEndState().velocityMps;
+        double desiredMPS = trajectory.getEndState().linearVelocity;
         ChassisSpeeds currentChassisSpeeds = tracker.getRobotChassisSpeeds();
         double currentMPS = Math.hypot(Math.hypot(currentChassisSpeeds.vxMetersPerSecond, currentChassisSpeeds.vyMetersPerSecond), currentChassisSpeeds.omegaRadiansPerSecond);
 

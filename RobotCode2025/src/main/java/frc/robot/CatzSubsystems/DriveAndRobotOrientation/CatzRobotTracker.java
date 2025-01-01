@@ -8,7 +8,6 @@ import edu.wpi.first.math.geometry.*;
 import edu.wpi.first.math.interpolation.*;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
-import edu.wpi.first.math.kinematics.SwerveDriveWheelPositions;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.numbers.N1;
@@ -23,7 +22,6 @@ import frc.robot.CatzSubsystems.DriveAndRobotOrientation.drivetrain.DriveConstan
 import frc.robot.Utilities.AllianceFlipUtil;
 import frc.robot.Utilities.GeomUtil;
 import frc.robot.Utilities.LoggedTunableNumber;
-import frc.robot.Utilities.NoteVisualizer;
 
 import java.util.NoSuchElementException;
 import java.util.Optional;
@@ -35,7 +33,7 @@ import lombok.experimental.ExtensionMethod;
 import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 
-import com.google.flatbuffers.Constants;
+import com.pathplanner.lib.util.DriveFeedforwards;
 
 
 @ExtensionMethod({GeomUtil.class})
@@ -43,8 +41,6 @@ public class CatzRobotTracker {
 
   private static final LoggedTunableNumber autoLookahead = new LoggedTunableNumber("CatzRobotTracker/AutoLookahead", 0.5);
   private static final LoggedTunableNumber lookahead = new LoggedTunableNumber("CatzRobotTracker/lookaheadS", 0.35);
-  private static final LoggedTunableNumber superPoopLookahead = new LoggedTunableNumber("CatzRobotTracker/SuperPoopLookahead", 0.1);
-  private static final LoggedTunableNumber closeShootingZoneFeet = new LoggedTunableNumber("CatzRobotTracker/CloseShootingZoneFeet", 10.0);
 
   private static final double poseBufferSizeSeconds = 2.0;
 
@@ -77,15 +73,13 @@ public class CatzRobotTracker {
 
   // Odometry
   private final SwerveDriveKinematics kinematics;
-  private SwerveDriveWheelPositions lastWheelPositions =
-      new SwerveDriveWheelPositions(
-          new SwerveModulePosition[] {
-            new SwerveModulePosition(),
-            new SwerveModulePosition(),
-            new SwerveModulePosition(),
-            new SwerveModulePosition()
-          }
-  );
+  private SwerveModulePosition[] lastWheelPositions =
+            new SwerveModulePosition[] {
+              new SwerveModulePosition(),
+              new SwerveModulePosition(),
+              new SwerveModulePosition(),
+              new SwerveModulePosition()
+            };
   @Getter private SwerveModuleState[] currentModuleStates = 
       new SwerveModuleState[] {
         new SwerveModuleState(), 
@@ -93,6 +87,7 @@ public class CatzRobotTracker {
         new SwerveModuleState(), 
         new SwerveModuleState()
   };
+
   private Rotation2d lastGyroAngle = new Rotation2d();
   private Twist2d robotVelocity = new Twist2d();
   private Twist2d robotAccelerations = new Twist2d();
@@ -109,10 +104,10 @@ public class CatzRobotTracker {
     for (int i = 0; i < 3; ++i) {
       qStdDevs.set(i, 0, Math.pow(odometryStateStdDevs.get(i, 0), 2));
     }
-    kinematics = DriveConstants.swerveDriveKinematics;
+    kinematics = DriveConstants.SWERVE_KINEMATICS;
 
-    // Setup NoteVisualizer
-    NoteVisualizer.setRobotPoseSupplier(this::getEstimatedPose);
+    // Setup gamepiece Visualizer
+    //NoteVisualizer.setRobotPoseSupplier(this::getEstimatedPose);
   }
 
   //------------------------------------------------------------------------------------------------------
@@ -211,6 +206,10 @@ public class CatzRobotTracker {
     this.robotVelocity = robotVelocity;
   }
 
+  public void addFeedFowardData() {
+
+  }
+
   public void addTrajectoryVelocityData(Twist2d robotVelocity) {
     trajectoryVelocity = robotVelocity;
   }
@@ -282,7 +281,7 @@ public class CatzRobotTracker {
    * 
    *******************************************************************/
   public record OdometryObservation(
-      SwerveDriveWheelPositions wheelPositions, SwerveModuleState[] moduleStates, Rotation2d gyroAngle, double timestamp) {}
+      SwerveModulePosition[] wheelPositions, SwerveModuleState[] moduleStates, Rotation2d gyroAngle, double timestamp) {}
 
   public record VisionObservation(Pose2d visionPose, double timestamp, Matrix<N3, N1> stdDevs) {}
 
