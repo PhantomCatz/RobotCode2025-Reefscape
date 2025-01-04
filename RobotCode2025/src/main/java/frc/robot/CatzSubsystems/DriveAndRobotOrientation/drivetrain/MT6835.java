@@ -1,7 +1,6 @@
 package frc.robot.CatzSubsystems.DriveAndRobotOrientation.drivetrain;
 
 import edu.wpi.first.wpilibj.CAN;
-import edu.wpi.first.wpilibj2.*;
 import edu.wpi.first.hal.CANData;
 
 public class MT6835 {

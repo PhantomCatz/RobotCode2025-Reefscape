@@ -1,5 +1,7 @@
 package frc.robot.CatzSubsystems.DriveAndRobotOrientation.drivetrain;
 
+import static frc.robot.CatzSubsystems.DriveAndRobotOrientation.drivetrain.DriveConstants.DRIVE_CONFIG;
+
 import com.pathplanner.lib.config.ModuleConfig;
 import com.pathplanner.lib.config.PIDConstants;
 import com.pathplanner.lib.config.RobotConfig;
@@ -46,10 +48,6 @@ public class DriveConstants {
     private static final double kA_ANGULAR_ACCEL = 0.0;
     private static final double kA_LINEAR_ACCEL = 0.0;
 
-    public static final double ROBOT_MASS          = 68.0;
-    public static final double ROBOT_MOI           = ROBOT_MASS * (2/2) * (kA_ANGULAR_ACCEL/kA_LINEAR_ACCEL); // TBD verify
-    public static final double TREAD_COEF_FRICTION = 1.542;
-
     public static final DriveConfig DRIVE_CONFIG =
     switch (CatzConstants.getRobotType()) {
       case SN_TEST, SN2 ->
@@ -60,7 +58,7 @@ public class DriveConstants {
               .bumperWidthX(Units.inchesToMeters(37))
               .bumperWidthY(Units.inchesToMeters(33))
               .maxLinearVelocity(Units.feetToMeters(17))
-              .maxLinearAcceleration(Units.feetToMeters(75.0)) 
+              .maxLinearAcceleration(Math.pow(Units.feetToMeters(17), 2)) 
               .maxAngularVelocity(Units.degreesToRadians(600)) // Radians
               .maxAngularAcceleration(Units.degreesToRadians(600)) // Radians // TODO verify angle constraints
               .build();
@@ -183,10 +181,25 @@ public class DriveConstants {
             new Translation2d( DRIVE_CONFIG.robotLengthX(), -DRIVE_CONFIG.robotWidthY()).div(2.0)     //RT FRONT
         };    
 
+    private static final Translation2d[] TRAJECTORY_MODULE_TRANSLATIONS = 
+        new Translation2d[] {
+            new Translation2d( DRIVE_CONFIG.robotLengthX() , DRIVE_CONFIG.robotWidthY()).div(2.0),    //LT FRONT
+            new Translation2d( DRIVE_CONFIG.robotLengthX(), -DRIVE_CONFIG.robotWidthY()).div(2.0),    //RT FRONT
+            new Translation2d(-DRIVE_CONFIG.robotLengthX() , DRIVE_CONFIG.robotWidthY()).div(2.0),    //LT BACK
+            new Translation2d(-DRIVE_CONFIG.robotLengthX(), -DRIVE_CONFIG.robotWidthY()).div(2.0),    //RT BACK
+        }; 
+
     // calculates the orientation and speed of individual swerve modules when given
     // the motion of the whole robot
+    public static final SwerveDriveKinematics TRAJECTORY_SWERVE_KINEMATICS = new SwerveDriveKinematics(TRAJECTORY_MODULE_TRANSLATIONS);
     public static final SwerveDriveKinematics SWERVE_KINEMATICS = new SwerveDriveKinematics(MODULE_TRANSLATIONS);
 
+
+    //-----------------------------------------------------------------------------------------------------------------------------
+    //
+    //      Trajectory Helpers
+    //
+    //-----------------------------------------------------------------------------------------------------------------------------
     public static HolonomicDriveController getNewHolController(){
         return new HolonomicDriveController(
             new PIDController(10.0, 0.0, 0.1), 
@@ -205,21 +218,28 @@ public class DriveConstants {
             0.02
         );
     }
+
+    public static final PathFollowingController PATH_FOLLOWING_CONTROLLER = getNewPathFollowingController();
+
+    public static final double ROBOT_MASS          = 68.0;
+    public static final double ROBOT_MOI           = (1/12) * ROBOT_MASS * (Math.pow(DRIVE_CONFIG.bumperWidthX(), 2) + Math.pow(DRIVE_CONFIG.bumperWidthY(), 2));//ROBOT_MASS * (2/2) * (kA_ANGULAR_ACCEL/kA_LINEAR_ACCEL); // TODO need to recaculate with formula on Pathplanner
+    public static final double TREAD_COEF_FRICTION = 1.542;
     
     public static final ModuleConfig TRAJECTORY_MODULE_CONFIG = new ModuleConfig(
                                                                         DRIVE_CONFIG.wheelRadius(),
                                                                         DRIVE_CONFIG.maxLinearVelocity() / 2, 
                                                                         TREAD_COEF_FRICTION, 
-                                                                        DCMotor.getKrakenX60(1), 
+                                                                        DCMotor.getKrakenX60(1)
+                                                                                .withReduction(MODULE_GAINS_AND_RATIOS.driveReduction), 
                                                                         DRIVE_CURRENT_LIMIT, 
-                                                                        4
+                                                                        1
     );
 
     public static final RobotConfig TRAJECTORY_CONFIG = new RobotConfig(
                                                                 ROBOT_MASS,
                                                                 ROBOT_MOI,
                                                                 TRAJECTORY_MODULE_CONFIG,
-                                                                MODULE_TRANSLATIONS
+                                                                TRAJECTORY_MODULE_TRANSLATIONS
     );
 
 

@@ -21,6 +21,7 @@ import java.util.function.BooleanSupplier;
 
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
 import com.pathplanner.lib.auto.AutoBuilder;
@@ -31,6 +32,7 @@ import com.pathplanner.lib.path.EventMarker;
 import com.pathplanner.lib.path.GoalEndState;
 import com.pathplanner.lib.path.PathPlannerPath;
 import com.pathplanner.lib.trajectory.PathPlannerTrajectory;
+import com.pathplanner.lib.util.FileVersionException;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -65,10 +67,10 @@ import frc.robot.Utilities.VirtualSubsystem;
 
 /*********************************************************************************
  * 
- * 
+ *   Autonomous class housing all autonomous routines and related functions
  * 
  *********************************************************************************/
-public class CatzAutonomous extends VirtualSubsystem{
+public class CatzAutonomousInternal extends VirtualSubsystem{
     private final int MAX_QUESTIONS = 5;
     private static final AutoProgram defaultRoutine =
                 new AutoProgram("Do Nothing", List.of(), Commands.none());
@@ -89,7 +91,7 @@ public class CatzAutonomous extends VirtualSubsystem{
 
     private RobotContainer m_container;
 
-    public CatzAutonomous(RobotContainer container) {
+    public CatzAutonomousInternal(RobotContainer container) {
         this.m_container = container;
         autoProgramChooser.addDefaultOption(defaultRoutine.name(), defaultRoutine);
         lastRoutine = defaultRoutine;
@@ -132,24 +134,29 @@ public class CatzAutonomous extends VirtualSubsystem{
             container.getCatzDrivetrain()
         );
         
-        // //------------------------------------------------------------------------------------------------------------
-        // // Path Configuration
-        // //------------------------------------------------------------------------------------------------------------ //TODO issues with string conversions
+        //------------------------------------------------------------------------------------------------------------
+        // Path Configuration
+        //------------------------------------------------------------------------------------------------------------ //TODO issues with string conversions
         // for(File pathFile : choreoPathsDirectory.listFiles()){
         //     //to get rid of the extensions trailing the path names
-        //     String pathName = pathFile.getName().replaceFirst("[.][^.]+$", ""); 
+        //     String pathName = pathFile.getName().replaceFirst("[.][^.]+$", "");
         //     PathPlannerPath path = PathPlannerPath.fromChoreoTrajectory(pathName);
         //     choreoPaths.put(pathName, new TrajectoryDriveCmd(path, container.getCatzDrivetrain()));
         // }
         // NamedCommands.registerCommands(choreoPaths);
 
-        // for(File pathFile : pathplannerPathsDirectory.listFiles()){
-        //     //to get rid of the extensions trailing the path names
-        //     String pathName = pathFile.getName().replaceFirst("[.][^.]+$", ""); 
-        //     PathPlannerPath path = PathPlannerPath.fromPathFile(pathName);
-        //     pathplannerPaths.put(pathName, new TrajectoryDriveCmd(path, container.getCatzDrivetrain()));
-        // }
-        // NamedCommands.registerCommands(pathplannerPaths);
+        for(File pathFile : pathplannerPathsDirectory.listFiles()){
+            //to get rid of the extensions trailing the path names
+            String pathName = pathFile.getName().replaceFirst("[.][^.]+$", ""); 
+            PathPlannerPath path;
+            try {
+                path = PathPlannerPath.fromPathFile(pathName);
+                pathplannerPaths.put(pathName, new TrajectoryDriveCmd(path, container.getCatzDrivetrain()));
+            } catch (FileVersionException | IOException | ParseException e) {
+                e.printStackTrace();
+            }
+        }
+        NamedCommands.registerCommands(pathplannerPaths);
         
         addProgram("Speaker",  
             List.of(
@@ -225,7 +232,7 @@ public class CatzAutonomous extends VirtualSubsystem{
     //
     //---------------------------------------------------------------------------------------------------------
     /** Registers a new auto routine that can be selected. */
-    private void addRoutine(String name, Command command) {
+    private void addProgram(String name, Command command) {
         addProgram(name, List.of(), command);
     }
 
@@ -248,20 +255,30 @@ public class CatzAutonomous extends VirtualSubsystem{
     //---------------------------------------------------------------------------------------------------------
     public Command speakerSideAuto() {
         HashMap<AutoQuestionResponse, Command> startingChoices = new HashMap<>();
-        startingChoices.put(AutoQuestionResponse.AMP, NamedCommands.getCommand("Wing Scoring 1"));
+        startingChoices.put(AutoQuestionResponse.AMP, NamedCommands.getCommand("Example Path"));
         startingChoices.put(AutoQuestionResponse.CENTER, NamedCommands.getCommand("Wing Scoring 2"));
 
 
 
         return Commands.sequence(
+            Commands.select(
+                Map.of(
+                    AutoQuestionResponse.SOURCE,
+                    resetPose(new Pose2d()),
+                    AutoQuestionResponse.CENTER,
+                    resetPose(new Pose2d()),
+                    AutoQuestionResponse.AMP,
+                    resetPose(new Pose2d(2,5, Rotation2d.fromDegrees(0)))
+                ),
+                () -> lastResponses.get(0) // Starting location
+            ),
             Commands.select(startingChoices, () -> lastResponses.get(0)));
     }
 
 
-
     //---------------------------------------------------------------------------------------------------------
     //
-    //          Characteration Routines
+    //          Characterization Routines
     //
     //---------------------------------------------------------------------------------------------------------
 
@@ -335,8 +352,7 @@ public class CatzAutonomous extends VirtualSubsystem{
     //
     //---------------------------------------------------------------------------------------------------------
     /** A customizable auto routine associated with a single command. */
-    private static final record AutoProgram(
-        String name, List<AutoQuestion> questions, Command command) {}
+    private static final record AutoProgram(String name, List<AutoQuestion> questions, Command command) {}
 
     /** A question to ask for customizing an auto routine. */
     public static record AutoQuestion(String question, List<AutoQuestionResponse> responses) {}

@@ -2,17 +2,13 @@ plugins {
     id "java"
     id "edu.wpi.first.GradleRIO" version "2025.1.1-beta-3"
     id "com.peterabeles.gversion" version "1.10"
-    id "com.diffplug.spotless" version "6.25.0"
     id "io.freefair.lombok" version "8.4"
 }
-
-def grpcVersion = '1.61.0' // CURRENT_GRPC_VERSION
 
 java {
     sourceCompatibility = JavaVersion.VERSION_17
     targetCompatibility = JavaVersion.VERSION_17
 }
-
 
 def ROBOT_MAIN_CLASS = "frc.robot.Main"
 
@@ -40,7 +36,7 @@ deploy {
                     files = project.fileTree('src/main/deploy')
                     directory = '/home/lvuser/deploy'
                     deleteOldFiles = false // Change to true to delete files on roboRIO that no
-                                           // longer exist in deploy directory on roboRIO
+                                           // longer exist in deploy directory of this project
                 }
             }
         }
@@ -80,9 +76,6 @@ dependencies {
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 
     implementation 'gov.nist.math:jama:1.0.3'
-
-    implementation "javax.annotation:javax.annotation-api:1.3.2"
-    implementation "com.google.guava:guava:31.1-jre"
 
     def akitJson = new groovy.json.JsonSlurper().parseText(new File(projectDir.getAbsolutePath() + "/vendordeps/AdvantageKit.json").text)
     annotationProcessor "org.littletonrobotics.akit:akit-autolog:$akitJson.version"
@@ -128,31 +121,16 @@ repositories {
     mavenLocal()
 }
 
-// configurations.all {
-//     exclude group: "edu.wpi.first.wpilibj"
-// }
-
-task(checkAkitInstall, dependsOn: "classes", type: JavaExec) {
-    mainClass = "org.littletonrobotics.junction.CheckInstall"
+task(replayWatch, type: JavaExec) {
+    mainClass = "org.littletonrobotics.junction.ReplayWatch"
     classpath = sourceSets.main.runtimeClasspath
-}
-compileJava.finalizedBy checkAkitInstall
-
-// Create version file
-project.compileJava.dependsOn(createVersionFile)
-gversion {
-    srcDir       = "src/main/java/"
-    classPackage = "frc.robot"
-    className    = "BuildConstants"
-    dateFormat   = "yyyy-MM-dd HH:mm:ss z"
-    timeZone     = "America/New_York"
-    indent       = "  "
 }
 
 // Create commit with working changes on event branches
 task(eventDeploy) {
     doLast {
         if (project.gradle.startParameter.taskNames.any({ it.toLowerCase().contains("deploy") })) {
+
             def branchPrefix = "event"
             def branch = 'git branch --show-current'.execute().text.trim()
             def commitMessage = "Update at '${new Date().toString()}'"
@@ -181,3 +159,14 @@ task(eventDeploy) {
     }
 }
 createVersionFile.dependsOn(eventDeploy)
+
+// Create version file
+project.compileJava.dependsOn(createVersionFile)
+gversion {
+    srcDir       = "src/main/java/"
+    classPackage = "org.littletonrobotics.frc2024"
+    className    = "BuildConstants"
+    dateFormat   = "yyyy-MM-dd HH:mm:ss z"
+    timeZone     = "America/New_York"
+    indent       = "  "
+}

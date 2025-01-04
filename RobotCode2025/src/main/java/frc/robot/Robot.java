@@ -82,25 +82,25 @@ public class Robot extends LoggedRobot {
   //        Alerts
   //--------------------------------------------------------------------------------------------------------
   // CAN
-  private final Alert canErrorAlert = new Alert("CAN errors detected, robot may not be controllable.", AlertType.ERROR);
+  private final Alert CAN_ERROR_ALERT = new Alert("CAN errors detected, robot may not be controllable.", AlertType.kError);
 
   // Battery Alerts
-  private final Alert lowBatteryAlert = new Alert("Battery voltage is very low, consider turning off the robot or replacing the battery.", AlertType.WARNING);
-  private final Alert sameBatteryAlert = new Alert("The battery has not been changed since the last match.", AlertType.WARNING);
+  private final Alert LOW_BATTERY_ALERT = new Alert("Battery voltage is very low, consider turning off the robot or replacing the battery.", AlertType.kWarning);
+  private final Alert SAME_BATTERY_ALERT = new Alert("The battery has not been changed since the last match.", AlertType.kError);
 
   // Garbage Collection Alerts
-  private final Alert GC_COLLECTION_ALERT = new Alert("Please wait to enable, collecting garbage. 🗑️", AlertType.WARNING); //TODO reconfigure on time 
+  private final Alert GC_COLLECTION_ALERT = new Alert("Please wait to enable, collecting garbage. 🗑️", AlertType.kWarning);
   private int garbageCollectionCounter = 0;
 
   // DriverStation related alerts
-  private final Alert DS_DISCONNECT_ALERT = new Alert("Driverstation is not online, alliance selection will not work", AlertType.ERROR);
-  private final Alert FMS_DISCONNECT_ALERT = new Alert("fms is offline, robot cannot compete in match", AlertType.ERROR);
+  private final Alert DS_DISCONNECT_ALERT = new Alert("Driverstation is not online, alliance selection will not work", AlertType.kError);
+  private final Alert FMS_DISCONNECT_ALERT = new Alert("fms is offline, robot cannot compete in match", AlertType.kError);
 
   // Last deployment logging
   Date date = Calendar.getInstance().getTime();	
   SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd kk.mm.ss");;
   String dateFormatted = sdf.format(date);
-  private final Alert LAST_DEPLOYMENT_WARNING = new Alert("Last Deployment: " + dateFormatted , AlertType.INFO);
+  private final Alert LAST_DEPLOYMENT_WARNING = new Alert("Last Deployment: " + dateFormatted , AlertType.kInfo);
 
   // reset Position Logging
   public static boolean isResetPositionUsedInAuto = false;
@@ -266,7 +266,7 @@ public class Robot extends LoggedRobot {
     if (canStatus.transmitErrorCount > 0 || canStatus.receiveErrorCount > 0) {
       CAN_ERROR_TIMER.restart();
     }
-    canErrorAlert.set(
+    CAN_ERROR_ALERT.set(
         !CAN_ERROR_TIMER.hasElapsed(CAN_ERROR_TIME_THRESHOLD)
             && !CAN_INITIAL_ERROR_TIMER.hasElapsed(CAN_ERROR_TIME_THRESHOLD));
 
@@ -276,7 +276,7 @@ public class Robot extends LoggedRobot {
     }
     if (RobotController.getBatteryVoltage() <= LOW_BATTERY_VOLTAGE
         && DISABLED_TIMER.hasElapsed(LOW_BATTERY_DISABLED_TIME)) {
-      lowBatteryAlert.set(true);
+      LOW_BATTERY_ALERT.set(true);
       CatzLED.getInstance().lowBatteryAlert = true;
     }
   }
@@ -308,6 +308,8 @@ public class Robot extends LoggedRobot {
     GC_COLLECTION_ALERT.set(Timer.getFPGATimestamp() < 45.0);
     if((garbageCollectionCounter > 5*60*4)) { // 1 second * 60sec * 4 min
       System.gc();
+      GC_COLLECTION_ALERT.set(false);
+      GC_COLLECTION_ALERT.set(true);
       garbageCollectionCounter = 0;
     }
     garbageCollectionCounter++;

@@ -17,6 +17,8 @@ import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.pathfinding.Pathfinding;
 import com.pathplanner.lib.util.DriveFeedforwards;
 import com.pathplanner.lib.util.PathPlannerLogging;
+import com.pathplanner.lib.util.swerve.SwerveSetpoint;
+import com.pathplanner.lib.util.swerve.SwerveSetpointGenerator;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.VecBuilder;
@@ -53,6 +55,9 @@ public class CatzDrivetrain extends SubsystemBase {
     private final GyroIO gyroIO;
     private final GyroIOInputsAutoLogged gyroInputs = new GyroIOInputsAutoLogged();
 
+    // Position, odmetetry, and velocity estimator
+    private final CatzRobotTracker tracker = CatzRobotTracker.getInstance();
+
     // Alerts
     private final Alert gyroDisconnected;
 
@@ -65,6 +70,10 @@ public class CatzDrivetrain extends SubsystemBase {
     public final CatzSwerveModule LT_BACK_MODULE;
     public final CatzSwerveModule RT_FRNT_MODULE;
     public final CatzSwerveModule RT_BACK_MODULE;
+
+    //Swerve setpoint generator
+    private SwerveSetpointGenerator swerveSetpointGenerator = new SwerveSetpointGenerator(DriveConstants.TRAJECTORY_CONFIG, DriveConstants.DRIVE_CONFIG.maxAngularVelocity());
+    private SwerveSetpoint previousSetpoint = new SwerveSetpoint(tracker.getRobotChassisSpeeds(), tracker.getCurrentModuleStates(), DriveFeedforwards.zeros(4));
 
 
     private final Field2d field;
@@ -85,7 +94,7 @@ public class CatzDrivetrain extends SubsystemBase {
                 break;
         }
 
-        gyroDisconnected = new Alert("Gyro disconnected!", Alert.AlertType.WARNING); // Log on state change of the alert...Do this for all alerts
+        gyroDisconnected = new Alert("Gyro disconnected!", Alert.AlertType.kWarning);
 
 
         // Create swerve modules for each corner of the robot
@@ -119,7 +128,7 @@ public class CatzDrivetrain extends SubsystemBase {
 
         // Logging callback for target robot pose
         PathPlannerLogging.setLogTargetPoseCallback((pose) -> {
-            Logger.recordOutput("Drive/targetPost", pose);
+            Logger.recordOutput("Drive/targetPos", pose);
             CatzRobotTracker.getInstance().addTrajectorySetpointData(pose);
             field.getObject("target pose").setPose(pose);
         });
@@ -150,7 +159,7 @@ public class CatzDrivetrain extends SubsystemBase {
         } catch (Exception e) {
 
         }
-        Logger.processInputs("Drive/gyroinputs ", gyroInputs);    
+        Logger.processInputs("inputs/Drive/gyro ", gyroInputs);    
         // NOTE Gyro needs to be firmly mounted to rio for accurate results.
         // Set Gyro Disconnect alert to go off when gyro is disconnected
         if (Robot.isReal()) {
@@ -169,15 +178,12 @@ public class CatzDrivetrain extends SubsystemBase {
         
         
         // Add observations to robot tracker
-        CatzRobotTracker.getInstance()
-                            .addOdometryObservation(
-                                new OdometryObservation(
-                                wheelPositions,
-                                getModuleStates(),
-                                gyroAngle2d,
-                                Timer.getFPGATimestamp()    
-                                )
-                            );
+        OdometryObservation observation = new OdometryObservation(wheelPositions, 
+                                                                  getModuleStates(), 
+                                                                  gyroAngle2d, 
+                                                                  Timer.getFPGATimestamp()
+        );
+        CatzRobotTracker.getInstance().addOdometryObservation(observation);
 
         // Update current velocities use gyro when possible
         Twist2d robotRelativeVelocity = getTwist2dSpeeds();
@@ -187,14 +193,14 @@ public class CatzDrivetrain extends SubsystemBase {
                 : robotRelativeVelocity.dtheta;
         CatzRobotTracker.getInstance().addVelocityData(robotRelativeVelocity);
 
-        //----------------------------------------------------------------------------------------------------
-        // Swerve drive Feed Foward Calculation
-        //----------------------------------------------------------------------------------------------------
-
         //--------------------------------------------------------------
         // Logging
         //--------------------------------------------------------------
         SmartDashboard.putNumber("Heading", getGyroHeading());
+        Logger.recordOutput("Drive/Odometry module states", getModuleStates());
+        Logger.recordOutput("Drive/Odometry wheel positions", wheelPositions);
+        Logger.recordOutput("Drive/Odometry robot velocity", robotRelativeVelocity);
+
 
     }   //end of drivetrain periodic
 
@@ -226,6 +232,10 @@ public class CatzDrivetrain extends SubsystemBase {
             m_swerveModules[i].setModuleAngleAndVelocity(optimizedDesiredStates[i]);
         }
 
+        //--------------------------------------------------------
+        // Logging
+        //--------------------------------------------------------
+
         Logger.recordOutput("Drive/chassispeeds", chassisSpeeds);
         Logger.recordOutput("Drive/modulestates", optimizedDesiredStates);
     }
@@ -244,7 +254,6 @@ public class CatzDrivetrain extends SubsystemBase {
 
     /**  Create a command to stop driving */
     public void stopDriving() {
-        System.out.println("Stopped");
         for (CatzSwerveModule module : m_swerveModules) {
             module.stopDriving();
             module.setSteerPower(0.0);

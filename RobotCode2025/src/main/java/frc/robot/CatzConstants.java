@@ -23,8 +23,8 @@ public final class CatzConstants {
   //
   //--------------------------------------------------/
   public static final RobotSenario robotSenario      = RobotSenario.PRACTICE;
-  public static final RobotHardwareMode hardwareMode = RobotHardwareMode.REAL;
-  private static RobotID robotType                   = RobotID.SN1;
+  public static final RobotHardwareMode hardwareMode = RobotHardwareMode.SIM;
+  private static RobotID robotType                   = RobotID.SN_TEST;
   private static AlertPriority alertWarningPriority  = AlertPriority.ONE;
   
   public static final double LOOP_TIME = 0.02;
@@ -45,7 +45,7 @@ public final class CatzConstants {
   public static RobotID getRobotType() {
     // Checks to ensure that the selected robot Hardware mode is not paired with an illegal Robot Id
     if (RobotBase.isReal() && robotType == RobotID.SN_TEST) {
-      new Alert("Invalid robot selected, using competition robot as default.", AlertType.ERROR)
+      new Alert("Invalid robot selected, using competition robot as default.", AlertType.kError)
           .set(true);
       robotType = RobotID.SN2;
     }

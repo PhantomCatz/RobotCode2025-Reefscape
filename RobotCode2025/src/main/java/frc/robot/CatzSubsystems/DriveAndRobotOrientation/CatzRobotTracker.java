@@ -72,7 +72,7 @@ public class CatzRobotTracker {
       };
 
   // Odometry
-  private final SwerveDriveKinematics kinematics;
+  private final SwerveDriveKinematics KINEMATICS;
   private SwerveModulePosition[] lastWheelPositions =
             new SwerveModulePosition[] {
               new SwerveModulePosition(),
@@ -104,10 +104,7 @@ public class CatzRobotTracker {
     for (int i = 0; i < 3; ++i) {
       qStdDevs.set(i, 0, Math.pow(odometryStateStdDevs.get(i, 0), 2));
     }
-    kinematics = DriveConstants.SWERVE_KINEMATICS;
-
-    // Setup gamepiece Visualizer
-    //NoteVisualizer.setRobotPoseSupplier(this::getEstimatedPose);
+    KINEMATICS = DriveConstants.SWERVE_KINEMATICS;
   }
 
   //------------------------------------------------------------------------------------------------------
@@ -118,7 +115,8 @@ public class CatzRobotTracker {
   /** Add odometry observation */
   public void addOdometryObservation(OdometryObservation observation) {
     currentModuleStates = observation.moduleStates;
-    Twist2d twist = kinematics.toTwist2d(lastWheelPositions, observation.wheelPositions());
+    // Calculate twist from last wheel positions to current wheel positions, useful for when gyro is disabled
+    Twist2d twist = KINEMATICS.toTwist2d(lastWheelPositions, observation.wheelPositions());
     lastWheelPositions = observation.wheelPositions();
     // Check gyro connected
     if (observation.gyroAngle != null) {
@@ -136,7 +134,7 @@ public class CatzRobotTracker {
     estimatedPose = estimatedPose.exp(twist);
 
     // Collect Velocity and Accerleration values
-    var chassisSpeeds = kinematics.toChassisSpeeds(observation.moduleStates);
+    var chassisSpeeds = KINEMATICS.toChassisSpeeds(observation.moduleStates);
     robotAccelerations = new Twist2d(
             (chassisSpeeds.vxMetersPerSecond - m_lastChassisSpeeds.vxMetersPerSecond) / observation.timestamp,
             (chassisSpeeds.vyMetersPerSecond - m_lastChassisSpeeds.vyMetersPerSecond) / observation.timestamp,
@@ -270,7 +268,7 @@ public class CatzRobotTracker {
     return odometryPose;
   }
 
-  @AutoLogOutput(key = "CatzRobotTrakcer/RecordedChassisSpeeds")
+  @AutoLogOutput(key = "CatzRobotTracker/RecordedChassisSpeeds")
   public ChassisSpeeds getRobotChassisSpeeds() {
     return m_lastChassisSpeeds;
   }

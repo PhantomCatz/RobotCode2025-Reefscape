@@ -68,8 +68,8 @@ public class CatzSwerveModule {
         }
 
         // Disconnected Alerts
-        driveMotorDisconnected = new Alert(m_moduleName + " drive motor disconnected!", Alert.AlertType.WARNING);
-        steerMotorDisconnected = new Alert(m_moduleName + " steer motor disconnected!", Alert.AlertType.WARNING);
+        driveMotorDisconnected = new Alert(m_moduleName + " drive motor disconnected!", Alert.AlertType.kError);
+        steerMotorDisconnected = new Alert(m_moduleName + " steer motor disconnected!", Alert.AlertType.kError);
 
         resetDriveEncs();
 
@@ -114,8 +114,6 @@ public class CatzSwerveModule {
 
         //SmartDashboard.putNumber("absencposrad" + m_moduleName, inputs.steerAbsoluteEncPosition.getRadians());
         SmartDashboard.putNumber("angle" + m_moduleName , getCurrentRotation().getDegrees());
-
-
     }
 
     /**

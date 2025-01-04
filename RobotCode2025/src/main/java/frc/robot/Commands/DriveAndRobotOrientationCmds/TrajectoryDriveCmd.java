@@ -12,11 +12,14 @@ import java.util.Set;
 import org.littletonrobotics.junction.Logger;
 
 import com.pathplanner.lib.commands.PathPlannerAuto;
+import com.pathplanner.lib.controllers.PPHolonomicDriveController;
+import com.pathplanner.lib.controllers.PathFollowingController;
 import com.pathplanner.lib.events.EventScheduler;
 import com.pathplanner.lib.path.EventMarker;
 import com.pathplanner.lib.path.GoalEndState;
 import com.pathplanner.lib.path.PathConstraints;
 import com.pathplanner.lib.path.PathPlannerPath;
+import com.pathplanner.lib.path.RotationTarget;
 import com.pathplanner.lib.trajectory.PathPlannerTrajectory;
 import com.pathplanner.lib.trajectory.PathPlannerTrajectoryState;
 import com.pathplanner.lib.util.DriveFeedforwards;
@@ -65,11 +68,13 @@ public class TrajectoryDriveCmd extends Command {
 
     // Subsystems
     private CatzDrivetrain m_driveTrain;
-    private PathPlannerTrajectory trajectory;
     private CatzRobotTracker tracker = CatzRobotTracker.getInstance();
     
     // Trajectory variables
     private HolonomicDriveController hocontroller;
+    private PathFollowingController ppHoController;
+    private PathPlannerTrajectory trajectory;
+    private Trajectory testTrajectory;
     private PathPlannerPath path;
     private boolean atTarget = false;
     private double pathTimeOut = -999.0;
@@ -80,9 +85,6 @@ public class TrajectoryDriveCmd extends Command {
     private final Map<Command, Boolean> currentEventCommands = new HashMap();
     private final List<Pair<Double, Command>> untriggeredEvents = new ArrayList();
     private boolean isEventCommandRunning = false;
-
-    //Constructor Logger
-    private int m_constructorLogger = 1; // For determining if the command is auto path find or autonomous
 
     //---------------------------------------------------------------------------------------------
     //
@@ -114,26 +116,35 @@ public class TrajectoryDriveCmd extends Command {
     public void initialize() {
         // Flip path if necessary
         PathPlannerPath usePath = path;
+        Rotation2d flippedRotation2d = tracker.getEstimatedPose().getRotation();
+        System.out.println(flippedRotation2d.getDegrees());
         if(AllianceFlipUtil.shouldFlipToRed()) {
             usePath = path.flipPath();
+            flippedRotation2d = flippedRotation2d.plus(Rotation2d.fromDegrees(180));
         }
-
         // Construct trajectory
-        this.trajectory = new PathPlannerTrajectory(
-            usePath,
-            DriveConstants.
-                SWERVE_KINEMATICS.
-                    toChassisSpeeds(tracker.getCurrentModuleStates()),
-            tracker.getEstimatedPose().getRotation(),
-            DriveConstants.TRAJECTORY_CONFIG
-        );
+        this.trajectory = usePath.generateTrajectory(DriveConstants.
+                                                        SWERVE_KINEMATICS
+                                                            .toChassisSpeeds(tracker.getCurrentModuleStates()), 
+                                                            flippedRotation2d, 
+                                                            DriveConstants.TRAJECTORY_CONFIG);
+        // new PathPlannerTrajectory(
+        //     usePath,
+        //     DriveConstants.
+        //         SWERVE_KINEMATICS
+        //             .toChassisSpeeds(tracker.getCurrentModuleStates()),
+        //     flippedRotation2d,
+        //     DriveConstants.TRAJECTORY_CONFIG
+        // );
 
-        hocontroller = DriveConstants.getNewHolController();                                
+        System.out.println(flippedRotation2d.getDegrees());
+        hocontroller = DriveConstants.getNewHolController(); 
+        ppHoController = DriveConstants.getNewPathFollowingController();
         pathTimeOut = trajectory.getTotalTimeSeconds() * TIMEOUT_SCALAR; //TODO do we still need this
 
         // Reset
-        PathPlannerLogging.logActivePath(path);
-        PPLibTelemetry.setCurrentPath(path);
+        PathPlannerLogging.logActivePath(usePath);
+        PPLibTelemetry.setCurrentPath(usePath);
 
         eventScheduler.initialize(trajectory);
         this.timer.reset();
@@ -146,16 +157,15 @@ public class TrajectoryDriveCmd extends Command {
     // 
     //---------------------------------------------------------------------------------------------
     @Override
-    public void execute() {
+    public void execute() {;
         double currentTime = this.timer.get();
         // Getters from pathplanner and current robot pose
         PathPlannerTrajectoryState goal = trajectory.sample(Math.min(currentTime, trajectory.getTotalTimeSeconds()));
-        Rotation2d targetOrientation     = goal.heading;
-        Pose2d currentPose               = tracker.getEstimatedPose();
-        ChassisSpeeds currentSpeeds = DriveConstants.SWERVE_KINEMATICS.toChassisSpeeds(m_driveTrain.getModuleStates());
-        double currentVel =
-            Math.hypot(currentSpeeds.vxMetersPerSecond, currentSpeeds.vyMetersPerSecond);
-
+        Rotation2d targetOrientation    = goal.heading;
+        Pose2d currentPose              = tracker.getEstimatedPose();
+        ChassisSpeeds currentSpeeds     = DriveConstants.SWERVE_KINEMATICS.toChassisSpeeds(m_driveTrain.getModuleStates());
+        double currentVel               = Math.hypot(currentSpeeds.vxMetersPerSecond, currentSpeeds.vyMetersPerSecond);
+        System.out.println(atTarget);
         // Trajectory Executor
         if(!atTarget){
                 
@@ -175,13 +185,13 @@ public class TrajectoryDriveCmd extends Command {
     
             //construct chassisspeeds
             ChassisSpeeds adjustedSpeeds = hocontroller.calculate(currentPose, state, targetOrientation);
-            ChassisSpeeds ppAdjustedSpeeds = DriveConstants.getNewPathFollowingController().calculateRobotRelativeSpeeds(currentPose, goal);
+            ChassisSpeeds ppAdjustedSpeeds = ppHoController.calculateRobotRelativeSpeeds(currentPose, goal);
 
 
             //send to drivetrain
             m_driveTrain.drive(adjustedSpeeds);
             tracker.addTrajectorySetpointData(goal.pose);
-
+            System.out.println("hi");
             // Log desired pose
             Logger.recordOutput("CatzRobotTracker/Desired Auto Pose", new Pose2d(state.poseMeters.getTranslation(), goal.heading));
         }
@@ -190,8 +200,14 @@ public class TrajectoryDriveCmd extends Command {
         } // End of if(!atTarget) else
         
 
+        //---------------------------------------------------------------------------------------------------------------------------
+        // Named Commands
+        //---------------------------------------------------------------------------------------------------------------------------
         eventScheduler.execute(currentTime);
 
+        //---------------------------------------------------------------------------------------------------------------------------
+        //  Logging
+        //---------------------------------------------------------------------------------------------------------------------------
         PPLibTelemetry.setCurrentPose(currentPose);
         PathPlannerLogging.logCurrentPose(currentPose);
     
@@ -203,6 +219,7 @@ public class TrajectoryDriveCmd extends Command {
             goal.linearVelocity,
             currentSpeeds.omegaRadiansPerSecond,
             goal.heading.getRadians());
+        debugLogsTrajectory();
     } //end of execute
 
     //---------------------------------------------------------------------------------------------

@@ -6,6 +6,7 @@ package frc.robot;
 
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 import org.littletonrobotics.junction.networktables.LoggedDashboardNumber;
+import org.littletonrobotics.junction.networktables.LoggedNetworkNumber;
 
 import com.google.flatbuffers.Constants;
 import com.pathplanner.lib.auto.NamedCommands;
@@ -20,8 +21,8 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
-import frc.robot.Autonomous.CatzAutonomous;
-import frc.robot.Autonomous.CatzAutonomous;
+import frc.robot.Autonomous.CatzAutonomousInternal;
+import frc.robot.Autonomous.CatzAutonomousInternal;
 import frc.robot.CatzConstants.AllianceColor;
 import frc.robot.CatzConstants.RobotSenario;
 import frc.robot.CatzConstants.XboxInterfaceConstants;
@@ -64,16 +65,16 @@ public class RobotContainer {
   //-------------------------------------------------------------------------------------------------------------------
   // Alert Declaration
   //-------------------------------------------------------------------------------------------------------------------
-  private final Alert disconnectedAlertDrive = new Alert("Driver controller disconnected (port 0).", AlertType.WARNING);
-  private final Alert disconnectedAlertAux = new Alert("Operator controller disconnected (port 1).", AlertType.WARNING);
-  private final LoggedDashboardNumber endgameAlert1 = new LoggedDashboardNumber("Endgame Alert #1", 30.0);
-  private final LoggedDashboardNumber endgameAlert2 = new LoggedDashboardNumber("Endgame Alert #2", 15.0);
+  private final Alert disconnectedAlertDrive = new Alert("Driver controller disconnected (port 0).", AlertType.kWarning);
+  private final Alert disconnectedAlertAux = new Alert("Operator controller disconnected (port 1).", AlertType.kWarning);
+  private final LoggedNetworkNumber endgameAlert1 = new LoggedNetworkNumber("Endgame Alert #1", 30.0);
+  private final LoggedNetworkNumber endgameAlert2 = new LoggedNetworkNumber("Endgame Alert #2", 15.0);
 
   //-------------------------------------------------------------------------------------------------------------------
   // Auto Declaration
   //---------------------------------------------------------------------------------------------------------------------
   private AutomatedSequenceCmds autosequence = new AutomatedSequenceCmds();
-  private CatzAutonomous auto = new CatzAutonomous(this);
+  private CatzAutonomousInternal auto = new CatzAutonomousInternal(this);
 
   public RobotContainer() {
 
@@ -170,7 +171,6 @@ public class RobotContainer {
         !DriverStation.isJoystickConnected(xboxAux.getHID().getPort())
             || !DriverStation.getJoystickIsXbox(xboxAux.getHID().getPort())
     );
-    disconnectedAlertAux.setAlertOnloop(true, 1.0, 10.0);
   }
 
   //---------------------------------------------------------------------------
@@ -182,7 +182,7 @@ public class RobotContainer {
     return drive;
   }
 
-  public CatzAutonomous getCatzAutonomous(){
+  public CatzAutonomousInternal getCatzAutonomous(){
     return auto;
   }
 

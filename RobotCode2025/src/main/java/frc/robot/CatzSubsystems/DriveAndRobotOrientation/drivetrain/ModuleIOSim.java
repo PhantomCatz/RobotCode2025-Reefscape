@@ -17,11 +17,11 @@ import edu.wpi.first.wpilibj.simulation.DCMotorSim;
 import frc.robot.CatzConstants;
 import frc.robot.CatzSubsystems.DriveAndRobotOrientation.drivetrain.DriveConstants.ModuleIDsAndCurrentLimits;
 public class ModuleIOSim implements ModuleIO {
-  private final LinearSystem<N2, N1, N2> plantDrive = LinearSystemId.createDCMotorSystem(DCMotor.getKrakenX60(1), 0.025, MODULE_GAINS_AND_RATIOS.driveReduction());
-  private final LinearSystem<N2, N1, N2> plantSteer = LinearSystemId.createDCMotorSystem(DCMotor.getKrakenX60(1), 0.004, MODULE_GAINS_AND_RATIOS.steerReduction());
+  private final LinearSystem<N2, N1, N2> plantDrive = LinearSystemId.createDCMotorSystem(DCMotor.getKrakenX60(1), 0.025, DriveConstants.MODULE_GAINS_AND_RATIOS.driveReduction());
+  private final LinearSystem<N2, N1, N2> plantSteer = LinearSystemId.createDCMotorSystem(DCMotor.getKrakenX60(1), 0.004, DriveConstants.MODULE_GAINS_AND_RATIOS.driveReduction());
 
-  private final DCMotorSim driveSim = new DCMotorSim(plantDrive, DCMotor.getKrakenX60Foc(1), DriveConstants.MODULE_GAINS_AND_RATIOS.driveReduction());
-  private final DCMotorSim steerSim = new DCMotorSim(plantSteer, DCMotor.getKrakenX60Foc(1), DriveConstants.MODULE_GAINS_AND_RATIOS.steerReduction());
+  private final DCMotorSim driveSim = new DCMotorSim(plantDrive, DCMotor.getKrakenX60Foc(1), 0.0, 0.0);
+  private final DCMotorSim steerSim = new DCMotorSim(plantSteer, DCMotor.getKrakenX60Foc(1), 0.0, 0.0);
 
   private final PIDController driveFeedback = new PIDController(0.1, 0.0, 0.0, CatzConstants.LOOP_TIME);
   private final PIDController steerFeedback = new PIDController(10.0, 0.0, 0.0, CatzConstants.LOOP_TIME);
