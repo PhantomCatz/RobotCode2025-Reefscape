@@ -119,7 +119,7 @@ public class RobotContainer {
 
     // Auto Driving
    // xboxDrv.y().onTrue(new FaceTarget(FieldConstants.Speaker.centerSpeakerOpening.toTranslation2d(), drive));
-    xboxDrv.b().onTrue(auto.autoFindPathAmp());
+    xboxDrv.b().onTrue(auto.autoFindPathStation());
     xboxDrv.x().onTrue(auto.autoFindPathSpeaker());
 
 
