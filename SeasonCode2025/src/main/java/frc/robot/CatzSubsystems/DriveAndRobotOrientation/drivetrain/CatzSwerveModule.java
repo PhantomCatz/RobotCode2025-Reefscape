@@ -4,6 +4,7 @@ import static frc.robot.CatzSubsystems.DriveAndRobotOrientation.drivetrain.Drive
 
 import org.littletonrobotics.junction.Logger;
 
+import com.ctre.phoenix6.signals.DiffPIDRefSlopeECUTime_ClosedLoopModeValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;

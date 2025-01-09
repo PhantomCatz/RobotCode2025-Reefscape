@@ -21,12 +21,16 @@ import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
+import com.pathplanner.lib.commands.PathPlannerAuto;
+import com.pathplanner.lib.controllers.PathFollowingController;
 import com.pathplanner.lib.path.PathPlannerPath;
 import com.pathplanner.lib.trajectory.PathPlannerTrajectory;
+import com.pathplanner.lib.trajectory.PathPlannerTrajectoryState;
 import com.pathplanner.lib.util.FileVersionException;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.StringPublisher;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -58,21 +62,20 @@ import frc.robot.Utilities.VirtualSubsystem;
 
 public class CatzAutonomousExternal extends VirtualSubsystem{
     private final int MAX_QUESTIONS = 5;
-    private static final DashboardAutoProgram defaultRoutine =
-                new DashboardAutoProgram("Do Nothing", List.of(), Commands.none());
     private static final String AUTO_STRING = "Auto";
 
-    private final LoggedDashboardChooser<DashboardAutoProgram> autoProgramChooser = new LoggedDashboardChooser<>(AUTO_STRING + "/Program");
+    private final LoggedDashboardChooser<PathPlannerAuto> autoProgramChooser = new LoggedDashboardChooser<>(AUTO_STRING + "/Program");
     private final List<StringPublisher> questionPublishers;
     private final List<SwitchableChooser> questionChoosers;
 
     private boolean trajectoriesLoaded = false;
     private HashMap<String, Command> pathplannerPaths = new HashMap<>();
     private HashMap<String, Command> choreoPaths = new HashMap<>();
+    private File autosDirectory = new File(Filesystem.getDeployDirectory(), "pathplanner/autos");
     private File choreoPathsDirectory = new File(Filesystem.getDeployDirectory(), "choreo");
     private File pathplannerPathsDirectory = new File(Filesystem.getDeployDirectory(), "pathplanner/paths");
 
-    private DashboardAutoProgram lastProgram;
+    private PathPlannerAuto lastProgram;
     private List<AutoQuestionResponse> lastResponses;
     private JSONParser parser = new JSONParser();
 
@@ -87,8 +90,6 @@ public class CatzAutonomousExternal extends VirtualSubsystem{
 
     public CatzAutonomousExternal(RobotContainer container) {
         this.m_container = container;
-        autoProgramChooser.addDefaultOption(defaultRoutine.name(), defaultRoutine);
-        lastProgram = defaultRoutine;
         lastResponses = List.of();
 
         // Publish questions and choosers
@@ -115,6 +116,28 @@ public class CatzAutonomousExternal extends VirtualSubsystem{
 
         NamedCommands.registerCommand("TestPrint", Commands.print("Bench"));
 
+        class controller implements PathFollowingController {
+
+            @Override
+            public ChassisSpeeds calculateRobotRelativeSpeeds(Pose2d currentPose,
+                    PathPlannerTrajectoryState targetState) {
+                // TODO Auto-generated method stub
+                throw new UnsupportedOperationException("Unimplemented method 'calculateRobotRelativeSpeeds'");
+            }
+
+            @Override
+            public void reset(Pose2d currentPose, ChassisSpeeds currentSpeeds) {
+                // TODO Auto-generated method stub
+                throw new UnsupportedOperationException("Unimplemented method 'reset'");
+            }
+
+            @Override
+            public boolean isHolonomic() {
+                // TODO Auto-generated method stub
+                throw new UnsupportedOperationException("Unimplemented method 'isHolonomic'");
+            }
+           
+        }
 
         BooleanSupplier shouldFlip = ()-> AllianceFlipUtil.shouldFlipToRed();
         // AutoBuilder.configure(
@@ -122,11 +145,11 @@ public class CatzAutonomousExternal extends VirtualSubsystem{
         //     tracker::resetPose,
         //     tracker::getRobotChassisSpeeds,
         //     container.getCatzDrivetrain()::drive,
-        //     getNewPathFollowingController(),
+        //     new controller(),
         //     DriveConstants.TRAJECTORY_CONFIG,
         //     shouldFlip,
         //     container.getCatzDrivetrain()
-        // );;
+        // );
         
         //------------------------------------------------------------------------------------------------------------
         // Path Configuration
@@ -168,20 +191,10 @@ public class CatzAutonomousExternal extends VirtualSubsystem{
         startingChoices.put(AutoQuestionResponse.CENTER, NamedCommands.getCommand("Wing Scoring 2"));
         NamedCommands.registerCommand("twoOrThreeGamePieces", Commands.select(startingChoices, () -> lastResponses.get(0)));
 
-
-
-        addProgram("SpeakerSide",  
-            List.of(
-                new AutoQuestion(
-                    "Starting location?",
-                    List.of(
-                        AutoQuestionResponse.AMP,
-                        AutoQuestionResponse.CENTER)),
-                new AutoQuestion(
-                    "How many spike notes?",
-                    List.of(AutoQuestionResponse.TWO, AutoQuestionResponse.THREE))), 
-            AutoBuilder.buildAuto("SpeakerSide")
-        );
+        for (File autoFile: autosDirectory.listFiles()){
+            String autoName = autoFile.getName().replaceFirst("[.][^.]+$", "");
+            autoProgramChooser.addOption(autoName, new PathPlannerAuto(autoName));
+        }
 
     }
 
@@ -192,13 +205,13 @@ public class CatzAutonomousExternal extends VirtualSubsystem{
             return;
         }
         // Update the list of questions
-        var selectedProgram = autoProgramChooser.get();
+        PathPlannerAuto selectedProgram = autoProgramChooser.get();
         if (selectedProgram == null) {
             return;
         }
 
         try {
-            String autoName = autoProgramChooser.get().name + ".auto";
+            String autoName = autoProgramChooser.get().getName() + ".auto";
             JSONObject json = (JSONObject) parser.parse(new FileReader(Filesystem.getDeployDirectory()+"/pathplanner/autos/" + autoName));
             // Refresh Questionaire list when new Auto routine is selected
             if (!selectedProgram.equals(lastProgram)) {
@@ -233,19 +246,19 @@ public class CatzAutonomousExternal extends VirtualSubsystem{
 
         // Update the routine and responses periodically from user
         lastProgram = selectedProgram;
-        lastResponses = new ArrayList<>();
-        for (int i = 0; i < lastProgram.questions().size(); i++) {
-            String responseString = questionChoosers.get(i).get();
-            lastResponses.add(
-                responseString == null
-                    ? lastProgram.questions().get(i).responses().get(0)
-                    : AutoQuestionResponse.valueOf(responseString)
-            );
-        }
+        // lastResponses = new ArrayList<>();
+        // for (int i = 0; i < lastProgram.questions().size(); i++) {
+        //     String responseString = questionChoosers.get(i).get();
+        //     lastResponses.add(
+        //         responseString == null
+        //             ? lastProgram.questions().get(i).responses().get(0)
+        //             : AutoQuestionResponse.valueOf(responseString)
+        //     );
+        // }
 
-        // // Refresh Questionaire list when new Auto routine is selected
-        // if (!selectedRoutine.equals(lastProgram)) {
-        //     List<AutoQuestion> questions = selectedRoutine.questions();
+        // Refresh Questionaire list when new Auto routine is selected
+        // if (!selectedProgram.equals(lastProgram)) {
+        //     List<AutoQuestion> questions = selectedProgram.questions();
         //     for (int i = 0; i < MAX_QUESTIONS; i++) {
         //         if (i < questions.size()) {
         //             questionPublishers.get(i).set(questions.get(i).question());
@@ -260,7 +273,7 @@ public class CatzAutonomousExternal extends VirtualSubsystem{
         //     }
         // }
 
-        // // Update the routine and responses periodically from user
+        // Update the routine and responses periodically from user
         // lastProgram = selectedRoutine;
         // lastResponses = new ArrayList<>();
         // for (int i = 0; i < lastProgram.questions().size(); i++) {
@@ -285,14 +298,14 @@ public class CatzAutonomousExternal extends VirtualSubsystem{
 
     /** Registers a new auto routine that can be selected. */
     private void addProgram(String name, List<AutoQuestion> questions, Command command) {
-        if (questions.size() > MAX_QUESTIONS) {
-            throw new RuntimeException(
-                "Auto routine contained more than "
-                    + Integer.toString(MAX_QUESTIONS)
-                    + " questions: "
-                    + name);
-        }
-        autoProgramChooser.addOption(name, new DashboardAutoProgram(name, questions, command));
+        // if (questions.size() > MAX_QUESTIONS) {
+        //     throw new RuntimeException(
+        //         "Auto routine contained more than "
+        //             + Integer.toString(MAX_QUESTIONS)
+        //             + " questions: "
+        //             + name);
+        // }
+        // autoProgramChooser.addOption(name, new DashboardAutoProgram(name, questions, command));
     }
 
     // //---------------------------------------------------------------------------------------------------------
@@ -390,7 +403,7 @@ public class CatzAutonomousExternal extends VirtualSubsystem{
 
     /** Getter for final autonomous Program */
     public Command getCommand() { 
-        return lastProgram.command();
+        return lastProgram;
     }
 
 

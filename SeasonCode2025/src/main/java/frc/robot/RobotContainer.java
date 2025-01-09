@@ -18,6 +18,7 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
+import frc.robot.Autonomous.CatzAutonomousExternal;
 import frc.robot.Autonomous.CatzAutonomousInternal;
 import frc.robot.Autonomous.CatzAutonomousInternal;
 import frc.robot.CatzConstants.AllianceColor;
@@ -72,6 +73,7 @@ public class RobotContainer {
   //---------------------------------------------------------------------------------------------------------------------
   private AutomatedSequenceCmds autosequence = new AutomatedSequenceCmds();
   private CatzAutonomousInternal auto = new CatzAutonomousInternal(this);
+  private CatzAutonomousExternal autoEx = new CatzAutonomousExternal(this);
 
   public RobotContainer() {
 
@@ -184,6 +186,6 @@ public class RobotContainer {
   }
 
   public Command getAutonomousCommand() {
-    return auto.getCommand();
+    return autoEx.getCommand();
   }
 }

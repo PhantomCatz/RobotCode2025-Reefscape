@@ -66,7 +66,7 @@ public class DriveConstants {
               .bumperWidthX(Units.inchesToMeters(37))
               .bumperWidthY(Units.inchesToMeters(33))
               .maxLinearVelocity(Units.feetToMeters(17))
-              .maxLinearAcceleration(Math.pow(Units.feetToMeters(17), 2)) 
+              .maxLinearAcceleration(Math.pow(Units.feetToMeters(17), 2)) //TODO why square
               .maxAngularVelocity(Units.degreesToRadians(600)) // Radians
               .maxAngularAcceleration(Units.degreesToRadians(600)) // Radians // TODO verify angle constraints
               .build();
@@ -230,7 +230,7 @@ public class DriveConstants {
 
     public static final double ROBOT_MASS          = 68.0;
     public static final double ROBOT_MOI           = (1/12) * ROBOT_MASS * (Math.pow(DRIVE_CONFIG.bumperWidthX(), 2) + Math.pow(DRIVE_CONFIG.bumperWidthY(), 2));//ROBOT_MASS * (2/2) * (kA_ANGULAR_ACCEL/kA_LINEAR_ACCEL); // TODO need to recaculate with formula on Pathplanner
-    public static final double TREAD_COEF_FRICTION = 1.542;
+    public static final double TREAD_COEF_FRICTION = 1000000.542;
     
     public static final ModuleConfig TRAJECTORY_MODULE_CONFIG = new ModuleConfig(
                                                                         DRIVE_CONFIG.wheelRadius(),

@@ -1,5 +1,7 @@
 package frc.robot.Commands.DriveAndRobotOrientationCmds;
 
+import static edu.wpi.first.units.Units.Ounce;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -133,7 +135,6 @@ public class TrajectoryDriveCmd extends Command {
             DriveConstants.TRAJECTORY_CONFIG
         );
 
-        System.out.println(flippedRotation2d.getDegrees());
         hocontroller = DriveConstants.getNewHolController(); 
         ppHoController = DriveConstants.getNewPathFollowingController();
         pathTimeOut = trajectory.getTotalTimeSeconds() * TIMEOUT_SCALAR; //TODO do we still need this
@@ -153,7 +154,8 @@ public class TrajectoryDriveCmd extends Command {
     // 
     //---------------------------------------------------------------------------------------------
     @Override
-    public void execute() {;
+    public void execute() {
+        System.out.println("executing");
         double currentTime = this.timer.get();
         // Getters from pathplanner and current robot pose
         PathPlannerTrajectoryState goal = trajectory.sample(Math.min(currentTime, trajectory.getTotalTimeSeconds()));
