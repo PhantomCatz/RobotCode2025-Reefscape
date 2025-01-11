@@ -189,7 +189,7 @@ public class DriveConstants {
             new Translation2d( DRIVE_CONFIG.robotLengthX(), -DRIVE_CONFIG.robotWidthY()).div(2.0)     //RT FRONT
         };    
 
-    private static final Translation2d[] TRAJECTORY_MODULE_TRANSLATIONS = 
+    public static final Translation2d[] TRAJECTORY_MODULE_TRANSLATIONS = 
         new Translation2d[] {
             new Translation2d( DRIVE_CONFIG.robotLengthX() , DRIVE_CONFIG.robotWidthY()).div(2.0),    //LT FRONT
             new Translation2d( DRIVE_CONFIG.robotLengthX(), -DRIVE_CONFIG.robotWidthY()).div(2.0),    //RT FRONT
@@ -232,23 +232,6 @@ public class DriveConstants {
     public static final double ROBOT_MOI           = (1/12) * ROBOT_MASS * (Math.pow(DRIVE_CONFIG.bumperWidthX(), 2) + Math.pow(DRIVE_CONFIG.bumperWidthY(), 2));//ROBOT_MASS * (2/2) * (kA_ANGULAR_ACCEL/kA_LINEAR_ACCEL); // TODO need to recaculate with formula on Pathplanner
     public static final double TREAD_COEF_FRICTION = 1000000.542;
     
-    public static final ModuleConfig TRAJECTORY_MODULE_CONFIG = new ModuleConfig(
-                                                                        DRIVE_CONFIG.wheelRadius(),
-                                                                        DRIVE_CONFIG.maxLinearVelocity() / 2, 
-                                                                        TREAD_COEF_FRICTION, 
-                                                                        DCMotor.getKrakenX60(1)
-                                                                                .withReduction(MODULE_GAINS_AND_RATIOS.driveReduction), 
-                                                                        DRIVE_CURRENT_LIMIT, 
-                                                                        1
-    );
-
-    public static final RobotConfig TRAJECTORY_CONFIG = new RobotConfig(
-                                                                ROBOT_MASS,
-                                                                ROBOT_MOI,
-                                                                TRAJECTORY_MODULE_CONFIG,
-                                                                TRAJECTORY_MODULE_TRANSLATIONS
-    );
-
     //-----------------------------------------------------------------------------------------------------------------------------
     //
     //      Simulation helpers

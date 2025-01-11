@@ -132,7 +132,7 @@ public class TrajectoryDriveCmd extends Command {
                 SWERVE_KINEMATICS
                     .toChassisSpeeds(tracker.getCurrentModuleStates()),
             flippedRotation2d,
-            DriveConstants.TRAJECTORY_CONFIG
+            m_driveTrain.TRAJECTORY_CONFIG
         );
 
         hocontroller = DriveConstants.getNewHolController(); 

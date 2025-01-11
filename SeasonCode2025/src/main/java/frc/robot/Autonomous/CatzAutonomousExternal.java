@@ -368,21 +368,21 @@ public class CatzAutonomousExternal extends VirtualSubsystem{
     //          Trajectory Helpers
     //
     //---------------------------------------------------------------------------------------------------------
-    private void preloadTrajectoryClass(PathPlannerPath segment) {
-        // This is done because Java loads classes lazily. Calling this here loads the trajectory pathplanner class which
-        // is used to follow paths and saves user code ms loop time at the start of auto.
-        if (!trajectoriesLoaded) {
-            trajectoriesLoaded = true;
-            var trajectory = new PathPlannerTrajectory(
-                segment,
-                DriveConstants.
-                    SWERVE_KINEMATICS.
-                        toChassisSpeeds(CatzRobotTracker.getInstance().getCurrentModuleStates()),
-                CatzRobotTracker.getInstance().getEstimatedPose().getRotation(),
-                DriveConstants.TRAJECTORY_CONFIG
-            );
-        }
-    }
+    // private void preloadTrajectoryClass(PathPlannerPath segment) {
+    //     // This is done because Java loads classes lazily. Calling this here loads the trajectory pathplanner class which
+    //     // is used to follow paths and saves user code ms loop time at the start of auto.
+    //     if (!trajectoriesLoaded) {
+    //         trajectoriesLoaded = true;
+    //         var trajectory = new PathPlannerTrajectory(
+    //             segment,
+    //             DriveConstants.
+    //                 SWERVE_KINEMATICS.
+    //                     toChassisSpeeds(CatzRobotTracker.getInstance().getCurrentModuleStates()),
+    //             CatzRobotTracker.getInstance().getEstimatedPose().getRotation(),
+    //             DriveConstants.TRAJECTORY_CONFIG
+    //         );
+    //     }
+    // }
 
   /**
    * Resets pose accounting for alliance color.
