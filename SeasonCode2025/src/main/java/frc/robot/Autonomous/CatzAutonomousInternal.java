@@ -3,11 +3,11 @@ package frc.robot.Autonomous;
 import java.nio.file.Path;
 import java.util.Arrays;
 
-import static frc.robot.CatzSubsystems.DriveAndRobotOrientation.drivetrain.DriveConstants.DRIVE_CONFIG;
-import static frc.robot.CatzSubsystems.DriveAndRobotOrientation.drivetrain.DriveConstants.PATH_FOLLOWING_CONTROLLER;
-import static frc.robot.CatzSubsystems.DriveAndRobotOrientation.drivetrain.DriveConstants.TRAJECTORY_CONFIG;
-import static frc.robot.CatzSubsystems.DriveAndRobotOrientation.drivetrain.DriveConstants.getNewHolController;
-import static frc.robot.CatzSubsystems.DriveAndRobotOrientation.drivetrain.DriveConstants.getNewPathFollowingController;
+import static frc.robot.CatzSubsystems.DriveAndRobotOrientation.Drivetrain.DriveConstants.DRIVE_CONFIG;
+import static frc.robot.CatzSubsystems.DriveAndRobotOrientation.Drivetrain.DriveConstants.PATH_FOLLOWING_CONTROLLER;
+import static frc.robot.CatzSubsystems.DriveAndRobotOrientation.Drivetrain.DriveConstants.TRAJECTORY_CONFIG;
+import static frc.robot.CatzSubsystems.DriveAndRobotOrientation.Drivetrain.DriveConstants.getNewHolController;
+import static frc.robot.CatzSubsystems.DriveAndRobotOrientation.Drivetrain.DriveConstants.getNewPathFollowingController;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -54,7 +54,7 @@ import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.FieldConstants;
 import frc.robot.RobotContainer;
 import frc.robot.CatzSubsystems.DriveAndRobotOrientation.CatzRobotTracker;
-import frc.robot.CatzSubsystems.DriveAndRobotOrientation.drivetrain.DriveConstants;
+import frc.robot.CatzSubsystems.DriveAndRobotOrientation.Drivetrain.DriveConstants;
 import frc.robot.Commands.AutomatedSequenceCmds;
 import frc.robot.Commands.CharacterizationCmds.FeedForwardCharacterization;
 import frc.robot.Commands.CharacterizationCmds.WheelRadiusCharacterization;

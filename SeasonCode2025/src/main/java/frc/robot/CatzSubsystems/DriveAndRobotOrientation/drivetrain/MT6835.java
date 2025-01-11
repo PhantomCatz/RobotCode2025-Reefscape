@@ -1,4 +1,4 @@
-package frc.robot.CatzSubsystems.DriveAndRobotOrientation.drivetrain;
+package frc.robot.CatzSubsystems.DriveAndRobotOrientation.Drivetrain;
 
 import edu.wpi.first.wpilibj.CAN;
 import edu.wpi.first.hal.CANData;

@@ -20,6 +20,9 @@ import frc.robot.CatzConstants.RobotHardwareMode;
 import frc.robot.CatzSubsystems.DriveAndRobotOrientation.CatzRobotTracker;
 import frc.robot.CatzSubsystems.DriveAndRobotOrientation.CatzRobotTracker.VisionObservation;
 
+import frc.robot.CatzSubsystems.DriveAndRobotOrientation.vision.VisionIOInputsAutoLogged;
+
+
 public class CatzVision extends SubsystemBase {
 
     // Hardware IO declaration
@@ -57,12 +60,9 @@ public class CatzVision extends SubsystemBase {
             Logger.processInputs("inputs/Vision/" + cameras[i].getName() + "/Inputs", inputs[i]);
            
             // Check when to process Vision Info
-            if(cameras[i].getName().equals("limelight-ramen")) { 
-                // Continue
-            } else {
-                if (Robot.isReal()) { // Prevents out of bounds crash in SIM
-                    processVision(i);
-                }
+
+            if (Robot.isReal()) { // Prevents out of bounds crash in SIM
+                processVision(i);
             }
 
         }        
@@ -75,7 +75,10 @@ public class CatzVision extends SubsystemBase {
         //DEBUG
 
         //Logger.recordOutput("Vision/ResultCount", results.size());
+
+
     } //end of periodic()
+
 
     public void processVision(int cameraNum) {
         // create a new pose based off the new inputs[cameraNum

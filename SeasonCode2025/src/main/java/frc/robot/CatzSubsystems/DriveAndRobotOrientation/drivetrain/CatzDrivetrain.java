@@ -1,20 +1,11 @@
 
-package frc.robot.CatzSubsystems.DriveAndRobotOrientation.drivetrain;
+package frc.robot.CatzSubsystems.DriveAndRobotOrientation.Drivetrain;
 
 import static edu.wpi.first.units.Units.KilogramSquareMeters;
 import static edu.wpi.first.units.Units.Kilograms;
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.Volts;
-import static frc.robot.CatzSubsystems.DriveAndRobotOrientation.drivetrain.DriveConstants.DRIVE_CONFIG;
-import static frc.robot.CatzSubsystems.DriveAndRobotOrientation.drivetrain.DriveConstants.INDEX_BL;
-import static frc.robot.CatzSubsystems.DriveAndRobotOrientation.drivetrain.DriveConstants.INDEX_BR;
-import static frc.robot.CatzSubsystems.DriveAndRobotOrientation.drivetrain.DriveConstants.INDEX_FL;
-import static frc.robot.CatzSubsystems.DriveAndRobotOrientation.drivetrain.DriveConstants.INDEX_FR;
-import static frc.robot.CatzSubsystems.DriveAndRobotOrientation.drivetrain.DriveConstants.MODULE_GAINS_AND_RATIOS;
-import static frc.robot.CatzSubsystems.DriveAndRobotOrientation.drivetrain.DriveConstants.MODULE_NAMES;
-import static frc.robot.CatzSubsystems.DriveAndRobotOrientation.drivetrain.DriveConstants.MODULE_TRANSLATIONS;
-import static frc.robot.CatzSubsystems.DriveAndRobotOrientation.drivetrain.DriveConstants.ROBOT_MASS;
-
+import static frc.robot.CatzSubsystems.DriveAndRobotOrientation.Drivetrain.DriveConstants.*;
 import java.util.Arrays;
 
 import org.ironmaple.simulation.drivesims.COTS;
@@ -54,6 +45,8 @@ import frc.robot.CatzConstants;
 import frc.robot.CatzConstants.AllianceColor;
 import frc.robot.CatzSubsystems.DriveAndRobotOrientation.CatzRobotTracker;
 import frc.robot.CatzSubsystems.DriveAndRobotOrientation.CatzRobotTracker.OdometryObservation;
+import frc.robot.CatzSubsystems.DriveAndRobotOrientation.Drivetrain.GyroIO;
+import frc.robot.CatzSubsystems.DriveAndRobotOrientation.Drivetrain.GyroIOInputsAutoLogged;
 import frc.robot.Robot;
 import frc.robot.Utilities.Alert;
 import frc.robot.Utilities.EqualsUtil;

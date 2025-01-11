@@ -1,16 +1,19 @@
 // 2637
 // https://github.com/PhantomCatz/
 
-package frc.robot.CatzSubsystems.DriveAndRobotOrientation.drivetrain;
+package frc.robot.CatzSubsystems.DriveAndRobotOrientation.Drivetrain;
 
 import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.StatusCode;
 import com.ctre.phoenix6.StatusSignal;
+import com.ctre.phoenix6.configs.CANcoderConfiguration;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.*;
+import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
+import com.ctre.phoenix6.signals.SensorDirectionValue;
 
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -26,9 +29,9 @@ import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.DutyCycleEncoder;
 import edu.wpi.first.wpilibj.RobotController;
 import frc.robot.CatzConstants;
-import frc.robot.CatzSubsystems.DriveAndRobotOrientation.drivetrain.DriveConstants.ModuleIDsAndCurrentLimits;
+import frc.robot.CatzSubsystems.DriveAndRobotOrientation.Drivetrain.DriveConstants.ModuleIDsAndCurrentLimits;
 
-import static frc.robot.CatzSubsystems.DriveAndRobotOrientation.drivetrain.DriveConstants.*;
+import static frc.robot.CatzSubsystems.DriveAndRobotOrientation.Drivetrain.DriveConstants.*;
 
 import javax.swing.text.Position;
 
@@ -38,6 +41,7 @@ public class ModuleIORealFoc implements ModuleIO {
   // Hardware
   private final TalonFX driveTalon;
   private final TalonFX steerTalon;
+  private final CANcoder encoder;
   private final MT6835 absEncoder;
   private final Rotation2d absoluteEncoderOffset;
 
@@ -73,6 +77,8 @@ public class ModuleIORealFoc implements ModuleIO {
 
   ModuleIDsAndCurrentLimits m_config;
   public ModuleIORealFoc(ModuleIDsAndCurrentLimits config) {
+    encoder = new CANcoder(config.absoluteEncoderChannel(), "*");
+
     m_config = config;
     // Init drive controllers from config constants
     driveTalon = new TalonFX(config.driveID());
@@ -91,6 +97,15 @@ public class ModuleIORealFoc implements ModuleIO {
     driveTalonConfig.Slot0.kD = MODULE_GAINS_AND_RATIOS.drivekD();
     driveTalonConfig.Slot0.kS = MODULE_GAINS_AND_RATIOS.driveFFkS();
     driveTalonConfig.Slot0.kV = MODULE_GAINS_AND_RATIOS.driveFFkV();
+
+    // CANCoder
+    var cancoderConfig = new CANcoderConfiguration();
+    cancoderConfig.MagnetSensor.MagnetOffset = config.absoluteEncoderOffset(); //config.encoderOffset().getRotations();
+    cancoderConfig.MagnetSensor.SensorDirection =
+        config.encoderInverted()
+            ? SensorDirectionValue.Clockwise_Positive
+            : SensorDirectionValue.CounterClockwise_Positive;
+    encoder.getConfigurator().apply(cancoderConfig);
 
     // Assign 100hz Signals
     drivePosition = driveTalon.getPosition();
