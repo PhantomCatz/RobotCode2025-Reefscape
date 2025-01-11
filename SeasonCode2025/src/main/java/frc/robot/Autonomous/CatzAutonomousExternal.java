@@ -140,16 +140,16 @@ public class CatzAutonomousExternal extends VirtualSubsystem{
         }
 
         BooleanSupplier shouldFlip = ()-> AllianceFlipUtil.shouldFlipToRed();
-        // AutoBuilder.configure(
-        //     tracker::getEstimatedPose,
-        //     tracker::resetPose,
-        //     tracker::getRobotChassisSpeeds,
-        //     container.getCatzDrivetrain()::drive,
-        //     new controller(),
-        //     DriveConstants.TRAJECTORY_CONFIG,
-        //     shouldFlip,
-        //     container.getCatzDrivetrain()
-        // );
+        AutoBuilder.configure(
+            tracker::getEstimatedPose,
+            tracker::resetPose,
+            tracker::getRobotChassisSpeeds,
+            container.getCatzDrivetrain()::drive,
+            new controller(),
+            DriveConstants.TRAJECTORY_CONFIG,
+            shouldFlip,
+            container.getCatzDrivetrain()
+        );
         
         //------------------------------------------------------------------------------------------------------------
         // Path Configuration
@@ -179,18 +179,8 @@ public class CatzAutonomousExternal extends VirtualSubsystem{
                 e.printStackTrace();
             }
         }
+
         NamedCommands.registerCommands(pathplannerPaths);
-
-        autoQuestions.put("twoOrThreeGamePieces", new AutoQuestion(
-                                                        "Starting location?",
-                                                        List.of(
-                                                            AutoQuestionResponse.AMP,
-                                                            AutoQuestionResponse.CENTER)));
-        HashMap<AutoQuestionResponse, Command> startingChoices = new HashMap<>();
-        startingChoices.put(AutoQuestionResponse.AMP, NamedCommands.getCommand("Wing Scoring 1"));
-        startingChoices.put(AutoQuestionResponse.CENTER, NamedCommands.getCommand("Wing Scoring 2"));
-        NamedCommands.registerCommand("twoOrThreeGamePieces", Commands.select(startingChoices, () -> lastResponses.get(0)));
-
         for (File autoFile: autosDirectory.listFiles()){
             String autoName = autoFile.getName().replaceFirst("[.][^.]+$", "");
             autoProgramChooser.addOption(autoName, new PathPlannerAuto(autoName));
@@ -246,104 +236,8 @@ public class CatzAutonomousExternal extends VirtualSubsystem{
 
         // Update the routine and responses periodically from user
         lastProgram = selectedProgram;
-        // lastResponses = new ArrayList<>();
-        // for (int i = 0; i < lastProgram.questions().size(); i++) {
-        //     String responseString = questionChoosers.get(i).get();
-        //     lastResponses.add(
-        //         responseString == null
-        //             ? lastProgram.questions().get(i).responses().get(0)
-        //             : AutoQuestionResponse.valueOf(responseString)
-        //     );
-        // }
-
-        // Refresh Questionaire list when new Auto routine is selected
-        // if (!selectedProgram.equals(lastProgram)) {
-        //     List<AutoQuestion> questions = selectedProgram.questions();
-        //     for (int i = 0; i < MAX_QUESTIONS; i++) {
-        //         if (i < questions.size()) {
-        //             questionPublishers.get(i).set(questions.get(i).question());
-        //             questionChoosers.get(i).setOptions(questions.get(i).responses().stream()
-        //                         .map((AutoQuestionResponse response) -> response.toString())
-        //                         .toArray(String[]::new)
-        //             );
-        //         } else {
-        //             questionPublishers.get(i).set("");
-        //             questionChoosers.get(i).setOptions(new String[] {});
-        //         }
-        //     }
-        // }
-
-        // Update the routine and responses periodically from user
-        // lastProgram = selectedRoutine;
-        // lastResponses = new ArrayList<>();
-        // for (int i = 0; i < lastProgram.questions().size(); i++) {
-        //     String responseString = questionChoosers.get(i).get();
-        //     lastResponses.add(
-        //         responseString == null
-        //             ? lastProgram.questions().get(i).responses().get(0)
-        //             : AutoQuestionResponse.valueOf(responseString)
-        //     );
-        // }
-
-    }
-    //---------------------------------------------------------------------------------------------------------
-    //
-    //          Chooser helpers
-    //
-    //---------------------------------------------------------------------------------------------------------
-    /** Registers a new auto routine that can be selected. */
-    private void addProgram(String name, Command command) {
-        addProgram(name, List.of(), command);
     }
 
-    /** Registers a new auto routine that can be selected. */
-    private void addProgram(String name, List<AutoQuestion> questions, Command command) {
-        // if (questions.size() > MAX_QUESTIONS) {
-        //     throw new RuntimeException(
-        //         "Auto routine contained more than "
-        //             + Integer.toString(MAX_QUESTIONS)
-        //             + " questions: "
-        //             + name);
-        // }
-        // autoProgramChooser.addOption(name, new DashboardAutoProgram(name, questions, command));
-    }
-
-    // //---------------------------------------------------------------------------------------------------------
-    // //
-    // //          Autonomous Paths
-    // //
-    // //---------------------------------------------------------------------------------------------------------
-    // public Command speakerSideAuto() {
-    //     HashMap<AutoQuestionResponse, Command> startingChoices = new HashMap<>();
-    //     startingChoices.put(AutoQuestionResponse.AMP, NamedCommands.getCommand("Wing Scoring 1"));
-    //     startingChoices.put(AutoQuestionResponse.CENTER, NamedCommands.getCommand("Wing Scoring 2"));
-
-
-
-    //     return Commands.sequence(
-    //         Commands.select(
-    //             Map.of(
-    //                 AutoQuestionResponse.SOURCE,
-    //                 resetPose(FieldConstants.startingCenter),
-    //                 AutoQuestionResponse.CENTER,
-    //                 resetPose(FieldConstants.startingCenter),
-    //                 AutoQuestionResponse.AMP,
-    //                 resetPose(FieldConstants.startingAmp)
-    //             ),
-    //             () -> lastResponses.get(0) // Starting location
-    //         ),
-    //         Commands.select(startingChoices, () -> lastResponses.get(0)));
-    // }
-
-
-
-    //---------------------------------------------------------------------------------------------------------
-    //
-    //          Characteration Routines
-    //
-    //---------------------------------------------------------------------------------------------------------
-
-    
     //---------------------------------------------------------------------------------------------------------
     //
     //          Auto Driving

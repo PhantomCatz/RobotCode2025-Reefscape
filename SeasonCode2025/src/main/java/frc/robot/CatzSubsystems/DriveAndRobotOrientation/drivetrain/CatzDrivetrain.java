@@ -80,24 +80,6 @@ public class CatzDrivetrain extends SubsystemBase {
     //Swerve setpoint generator
     private final Field2d field;
 
-
-    public final ModuleConfig TRAJECTORY_MODULE_CONFIG = new ModuleConfig(
-                                                                        DRIVE_CONFIG.wheelRadius(),
-                                                                        DRIVE_CONFIG.maxLinearVelocity() / 2, 
-                                                                        TREAD_COEF_FRICTION, 
-                                                                        DCMotor.getKrakenX60(1)
-                                                                                .withReduction(MODULE_GAINS_AND_RATIOS.driveReduction()), 
-                                                                        DRIVE_CURRENT_LIMIT, 
-                                                                        1
-    );
-
-    public final RobotConfig TRAJECTORY_CONFIG = new RobotConfig(
-                                                                ROBOT_MASS,
-                                                                ROBOT_MOI,
-                                                                TRAJECTORY_MODULE_CONFIG,
-                                                                TRAJECTORY_MODULE_TRANSLATIONS
-    );
-
     public CatzDrivetrain() {
 
         // Gyro Instantiation

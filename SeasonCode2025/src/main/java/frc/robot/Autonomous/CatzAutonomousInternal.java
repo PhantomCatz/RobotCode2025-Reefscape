@@ -163,27 +163,27 @@ public class CatzAutonomousInternal extends VirtualSubsystem{
         }
         NamedCommands.registerCommands(pathplannerPaths);
         
-        addProgram("Speaker",  
-            List.of(
-                new AutoQuestion(
-                    "Starting location?",
-                    List.of(
-                        AutoQuestionResponse.AMP,
-                        AutoQuestionResponse.CENTER
-                    )
-                ),
-                new AutoQuestion(
-                    "How many spike notes?",
-                    List.of(
-                            AutoQuestionResponse.TWO,
-                            AutoQuestionResponse.THREE
-                    )
-                )
-                    ), 
-            speakerSideAuto()
-        );
+        // addProgram("Speaker",  
+        //     List.of(
+        //         new AutoQuestion(
+        //             "Starting location?",
+        //             List.of(
+        //                 AutoQuestionResponse.AMP,
+        //                 AutoQuestionResponse.CENTER
+        //             )
+        //         ),
+        //         new AutoQuestion(
+        //             "How many spike notes?",
+        //             List.of(
+        //                     AutoQuestionResponse.TWO,
+        //                     AutoQuestionResponse.THREE
+        //             )
+        //         )
+        //             ), 
+        //     speakerSideAuto()
+        // );
 
-        addProgram("test", autoFindPathStation());
+        // addProgram("test", autoFindPathStation());
     } //end of CatzAutonomous constructor
 
     @Override

@@ -21,6 +21,7 @@ import edu.wpi.first.math.controller.HolonomicDriveController;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
@@ -225,12 +226,30 @@ public class DriveConstants {
             0.02
         );
     }
-
     public static final PathFollowingController PATH_FOLLOWING_CONTROLLER = getNewPathFollowingController();
 
+    public static final ChassisSpeeds NON_ZERO_CHASSIS_SPEED = new ChassisSpeeds(1, 1, 0);
+
     public static final double ROBOT_MASS          = 68.0;
-    public static final double ROBOT_MOI           = (1/12) * ROBOT_MASS * (Math.pow(DRIVE_CONFIG.bumperWidthX(), 2) + Math.pow(DRIVE_CONFIG.bumperWidthY(), 2));//ROBOT_MASS * (2/2) * (kA_ANGULAR_ACCEL/kA_LINEAR_ACCEL); // TODO need to recaculate with formula on Pathplanner
-    public static final double TREAD_COEF_FRICTION = 1000000.542;
+    public static final double ROBOT_MOI           = (1.0/12.0) * ROBOT_MASS * (Math.pow(DRIVE_CONFIG.bumperWidthX(), 2) + Math.pow(DRIVE_CONFIG.bumperWidthY(), 2));//ROBOT_MASS * (2/2) * (kA_ANGULAR_ACCEL/kA_LINEAR_ACCEL); // TODO need to recaculate with formula on Pathplanner
+    public static final double TREAD_COEF_FRICTION = 1.542;
+
+    public static final ModuleConfig TRAJECTORY_MODULE_CONFIG = new ModuleConfig(
+                                                                        DRIVE_CONFIG.wheelRadius(),
+                                                                        DRIVE_CONFIG.maxLinearVelocity() / 2.0, 
+                                                                        TREAD_COEF_FRICTION, 
+                                                                        DCMotor.getKrakenX60(1)
+                                                                                .withReduction(MODULE_GAINS_AND_RATIOS.driveReduction()), 
+                                                                        DRIVE_CURRENT_LIMIT, 
+                                                                        1
+    );
+
+    public static final RobotConfig TRAJECTORY_CONFIG = new RobotConfig(
+                                                                ROBOT_MASS,
+                                                                ROBOT_MOI,
+                                                                TRAJECTORY_MODULE_CONFIG,
+                                                                TRAJECTORY_MODULE_TRANSLATIONS
+    );
     
     //-----------------------------------------------------------------------------------------------------------------------------
     //
