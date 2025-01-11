@@ -127,6 +127,7 @@ public class TrajectoryDriveCmd extends Command {
         tracker.resetPose(startingPose);
         
         ChassisSpeeds currentSpeeds = DriveConstants.SWERVE_KINEMATICS.toChassisSpeeds(tracker.getCurrentModuleStates());
+        //If we provide an initial speed of zero the trajectory will take an infinite time to finish (divide by 0) and not be sampleable
         if (Math.hypot(currentSpeeds.vxMetersPerSecond, currentSpeeds.vxMetersPerSecond) < 1e-6){
             currentSpeeds = DriveConstants.NON_ZERO_CHASSIS_SPEED;
         }
