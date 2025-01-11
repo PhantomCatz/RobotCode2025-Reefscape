@@ -30,6 +30,8 @@ import frc.robot.CatzSubsystems.DriveAndRobotOrientation.vision.CatzVision;
 import frc.robot.CatzSubsystems.DriveAndRobotOrientation.vision.VisionIO;
 import frc.robot.CatzSubsystems.DriveAndRobotOrientation.vision.VisionIOLimeLight;
 import frc.robot.CatzSubsystems.LEDs.CatzLED;
+import frc.robot.CatzSubsystems.outtake.CatzOuttake;
+import frc.robot.CatzSubsystems.outtake.OuttakeIOSparkmax;
 import frc.robot.Commands.AutomatedSequenceCmds;
 import frc.robot.Commands.ControllerModeAbstraction;
 import frc.robot.Commands.DriveAndRobotOrientationCmds.FaceTarget;
@@ -47,11 +49,14 @@ public class RobotContainer {
   //-------------------------------------------------------------------------------------------------------------------
   // Primary subsystem declaration
   private static CatzDrivetrain   drive                = new CatzDrivetrain();
+
   
   // Assistance Subsystem declaration
   private static CatzLED          led = CatzLED.getInstance();
   private static CatzRobotTracker robotTracker = CatzRobotTracker.getInstance();
   private static CatzVision       vision       = new CatzVision();
+
+  private static CatzOuttake      outtake = new CatzOuttake();
 
   //------------------------------------------------------------------------------------------------------------------
   // Drive Controller Declaration
@@ -122,12 +127,15 @@ public class RobotContainer {
     xboxDrv.b().onTrue(auto.autoFindPathStation());
     xboxDrv.x().onTrue(auto.autoFindPathSpeaker());
 
+    xboxDrv.a().toggleOnTrue(outtake.runMotor().alongWith(Commands.print("press a")));
+    
 
     
     drive.setDefaultCommand(new TeleopDriveCmd(() -> xboxDrv.getLeftX(), 
                                                () -> xboxDrv.getLeftY(), 
                                                () -> xboxDrv.getRightX(), drive));
     //TODO add triggers to put default as priority    
+
   }
 
   //---------------------------------------------------------------------------
