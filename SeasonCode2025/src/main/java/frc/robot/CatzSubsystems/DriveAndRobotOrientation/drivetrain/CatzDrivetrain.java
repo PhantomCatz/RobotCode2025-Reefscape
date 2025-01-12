@@ -16,6 +16,8 @@ import org.littletonrobotics.junction.Logger;
 
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.config.ModuleConfig;
+import com.pathplanner.lib.config.RobotConfig;
 import com.pathplanner.lib.pathfinding.Pathfinding;
 import com.pathplanner.lib.util.DriveFeedforwards;
 import com.pathplanner.lib.util.PathPlannerLogging;
@@ -55,7 +57,7 @@ import frc.robot.Utilities.MotorUtil.NeutralMode;
 
 // Drive train subsystem for swerve drive implementation
 public class CatzDrivetrain extends SubsystemBase {
-    
+
     // Gyro input/output interface
     private final GyroIO gyroIO;
     private final GyroIOInputsAutoLogged gyroInputs = new GyroIOInputsAutoLogged();
@@ -78,7 +80,6 @@ public class CatzDrivetrain extends SubsystemBase {
 
     //Swerve setpoint generator
     private final Field2d field;
-
 
     public CatzDrivetrain() {
 

@@ -100,6 +100,7 @@ public class CatzRobotTracker {
   //
   //  Pose Estimation adder methods
   //
+  
   //------------------------------------------------------------------------------------------------------
   /** Add odometry observation */
   public void addOdometryObservation(OdometryObservation observation) {

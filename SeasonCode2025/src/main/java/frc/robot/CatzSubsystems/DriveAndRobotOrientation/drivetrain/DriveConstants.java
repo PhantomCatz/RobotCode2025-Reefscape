@@ -16,12 +16,14 @@ import com.pathplanner.lib.config.RobotConfig;
 import com.pathplanner.lib.controllers.PPHolonomicDriveController;
 import com.pathplanner.lib.controllers.PathFollowingController;
 import com.pathplanner.lib.path.PathConstraints;
+import com.pathplanner.lib.pathfinding.LocalADStar;
 
 import edu.wpi.first.math.controller.HolonomicDriveController;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
@@ -67,7 +69,7 @@ public class DriveConstants {
               .bumperWidthX(Units.inchesToMeters(37))
               .bumperWidthY(Units.inchesToMeters(33))
               .maxLinearVelocity(Units.feetToMeters(17))
-              .maxLinearAcceleration(Math.pow(Units.feetToMeters(17), 2)) 
+              .maxLinearAcceleration(Math.pow(Units.feetToMeters(17), 2)) //TODO why square
               .maxAngularVelocity(Units.degreesToRadians(600)) // Radians
               .maxAngularAcceleration(Units.degreesToRadians(600)) // Radians // TODO verify angle constraints
               .build();
@@ -172,13 +174,14 @@ public class DriveConstants {
                     new ModuleIDsAndCurrentLimits(7, 8, 6, 0.0, false)
                 };
         };
+
     //-----------------------------------------------------------------------------------------------------------------------------
     //
     //      Drivebase controller/object definements
     //
     //-----------------------------------------------------------------------------------------------------------------------------
     public static final PathConstraints PATHFINDING_CONSTRAINTS = new PathConstraints( // 540 // 720 
-                                                                    2.0, DRIVE_CONFIG.maxLinearAcceleration, //max vel causing messup
+                                                                    DRIVE_CONFIG.maxLinearVelocity, DRIVE_CONFIG.maxLinearAcceleration, //max vel causing messup
                                                                     DRIVE_CONFIG.maxAngularVelocity, DRIVE_CONFIG.maxAngularAcceleration);
 
 
@@ -190,7 +193,7 @@ public class DriveConstants {
             new Translation2d( DRIVE_CONFIG.robotLengthX(), -DRIVE_CONFIG.robotWidthY()).div(2.0)     //RT FRONT
         };    
 
-    private static final Translation2d[] TRAJECTORY_MODULE_TRANSLATIONS = 
+    public static final Translation2d[] TRAJECTORY_MODULE_TRANSLATIONS = 
         new Translation2d[] {
             new Translation2d( DRIVE_CONFIG.robotLengthX() , DRIVE_CONFIG.robotWidthY()).div(2.0),    //LT FRONT
             new Translation2d( DRIVE_CONFIG.robotLengthX(), -DRIVE_CONFIG.robotWidthY()).div(2.0),    //RT FRONT
@@ -226,19 +229,20 @@ public class DriveConstants {
             0.02
         );
     }
-
     public static final PathFollowingController PATH_FOLLOWING_CONTROLLER = getNewPathFollowingController();
 
+    public static final ChassisSpeeds NON_ZERO_CHASSIS_SPEED = new ChassisSpeeds(1, 1, 0);
+
     public static final double ROBOT_MASS          = 68.0;
-    public static final double ROBOT_MOI           = (1/12) * ROBOT_MASS * (Math.pow(DRIVE_CONFIG.bumperWidthX(), 2) + Math.pow(DRIVE_CONFIG.bumperWidthY(), 2));//ROBOT_MASS * (2/2) * (kA_ANGULAR_ACCEL/kA_LINEAR_ACCEL); // TODO need to recaculate with formula on Pathplanner
+    public static final double ROBOT_MOI           = (1.0/12.0) * ROBOT_MASS * (Math.pow(DRIVE_CONFIG.bumperWidthX(), 2) + Math.pow(DRIVE_CONFIG.bumperWidthY(), 2));//ROBOT_MASS * (2/2) * (kA_ANGULAR_ACCEL/kA_LINEAR_ACCEL); // TODO need to recaculate with formula on Pathplanner
     public static final double TREAD_COEF_FRICTION = 1.542;
-    
+
     public static final ModuleConfig TRAJECTORY_MODULE_CONFIG = new ModuleConfig(
                                                                         DRIVE_CONFIG.wheelRadius(),
-                                                                        DRIVE_CONFIG.maxLinearVelocity() / 2, 
+                                                                        DRIVE_CONFIG.maxLinearVelocity() / 2.0, 
                                                                         TREAD_COEF_FRICTION, 
                                                                         DCMotor.getKrakenX60(1)
-                                                                                .withReduction(MODULE_GAINS_AND_RATIOS.driveReduction), 
+                                                                                .withReduction(MODULE_GAINS_AND_RATIOS.driveReduction()), 
                                                                         DRIVE_CURRENT_LIMIT, 
                                                                         1
     );
@@ -249,7 +253,7 @@ public class DriveConstants {
                                                                 TRAJECTORY_MODULE_CONFIG,
                                                                 TRAJECTORY_MODULE_TRANSLATIONS
     );
-
+    
     //-----------------------------------------------------------------------------------------------------------------------------
     //
     //      Simulation helpers

@@ -1,5 +1,7 @@
 package frc.robot.Commands.DriveAndRobotOrientationCmds;
 
+import static edu.wpi.first.units.Units.Ounce;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -7,7 +9,10 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.Set;
+
+import javax.sound.sampled.SourceDataLine;
 
 import org.littletonrobotics.junction.Logger;
 
@@ -20,6 +25,7 @@ import com.pathplanner.lib.path.GoalEndState;
 import com.pathplanner.lib.path.PathConstraints;
 import com.pathplanner.lib.path.PathPlannerPath;
 import com.pathplanner.lib.path.RotationTarget;
+import com.pathplanner.lib.pathfinding.LocalADStar;
 import com.pathplanner.lib.trajectory.PathPlannerTrajectory;
 import com.pathplanner.lib.trajectory.PathPlannerTrajectoryState;
 import com.pathplanner.lib.util.DriveFeedforwards;
@@ -116,24 +122,27 @@ public class TrajectoryDriveCmd extends Command {
     public void initialize() {
         // Flip path if necessary
         PathPlannerPath usePath = path;
-        Rotation2d flippedRotation2d = tracker.getEstimatedPose().getRotation();
-        System.out.println(flippedRotation2d.getDegrees());
         if(AllianceFlipUtil.shouldFlipToRed()) {
             usePath = path.flipPath();
-            flippedRotation2d = flippedRotation2d.plus(Rotation2d.fromDegrees(180));
         }
+
+        try{
+            tracker.resetPose(usePath.getStartingHolonomicPose().get());
+        }catch(NoSuchElementException e){}
         
+        ChassisSpeeds currentSpeeds = DriveConstants.SWERVE_KINEMATICS.toChassisSpeeds(tracker.getCurrentModuleStates());
+        // If we provide an initial speed of zero the trajectory will take an infinite time to finish (divide by 0) and not be sampleable
+        if (Math.hypot(currentSpeeds.vxMetersPerSecond, currentSpeeds.vxMetersPerSecond) < 1e-6){
+            currentSpeeds = DriveConstants.NON_ZERO_CHASSIS_SPEED;
+        }
         // Construct trajectory
         this.trajectory = new PathPlannerTrajectory(
             usePath,
-            DriveConstants.
-                SWERVE_KINEMATICS
-                    .toChassisSpeeds(tracker.getCurrentModuleStates()),
-            flippedRotation2d,
+            currentSpeeds,
+            tracker.getEstimatedPose().getRotation(),
             DriveConstants.TRAJECTORY_CONFIG
         );
 
-        System.out.println(flippedRotation2d.getDegrees());
         hocontroller = DriveConstants.getNewHolController(); 
         ppHoController = DriveConstants.getNewPathFollowingController();
         pathTimeOut = trajectory.getTotalTimeSeconds() * TIMEOUT_SCALAR; //TODO do we still need this
@@ -153,49 +162,38 @@ public class TrajectoryDriveCmd extends Command {
     // 
     //---------------------------------------------------------------------------------------------
     @Override
-    public void execute() {;
+    public void execute() {
         double currentTime = this.timer.get();
         // Getters from pathplanner and current robot pose
         PathPlannerTrajectoryState goal = trajectory.sample(Math.min(currentTime, trajectory.getTotalTimeSeconds()));
-        Rotation2d targetOrientation    = goal.heading;
         Pose2d currentPose              = tracker.getEstimatedPose();
         ChassisSpeeds currentSpeeds     = DriveConstants.SWERVE_KINEMATICS.toChassisSpeeds(m_driveTrain.getModuleStates());
         double currentVel               = Math.hypot(currentSpeeds.vxMetersPerSecond, currentSpeeds.vyMetersPerSecond);
-        System.out.println(atTarget);
         // Trajectory Executor
-        if(!atTarget){
-                
-            //-------------------------------------------------------------------------------------
-            // Convert PP trajectory into a wpilib trajectory type 
-            // Only takes in the current robot position 
-            // Does not take acceleration to be used with the internal WPILIB trajectory library
-            // Holonomic drive controller only relies on its current position, not its velocity because the target velocity is used as a ff
-            //-------------------------------------------------------------------------------------
-            Trajectory.State state = new Trajectory.State(
-                currentTime, 
-                goal.linearVelocity,  //made the 
-                goal.linearVelocity/goal.timeSeconds, //TODO verify if this does what we want it to do 
-                goal.pose,
-                0.0
-            );
+       
+        //-------------------------------------------------------------------------------------
+        // Convert PP trajectory into a wpilib trajectory type 
+        // Only takes in the current robot position 
+        // Does not take acceleration to be used with the internal WPILIB trajectory library
+        // Holonomic drive controller only relies on its current position, not its velocity because the target velocity is used as a ff
+        //-------------------------------------------------------------------------------------
+        Trajectory.State state = new Trajectory.State(
+            currentTime, 
+            goal.linearVelocity,  //made the 
+            0.0, //TODO verify if this does what we want it to do 
+            new Pose2d(goal.pose.getTranslation(), goal.heading),
+            0.0
+        );
+
+        //construct chassisspeeds
+        ChassisSpeeds adjustedSpeeds = hocontroller.calculate(currentPose, state, goal.pose.getRotation());
+
+        //send to drivetrain
+        m_driveTrain.drive(adjustedSpeeds);
+        tracker.addTrajectorySetpointData(goal.pose);
+        // Log desired pose
+        Logger.recordOutput("CatzRobotTracker/Desired Auto Pose", goal.pose);
     
-            //construct chassisspeeds
-            ChassisSpeeds adjustedSpeeds = hocontroller.calculate(currentPose, state, targetOrientation);
-            ChassisSpeeds ppAdjustedSpeeds = ppHoController.calculateRobotRelativeSpeeds(currentPose, goal);
-
-
-            //send to drivetrain
-            m_driveTrain.drive(adjustedSpeeds);
-            tracker.addTrajectorySetpointData(goal.pose);
-            System.out.println("hi");
-            // Log desired pose
-            Logger.recordOutput("CatzRobotTracker/Desired Auto Pose", new Pose2d(state.poseMeters.getTranslation(), goal.heading));
-        }
-        else{
-            m_driveTrain.stopDriving();
-        } // End of if(!atTarget) else
-        
-
         //---------------------------------------------------------------------------------------------------------------------------
         // Named Commands
         //---------------------------------------------------------------------------------------------------------------------------
