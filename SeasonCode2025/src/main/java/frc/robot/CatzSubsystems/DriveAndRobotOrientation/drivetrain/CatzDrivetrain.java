@@ -5,15 +5,7 @@ import static edu.wpi.first.units.Units.KilogramSquareMeters;
 import static edu.wpi.first.units.Units.Kilograms;
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.Volts;
-import static frc.robot.CatzSubsystems.DriveAndRobotOrientation.drivetrain.DriveConstants.DRIVE_CONFIG;
-import static frc.robot.CatzSubsystems.DriveAndRobotOrientation.drivetrain.DriveConstants.INDEX_BL;
-import static frc.robot.CatzSubsystems.DriveAndRobotOrientation.drivetrain.DriveConstants.INDEX_BR;
-import static frc.robot.CatzSubsystems.DriveAndRobotOrientation.drivetrain.DriveConstants.INDEX_FL;
-import static frc.robot.CatzSubsystems.DriveAndRobotOrientation.drivetrain.DriveConstants.INDEX_FR;
-import static frc.robot.CatzSubsystems.DriveAndRobotOrientation.drivetrain.DriveConstants.MODULE_GAINS_AND_RATIOS;
-import static frc.robot.CatzSubsystems.DriveAndRobotOrientation.drivetrain.DriveConstants.MODULE_NAMES;
-import static frc.robot.CatzSubsystems.DriveAndRobotOrientation.drivetrain.DriveConstants.MODULE_TRANSLATIONS;
-import static frc.robot.CatzSubsystems.DriveAndRobotOrientation.drivetrain.DriveConstants.ROBOT_MASS;
+import static frc.robot.CatzSubsystems.DriveAndRobotOrientation.drivetrain.DriveConstants.*;
 
 import java.util.Arrays;
 
@@ -25,6 +17,8 @@ import org.littletonrobotics.junction.Logger;
 
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.config.ModuleConfig;
+import com.pathplanner.lib.config.RobotConfig;
 import com.pathplanner.lib.pathfinding.Pathfinding;
 import com.pathplanner.lib.util.DriveFeedforwards;
 import com.pathplanner.lib.util.PathPlannerLogging;
@@ -62,7 +56,7 @@ import frc.robot.Utilities.MotorUtil.NeutralMode;
 
 // Drive train subsystem for swerve drive implementation
 public class CatzDrivetrain extends SubsystemBase {
-    
+
     // Gyro input/output interface
     private final GyroIO gyroIO;
     private final GyroIOInputsAutoLogged gyroInputs = new GyroIOInputsAutoLogged();
@@ -85,7 +79,6 @@ public class CatzDrivetrain extends SubsystemBase {
 
     //Swerve setpoint generator
     private final Field2d field;
-
 
     public CatzDrivetrain() {
 

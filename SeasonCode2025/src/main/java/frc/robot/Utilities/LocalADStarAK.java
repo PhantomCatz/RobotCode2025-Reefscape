@@ -2,12 +2,13 @@ package frc.robot.Utilities;
 
 import edu.wpi.first.math.Pair;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.wpilibj.Timer;
+
 import com.pathplanner.lib.path.GoalEndState;
 import com.pathplanner.lib.path.PathConstraints;
 import com.pathplanner.lib.path.PathPlannerPath;
 import com.pathplanner.lib.path.PathPoint;
 import com.pathplanner.lib.pathfinding.Pathfinder;
-import com.pathplanner.lib.pathfinding.LocalADStar;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -17,6 +18,7 @@ import org.littletonrobotics.junction.inputs.LoggableInputs;
 
 public class LocalADStarAK implements Pathfinder {
   private final ADStarIO io = new ADStarIO();
+  private static final double TIMEOUT = 2;
 
   /**
    * Get if a new path has been calculated since the last time a path was retrieved
@@ -137,7 +139,15 @@ public class LocalADStarAK implements Pathfinder {
     }
 
     public void updateCurrentPathPoints(PathConstraints constraints, GoalEndState goalEndState) {
-      PathPlannerPath currentPath = adStar.getCurrentPath(constraints, goalEndState);
+      PathPlannerPath currentPath = null;
+      Timer time = new Timer();
+      time.reset();
+      time.start();
+
+      while(!adStar.isNewPathAvailable() && time.get() < TIMEOUT){
+        Timer.delay(0.02);
+      }
+      currentPath = adStar.getCurrentPath(constraints, goalEndState);
 
       if (currentPath != null) {
         currentPathPoints = currentPath.getAllPathPoints();

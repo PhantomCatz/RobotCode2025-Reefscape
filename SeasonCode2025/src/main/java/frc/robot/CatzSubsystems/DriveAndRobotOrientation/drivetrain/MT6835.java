@@ -1,6 +1,10 @@
 package frc.robot.CatzSubsystems.DriveAndRobotOrientation.drivetrain;
 
 import edu.wpi.first.wpilibj.CAN;
+
+import java.util.ArrayList;
+import java.util.List;
+
 import edu.wpi.first.hal.CANData;
 
 public class MT6835 {
@@ -8,85 +12,80 @@ public class MT6835 {
     private CANData canData;
     private final int deviceID;
     private final boolean debugMode;
-    private final int apiID = 0;
-    private double lastValue;
-    private int rotationCount;
+    private long multiTurnCounts;
+    
+    // Default API ID for reading multi-turn counts
+    private static final int DEFAULT_API_ID = 0;  // Replace with your appropriate default API ID.
+    private static final int QUERY_API_ID = 1;   // API ID for querying devices
 
     public MT6835(int deviceID, boolean debugMode) {
         this.deviceID = deviceID;
         this.debugMode = debugMode;
         this.canDevice = new CAN(deviceID, 8, 10);
         this.canData = new CANData();
-        this.lastValue = 0.0;
-        this.rotationCount = 0;
     }
 
     /**
-     * Reads the latest packet from the CAN device and returns the angle as a normalized value.
+     * Reads the latest CAN packet using the default API ID, parses 8 bytes
+     * into a 64-bit raw count, and stores it in `multiTurnCounts`.
      *
-     * @return A double representing the angle between 0 and 1, or -1 if no valid packet is received.
+     * If no valid packet is received or data is < 8 bytes, `multiTurnCounts` is not updated.
      */
-    public double readPositionRollover() {
+    public void readMultiTurnCounts() {
+        // Use the default API ID for reading multi-turn counts
+        int apiID = DEFAULT_API_ID;
+
+        // Attempt to read the latest packet for apiID
         if (canDevice.readPacketLatest(apiID, canData)) {
             byte[] receivedData = canData.data;
 
-            if (canData.length >= 3) {
-                int counts = ((receivedData[0] & 0xFF) << 16) |
-                             ((receivedData[1] & 0xFF) << 8) |
-                             (receivedData[2] & 0xFF);
+            // We need at least 8 bytes to parse a 64-bit long
+            if (canData.length >= 8) {
+                // Combine the 8 bytes into one 64-bit long
+                long rawCounts = ((long)(receivedData[0] & 0xFF) << 56)
+                               | ((long)(receivedData[1] & 0xFF) << 48)
+                               | ((long)(receivedData[2] & 0xFF) << 40)
+                               | ((long)(receivedData[3] & 0xFF) << 32)
+                               | ((long)(receivedData[4] & 0xFF) << 24)
+                               | ((long)(receivedData[5] & 0xFF) << 16)
+                               | ((long)(receivedData[6] & 0xFF) <<  8)
+                               | ((long)(receivedData[7] & 0xFF));
 
-                double angle = counts / (double) (1 << 21); // Normalize based on 2^21 (max value for 21 bits)
+                // Store it in our field
+                multiTurnCounts = rawCounts;
 
+                // Optional debug info
                 if (debugMode) {
-                    System.out.printf("Device %d: Read angle = %.6f (API_ID=%d, Data=%s)%n",
-                            deviceID, angle, apiID, bytesToHex(receivedData));
+                    System.out.printf(
+                        "Device %d: multiTurnCounts = %d (API_ID=0x%X, Data=%s)%n",
+                        deviceID, multiTurnCounts, apiID, bytesToHex(receivedData)
+                    );
                 }
-
-                return angle;
             } else {
+                // Not enough data to parse 64 bits
                 if (debugMode) {
-                    System.out.println("Device " + deviceID + ": Received CAN Packet with insufficient data.");
+                    System.out.printf(
+                        "Device %d: Received CAN packet with only %d bytes; need 8.%n",
+                        deviceID, canData.length
+                    );
                 }
             }
         } else {
+            // No CAN packet received
             if (debugMode) {
-                System.out.println("Device " + deviceID + ": No CAN message received.");
+                System.out.printf("Device %d: No CAN message received for API_ID=0x%X.%n", 
+                                  deviceID, apiID);
             }
         }
-        return -1; // Return -1 to indicate an error
     }
 
     /**
-     * Reads the latest packet from the CAN device and returns the angle as a normalized value.
+     * Returns the last stored raw multi-turn counts.
      *
-     * @return A double representing the encoder value in the -1 to 1 scale
+     * @return The last known value of multiTurnCounts.
      */
-    public double readAbsolutePosition() {
-        return applyCountUp(readPositionRollover());
-    }
-
-    /**
-     * Updates the encoder's cumulative value based on the current reading.
-     * 
-     * @param currentValue The Latest encoder value (0 to 1).
-     * @return The cumulative encoder value.
-     */
-    public double applyCountUp(double currentValue) {
-        // Calculate the difference
-        double delta = currentValue - lastValue;
-
-        // Handle Rollovers
-        if(delta > 0.5) { //Rollover in the Negative Direction
-            rotationCount--;
-        } else if(delta < -0.5) { // Rollover in the positive Direction
-            rotationCount++;
-        }
-
-        // Update the last value
-        lastValue = currentValue;
-
-        // Compute the cumulative value
-        return rotationCount + currentValue;
+    public long getMultiTurnCounts() {
+        return multiTurnCounts;
     }
 
     /**
@@ -107,6 +106,38 @@ public class MT6835 {
                 System.err.printf("Device %d: Failed to send CAN Packet: %s%n", deviceID, e.getMessage());
             }
         }
+    }
+
+    /**
+     * Method to query devices using API ID 1.
+     * Continuously reads CAN packets with a timeout of 1000 ms until no new packets arrive.
+     * Stores all received data in an array and prints the received devices.
+     *
+     * @return List of received CAN packet data as byte arrays.
+     */
+    public List<byte[]> queryDevices() {
+        List<byte[]> receivedPackets = new ArrayList<>();
+        boolean packetReceived;
+        int responseCount = 0;
+
+        do {
+            packetReceived = canDevice.readPacketNew(QUERY_API_ID, canData);
+            if (packetReceived) {
+                responseCount++;
+                byte[] dataCopy = new byte[canData.length];
+                System.arraycopy(canData.data, 0, dataCopy, 0, canData.length);
+                receivedPackets.add(dataCopy);
+                System.out.printf("Response %d: Received CAN Packet: Data=%s%n", responseCount, bytesToHex(dataCopy));
+            }
+        } while (packetReceived);
+
+        System.out.printf("Total number of responses: %d%n", responseCount);
+
+        if (receivedPackets.isEmpty()) {
+            System.out.println("No CAN packets received during device query.");
+        }
+
+        return receivedPackets;
     }
 
     /**
