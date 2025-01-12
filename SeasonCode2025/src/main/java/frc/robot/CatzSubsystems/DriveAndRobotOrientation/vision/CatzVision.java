@@ -66,8 +66,8 @@ public class CatzVision extends SubsystemBase {
             }
 
         }        
-        Pose2d sobaPose2d = new Pose2d(inputs[1].x, inputs[1].y, new Rotation2d());
-        Logger.recordOutput("Vision/vision poses/soba", sobaPose2d);
+        // Pose2d sobaPose2d = new Pose2d(inputs[1].x, inputs[1].y, new Rotation2d());
+        // Logger.recordOutput("Vision/vision poses/soba", sobaPose2d);
 
         Pose2d udonPose2d = new Pose2d(inputs[0].x, inputs[0].y, new Rotation2d());
         Logger.recordOutput("Vision/vison poses/udon", udonPose2d); 

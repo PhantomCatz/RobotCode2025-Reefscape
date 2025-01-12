@@ -42,6 +42,8 @@ public class ModuleIORealFoc implements ModuleIO {
   private final TalonFX driveTalon;
   private final TalonFX steerTalon;
   private final CANcoder encoder;
+  private final DutyCycleEncoder steerAbsoluteMagEnc;
+  private final DigitalInput magEncPWMInput;
   private final MT6835 absEncoder;
   private final Rotation2d absoluteEncoderOffset;
 
@@ -90,7 +92,7 @@ public class ModuleIORealFoc implements ModuleIO {
     driveTalonConfig.TorqueCurrent.PeakForwardTorqueCurrent = 80.0; 
     driveTalonConfig.TorqueCurrent.PeakReverseTorqueCurrent = -80.0;
     driveTalonConfig.ClosedLoopRamps.TorqueClosedLoopRampPeriod = 0.02;
-    driveTalonConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
+    driveTalonConfig.MotorOutput.NeutralMode = NeutralModeValue.Coast;
 
     // Gain Setting
     driveTalonConfig.Slot0.kP = MODULE_GAINS_AND_RATIOS.drivekP();
@@ -99,13 +101,18 @@ public class ModuleIORealFoc implements ModuleIO {
     driveTalonConfig.Slot0.kV = MODULE_GAINS_AND_RATIOS.driveFFkV();
 
     // CANCoder
-    var cancoderConfig = new CANcoderConfiguration();
-    cancoderConfig.MagnetSensor.MagnetOffset = config.absoluteEncoderOffset(); //config.encoderOffset().getRotations();
-    cancoderConfig.MagnetSensor.SensorDirection =
-        config.encoderInverted()
-            ? SensorDirectionValue.Clockwise_Positive
-            : SensorDirectionValue.CounterClockwise_Positive;
-    encoder.getConfigurator().apply(cancoderConfig);
+    // var cancoderConfig = new CANcoderConfiguration();
+    // cancoderConfig.MagnetSensor.MagnetOffset = config.absoluteEncoderOffset(); //config.encoderOffset().getRotations();
+    // cancoderConfig.MagnetSensor.SensorDirection =
+    //     config.encoderInverted()
+    //         ? SensorDirectionValue.Clockwise_Positive
+    //         : SensorDirectionValue.CounterClockwise_Positive;
+    // encoder.getConfigurator().apply(cancoderConfig);
+
+    // MagEnc
+    // Init Steer controllers and steer encoder from config constants
+    magEncPWMInput = new DigitalInput(config.absoluteEncoderChannel());
+    steerAbsoluteMagEnc = new DutyCycleEncoder(magEncPWMInput);
 
     // Assign 100hz Signals
     drivePosition = driveTalon.getPosition();
@@ -203,8 +210,10 @@ public class ModuleIORealFoc implements ModuleIO {
     inputs.driveTorqueCurrentAmps = driveTorqueCurrent.getValueAsDouble();
 
     // Refresh steer Motor Values
-    inputs.rawAbsEncValueRotation  = absEncoder.readAbsolutePosition();
-    inputs.steerAbsPosition   = Rotation2d.fromRotations(-(inputs.rawAbsEncValueRotation - absoluteEncoderOffset.getRotations()));
+    // inputs.rawAbsEncValueRotation  = absEncoder.readAbsolutePosition();
+    // inputs.steerAbsPosition   = Rotation2d.fromRotations(-(inputs.rawAbsEncValueRotation - absoluteEncoderOffset.getRotations()));
+    inputs.rawAbsEncPosition = Rotation2d.fromRotations(steerAbsoluteMagEnc.get());
+    inputs.steerAbsPosition  = Rotation2d.fromRotations(inputs.rawAbsEncValueRotation - absoluteEncoderOffset.getRotations());
 
     inputs.steerVelocityRadsPerSec = Units.rotationsToRadians(steerVelocity.getValueAsDouble());
     inputs.steerSupplyCurrentAmps = steerSupplyCurrent.getValueAsDouble();

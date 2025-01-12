@@ -159,8 +159,8 @@ public class DriveConstants {
                 };
             case SN1 ->
                 new ModuleIDsAndCurrentLimits[] {
-                    new ModuleIDsAndCurrentLimits(1, 2, 2, -0.22139, false),
-                    new ModuleIDsAndCurrentLimits(3, 4, 1, 0.259, false),
+                    new ModuleIDsAndCurrentLimits(1, 2, 1, -0.22139, false),
+                    new ModuleIDsAndCurrentLimits(3, 4, 2, 0.259, false),
                     new ModuleIDsAndCurrentLimits(5, 6, 3, 0.188, false),
                     new ModuleIDsAndCurrentLimits(7, 8, 4, 0.000182, false)
                 };
