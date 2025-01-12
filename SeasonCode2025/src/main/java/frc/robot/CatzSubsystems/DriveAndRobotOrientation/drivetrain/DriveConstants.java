@@ -1,10 +1,10 @@
-package frc.robot.CatzSubsystems.DriveAndRobotOrientation.drivetrain;
+package frc.robot.CatzSubsystems.DriveAndRobotOrientation.Drivetrain;
 
 import static edu.wpi.first.units.Units.KilogramSquareMeters;
 import static edu.wpi.first.units.Units.Kilograms;
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.Volts;
-import static frc.robot.CatzSubsystems.DriveAndRobotOrientation.drivetrain.DriveConstants.DRIVE_CONFIG;
+import static frc.robot.CatzSubsystems.DriveAndRobotOrientation.Drivetrain.DriveConstants.DRIVE_CONFIG;
 
 import org.ironmaple.simulation.drivesims.COTS;
 import org.ironmaple.simulation.drivesims.configs.DriveTrainSimulationConfig;
@@ -22,6 +22,7 @@ import edu.wpi.first.math.controller.HolonomicDriveController;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.system.plant.DCMotor;
@@ -153,24 +154,24 @@ public class DriveConstants {
         switch (CatzConstants.getRobotType()) {
             case SN2 ->
                 new ModuleIDsAndCurrentLimits[] {
-                    new ModuleIDsAndCurrentLimits(1, 2, 9, 1.4196464857/Math.PI/2+0.5),
-                    new ModuleIDsAndCurrentLimits(3, 4, 8, 4.6208462275/Math.PI/2+0.5),
-                    new ModuleIDsAndCurrentLimits(5, 6, 7, 0.6691969510/Math.PI/2),
-                    new ModuleIDsAndCurrentLimits(7, 8, 6, 2.0568857418/Math.PI/2)
+                    new ModuleIDsAndCurrentLimits(1, 2, 9, 1.4196464857/Math.PI/2+0.5, false),
+                    new ModuleIDsAndCurrentLimits(3, 4, 10, 4.6208462275/Math.PI/2+0.5, false),
+                    new ModuleIDsAndCurrentLimits(5, 6, 11, 0.6691969510/Math.PI/2, false),
+                    new ModuleIDsAndCurrentLimits(7, 8, 12, 2.0568857418/Math.PI/2, false)
                 };
             case SN1 ->
                 new ModuleIDsAndCurrentLimits[] {
-                    new ModuleIDsAndCurrentLimits(1, 2, 2, -0.22139),
-                    new ModuleIDsAndCurrentLimits(3, 4, 1, 0.259),
-                    new ModuleIDsAndCurrentLimits(5, 6, 3, 0.188),
-                    new ModuleIDsAndCurrentLimits(7, 8, 4, 0.000182)
+                    new ModuleIDsAndCurrentLimits(1, 2, 1, -0.22139, false),
+                    new ModuleIDsAndCurrentLimits(3, 4, 2, 0.259, false),
+                    new ModuleIDsAndCurrentLimits(5, 6, 3, 0.188, false),
+                    new ModuleIDsAndCurrentLimits(7, 8, 4, 0.000182, false)
                 };
             case SN_TEST -> 
                 new ModuleIDsAndCurrentLimits[] {
-                    new ModuleIDsAndCurrentLimits(1, 2, 9, 0.0),
-                    new ModuleIDsAndCurrentLimits(3, 4, 8, 0.0),
-                    new ModuleIDsAndCurrentLimits(5, 6, 7, 0.0),
-                    new ModuleIDsAndCurrentLimits(7, 8, 6, 0.0)
+                    new ModuleIDsAndCurrentLimits(1, 2, 9, 0.0, false),
+                    new ModuleIDsAndCurrentLimits(3, 4, 8, 0.0, false),
+                    new ModuleIDsAndCurrentLimits(5, 6, 7, 0.0, false),
+                    new ModuleIDsAndCurrentLimits(7, 8, 6, 0.0, false)
                 };
         };
 
@@ -285,7 +286,9 @@ public class DriveConstants {
         int driveID,
         int steerID,
         int absoluteEncoderChannel,
-        double absoluteEncoderOffset) {}
+        double absoluteEncoderOffset,
+        boolean encoderInverted
+        ) {}
 
     public record ModuleGainsAndRatios(
         double driveFFkS,

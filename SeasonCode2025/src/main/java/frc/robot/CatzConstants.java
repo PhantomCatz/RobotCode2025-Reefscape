@@ -1,10 +1,10 @@
 package frc.robot;
 
-import static frc.robot.CatzSubsystems.DriveAndRobotOrientation.drivetrain.DriveConstants.DRIVE_CURRENT_LIMIT;
-import static frc.robot.CatzSubsystems.DriveAndRobotOrientation.drivetrain.DriveConstants.ROBOT_MASS;
-import static frc.robot.CatzSubsystems.DriveAndRobotOrientation.drivetrain.DriveConstants.ROBOT_MOI;
-import static frc.robot.CatzSubsystems.DriveAndRobotOrientation.drivetrain.DriveConstants.TRAJECTORY_MODULE_TRANSLATIONS;
-import static frc.robot.CatzSubsystems.DriveAndRobotOrientation.drivetrain.DriveConstants.TREAD_COEF_FRICTION;
+import static frc.robot.CatzSubsystems.DriveAndRobotOrientation.Drivetrain.DriveConstants.DRIVE_CURRENT_LIMIT;
+import static frc.robot.CatzSubsystems.DriveAndRobotOrientation.Drivetrain.DriveConstants.ROBOT_MASS;
+import static frc.robot.CatzSubsystems.DriveAndRobotOrientation.Drivetrain.DriveConstants.ROBOT_MOI;
+import static frc.robot.CatzSubsystems.DriveAndRobotOrientation.Drivetrain.DriveConstants.TRAJECTORY_MODULE_TRANSLATIONS;
+import static frc.robot.CatzSubsystems.DriveAndRobotOrientation.Drivetrain.DriveConstants.TREAD_COEF_FRICTION;
 
 import com.pathplanner.lib.config.ModuleConfig;
 import com.pathplanner.lib.config.RobotConfig;
@@ -33,8 +33,8 @@ public final class CatzConstants {
   //
   //--------------------------------------------------/
   public static final RobotSenario robotSenario      = RobotSenario.PRACTICE;
-  public static final RobotHardwareMode hardwareMode = RobotHardwareMode.SIM;
-  private static RobotID robotType                   = RobotID.SN_TEST;
+  public static final RobotHardwareMode hardwareMode = RobotHardwareMode.REAL;
+  private static RobotID robotType                   = RobotID.SN1;
   private static AlertPriority alertWarningPriority  = AlertPriority.ONE;
   
   public static final double LOOP_TIME = 0.02;

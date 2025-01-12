@@ -51,9 +51,9 @@ public class VisionConstants {
                                                                   );
 
   public static final VisionIO[] limelights = new VisionIO[] {
-    new VisionIOLimeLight("limelight-udon", UDON_TRANSFORM),    //index 0 left
-    new VisionIOLimeLight("limelight-soba", SOBA_TRANSFORM),    //index 1 right
-    new VisionIOLimeLight("limelight-ramen", RAMEN_TRANSFORM)    //index 2 turret)
+    // new VisionIOLimeLight("limelight-udon", UDON_TRANSFORM),    //index 0 left
+    new VisionIOLimeLight("limelight-soba", SOBA_TRANSFORM)    //index 1 right
+    // new VisionIOLimeLight("limelight-ramen", RAMEN_TRANSFORM)    //index 2 turret)
   };
 
   public static final Transform3d[] limelightTransform = new Transform3d[] {

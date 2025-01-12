@@ -1,4 +1,4 @@
-package frc.robot.CatzSubsystems.DriveAndRobotOrientation.drivetrain;
+package frc.robot.CatzSubsystems.DriveAndRobotOrientation.Drivetrain;
 
 import org.littletonrobotics.junction.AutoLog;
 
