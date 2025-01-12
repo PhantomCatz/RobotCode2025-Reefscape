@@ -16,6 +16,7 @@ import com.pathplanner.lib.config.RobotConfig;
 import com.pathplanner.lib.controllers.PPHolonomicDriveController;
 import com.pathplanner.lib.controllers.PathFollowingController;
 import com.pathplanner.lib.path.PathConstraints;
+import com.pathplanner.lib.pathfinding.LocalADStar;
 
 import edu.wpi.first.math.controller.HolonomicDriveController;
 import edu.wpi.first.math.controller.PIDController;
@@ -172,13 +173,14 @@ public class DriveConstants {
                     new ModuleIDsAndCurrentLimits(7, 8, 6, 0.0)
                 };
         };
+
     //-----------------------------------------------------------------------------------------------------------------------------
     //
     //      Drivebase controller/object definements
     //
     //-----------------------------------------------------------------------------------------------------------------------------
     public static final PathConstraints PATHFINDING_CONSTRAINTS = new PathConstraints( // 540 // 720 
-                                                                    2.0, DRIVE_CONFIG.maxLinearAcceleration, //max vel causing messup
+                                                                    DRIVE_CONFIG.maxLinearVelocity, DRIVE_CONFIG.maxLinearAcceleration, //max vel causing messup
                                                                     DRIVE_CONFIG.maxAngularVelocity, DRIVE_CONFIG.maxAngularAcceleration);
 
 

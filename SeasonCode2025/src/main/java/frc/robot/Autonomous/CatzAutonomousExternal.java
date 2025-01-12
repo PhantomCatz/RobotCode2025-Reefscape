@@ -23,7 +23,9 @@ import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
 import com.pathplanner.lib.commands.PathPlannerAuto;
 import com.pathplanner.lib.controllers.PathFollowingController;
+import com.pathplanner.lib.path.GoalEndState;
 import com.pathplanner.lib.path.PathPlannerPath;
+import com.pathplanner.lib.pathfinding.Pathfinding;
 import com.pathplanner.lib.trajectory.PathPlannerTrajectory;
 import com.pathplanner.lib.trajectory.PathPlannerTrajectoryState;
 import com.pathplanner.lib.util.FileVersionException;
@@ -35,6 +37,7 @@ import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.StringPublisher;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Filesystem;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -57,6 +60,7 @@ import frc.robot.Commands.DriveAndRobotOrientationCmds.TrajectoryDriveCmd;
 import frc.robot.Commands.DriveAndRobotOrientationCmds.WaitUntilPassX;
 import frc.robot.Utilities.AllianceFlipUtil;
 import frc.robot.Utilities.JSONUtil;
+import frc.robot.Utilities.LocalADStarAK;
 import frc.robot.Utilities.SwitchableChooser;
 import frc.robot.Utilities.VirtualSubsystem;
 
@@ -83,9 +87,6 @@ public class CatzAutonomousExternal extends VirtualSubsystem{
     //  Auto Questions
     //-----------------------------------------------------------------------------------------------------
     private HashMap<String, AutoQuestion> autoQuestions = new HashMap<>();
-
-
-
     private RobotContainer m_container;
 
     public CatzAutonomousExternal(RobotContainer container) {
@@ -185,7 +186,6 @@ public class CatzAutonomousExternal extends VirtualSubsystem{
             String autoName = autoFile.getName().replaceFirst("[.][^.]+$", "");
             autoProgramChooser.addOption(autoName, new PathPlannerAuto(autoName));
         }
-
     }
 
     @Override
@@ -240,66 +240,21 @@ public class CatzAutonomousExternal extends VirtualSubsystem{
 
     //---------------------------------------------------------------------------------------------------------
     //
-    //          Auto Driving
+    //          Pathfinding
     //
     //---------------------------------------------------------------------------------------------------------
-    public Command autoFindPathAmp() {
-        return Commands.either(
-            AutoBuilder.pathfindToPoseFlipped(new Pose2d(1.89, 7.76, Rotation2d.fromDegrees(90)), DriveConstants.PATHFINDING_CONSTRAINTS), 
-            AutoBuilder.pathfindToPose(new Pose2d(1.89, 7.76, Rotation2d.fromDegrees(90)), DriveConstants.PATHFINDING_CONSTRAINTS), 
-            ()->AllianceFlipUtil.shouldFlipToRed());
 
+    public Command getPathfindingCommand(Pose2d goal){
+        Pathfinding.setStartPosition(CatzRobotTracker.getInstance().getEstimatedPose().getTranslation());
+        Pathfinding.setGoalPosition(goal.getTranslation());
+
+        return new TrajectoryDriveCmd(Pathfinding.getCurrentPath(DriveConstants.PATHFINDING_CONSTRAINTS, new GoalEndState(0, goal.getRotation())), m_container.getCatzDrivetrain());
     }
-
-    public Command autoFindPathSpeaker() {
-        return Commands.either(
-            AutoBuilder.pathfindToPoseFlipped(new Pose2d(2.74, 6.14, Rotation2d.fromDegrees(180)), DriveConstants.PATHFINDING_CONSTRAINTS), 
-            AutoBuilder.pathfindToPose(new Pose2d(2.74, 6.14, Rotation2d.fromDegrees(180)), DriveConstants.PATHFINDING_CONSTRAINTS), 
-            ()->AllianceFlipUtil.shouldFlipToRed());
-    }
-    //---------------------------------------------------------------------------------------------------------
-    //
-    //          Trajectory Helpers
-    //
-    //---------------------------------------------------------------------------------------------------------
-    // private void preloadTrajectoryClass(PathPlannerPath segment) {
-    //     // This is done because Java loads classes lazily. Calling this here loads the trajectory pathplanner class which
-    //     // is used to follow paths and saves user code ms loop time at the start of auto.
-    //     if (!trajectoriesLoaded) {
-    //         trajectoriesLoaded = true;
-    //         var trajectory = new PathPlannerTrajectory(
-    //             segment,
-    //             DriveConstants.
-    //                 SWERVE_KINEMATICS.
-    //                     toChassisSpeeds(CatzRobotTracker.getInstance().getCurrentModuleStates()),
-    //             CatzRobotTracker.getInstance().getEstimatedPose().getRotation(),
-    //             DriveConstants.TRAJECTORY_CONFIG
-    //         );
-    //     }
-    // }
-
-  /**
-   * Resets pose accounting for alliance color.
-   *
-   * @param pose Pose to reset to.
-   */
-  public static Command resetPose(Pose2d pose) {
-    return Commands.runOnce(
-        () -> {
-          CatzRobotTracker.getInstance().resetPose(AllianceFlipUtil.apply(pose));
-          CatzRobotTracker.getInstance().addTrajectorySetpointData(AllianceFlipUtil.apply(pose));
-        });
-  }
-
-
-
-
 
     /** Getter for final autonomous Program */
     public Command getCommand() { 
         return lastProgram;
     }
-
 
     //---------------------------------------------------------------------------------------------------------
     //

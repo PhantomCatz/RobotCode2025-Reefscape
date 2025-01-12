@@ -9,6 +9,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.Set;
 
 import javax.sound.sampled.SourceDataLine;
@@ -24,6 +25,7 @@ import com.pathplanner.lib.path.GoalEndState;
 import com.pathplanner.lib.path.PathConstraints;
 import com.pathplanner.lib.path.PathPlannerPath;
 import com.pathplanner.lib.path.RotationTarget;
+import com.pathplanner.lib.pathfinding.LocalADStar;
 import com.pathplanner.lib.trajectory.PathPlannerTrajectory;
 import com.pathplanner.lib.trajectory.PathPlannerTrajectoryState;
 import com.pathplanner.lib.util.DriveFeedforwards;
@@ -123,20 +125,21 @@ public class TrajectoryDriveCmd extends Command {
         if(AllianceFlipUtil.shouldFlipToRed()) {
             usePath = path.flipPath();
         }
-        Pose2d startingPose = usePath.getStartingHolonomicPose().get();
-        tracker.resetPose(startingPose);
+
+        try{
+            tracker.resetPose(usePath.getStartingHolonomicPose().get());
+        }catch(NoSuchElementException e){}
         
         ChassisSpeeds currentSpeeds = DriveConstants.SWERVE_KINEMATICS.toChassisSpeeds(tracker.getCurrentModuleStates());
         //If we provide an initial speed of zero the trajectory will take an infinite time to finish (divide by 0) and not be sampleable
         if (Math.hypot(currentSpeeds.vxMetersPerSecond, currentSpeeds.vxMetersPerSecond) < 1e-6){
             currentSpeeds = DriveConstants.NON_ZERO_CHASSIS_SPEED;
         }
-
         // Construct trajectory
         this.trajectory = new PathPlannerTrajectory(
             usePath,
             currentSpeeds,
-            startingPose.getRotation(),
+            tracker.getEstimatedPose().getRotation(),
             DriveConstants.TRAJECTORY_CONFIG
         );
 

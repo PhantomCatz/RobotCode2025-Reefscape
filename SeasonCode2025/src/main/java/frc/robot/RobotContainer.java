@@ -8,6 +8,10 @@ import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 import org.littletonrobotics.junction.networktables.LoggedDashboardNumber;
 import org.littletonrobotics.junction.networktables.LoggedNetworkNumber;
 
+import com.pathplanner.lib.commands.PathfindingCommand;
+
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
@@ -16,6 +20,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Autonomous.CatzAutonomousExternal;
@@ -111,6 +116,7 @@ public class RobotContainer {
   //  Button mapping to commands
   //
   //---------------------------------------------------------------------------
+  Command pathfindToOrigin = Commands.runOnce(()->{});
   private void configureBindings() { // TODO organize by function
     
     /* XBOX AUX */
@@ -121,9 +127,15 @@ public class RobotContainer {
 
     // Auto Driving
    // xboxDrv.y().onTrue(new FaceTarget(FieldConstants.Speaker.centerSpeakerOpening.toTranslation2d(), drive));
-    xboxDrv.b().onTrue(auto.autoFindPathStation());
-    xboxDrv.x().onTrue(auto.autoFindPathSpeaker());
-
+    xboxDrv.b().toggleOnTrue(Commands.runOnce(() -> {
+      pathfindToOrigin = autoEx.getPathfindingCommand(new Pose2d(2, 7, new Rotation2d()));
+      pathfindToOrigin.schedule();
+      System.out.println("scheduled");
+    }));
+    xboxDrv.b().toggleOnFalse(Commands.runOnce(()->{
+      pathfindToOrigin.cancel();
+      System.out.println("Calceled");
+    }));
 
     
     drive.setDefaultCommand(new TeleopDriveCmd(() -> xboxDrv.getLeftX(), 
