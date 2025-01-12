@@ -117,7 +117,7 @@ public class CatzAutonomousExternal extends VirtualSubsystem{
 
         NamedCommands.registerCommand("TestPrint", Commands.print("Bench"));
 
-        class controller implements PathFollowingController {
+    class controller implements PathFollowingController {
 
             @Override
             public ChassisSpeeds calculateRobotRelativeSpeeds(Pose2d currentPose,

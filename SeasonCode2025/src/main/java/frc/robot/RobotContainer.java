@@ -24,8 +24,6 @@ import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Autonomous.CatzAutonomousExternal;
-import frc.robot.Autonomous.CatzAutonomousInternal;
-import frc.robot.Autonomous.CatzAutonomousInternal;
 import frc.robot.CatzConstants.AllianceColor;
 import frc.robot.CatzConstants.RobotSenario;
 import frc.robot.CatzConstants.XboxInterfaceConstants;
@@ -77,7 +75,6 @@ public class RobotContainer {
   // Auto Declaration
   //---------------------------------------------------------------------------------------------------------------------
   private AutomatedSequenceCmds autosequence = new AutomatedSequenceCmds();
-  private CatzAutonomousInternal auto = new CatzAutonomousInternal(this);
   private CatzAutonomousExternal autoEx = new CatzAutonomousExternal(this);
 
   public RobotContainer() {
@@ -127,15 +124,17 @@ public class RobotContainer {
 
     // Auto Driving
    // xboxDrv.y().onTrue(new FaceTarget(FieldConstants.Speaker.centerSpeakerOpening.toTranslation2d(), drive));
-    xboxDrv.b().toggleOnTrue(Commands.runOnce(() -> {
-      pathfindToOrigin = autoEx.getPathfindingCommand(new Pose2d(2, 7, new Rotation2d()));
-      pathfindToOrigin.schedule();
-      System.out.println("scheduled");
+    xboxDrv.b().toggleOnTrue(Commands.startEnd(
+      () -> {
+        pathfindToOrigin = autoEx.getPathfindingCommand(new Pose2d(2, 7, new Rotation2d()));
+        pathfindToOrigin.schedule();
+        System.out.println("scheduled");
+    }, 
+      () -> {
+        pathfindToOrigin.cancel();
+        System.out.println("Canceled");
     }));
-    xboxDrv.b().toggleOnFalse(Commands.runOnce(()->{
-      pathfindToOrigin.cancel();
-      System.out.println("Calceled");
-    }));
+
 
     
     drive.setDefaultCommand(new TeleopDriveCmd(() -> xboxDrv.getLeftX(), 
@@ -191,10 +190,6 @@ public class RobotContainer {
   //---------------------------------------------------------------------------
   public CatzDrivetrain getCatzDrivetrain() {
     return drive;
-  }
-
-  public CatzAutonomousInternal getCatzAutonomous(){
-    return auto;
   }
 
   public Command getAutonomousCommand() {
