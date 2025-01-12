@@ -30,8 +30,9 @@ import frc.robot.CatzSubsystems.DriveAndRobotOrientation.vision.CatzVision;
 import frc.robot.CatzSubsystems.DriveAndRobotOrientation.vision.VisionIO;
 import frc.robot.CatzSubsystems.DriveAndRobotOrientation.vision.VisionIOLimeLight;
 import frc.robot.CatzSubsystems.LEDs.CatzLED;
-import frc.robot.CatzSubsystems.outtake.CatzOuttake;
-import frc.robot.CatzSubsystems.outtake.OuttakeIOSparkmax;
+import frc.robot.CatzSubsystems.Outtake.CatzOuttake;
+import frc.robot.CatzSubsystems.Outtake.OuttakeIOSparkmax;
+import frc.robot.CatzSubsystems.Elevator.*;
 import frc.robot.Commands.AutomatedSequenceCmds;
 import frc.robot.Commands.ControllerModeAbstraction;
 import frc.robot.Commands.DriveAndRobotOrientationCmds.FaceTarget;
@@ -57,6 +58,7 @@ public class RobotContainer {
   private static CatzVision       vision       = new CatzVision();
 
   private static CatzOuttake      outtake = new CatzOuttake();
+  private static CatzElevator     elevator = new CatzElevator();
 
   //------------------------------------------------------------------------------------------------------------------
   // Drive Controller Declaration
@@ -127,9 +129,11 @@ public class RobotContainer {
     xboxDrv.b().onTrue(auto.autoFindPathStation());
     xboxDrv.x().onTrue(auto.autoFindPathSpeaker());
 
-    xboxDrv.a().toggleOnTrue(outtake.runMotor().alongWith(Commands.print("press a")));
-    
+    xboxDrv.a().toggleOnTrue(outtake.runMotor().alongWith(Commands.print("pressed a")));
+    xboxDrv.y().toggleOnTrue(outtake.runMotorBck().alongWith(Commands.print("pressed y")));
 
+    xboxAux.a().toggleOnTrue(elevator.runMotor().alongWith(Commands.print("pressed elevator a")));
+    xboxAux.y().toggleOnTrue(elevator.runMotorBck().alongWith(Commands.print("pressed elevator y")));
     
     drive.setDefaultCommand(new TeleopDriveCmd(() -> xboxDrv.getLeftX(), 
                                                () -> xboxDrv.getLeftY(), 

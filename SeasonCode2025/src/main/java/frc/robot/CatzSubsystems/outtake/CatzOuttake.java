@@ -1,4 +1,4 @@
-package frc.robot.CatzSubsystems.outtake;
+package frc.robot.CatzSubsystems.Outtake;
 
 import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.inputs.LoggableInputs;
@@ -7,6 +7,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Utilities.LoggedTunableNumber;
 import frc.robot.CatzConstants;
+import frc.robot.CatzSubsystems.Outtake.OuttakeIOInputsAutoLogged;
 
 
 public class CatzOuttake extends SubsystemBase{
@@ -41,6 +42,10 @@ public class CatzOuttake extends SubsystemBase{
     }
 
     public Command runMotor() {
+        return startEnd(() -> outtakeSpeed = tunableNumber.getAsDouble(), () -> outtakeSpeed = 0);
+    }
+
+    public Command runMotorBck() {
         return startEnd(() -> outtakeSpeed = tunableNumber.getAsDouble(), () -> outtakeSpeed = 0);
     }
   

@@ -1,4 +1,4 @@
-package frc.robot.CatzSubsystems.outtake;
+package frc.robot.CatzSubsystems.Outtake;
 
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.config.SparkBaseConfig;
@@ -39,12 +39,22 @@ public class OuttakeIOSparkmax implements OuttakeIO {
 
     @Override
     public void runMotor(double speed) {
-        System.out.println(speed);
+        System.out.println("Motor1 " + speed);
+        System.out.println("Motor2 " + speed);
+
         outtakeMotor1.set(speed);
         outtakeMotor2.set(-speed);
 
     }
 
+    @Override
+    public void runMotorBck(double speed) {
+        System.out.println("Motor1 " + speed);
+        System.out.println("Motor2 " + speed);
+        outtakeMotor1.set(-speed);
+        outtakeMotor2.set(speed);
+
+    }
 
 
 

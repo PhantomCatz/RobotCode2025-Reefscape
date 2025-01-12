@@ -1,15 +1,15 @@
-package frc.robot.CatzSubsystems.Outtake;
+package frc.robot.CatzSubsystems.Elevator;
 
 import org.littletonrobotics.junction.AutoLog;
 
-import frc.robot.CatzSubsystems.Outtake.OuttakeIOInputsAutoLogged;
+import frc.robot.CatzSubsystems.Elevator.ElevatorIOInputsAutoLogged;
 
-public interface OuttakeIO {
+public interface ElevatorIO {
     
     @AutoLog
-    public static class OuttakeIOInputs {
+    public static class ElevatorIOInputs {
 
-        public boolean isIntakeIOMotorConnected = true;
+        public boolean isElevatorIOMotorConnected = true;
 
         public double positionMechs = 0.0;
         public double velocityRpm = 0.0;
@@ -24,14 +24,15 @@ public interface OuttakeIO {
     
     public default void runMotorBck(double Speed) {}
 
-    public default void runSparkMax(double Speed) {}
-
-    public default void updateInputs(OuttakeIOInputsAutoLogged inputs) {}
+    public default void updateInputs(ElevatorIOInputsAutoLogged inputs) {}
 
     public default void setPID(double kP, double kI, double kD) {}
 
     public default void setFF(double kS, double kV, double kA) {}
     
     public default void runCharacterizationMotor(double input) {}
-}
 
+    public default void runSetpoint(double setpointRotations, double feedforward) {}
+
+    public default void setBrakeMode(boolean enabled) {}
+}
