@@ -155,18 +155,18 @@ public class CatzAutonomousExternal extends VirtualSubsystem{
         //------------------------------------------------------------------------------------------------------------
         // Path Configuration
         //------------------------------------------------------------------------------------------------------------
-        for(File pathFile : choreoPathsDirectory.listFiles()){
-            //to get rid of the extensions trailing the path names
-            String pathName = pathFile.getName().replaceFirst("[.][^.]+$", ""); 
-            PathPlannerPath path;
-            try {
-                path = PathPlannerPath.fromChoreoTrajectory(pathName);
-                choreoPaths.put(pathName, new TrajectoryDriveCmd(path, container.getCatzDrivetrain()));
-            } catch (FileVersionException | IOException | ParseException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            }
-        }
+        // for(File pathFile : choreoPathsDirectory.listFiles()){
+        //     //to get rid of the extensions trailing the path names
+        //     String pathName = pathFile.getName().replaceFirst("[.][^.]+$", ""); 
+        //     PathPlannerPath path;
+        //     try {
+        //         path = PathPlannerPath.fromChoreoTrajectory(pathName);
+        //         choreoPaths.put(pathName, new TrajectoryDriveCmd(path, container.getCatzDrivetrain()));
+        //     } catch (FileVersionException | IOException | ParseException e) {
+        //         // TODO Auto-generated catch block
+        //         e.printStackTrace();
+        //     }
+        // }
         NamedCommands.registerCommands(choreoPaths);
         
         for(File pathFile : pathplannerPathsDirectory.listFiles()){

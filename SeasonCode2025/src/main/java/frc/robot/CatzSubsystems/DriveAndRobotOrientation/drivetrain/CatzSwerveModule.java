@@ -146,6 +146,7 @@ public class CatzSwerveModule {
         //--------------------------------------------------------
         // Run closed loop steer control
         //--------------------------------------------------------
+        System.out.println(inputs.steerAbsPosition.getRadians());
         io.runSteerPositionSetpoint(currentAngleRads, targetAngleRads);
     }
 
