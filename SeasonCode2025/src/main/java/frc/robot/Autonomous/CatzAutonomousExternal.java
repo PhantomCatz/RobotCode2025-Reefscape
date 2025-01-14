@@ -251,6 +251,14 @@ public class CatzAutonomousExternal extends VirtualSubsystem{
         return new TrajectoryDriveCmd(Pathfinding.getCurrentPath(DriveConstants.PATHFINDING_CONSTRAINTS, new GoalEndState(0, goal.getRotation())), m_container.getCatzDrivetrain());
     }
 
+    public Command pathfindThenFollowPath(AutoScoringOptions option){ 
+        Pose2d goal = new Pose2d(0, 0, new Rotation2d());
+        return new SequentialCommandGroup(
+            getPathfindingCommand(goal),
+            new TrajectoryDriveCmd(Pathfinding.getCurrentPath(DriveConstants.PATHFINDING_CONSTRAINTS, new GoalEndState(0, goal.getRotation())), m_container.getCatzDrivetrain())
+        );
+    }
+
     /** Getter for final autonomous Program */
     public Command getCommand() { 
         return lastProgram;
@@ -270,25 +278,23 @@ public class CatzAutonomousExternal extends VirtualSubsystem{
 
     /** Responses to auto routine questions. */
     public static enum AutoQuestionResponse {
-        AMP,
-        CENTER,
-        SOURCE,
-        ONE,
-        TWO,
-        THREE,
-        SOURCE_WALL,
-        SOURCE_MIDDLE,
-        MIDDLE,
-        AMP_MIDDLE,
-        AMP_WALL,
-        SCORE_POOPED,
-        FOURTH_CENTER,
         THINKING_ON_YOUR_FEET,
         IMMEDIATELY,
         SIX_SECONDS,
         LAST_SECOND,
         YES,
         NO
+    }
+
+    public static enum AutoScoringOptions {
+        CORAL_ROD_1,
+        CORAL_ROD_2,
+        CORAL_ROD_4,
+        CORAL_ROD_5,
+        CORAL_ROD_7,
+        CORAL_ROD_8,
+        CORAL_ROD_10,
+        CORAL_ROD_11,
     }
 
 

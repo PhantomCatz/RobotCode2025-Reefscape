@@ -55,15 +55,15 @@ public class CatzVision extends SubsystemBase {
     public void periodic() {
         // For every limelight camera process vision with according logic
         for (int i = 0; i < inputs.length; i++) {
-            // // update and process new inputs[cameraNum] for camera
-            // cameras[i].updateInputs(inputs[i]);
-            // Logger.processInputs("inputs/Vision/" + cameras[i].getName() + "/Inputs", inputs[i]);
+            // update and process new inputs[cameraNum] for camera
+            cameras[i].updateInputs(inputs[i]);
+            Logger.processInputs("inputs/Vision/" + cameras[i].getName() + "/Inputs", inputs[i]);
            
-            // // Check when to process Vision Info
+            // Check when to process Vision Info
 
-            // if (Robot.isReal()) { // Prevents out of bounds crash in SIM
-            //     processVision(i);
-            // }
+            if (Robot.isReal()) { // Prevents out of bounds crash in SIM
+                processVision(i);
+            }
 
         }        
         // Pose2d sobaPose2d = new Pose2d(inputs[1].x, inputs[1].y, new Rotation2d());
