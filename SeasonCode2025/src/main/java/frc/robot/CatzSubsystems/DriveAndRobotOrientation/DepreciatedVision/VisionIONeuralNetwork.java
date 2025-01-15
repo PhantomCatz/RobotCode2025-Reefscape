@@ -1,6 +1,6 @@
-package frc.robot.CatzSubsystems.DriveAndRobotOrientation.vision;
+package frc.robot.CatzSubsystems.DriveAndRobotOrientation.DepreciatedVision;
 
-import static frc.robot.CatzSubsystems.DriveAndRobotOrientation.vision.VisionConstants.*;
+import static frc.robot.CatzSubsystems.DriveAndRobotOrientation.DepreciatedVision.VisionConstants.*;
 
 import edu.wpi.first.math.geometry.Transform3d;
 import frc.robot.Utilities.LimelightHelpers;

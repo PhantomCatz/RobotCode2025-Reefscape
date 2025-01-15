@@ -146,7 +146,7 @@ public class ModuleIORealFoc implements ModuleIO {
     steerTalonConfig.TorqueCurrent.PeakReverseTorqueCurrent = -40.0;
     steerTalonConfig.ClosedLoopRamps.TorqueClosedLoopRampPeriod = 0.02;
 
-    steerTalonConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake; //Change back to break
+    steerTalonConfig.MotorOutput.NeutralMode = NeutralModeValue.Coast; //Change back to break
 
     // Gain Setting
     steerTalonConfig.Slot0.kP = MODULE_GAINS_AND_RATIOS.steerkP();
@@ -210,8 +210,8 @@ public class ModuleIORealFoc implements ModuleIO {
     inputs.driveTorqueCurrentAmps = driveTorqueCurrent.getValueAsDouble();
 
     // Refresh steer Motor Values
-    inputs.rawAbsEncValueRotation  = (double) absEncoder.getMultiTurnCounts();
-    inputs.steerAbsPosition   = Rotation2d.fromRotations(-(inputs.rawAbsEncValueRotation - absoluteEncoderOffset.getRotations()));
+    inputs.rawAbsEncValueRotation  = encoder.getPosition().getValueAsDouble();
+    inputs.steerAbsPosition   = Rotation2d.fromRotations((inputs.rawAbsEncValueRotation - absoluteEncoderOffset.getRotations()));
 
     inputs.steerVelocityRadsPerSec = Units.rotationsToRadians(steerVelocity.getValueAsDouble());
     inputs.steerSupplyCurrentAmps = steerSupplyCurrent.getValueAsDouble();

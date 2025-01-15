@@ -64,8 +64,8 @@ public class DriveConstants {
       case SN_TEST, SN2 ->
           DriveConfig.builder()
               .wheelRadius(Units.inchesToMeters(1.8))
-              .robotLengthX(Units.inchesToMeters(24.0))
-              .robotWidthY(Units.inchesToMeters(23.5))
+              .robotLengthX(Units.inchesToMeters(29.0))
+              .robotWidthY(Units.inchesToMeters(29.0))
               .bumperWidthX(Units.inchesToMeters(37))
               .bumperWidthY(Units.inchesToMeters(33))
               .maxLinearVelocity(Units.feetToMeters(17))
@@ -73,7 +73,7 @@ public class DriveConstants {
               .maxAngularVelocity(Units.degreesToRadians(600)) // Radians
               .maxAngularAcceleration(Units.degreesToRadians(600)) // Radians // TODO verify angle constraints
               .build();
-      case SN1 ->
+      case SN1,SN1_2024 ->
           new DriveConfig(
               Units.inchesToMeters(2.01834634),
               Units.inchesToMeters(20.75),
@@ -123,6 +123,17 @@ public class DriveConstants {
                     0.0,
                     Mk4iReductions.L2_PLUS.reduction,
                     Mk4iReductions.steer.reduction);
+            case SN1_2024 ->
+                new ModuleGainsAndRatios(
+                    5.0,
+                    0.0,
+                    1.0 / DCMotor.getKrakenX60Foc(1).KtNMPerAmp, // A/(N*m)
+                    0.2,
+                    0.0,
+                    0.3,
+                    0.005, 
+                    Mk4iReductions.L2_PLUS.reduction,
+                    Mk4iReductions.steer.reduction);
         };
 
 
@@ -132,7 +143,7 @@ public class DriveConstants {
     public static final double ODOMETRY_FREQUENCY =
         switch (CatzConstants.getRobotType()) {
             case SN_TEST -> 50.0;
-            case SN1 -> 100.0;
+            case SN1,SN1_2024 -> 100.0;
             case SN2 -> 250.0;
         };
 
@@ -172,6 +183,13 @@ public class DriveConstants {
                     new ModuleIDsAndCurrentLimits(3, 4, 8, 0.0, false),
                     new ModuleIDsAndCurrentLimits(5, 6, 7, 0.0, false),
                     new ModuleIDsAndCurrentLimits(7, 8, 6, 0.0, false)
+                };
+            case SN1_2024 ->
+                new ModuleIDsAndCurrentLimits[] {
+                    new ModuleIDsAndCurrentLimits(1, 2, 1, 0.7066, false), //FL
+                    new ModuleIDsAndCurrentLimits(3, 4, 2, 0.5682, false), //BL
+                    new ModuleIDsAndCurrentLimits(5, 6, 3, 0.7969, false), //BR
+                    new ModuleIDsAndCurrentLimits(7, 8, 4, 0.9919, false) //FR
                 };
         };
 
@@ -216,7 +234,7 @@ public class DriveConstants {
             new PIDController(10.0, 0.0, 0.1), 
             new PIDController(10.0, 0.0, 0.1),
             new ProfiledPIDController(
-                4, 0, 0,
+                1, 0, 0,
                 new TrapezoidProfile.Constraints(DRIVE_CONFIG.maxAngularVelocity, DRIVE_CONFIG.maxAngularAcceleration)
             )
         );
@@ -239,7 +257,7 @@ public class DriveConstants {
 
     public static final ModuleConfig TRAJECTORY_MODULE_CONFIG = new ModuleConfig(
                                                                         DRIVE_CONFIG.wheelRadius(),
-                                                                        DRIVE_CONFIG.maxLinearVelocity() / 2.0, 
+                                                                        DRIVE_CONFIG.maxLinearVelocity() * 0.8, //TODO possibly need to scale down to prevent wheel slip
                                                                         TREAD_COEF_FRICTION, 
                                                                         DCMotor.getKrakenX60(1)
                                                                                 .withReduction(MODULE_GAINS_AND_RATIOS.driveReduction()), 
@@ -259,21 +277,6 @@ public class DriveConstants {
     //      Simulation helpers
     //
     //-----------------------------------------------------------------------------------------------------------------------------
-
-    // public static final DriveTrainSimulationConfig mapleSimConfig = DriveTrainSimulationConfig.Default()
-    //         .withRobotMass(Kilograms.of(ROBOT_MASS))
-    //         .withCustomModuleTranslations(MODULE_TRANSLATIONS)
-    //         .withGyro(COTS.ofPigeon2())
-    //         .withSwerveModule(new SwerveModuleSimulationConfig(
-    //                 DCMotor.getKrakenX60(1),
-    //                 DCMotor.getFalcon500(1),
-    //                 MODULE_GAINS_AND_RATIOS.driveReduction(),
-    //                 MODULE_GAINS_AND_RATIOS.steerReduction(),
-    //                 Volts.of(0.25),
-    //                 Volts.of(0.25),
-    //                 Meters.of(DRIVE_CONFIG.wheelRadius()),
-    //                 KilogramSquareMeters.of(0.00001),
-    //                 DriveConstants.ROBOT_MOI));
 
 
                                                                             

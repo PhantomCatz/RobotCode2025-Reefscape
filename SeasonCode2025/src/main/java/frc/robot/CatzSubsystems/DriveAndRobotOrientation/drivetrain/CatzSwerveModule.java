@@ -133,8 +133,6 @@ public class CatzSwerveModule {
         this.m_swerveModuleState        = state;
         double targetAngleRads          = state.angle.getRadians();
         double currentAngleRads         = getAbsEncRadians();
-
-        Logger.recordOutput("Module/TargetMPS", state.speedMetersPerSecond);
     
         //--------------------------------------------------------
         // Run closed loop drive control
