@@ -92,7 +92,7 @@ public class Robot extends LoggedRobot {
   private final Alert SAME_BATTERY_ALERT = new Alert("The battery has not been changed since the last match.", AlertType.kError);
 
   // Garbage Collection Alerts
-  private final Alert GC_COLLECTION_ALERT = new Alert("Please wait to enable, collecting garbage. 🗑️", AlertType.kWarning);
+  private final Alert GC_COLLECTION_ALERT = new Alert("Please wait to enable, collecting garbage.", AlertType.kWarning);
   private int garbageCollectionCounter = 0;
 
   // DriverStation related alerts
