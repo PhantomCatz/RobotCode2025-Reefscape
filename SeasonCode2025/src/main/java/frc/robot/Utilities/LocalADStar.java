@@ -389,8 +389,12 @@ public class LocalADStar implements Pathfinder {
     List<GridPosition> simplifiedPath = new ArrayList<>();
     simplifiedPath.add(path.get(path.size()-1));
     for (int i = path.size() - 1; i > 0; i--) {
-      if (!walkable(simplifiedPath.get(simplifiedPath.size() - 1), path.get(i - 1), obstacles)) {
-        simplifiedPath.add(path.get(i));
+      for (int j = i - 1; j > 0; j--) {
+        if (!walkable(path.get(i), path.get(j), obstacles)) {
+          i = j + 1;
+          simplifiedPath.add(path.get(j));
+          break;
+        }
       }
     }
     simplifiedPath.add(path.get(0));
@@ -459,7 +463,7 @@ public class LocalADStar implements Pathfinder {
   private boolean walkable(GridPosition s1, GridPosition s2, Set<GridPosition> obstacles) {
     Translation2d slope = new Translation2d(s2.x-s1.x, s2.y-s1.y);
     double n = 1 + Math.max(Math.abs(slope.getX()), Math.abs(slope.getY())); 
-    
+
     if(slope.getX() == 0 || slope.getY() == 0){
       slope = slope.div(slope.getNorm());
     }else{
