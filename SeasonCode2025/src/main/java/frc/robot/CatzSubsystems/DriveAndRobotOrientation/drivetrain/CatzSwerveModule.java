@@ -15,7 +15,6 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.CatzConstants;
 import frc.robot.CatzSubsystems.DriveAndRobotOrientation.Drivetrain.ModuleIO;
-import frc.robot.CatzSubsystems.DriveAndRobotOrientation.Drivetrain.ModuleIOInputsAutoLogged;
 import frc.robot.CatzSubsystems.DriveAndRobotOrientation.Drivetrain.ModuleIORealFoc;
 import frc.robot.Utilities.Alert;
 import frc.robot.Utilities.CatzMathUtils;

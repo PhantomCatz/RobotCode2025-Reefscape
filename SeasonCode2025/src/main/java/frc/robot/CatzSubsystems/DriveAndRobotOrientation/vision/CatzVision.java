@@ -28,6 +28,7 @@ import frc.robot.CatzConstants;
 import frc.robot.CatzSubsystems.DriveAndRobotOrientation.CatzRobotTracker;
 import frc.robot.CatzSubsystems.DriveAndRobotOrientation.CatzRobotTracker.VisionObservation;
 import frc.robot.CatzSubsystems.DriveAndRobotOrientation.Vision.VisionIO.PoseObservationType;
+import frc.robot.CatzSubsystems.DriveAndRobotOrientation.Vision.VisionIOInputsAutoLogged;
 
 import static frc.robot.CatzSubsystems.DriveAndRobotOrientation.Vision.VisionConstants.*;
 

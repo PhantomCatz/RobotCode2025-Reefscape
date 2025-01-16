@@ -4,7 +4,6 @@
 
 package frc.robot;
 
-import static frc.robot.CatzSubsystems.DriveAndRobotOrientation.DepreciatedVision.VisionConstants.SOBA_TRANSFORM;
 
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 import org.littletonrobotics.junction.networktables.LoggedDashboardNumber;
@@ -14,6 +13,7 @@ import com.pathplanner.lib.commands.PathfindingCommand;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
@@ -30,7 +30,6 @@ import frc.robot.CatzConstants.AllianceColor;
 import frc.robot.CatzConstants.RobotSenario;
 import frc.robot.CatzConstants.XboxInterfaceConstants;
 import frc.robot.CatzSubsystems.DriveAndRobotOrientation.CatzRobotTracker;
-import frc.robot.CatzSubsystems.DriveAndRobotOrientation.DepreciatedVision.VisionIOLimeLight;
 import frc.robot.CatzSubsystems.DriveAndRobotOrientation.Drivetrain.CatzDrivetrain;
 import frc.robot.CatzSubsystems.DriveAndRobotOrientation.Drivetrain.DriveConstants;
 import frc.robot.CatzSubsystems.DriveAndRobotOrientation.Vision.CatzVision;
@@ -58,7 +57,7 @@ public class RobotContainer {
   // Assistance Subsystem declaration
   private static CatzLED          led = CatzLED.getInstance();
   private static CatzRobotTracker robotTracker = CatzRobotTracker.getInstance();
-  private static CatzVision       vision = new CatzVision(new VisionIOPhotonVisionSim("SOBA", SOBA_TRANSFORM, () -> robotTracker.getEstimatedPose()));
+  private static CatzVision       vision = new CatzVision(new VisionIOPhotonVisionSim("SOBA", new Transform3d(), () -> robotTracker.getEstimatedPose()));
 
   //------------------------------------------------------------------------------------------------------------------
   // Drive Controller Declaration
