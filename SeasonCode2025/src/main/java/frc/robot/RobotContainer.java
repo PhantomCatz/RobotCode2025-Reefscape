@@ -127,15 +127,13 @@ public class RobotContainer {
 
     // Auto Driving
    // xboxDrv.y().onTrue(new FaceTarget(FieldConstants.Speaker.centerSpeakerOpening.toTranslation2d(), drive));
-    xboxDrv.b().toggleOnTrue(Commands.startEnd(
-      () -> {
+    xboxDrv.b().toggleOnTrue(Commands.runOnce(() -> {
         pathfindToOrigin = autoEx.getPathfindingCommand(new Pose2d(2, 7, new Rotation2d()));
         pathfindToOrigin.schedule();
-        System.out.println("scheduled");
-    }, 
-      () -> {
-        pathfindToOrigin.cancel();
-        System.out.println("Canceled");
+    }));
+
+    xboxDrv.b().toggleOnFalse(Commands.runOnce(() -> {
+      pathfindToOrigin.cancel();
     }));
 
 

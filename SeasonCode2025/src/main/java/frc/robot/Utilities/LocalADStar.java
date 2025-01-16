@@ -286,9 +286,8 @@ public class LocalADStar implements Pathfinder {
           requestReset = false;
         }
 
-        if (minor) {
+        if (minor || major) {
           requestMinor = false;
-        } else if (major && (eps - 0.5) <= 1.0) {
           requestMajor = false;
         }
         requestLock.readLock().unlock();
@@ -389,6 +388,7 @@ public class LocalADStar implements Pathfinder {
     for (int i = path.size() - 1; i > 0; i--) {
       if (!walkable(simplifiedPath.get(simplifiedPath.size() - 1), path.get(i - 1), obstacles)) {
         simplifiedPath.add(path.get(i));
+        System.out.println(path.get(i));
       }
     }
     simplifiedPath.add(path.get(0));
@@ -546,9 +546,6 @@ public class LocalADStar implements Pathfinder {
         }
         updateState(s, sStart, sGoal, obstacles);
       }
-    }
-    for(GridPosition pos: g.keySet()){
-        System.out.println(pos + " " + g.get(pos));
     }
   }
 
