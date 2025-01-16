@@ -29,15 +29,18 @@ import com.pathplanner.lib.pathfinding.Pathfinding;
 import com.pathplanner.lib.trajectory.PathPlannerTrajectory;
 import com.pathplanner.lib.trajectory.PathPlannerTrajectoryState;
 import com.pathplanner.lib.util.FileVersionException;
+import com.pathplanner.lib.util.FlippingUtil;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.StringPublisher;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -245,10 +248,20 @@ public class CatzAutonomousExternal extends VirtualSubsystem{
     //---------------------------------------------------------------------------------------------------------
 
     public Command getPathfindingCommand(Pose2d goal){
-        Pathfinding.setStartPosition(CatzRobotTracker.getInstance().getEstimatedPose().getTranslation());
+        Translation2d robotPos = CatzRobotTracker.getInstance().getEstimatedPose().getTranslation();
+        if(AllianceFlipUtil.shouldFlipToRed()){
+            robotPos = FlippingUtil.flipFieldPosition(robotPos);
+        }
+        Pathfinding.setStartPosition(robotPos);
         Pathfinding.setGoalPosition(goal.getTranslation());
+        PathPlannerPath path = Pathfinding.getCurrentPath(DriveConstants.PATHFINDING_CONSTRAINTS, new GoalEndState(0, goal.getRotation()));
 
-        return new TrajectoryDriveCmd(Pathfinding.getCurrentPath(DriveConstants.PATHFINDING_CONSTRAINTS, new GoalEndState(0, goal.getRotation())), m_container.getCatzDrivetrain());
+        if(path == null){
+            return new InstantCommand();
+        }else{
+            return new TrajectoryDriveCmd(path, m_container.getCatzDrivetrain());
+        }
+
     }
 
     public Command pathfindThenFollowPath(AutoScoringOptions option){ 
