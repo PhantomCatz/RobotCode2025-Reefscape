@@ -34,6 +34,7 @@ import frc.robot.CatzSubsystems.DriveAndRobotOrientation.Drivetrain.CatzDrivetra
 import frc.robot.CatzSubsystems.DriveAndRobotOrientation.Drivetrain.DriveConstants;
 import frc.robot.CatzSubsystems.DriveAndRobotOrientation.Vision.CatzVision;
 import frc.robot.CatzSubsystems.DriveAndRobotOrientation.Vision.VisionIO;
+import frc.robot.CatzSubsystems.DriveAndRobotOrientation.Vision.VisionIOLimelight;
 import frc.robot.CatzSubsystems.DriveAndRobotOrientation.Vision.VisionIOPhotonVisionSim;
 import frc.robot.CatzSubsystems.LEDs.CatzLED;
 import frc.robot.Commands.AutomatedSequenceCmds;
@@ -57,7 +58,7 @@ public class RobotContainer {
   // Assistance Subsystem declaration
   private static CatzLED          led = CatzLED.getInstance();
   private static CatzRobotTracker robotTracker = CatzRobotTracker.getInstance();
-  private static CatzVision       vision = new CatzVision(new VisionIOPhotonVisionSim("SOBA", new Transform3d(), () -> robotTracker.getEstimatedPose()));
+  private static CatzVision       vision = new CatzVision(new VisionIOLimelight("limelight-soba"));
 
   //------------------------------------------------------------------------------------------------------------------
   // Drive Controller Declaration

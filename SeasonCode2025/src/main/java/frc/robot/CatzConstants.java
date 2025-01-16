@@ -33,7 +33,7 @@ public final class CatzConstants {
   //
   //--------------------------------------------------/
   public static final RobotSenario robotSenario      = RobotSenario.PRACTICE;
-  public static final RobotHardwareMode hardwareMode = RobotHardwareMode.SIM;
+  public static final RobotHardwareMode hardwareMode = RobotHardwareMode.REAL;
   private static RobotID robotType                   = RobotID.SN_TEST;
   private static AlertPriority alertWarningPriority  = AlertPriority.ONE;
   
