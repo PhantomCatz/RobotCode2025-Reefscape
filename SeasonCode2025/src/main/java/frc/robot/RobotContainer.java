@@ -119,7 +119,7 @@ public class RobotContainer {
   //
   //---------------------------------------------------------------------------
   Command currentPathfindingCommand = Commands.runOnce(()->{});
-  HashMap<Rotation2d, Boolean> reefAngleToggles = new HashMap<>();
+  int POVReefAngle = 0; // 0 = none, x = x/6 revolutions
   int bumperLeftRight = 0; // 0 = none, 1 = left, -1 = right
 
   private void configureBindings() {
@@ -139,19 +139,12 @@ public class RobotContainer {
     //     pathfindToOrigin.cancel();
     //   }));
 
-    xboxDrv.povUp().onTrue(Commands.runOnce(() ->        reefAngleToggles.put(Rotation2d.fromRotations(0.0/6.0), true)));
-    xboxDrv.povUpLeft().onTrue(Commands.runOnce(() ->    reefAngleToggles.put(Rotation2d.fromRotations(1.0/6.0), true)));
-    xboxDrv.povDownLeft().onTrue(Commands.runOnce(() ->  reefAngleToggles.put(Rotation2d.fromRotations(2.0/6.0), true)));
-    xboxDrv.povDown().onTrue(Commands.runOnce(() ->      reefAngleToggles.put(Rotation2d.fromRotations(3.0/6.0), true)));
-    xboxDrv.povDownRight().onTrue(Commands.runOnce(() -> reefAngleToggles.put(Rotation2d.fromRotations(4.0/6.0), true)));
-    xboxDrv.povUpRight().onTrue(Commands.runOnce(() ->   reefAngleToggles.put(Rotation2d.fromRotations(5.0/6.0), true)));
-
-    xboxDrv.povUp().onFalse(Commands.runOnce(() ->        reefAngleToggles.put(Rotation2d.fromRotations(0.0/6.0), false)));
-    xboxDrv.povUpLeft().onFalse(Commands.runOnce(() ->    reefAngleToggles.put(Rotation2d.fromRotations(1.0/6.0), false)));
-    xboxDrv.povDownLeft().onFalse(Commands.runOnce(() ->  reefAngleToggles.put(Rotation2d.fromRotations(2.0/6.0), false)));
-    xboxDrv.povDown().onFalse(Commands.runOnce(() ->      reefAngleToggles.put(Rotation2d.fromRotations(3.0/6.0), false)));
-    xboxDrv.povDownRight().onFalse(Commands.runOnce(() -> reefAngleToggles.put(Rotation2d.fromRotations(4.0/6.0), false)));
-    xboxDrv.povUpRight().onFalse(Commands.runOnce(() ->   reefAngleToggles.put(Rotation2d.fromRotations(5.0/6.0), false)));
+    xboxDrv.povUp().onTrue(Commands.runOnce(() ->        POVReefAngle = 0));
+    xboxDrv.povUpLeft().onTrue(Commands.runOnce(() ->    POVReefAngle = 1));
+    xboxDrv.povDownLeft().onTrue(Commands.runOnce(() ->  POVReefAngle = 2));
+    xboxDrv.povDown().onTrue(Commands.runOnce(() ->      POVReefAngle = 3));
+    xboxDrv.povDownRight().onTrue(Commands.runOnce(() -> POVReefAngle = 4));
+    xboxDrv.povUpRight().onTrue(Commands.runOnce(() ->   POVReefAngle = 5));
 
     xboxDrv.leftBumper().onTrue(Commands.runOnce(() -> bumperLeftRight = 1));
     xboxDrv.leftBumper().onFalse(Commands.runOnce(() -> bumperLeftRight = 0));
@@ -159,22 +152,17 @@ public class RobotContainer {
     xboxDrv.rightBumper().onFalse(Commands.runOnce(() -> bumperLeftRight = 0));
 
     xboxDrv.a().onTrue(Commands.runOnce(() -> {
-      Rotation2d selectedAngle = new Rotation2d();
-      for(Rotation2d angle: reefAngleToggles.keySet()){
-        if(reefAngleToggles.get(angle)){
-          selectedAngle = angle;
-        }
-      }
-
+      Rotation2d selectedAngle = Rotation2d.fromRotations(POVReefAngle / 6.0);
       Translation2d unitRadius = new Translation2d(selectedAngle.getCos(), selectedAngle.getSin());
       Translation2d unitLeftRight = unitRadius.rotateBy(Rotation2d.fromDegrees(90));
+
       Translation2d radius = unitRadius.times(Reef.reefOrthogonalRadius + Reef.scoringDistance);
       Translation2d leftRight = unitLeftRight.times(bumperLeftRight * Reef.leftRightDistance);
       if (unitLeftRight.getY() < 0){
         leftRight = leftRight.times(-1);
       }
-
       Translation2d scoringPos = radius.plus(leftRight).plus(Reef.center);
+      
       currentPathfindingCommand = auto.getPathfindingCommand(new Pose2d(scoringPos, selectedAngle));
       currentPathfindingCommand.schedule();
     }));
