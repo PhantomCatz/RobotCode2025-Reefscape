@@ -3,29 +3,29 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 2.2297131147540985,
-        "y": 3.1798668032786876
+        "x": 7.564241803278687,
+        "y": 2.84421106557377
       },
       "prevControl": null,
       "nextControl": {
-        "x": 3.229713114754099,
-        "y": 3.1798668032786876
+        "x": 6.564241803278694,
+        "y": 2.84421106557377
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 4.843032786885245,
-        "y": 4.678329918032786
+        "x": 5.1067622950819676,
+        "y": 2.520543032786885
       },
       "prevControl": {
-        "x": 3.843032786885245,
-        "y": 4.678329918032786
+        "x": 6.66516393442623,
+        "y": 2.832223360655738
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": null
+      "linkedName": "Reef-E"
     }
   ],
   "rotationTargets": [],
@@ -42,10 +42,10 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": -70.74070835623282
+    "rotation": 119.99999999999999
   },
   "reversed": false,
-  "folder": null,
+  "folder": "L4 E Paths",
   "idealStartingState": {
     "velocity": 0,
     "rotation": 0.0

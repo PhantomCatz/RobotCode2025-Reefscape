@@ -42,10 +42,10 @@ public class DriveConstants {
     // Module organizations
     //---------------------------------------------------------------------------------------------------------------
     public static final String[] MODULE_NAMES = new String[] {"FL", "BL", "BR", "FR"};
-    public static final int INDEX_FL = 0;
-    public static final int INDEX_BL = 1;
-    public static final int INDEX_BR = 2;
-    public static final int INDEX_FR = 3;
+    public static final int INDEX_FR = 0;
+    public static final int INDEX_BR = 1;
+    public static final int INDEX_BL = 2;
+    public static final int INDEX_FL = 3;
 
     public static final int GYRO_ID = 0;
 
@@ -76,8 +76,8 @@ public class DriveConstants {
       case SN1,SN1_2024 ->
           new DriveConfig(
               Units.inchesToMeters(2.01834634),
-              Units.inchesToMeters(20.75),
-              Units.inchesToMeters(20.75),
+              Units.inchesToMeters(29.0),
+              Units.inchesToMeters(29.0),
               Units.inchesToMeters(37),
               Units.inchesToMeters(33),
               Units.feetToMeters(12.16),
@@ -97,7 +97,7 @@ public class DriveConstants {
                     1.0 / DCMotor.getKrakenX60Foc(1).KtNMPerAmp, // A/(N*m)
                     0.2,
                     0.0,
-                    0.7,
+                    0.01,
                     0.005, 
                     Mk4iReductions.L2_PLUS.reduction,
                     Mk4iReductions.steer.reduction);
@@ -159,8 +159,6 @@ public class DriveConstants {
     public static final LoggedTunableNumber steerkP = new LoggedTunableNumber("Drive/Module/steerkP", MODULE_GAINS_AND_RATIOS.steerkP());
     public static final LoggedTunableNumber steerkD = new LoggedTunableNumber("Drive/Module/steerkD", MODULE_GAINS_AND_RATIOS.steerkD());
 
-
-
     public static final ModuleIDsAndCurrentLimits[] MODULE_CONFIGS = 
         switch (CatzConstants.getRobotType()) {
             case SN2 ->
@@ -170,12 +168,13 @@ public class DriveConstants {
                     new ModuleIDsAndCurrentLimits(5, 6, 11, 0.6691969510/Math.PI/2, false),
                     new ModuleIDsAndCurrentLimits(7, 8, 12, 2.0568857418/Math.PI/2, false)
                 };
+
             case SN1 ->
                 new ModuleIDsAndCurrentLimits[] {
-                    new ModuleIDsAndCurrentLimits(1, 2, 1, -0.22139, false),
-                    new ModuleIDsAndCurrentLimits(3, 4, 2, 0.259, false),
-                    new ModuleIDsAndCurrentLimits(5, 6, 3, 0.188, false),
-                    new ModuleIDsAndCurrentLimits(7, 8, 4, 0.000182, false)
+                    new ModuleIDsAndCurrentLimits(7, 8, 14, -0.7688, false),  // FL
+                    new ModuleIDsAndCurrentLimits(5, 6, 13, -0.2185, false),    // BL
+                    new ModuleIDsAndCurrentLimits(3, 4, 12, -1.6421, false),    // BR
+                    new ModuleIDsAndCurrentLimits(1, 2, 11, 0.8887, false) // FR
                 };
             case SN_TEST -> 
                 new ModuleIDsAndCurrentLimits[] {
@@ -184,6 +183,7 @@ public class DriveConstants {
                     new ModuleIDsAndCurrentLimits(5, 6, 7, 0.0, false),
                     new ModuleIDsAndCurrentLimits(7, 8, 6, 0.0, false)
                 };
+
             case SN1_2024 ->
                 new ModuleIDsAndCurrentLimits[] {
                     new ModuleIDsAndCurrentLimits(1, 2, 1, 0.7066, false), //FL
@@ -205,10 +205,10 @@ public class DriveConstants {
 
     public static final Translation2d[] MODULE_TRANSLATIONS =
         new Translation2d[] {
-            new Translation2d( DRIVE_CONFIG.robotLengthX() , DRIVE_CONFIG.robotWidthY()).div(2.0),    //LT FRONT
-            new Translation2d(-DRIVE_CONFIG.robotLengthX() , DRIVE_CONFIG.robotWidthY()).div(2.0),    //LT BACK
-            new Translation2d(-DRIVE_CONFIG.robotLengthX(), -DRIVE_CONFIG.robotWidthY()).div(2.0),    //RT BACK
-            new Translation2d( DRIVE_CONFIG.robotLengthX(), -DRIVE_CONFIG.robotWidthY()).div(2.0)     //RT FRONT
+            new Translation2d( DRIVE_CONFIG.robotLengthX() ,-DRIVE_CONFIG.robotWidthY()).div(2.0),    //RT FRONT
+            new Translation2d(-DRIVE_CONFIG.robotLengthX() ,-DRIVE_CONFIG.robotWidthY()).div(2.0),    //RT BACK
+            new Translation2d(-DRIVE_CONFIG.robotLengthX(),  DRIVE_CONFIG.robotWidthY()).div(2.0),    //LT BACK
+            new Translation2d( DRIVE_CONFIG.robotLengthX(),  DRIVE_CONFIG.robotWidthY()).div(2.0)     //LT FRONT
         };    
 
     public static final Translation2d[] TRAJECTORY_MODULE_TRANSLATIONS = 

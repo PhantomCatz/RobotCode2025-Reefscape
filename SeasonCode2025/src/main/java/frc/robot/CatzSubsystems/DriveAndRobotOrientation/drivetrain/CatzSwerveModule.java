@@ -57,10 +57,10 @@ public class CatzSwerveModule {
         } else {
             // Run Robot Mode hardware assignment
             switch (CatzConstants.hardwareMode) {
-                case REAL: io = new ModuleIORealFoc(config);
+                case REAL: io = new ModuleIORealFoc(config, m_moduleName);
                             System.out.println("Module " + m_moduleName + " Configured for Real");
                 break;
-                case REPLAY : io = new ModuleIORealFoc(config) {};
+                case REPLAY : io = new ModuleIORealFoc(config, m_moduleName) {};
                             System.out.println("Module " + m_moduleName + " Configured for Replay simulation");
                 break;
                 case SIM: io = new ModuleIOSim(config);
@@ -81,7 +81,6 @@ public class CatzSwerveModule {
     } // -End of CatzSwerveModule Constructor
 
 
-    
     //----------------------------------------------------------------------------------------------
     //
     //  Periodic
@@ -90,7 +89,7 @@ public class CatzSwerveModule {
     public void periodic() {
         // Process and Log Module Inputs
         io.updateInputs(inputs);
-        Logger.processInputs("inputs/Drive/M " + m_moduleName, inputs); 
+        Logger.processInputs("inputs/Drive/Motors " + m_moduleName, inputs); 
 
         // Update ff and controllers
         LoggedTunableNumber.ifChanged(
@@ -114,6 +113,7 @@ public class CatzSwerveModule {
         Logger.recordOutput("Module " + m_moduleName + "/currentmodule state", m_swerveModuleState.angle.getRadians());
         Logger.recordOutput("Module " + m_moduleName + "/angle error deg", Math.toDegrees(m_swerveModuleState.angle.getRadians()-getAbsEncRadians()));
         Logger.recordOutput("Module " + m_moduleName + "/currentmoduleangle rad", getAbsEncRadians());
+        Logger.recordOutput("Module " + m_moduleName + "/current absolute enc", inputs.rawAbsEncValueRotation);
         //Logger.recordOutput("Module " + m_moduleName + "/targetmoduleangle rad", m_swerveModuleState.angle.getRadians());
 
 

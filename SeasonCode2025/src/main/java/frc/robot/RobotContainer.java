@@ -25,7 +25,7 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
-import frc.robot.Autonomous.CatzAutonomousExternal;
+import frc.robot.Autonomous.CatzAutonomous;
 import frc.robot.CatzConstants.AllianceColor;
 import frc.robot.CatzConstants.RobotSenario;
 import frc.robot.CatzConstants.XboxInterfaceConstants;
@@ -78,7 +78,7 @@ public class RobotContainer {
   // Auto Declaration
   //---------------------------------------------------------------------------------------------------------------------
   private AutomatedSequenceCmds autosequence = new AutomatedSequenceCmds();
-  private CatzAutonomousExternal autoEx = new CatzAutonomousExternal(this);
+  private CatzAutonomous auto = new CatzAutonomous(this);
 
   public RobotContainer() {
 
@@ -128,7 +128,7 @@ public class RobotContainer {
     // Auto Driving
    // xboxDrv.y().onTrue(new FaceTarget(FieldConstants.Speaker.centerSpeakerOpening.toTranslation2d(), drive));
     xboxDrv.b().toggleOnTrue(Commands.runOnce(() -> {
-        pathfindToOrigin = autoEx.getPathfindingCommand(new Pose2d(2, 7, new Rotation2d()));
+        pathfindToOrigin = auto.getPathfindingCommand(new Pose2d(2, 7, new Rotation2d()));
         pathfindToOrigin.schedule();
     }));
 
@@ -194,6 +194,6 @@ public class RobotContainer {
   }
 
   public Command getAutonomousCommand() {
-    return autoEx.getCommand();
+    return auto.getCommand();
   }
 }

@@ -1,0 +1,54 @@
+{
+  "version": "2025.0",
+  "waypoints": [
+    {
+      "anchor": {
+        "x": 6.005840163934426,
+        "y": 4.330686475409836
+      },
+      "prevControl": null,
+      "nextControl": {
+        "x": 7.851946721311475,
+        "y": 3.8032274590163935
+      },
+      "isLocked": false,
+      "linkedName": "Reef-H"
+    },
+    {
+      "anchor": {
+        "x": 1.2587090163934425,
+        "y": 1.046055327868852
+      },
+      "prevControl": {
+        "x": 3.296618852459016,
+        "y": 1.3457479508196706
+      },
+      "nextControl": null,
+      "isLocked": false,
+      "linkedName": "Coral-Bottom"
+    }
+  ],
+  "rotationTargets": [],
+  "constraintZones": [],
+  "pointTowardsZones": [],
+  "eventMarkers": [],
+  "globalConstraints": {
+    "maxVelocity": 3.0,
+    "maxAcceleration": 3.0,
+    "maxAngularVelocity": 540.0,
+    "maxAngularAcceleration": 720.0,
+    "nominalVoltage": 12.0,
+    "unlimited": false
+  },
+  "goalEndState": {
+    "velocity": 0,
+    "rotation": -126.25383773744477
+  },
+  "reversed": false,
+  "folder": "L4 H Paths",
+  "idealStartingState": {
+    "velocity": 0,
+    "rotation": 180.0
+  },
+  "useDefaultConstraints": true
+}
