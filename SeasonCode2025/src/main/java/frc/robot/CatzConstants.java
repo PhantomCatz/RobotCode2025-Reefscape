@@ -34,7 +34,7 @@ public final class CatzConstants {
   //--------------------------------------------------/
   public static final RobotSenario robotSenario      = RobotSenario.PRACTICE;
   public static final RobotHardwareMode hardwareMode = RobotHardwareMode.REAL;
-  private static RobotID robotType                   = RobotID.SN_TEST;
+  private static RobotID robotType                   = RobotID.SN1_2024;
   private static AlertPriority alertWarningPriority  = AlertPriority.ONE;
   
   public static final double LOOP_TIME = 0.02;

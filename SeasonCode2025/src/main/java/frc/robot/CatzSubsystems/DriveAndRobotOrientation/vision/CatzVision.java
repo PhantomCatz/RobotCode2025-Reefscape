@@ -102,17 +102,16 @@ public class CatzVision extends SubsystemBase {
             // Loop over pose observations
             for (var observation : inputs[cameraIndex].poseObservations) {
                 // Check whether to reject pose
-                boolean rejectPose = observation.tagCount() == 0 // Must have at least one tag
-                        || (observation.tagCount() == 1
-                                && observation.ambiguity() > maxAmbiguity) // Cannot be high ambiguity
-                        || Math.abs(observation.pose().getZ()) > maxZError // Must have realistic Z coordinate
-
+                boolean rejectPose =  
+                        ((observation.tagCount() == 0) // Must have at least one tag
+                        //|| (observation.tagCount() == 1  && observation.ambiguity() > maxAmbiguity) // Cannot be high ambiguity // TODO add back in
+                        || (Math.abs(observation.pose().getZ()) >= maxZError) // Must have realistic Z coordinate
                         // Must be within the field boundaries
-                        || observation.pose().getX() < 0.0
-                        || observation.pose().getX() > aprilTagLayout.getFieldLength()
-                        || observation.pose().getY() < 0.0
-                        || observation.pose().getY() > aprilTagLayout.getFieldWidth();
-
+                        || (observation.pose().getX() < 0.0)
+                        || (observation.pose().getX() > aprilTagLayout.getFieldLength())
+                        || (observation.pose().getY() < 0.0)
+                        || (observation.pose().getY() > aprilTagLayout.getFieldWidth()));
+                //System.out.println(rejectPose);
                 // Add pose to log
                 robotPoses.add(observation.pose());
                 if (rejectPose) {
@@ -148,6 +147,7 @@ public class CatzVision extends SubsystemBase {
                                     VecBuilder.fill(linearStdDev, linearStdDev, angularStdDev)
                                 )
                 );
+                //System.out.println("===");
             }
 
             // Log camera datadata
