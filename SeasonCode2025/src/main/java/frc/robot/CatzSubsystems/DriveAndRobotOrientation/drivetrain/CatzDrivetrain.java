@@ -142,7 +142,7 @@ public class CatzDrivetrain extends SubsystemBase {
         });
     }
 
-
+    Pose2d pose = new Pose2d();
 
     @Override
     public void periodic() {
@@ -152,6 +152,9 @@ public class CatzDrivetrain extends SubsystemBase {
         for (CatzSwerveModule module : m_swerveModules) {
             module.periodic();
         }
+
+        pose = pose.interpolate(tracker.getEstimatedPose(), 0.05);
+        Logger.recordOutput("pose", pose);
 
         //-----------------------------------------------------------------------------------------------------
         // Attempt to update gyro inputs and log

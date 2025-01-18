@@ -99,35 +99,6 @@ public class CatzAutonomous extends VirtualSubsystem{
         // ORDER MATTERS! Register named commands first, AutoBuilder second, Trajectories and add autos to dashboard last
         //------------------------------------------------------------------------------------------------------------
 
-        class testPrintCmd extends Command{
-            Timer time = new Timer();
-
-            @Override
-            public void initialize(){
-                time.reset();
-                time.start();
-            }
-
-            @Override
-            public void execute(){
-                System.out.println("hi");
-            }
-
-            @Override
-            public void end(boolean interrupted){
-                System.out.println("end");
-            }
-
-            @Override
-            public boolean isFinished(){
-                return time.get() > 2;
-            }
-        }
-
-        HashMap<String, Command> testCommandChoices = new HashMap<>();
-        testCommandChoices.put("TestLoopPrint", new testPrintCmd());
-        dashboardCmds.put("print", new DashboardCmd("print", testCommandChoices));
-
         BooleanSupplier shouldFlip = ()-> AllianceFlipUtil.shouldFlipToRed();
         AutoBuilder.configure(
             tracker::getEstimatedPose,

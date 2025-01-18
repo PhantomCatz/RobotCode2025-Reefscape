@@ -6,6 +6,8 @@ package frc.robot;
 
 import static frc.robot.CatzSubsystems.DriveAndRobotOrientation.DepreciatedVision.VisionConstants.SOBA_TRANSFORM;
 
+import java.util.HashMap;
+
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 import org.littletonrobotics.junction.networktables.LoggedDashboardNumber;
 import org.littletonrobotics.junction.networktables.LoggedNetworkNumber;
@@ -29,6 +31,7 @@ import frc.robot.Autonomous.CatzAutonomous;
 import frc.robot.CatzConstants.AllianceColor;
 import frc.robot.CatzConstants.RobotSenario;
 import frc.robot.CatzConstants.XboxInterfaceConstants;
+import frc.robot.FieldConstants.Reef;
 import frc.robot.CatzSubsystems.DriveAndRobotOrientation.CatzRobotTracker;
 import frc.robot.CatzSubsystems.DriveAndRobotOrientation.DepreciatedVision.VisionIOLimeLight;
 import frc.robot.CatzSubsystems.DriveAndRobotOrientation.Drivetrain.CatzDrivetrain;
@@ -65,7 +68,7 @@ public class RobotContainer {
   //-----------------------------------------------------------------------------------------------------------------
   private CommandXboxController xboxDrv = new CommandXboxController(0);
   private CommandXboxController xboxAux = new CommandXboxController(1);
-
+  
   //-------------------------------------------------------------------------------------------------------------------
   // Alert Declaration
   //-------------------------------------------------------------------------------------------------------------------
@@ -81,7 +84,6 @@ public class RobotContainer {
   private CatzAutonomous auto = new CatzAutonomous(this);
 
   public RobotContainer() {
-
     // Drive And Aux Command Mapping
     configureBindings();
 
@@ -116,27 +118,68 @@ public class RobotContainer {
   //  Button mapping to commands
   //
   //---------------------------------------------------------------------------
-  Command pathfindToOrigin = Commands.runOnce(()->{});
-  private void configureBindings() { // TODO organize by function
-    
-    /* XBOX AUX */
+  Command currentPathfindingCommand = Commands.runOnce(()->{});
+  HashMap<Rotation2d, Boolean> reefAngleToggles = new HashMap<>();
+  int bumperLeftRight = 0; // 0 = none, 1 = left, -1 = right
 
+  private void configureBindings() {
+    /* XBOX AUX */
 
     /* XBOX DRIVE */
     xboxDrv.start().onTrue(drive.cancelTrajectory());
 
     // Auto Driving
-   // xboxDrv.y().onTrue(new FaceTarget(FieldConstants.Speaker.centerSpeakerOpening.toTranslation2d(), drive));
-    xboxDrv.b().toggleOnTrue(Commands.runOnce(() -> {
-        pathfindToOrigin = auto.getPathfindingCommand(new Pose2d(2, 7, new Rotation2d()));
-        pathfindToOrigin.schedule();
+    //   xboxDrv.y().onTrue(new FaceTarget(FieldConstants.Speaker.centerSpeakerOpening.toTranslation2d(), drive));
+    //   xboxDrv.b().toggleOnTrue(Commands.runOnce(() -> {
+    //       pathfindToOrigin = auto.getPathfindingCommand(new Pose2d(2, 7, new Rotation2d()));
+    //       pathfindToOrigin.schedule();
+    //   }));
+
+    //   xboxDrv.b().toggleOnFalse(Commands.runOnce(() -> {
+    //     pathfindToOrigin.cancel();
+    //   }));
+
+    xboxDrv.povUp().onTrue(Commands.runOnce(() ->        reefAngleToggles.put(Rotation2d.fromRotations(0.0/6.0), true)));
+    xboxDrv.povUpLeft().onTrue(Commands.runOnce(() ->    reefAngleToggles.put(Rotation2d.fromRotations(1.0/6.0), true)));
+    xboxDrv.povDownLeft().onTrue(Commands.runOnce(() ->  reefAngleToggles.put(Rotation2d.fromRotations(2.0/6.0), true)));
+    xboxDrv.povDown().onTrue(Commands.runOnce(() ->      reefAngleToggles.put(Rotation2d.fromRotations(3.0/6.0), true)));
+    xboxDrv.povDownRight().onTrue(Commands.runOnce(() -> reefAngleToggles.put(Rotation2d.fromRotations(4.0/6.0), true)));
+    xboxDrv.povUpRight().onTrue(Commands.runOnce(() ->   reefAngleToggles.put(Rotation2d.fromRotations(5.0/6.0), true)));
+
+    xboxDrv.povUp().onFalse(Commands.runOnce(() ->        reefAngleToggles.put(Rotation2d.fromRotations(0.0/6.0), false)));
+    xboxDrv.povUpLeft().onFalse(Commands.runOnce(() ->    reefAngleToggles.put(Rotation2d.fromRotations(1.0/6.0), false)));
+    xboxDrv.povDownLeft().onFalse(Commands.runOnce(() ->  reefAngleToggles.put(Rotation2d.fromRotations(2.0/6.0), false)));
+    xboxDrv.povDown().onFalse(Commands.runOnce(() ->      reefAngleToggles.put(Rotation2d.fromRotations(3.0/6.0), false)));
+    xboxDrv.povDownRight().onFalse(Commands.runOnce(() -> reefAngleToggles.put(Rotation2d.fromRotations(4.0/6.0), false)));
+    xboxDrv.povUpRight().onFalse(Commands.runOnce(() ->   reefAngleToggles.put(Rotation2d.fromRotations(5.0/6.0), false)));
+
+    xboxDrv.leftBumper().onTrue(Commands.runOnce(() -> bumperLeftRight = 1));
+    xboxDrv.leftBumper().onFalse(Commands.runOnce(() -> bumperLeftRight = 0));
+    xboxDrv.rightBumper().onTrue(Commands.runOnce(() -> bumperLeftRight = -1));
+    xboxDrv.rightBumper().onFalse(Commands.runOnce(() -> bumperLeftRight = 0));
+
+    xboxDrv.a().onTrue(Commands.runOnce(() -> {
+      Rotation2d selectedAngle = new Rotation2d();
+      for(Rotation2d angle: reefAngleToggles.keySet()){
+        if(reefAngleToggles.get(angle)){
+          selectedAngle = angle;
+        }
+      }
+
+      Translation2d unitRadius = new Translation2d(selectedAngle.getCos(), selectedAngle.getSin());
+      Translation2d unitLeftRight = unitRadius.rotateBy(Rotation2d.fromDegrees(90));
+      Translation2d radius = unitRadius.times(Reef.reefOrthogonalRadius + Reef.scoringDistance);
+      Translation2d leftRight = unitLeftRight.times(bumperLeftRight * Reef.leftRightDistance);
+      if (unitLeftRight.getY() < 0){
+        leftRight = leftRight.times(-1);
+      }
+
+      Translation2d scoringPos = radius.plus(leftRight).plus(Reef.center);
+      currentPathfindingCommand = auto.getPathfindingCommand(new Pose2d(scoringPos, selectedAngle));
+      currentPathfindingCommand.schedule();
     }));
 
-    xboxDrv.b().toggleOnFalse(Commands.runOnce(() -> {
-      pathfindToOrigin.cancel();
-    }));
-
-
+    xboxDrv.a().onFalse(Commands.runOnce(() -> currentPathfindingCommand.cancel()));
     
     drive.setDefaultCommand(new TeleopDriveCmd(() -> xboxDrv.getLeftX(), 
                                                () -> xboxDrv.getLeftY(), 
