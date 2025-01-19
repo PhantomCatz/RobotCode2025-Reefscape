@@ -39,7 +39,6 @@ public final class CatzConstants {
   
   public static final double LOOP_TIME = 0.02;
 
-
   public static enum RobotSenario {
     TUNING, //In PID enviroment with logged tunable numbers
     PRACTICE, //Driver Practice + Testing

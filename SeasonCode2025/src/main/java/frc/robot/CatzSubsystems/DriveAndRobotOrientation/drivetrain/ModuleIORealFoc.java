@@ -42,9 +42,9 @@ public class ModuleIORealFoc implements ModuleIO {
   private final TalonFX driveTalon;
   private final TalonFX steerTalon;
   private final CANcoder encoder;
-  private final DutyCycleEncoder steerAbsoluteMagEnc;
-  private final DigitalInput magEncPWMInput;
-  private final MT6835 absEncoder;
+  // private final DutyCycleEncoder steerAbsoluteMagEnc;
+  // private final DigitalInput magEncPWMInput;
+  // private final MT6835 absEncoder;
   private final Rotation2d absoluteEncoderOffset;
 
   // Status Signals
@@ -77,13 +77,20 @@ public class ModuleIORealFoc implements ModuleIO {
   // Status Code Initialization
   private StatusCode initializationStatus = StatusCode.StatusCodeNotInitialized;
 
-  ModuleIDsAndCurrentLimits m_config;
-  public ModuleIORealFoc(ModuleIDsAndCurrentLimits config) {
-    encoder = new CANcoder(config.absoluteEncoderChannel(), "*");
+  // Module Name
+  private final String MODULE_NAME;
 
+  ModuleIDsAndCurrentLimits m_config;
+  public ModuleIORealFoc(ModuleIDsAndCurrentLimits config, String name) {
+    MODULE_NAME = name;
+
+    encoder = new CANcoder(config.absoluteEncoderChannel(), "*");
+    System.out.println(config.absoluteEncoderChannel());
+    System.out.println(config.driveID());
+    System.out.println(config.steerID());
     m_config = config;
     // Init drive controllers from config constants
-    driveTalon = new TalonFX(config.driveID());
+    driveTalon = new TalonFX(config.driveID(), "*");
 
     // Restore Factory Defaults
     driveTalon.getConfigurator().apply(new TalonFXConfiguration());
@@ -100,19 +107,10 @@ public class ModuleIORealFoc implements ModuleIO {
     driveTalonConfig.Slot0.kS = MODULE_GAINS_AND_RATIOS.driveFFkS();
     driveTalonConfig.Slot0.kV = MODULE_GAINS_AND_RATIOS.driveFFkV();
 
-    // CANCoder
-    // var cancoderConfig = new CANcoderConfiguration();
-    // cancoderConfig.MagnetSensor.MagnetOffset = config.absoluteEncoderOffset(); //config.encoderOffset().getRotations();
-    // cancoderConfig.MagnetSensor.SensorDirection =
-    //     config.encoderInverted()
-    //         ? SensorDirectionValue.Clockwise_Positive
-    //         : SensorDirectionValue.CounterClockwise_Positive;
-    // encoder.getConfigurator().apply(cancoderConfig);
-
     // MagEnc
     // Init Steer controllers and steer encoder from config constants
-    magEncPWMInput = new DigitalInput(config.absoluteEncoderChannel());
-    steerAbsoluteMagEnc = new DutyCycleEncoder(magEncPWMInput);
+    // magEncPWMInput = new DigitalInput(config.absoluteEncoderChannel());
+    // steerAbsoluteMagEnc = new DutyCycleEncoder(magEncPWMInput);
 
     // Assign 100hz Signals
     drivePosition = driveTalon.getPosition();
@@ -134,9 +132,9 @@ public class ModuleIORealFoc implements ModuleIO {
     driveTalon.optimizeBusUtilization(0, 1.0);
 
     // Init steer controllers from config constants
-    steerTalon = new TalonFX(config.steerID());
+    steerTalon = new TalonFX(config.steerID(), "*");
     absoluteEncoderOffset = Rotation2d.fromRotations(config.absoluteEncoderOffset());
-    absEncoder = new MT6835(config.absoluteEncoderChannel(), false);
+    // absEncoder = new MT6835(config.absoluteEncoderChannel(), false);
 
     // Restore Factory Defaults
     steerTalon.getConfigurator().apply(new TalonFXConfiguration());
@@ -210,8 +208,8 @@ public class ModuleIORealFoc implements ModuleIO {
     inputs.driveTorqueCurrentAmps = driveTorqueCurrent.getValueAsDouble();
 
     // Refresh steer Motor Values
-    inputs.rawAbsEncValueRotation  = steerAbsoluteMagEnc.get();
-    inputs.steerAbsPosition   = Rotation2d.fromRotations((inputs.rawAbsEncValueRotation - absoluteEncoderOffset.getRotations()));
+    inputs.rawAbsEncValueRotation  = encoder.getPosition().getValueAsDouble();
+    inputs.steerAbsPosition = Rotation2d.fromRotations(inputs.rawAbsEncValueRotation - absoluteEncoderOffset.getRotations());
 
     inputs.steerVelocityRadsPerSec = Units.rotationsToRadians(steerVelocity.getValueAsDouble());
     inputs.steerSupplyCurrentAmps = steerSupplyCurrent.getValueAsDouble();
@@ -247,8 +245,8 @@ public class ModuleIORealFoc implements ModuleIO {
   public void runSteerPositionSetpoint(double currentAngleRads, double targetAngleRads) {
 		steerTalon.setControl(dutyCycleOutControl.withOutput(-steerFeedback.calculate(currentAngleRads, targetAngleRads)));
 
-    Logger.recordOutput("Module " + m_config.driveID() + "/steer Target Angle", targetAngleRads);
-    Logger.recordOutput("Module " + m_config.driveID() + "/steer current Angle", currentAngleRads);
+    Logger.recordOutput("Module " + MODULE_NAME + "/steer Target Angle", targetAngleRads);
+    Logger.recordOutput("Module " + MODULE_NAME + "/steer current Angle", currentAngleRads);
 
   }
 

@@ -29,15 +29,18 @@ import com.pathplanner.lib.pathfinding.Pathfinding;
 import com.pathplanner.lib.trajectory.PathPlannerTrajectory;
 import com.pathplanner.lib.trajectory.PathPlannerTrajectoryState;
 import com.pathplanner.lib.util.FileVersionException;
+import com.pathplanner.lib.util.FlippingUtil;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.StringPublisher;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -50,6 +53,9 @@ import edu.wpi.first.wpilibj2.command.PrintCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.FieldConstants;
 import frc.robot.RobotContainer;
+import frc.robot.Autonomous.CatzAutonomous.AutoQuestion;
+import frc.robot.Autonomous.CatzAutonomous.AutoQuestionResponse;
+import frc.robot.Autonomous.CatzAutonomous.AutoScoringOptions;
 import frc.robot.CatzSubsystems.DriveAndRobotOrientation.CatzRobotTracker;
 import frc.robot.CatzSubsystems.DriveAndRobotOrientation.Drivetrain.DriveConstants;
 import frc.robot.Commands.AutomatedSequenceCmds;
@@ -64,48 +70,26 @@ import frc.robot.Utilities.LocalADStarAK;
 import frc.robot.Utilities.SwitchableChooser;
 import frc.robot.Utilities.VirtualSubsystem;
 
-public class CatzAutonomousExternal extends VirtualSubsystem{
+public class CatzAutonomous extends VirtualSubsystem{
     private final int MAX_QUESTIONS = 5;
     private static final String AUTO_STRING = "Auto";
-
     private final LoggedDashboardChooser<PathPlannerAuto> autoProgramChooser = new LoggedDashboardChooser<>(AUTO_STRING + "/Program");
-    private final List<StringPublisher> questionPublishers;
-    private final List<SwitchableChooser> questionChoosers;
 
-    private boolean trajectoriesLoaded = false;
-    private HashMap<String, Command> pathplannerPaths = new HashMap<>();
-    private HashMap<String, Command> choreoPaths = new HashMap<>();
+    private HashMap<String, DashboardCmd> dashboardCmds = new HashMap<>();
     private File autosDirectory = new File(Filesystem.getDeployDirectory(), "pathplanner/autos");
     private File choreoPathsDirectory = new File(Filesystem.getDeployDirectory(), "choreo");
     private File pathplannerPathsDirectory = new File(Filesystem.getDeployDirectory(), "pathplanner/paths");
 
     private PathPlannerAuto lastProgram;
-    private List<AutoQuestionResponse> lastResponses;
     private JSONParser parser = new JSONParser();
 
     //---------------------------------------------------------------------------------------------------
     //  Auto Questions
     //-----------------------------------------------------------------------------------------------------
-    private HashMap<String, AutoQuestion> autoQuestions = new HashMap<>();
     private RobotContainer m_container;
 
-    public CatzAutonomousExternal(RobotContainer container) {
+    public CatzAutonomous(RobotContainer container) {
         this.m_container = container;
-        lastResponses = List.of();
-
-        // Publish questions and choosers
-        questionPublishers = new ArrayList<>();
-        questionChoosers = new ArrayList<>();
-        for (int i = 0; i < MAX_QUESTIONS; i++) {
-            var publisher =
-                NetworkTableInstance.getDefault()
-                    .getStringTopic("/SmartDashboard/" + AUTO_STRING + "/Question #" + Integer.toString(i + 1))
-                    .publish();
-            publisher.set("NA");
-            questionPublishers.add(publisher);
-            questionChoosers.add(
-                new SwitchableChooser(AUTO_STRING + "/Question #" + Integer.toString(i + 1) + " Chooser"));
-        }
 
         // Path follwing setup
         CatzRobotTracker tracker = CatzRobotTracker.getInstance();
@@ -115,38 +99,13 @@ public class CatzAutonomousExternal extends VirtualSubsystem{
         // ORDER MATTERS! Register named commands first, AutoBuilder second, Trajectories and add autos to dashboard last
         //------------------------------------------------------------------------------------------------------------
 
-        NamedCommands.registerCommand("TestPrint", Commands.print("Bench"));
-
-    class controller implements PathFollowingController {
-
-            @Override
-            public ChassisSpeeds calculateRobotRelativeSpeeds(Pose2d currentPose,
-                    PathPlannerTrajectoryState targetState) {
-                // TODO Auto-generated method stub
-                throw new UnsupportedOperationException("Unimplemented method 'calculateRobotRelativeSpeeds'");
-            }
-
-            @Override
-            public void reset(Pose2d currentPose, ChassisSpeeds currentSpeeds) {
-                // TODO Auto-generated method stub
-                throw new UnsupportedOperationException("Unimplemented method 'reset'");
-            }
-
-            @Override
-            public boolean isHolonomic() {
-                // TODO Auto-generated method stub
-                throw new UnsupportedOperationException("Unimplemented method 'isHolonomic'");
-            }
-           
-        }
-
         BooleanSupplier shouldFlip = ()-> AllianceFlipUtil.shouldFlipToRed();
         AutoBuilder.configure(
             tracker::getEstimatedPose,
             tracker::resetPose,
             tracker::getRobotChassisSpeeds,
             container.getCatzDrivetrain()::drive,
-            new controller(),
+            DriveConstants.PATH_FOLLOWING_CONTROLLER,
             DriveConstants.TRAJECTORY_CONFIG,
             shouldFlip,
             container.getCatzDrivetrain()
@@ -155,86 +114,73 @@ public class CatzAutonomousExternal extends VirtualSubsystem{
         //------------------------------------------------------------------------------------------------------------
         // Path Configuration
         //------------------------------------------------------------------------------------------------------------
-        // for(File pathFile : choreoPathsDirectory.listFiles()){
-        //     //to get rid of the extensions trailing the path names
-        //     String pathName = pathFile.getName().replaceFirst("[.][^.]+$", ""); 
-        //     PathPlannerPath path;
-        //     try {
-        //         path = PathPlannerPath.fromChoreoTrajectory(pathName);
-        //         choreoPaths.put(pathName, new TrajectoryDriveCmd(path, container.getCatzDrivetrain()));
-        //     } catch (FileVersionException | IOException | ParseException e) {
-        //         // TODO Auto-generated catch block
-        //         e.printStackTrace();
-        //     }
-        // }
-        NamedCommands.registerCommands(choreoPaths);
+        for(File pathFile : choreoPathsDirectory.listFiles()){
+            //to get rid of the extensions trailing the path names
+            String pathName = pathFile.getName().replaceFirst("[.][^.]+$", ""); 
+            try {
+                NamedCommands.registerCommand(pathName, new TrajectoryDriveCmd(PathPlannerPath.fromChoreoTrajectory(pathName), m_container.getCatzDrivetrain()));
+            } catch (FileVersionException | IOException | ParseException e) {
+                e.printStackTrace();
+            }
+        }
         
         for(File pathFile : pathplannerPathsDirectory.listFiles()){
             //to get rid of the extensions trailing the path names
             String pathName = pathFile.getName().replaceFirst("[.][^.]+$", ""); 
-            PathPlannerPath path;
             try {
-                path = PathPlannerPath.fromPathFile(pathName);
-                pathplannerPaths.put(pathName, new TrajectoryDriveCmd(path, container.getCatzDrivetrain()));
+                NamedCommands.registerCommand(pathName, new TrajectoryDriveCmd(PathPlannerPath.fromPathFile(pathName), m_container.getCatzDrivetrain()));
             } catch (FileVersionException | IOException | ParseException e) {
                 e.printStackTrace();
             }
         }
 
-        NamedCommands.registerCommands(pathplannerPaths);
+        for(String question: dashboardCmds.keySet()){
+            NamedCommands.registerCommand(question, dashboardCmds.get(question));
+        }
+
         for (File autoFile: autosDirectory.listFiles()){
             String autoName = autoFile.getName().replaceFirst("[.][^.]+$", "");
-            autoProgramChooser.addOption(autoName, new PathPlannerAuto(autoName));
+            autoProgramChooser.addDefaultOption(autoName, new PathPlannerAuto(autoName));
         }
     }
 
     @Override
     public void periodic() {
-        // Skip updates when actively running in auto
-        if (DriverStation.isAutonomousEnabled() && lastProgram != null && lastResponses == null) {
-            return;
-        }
         // Update the list of questions
         PathPlannerAuto selectedProgram = autoProgramChooser.get();
-        if (selectedProgram == null) {
+        if (
+            selectedProgram == null || 
+            selectedProgram.equals(lastProgram) || 
+            (DriverStation.isAutonomousEnabled() && lastProgram != null)
+        ) {
             return;
         }
 
         try {
-            String autoName = autoProgramChooser.get().getName() + ".auto";
-            JSONObject json = (JSONObject) parser.parse(new FileReader(Filesystem.getDeployDirectory()+"/pathplanner/autos/" + autoName));
-            // Refresh Questionaire list when new Auto routine is selected
-            if (!selectedProgram.equals(lastProgram)) {
-                // Set Up Question Boxes
-                for(int i = 0; i < MAX_QUESTIONS; i++) {
-                    questionPublishers.get(i).set("");
-                    questionChoosers.get(i).setOptions(new String[] {});
+            for(int i=1; i<=MAX_QUESTIONS; i++){
+                String questionName = "Question #" + String.valueOf(i);
+                SmartDashboard.putString(questionName, "");
+                SmartDashboard.putData(questionName + " Response", new SendableChooser<Command>());
+            }
+
+            JSONObject json = (JSONObject) parser.parse(new FileReader(autosDirectory + "/" + selectedProgram.getName() + ".auto"));
+            ArrayList<Object> commands = JSONUtil.getCommandsFromPath(json);
+            int questionCounter = 1;
+           
+            for(Object o : commands){
+                String commandName = JSONUtil.getCommandName(o);
+                DashboardCmd modifiableCommand = dashboardCmds.get(commandName);
+
+                if(modifiableCommand != null){
+                    String questionName = "Question #" + String.valueOf(questionCounter);
+                    SmartDashboard.putString(questionName, modifiableCommand.getQuestion());
+                    SmartDashboard.putData(questionName + " Response", modifiableCommand.getChooser());
+                    questionCounter += 1;
                 }
-
-                // List all auton commands in Json
-                ArrayList<Object> commands = JSONUtil.getCommandsFromPath(json);
-                int questionCounter = 0;
-
-                // Fill Queston Boxes
-                for(Object o : commands){
-                    String commandName = JSONUtil.getCommandName(o);
-                    AutoQuestion chooserAutoQuestion = autoQuestions.get(commandName);
-
-                    if(chooserAutoQuestion != null) {
-                        String questionName = "Question " + String.valueOf(questionCounter);
-                        questionPublishers.get(questionCounter).set(chooserAutoQuestion.question());
-                        questionChoosers.get(questionCounter).setOptions(chooserAutoQuestion.responses().stream()
-                                                             .map((AutoQuestionResponse response) -> response.toString())
-                                                             .toArray(String[]::new));
-                        questionCounter += 1;
-                    }
-                }
-            }   
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }
-
-        // Update the routine and responses periodically from user
         lastProgram = selectedProgram;
     }
 
@@ -245,10 +191,19 @@ public class CatzAutonomousExternal extends VirtualSubsystem{
     //---------------------------------------------------------------------------------------------------------
 
     public Command getPathfindingCommand(Pose2d goal){
-        Pathfinding.setStartPosition(CatzRobotTracker.getInstance().getEstimatedPose().getTranslation());
+        Translation2d robotPos = CatzRobotTracker.getInstance().getEstimatedPose().getTranslation();
+        if(AllianceFlipUtil.shouldFlipToRed()){
+            robotPos = FlippingUtil.flipFieldPosition(robotPos);
+        }
+        Pathfinding.setStartPosition(robotPos);
         Pathfinding.setGoalPosition(goal.getTranslation());
+        PathPlannerPath path = Pathfinding.getCurrentPath(DriveConstants.PATHFINDING_CONSTRAINTS, new GoalEndState(0, goal.getRotation()));
 
-        return new TrajectoryDriveCmd(Pathfinding.getCurrentPath(DriveConstants.PATHFINDING_CONSTRAINTS, new GoalEndState(0, goal.getRotation())), m_container.getCatzDrivetrain());
+        if(path == null){
+            return new InstantCommand();
+        }else{
+            return new TrajectoryDriveCmd(path, m_container.getCatzDrivetrain());
+        }
     }
 
     public Command pathfindThenFollowPath(AutoScoringOptions option){ 

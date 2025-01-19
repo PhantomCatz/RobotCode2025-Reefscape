@@ -88,7 +88,6 @@ public class TeleopDriveCmd extends Command {
     m_headingAndVelocity_Y =       Math.abs(m_headingAndVelocity_Y) > XboxInterfaceConstants.kDeadband ? m_headingAndVelocity_Y * DriveConstants.DRIVE_CONFIG.maxLinearVelocity(): 0.0;
     turningVelocity =              Math.abs(turningVelocity) > XboxInterfaceConstants.kDeadband ? turningVelocity * DriveConstants.DRIVE_CONFIG.maxAngularVelocity(): 0.0;
 
-    new Rotation2d();
     // Construct desired chassis speeds
     Rotation2d flipped = Rotation2d.fromDegrees(-CatzRobotTracker.getInstance().getEstimatedPose().getRotation().getDegrees());
     chassisSpeeds = ChassisSpeeds.fromRobotRelativeSpeeds(m_headingAndVelocity_X, 

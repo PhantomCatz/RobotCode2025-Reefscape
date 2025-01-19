@@ -73,10 +73,10 @@ public class CatzDrivetrain extends SubsystemBase {
     private SwerveModuleState[] optimizedDesiredStates = new SwerveModuleState[4];
 
     // Swerve modules representing each corner of the robot
-    public final CatzSwerveModule LT_FRNT_MODULE;
-    public final CatzSwerveModule LT_BACK_MODULE;
     public final CatzSwerveModule RT_FRNT_MODULE;
     public final CatzSwerveModule RT_BACK_MODULE;
+    public final CatzSwerveModule LT_BACK_MODULE;
+    public final CatzSwerveModule LT_FRNT_MODULE;
 
     //Swerve setpoint generator
     private final Field2d field;
@@ -100,16 +100,16 @@ public class CatzDrivetrain extends SubsystemBase {
 
 
         // Create swerve modules for each corner of the robot
-        LT_FRNT_MODULE = new CatzSwerveModule(DriveConstants.MODULE_CONFIGS[INDEX_FL], MODULE_NAMES[INDEX_FL]);
-        LT_BACK_MODULE = new CatzSwerveModule(DriveConstants.MODULE_CONFIGS[INDEX_BL], MODULE_NAMES[INDEX_BL]);
-        RT_BACK_MODULE = new CatzSwerveModule(DriveConstants.MODULE_CONFIGS[INDEX_BR], MODULE_NAMES[INDEX_BR]);
         RT_FRNT_MODULE = new CatzSwerveModule(DriveConstants.MODULE_CONFIGS[INDEX_FR], MODULE_NAMES[INDEX_FR]);
+        RT_BACK_MODULE = new CatzSwerveModule(DriveConstants.MODULE_CONFIGS[INDEX_BR], MODULE_NAMES[INDEX_BR]);
+        LT_BACK_MODULE = new CatzSwerveModule(DriveConstants.MODULE_CONFIGS[INDEX_BL], MODULE_NAMES[INDEX_BL]);
+        LT_FRNT_MODULE = new CatzSwerveModule(DriveConstants.MODULE_CONFIGS[INDEX_FL], MODULE_NAMES[INDEX_FL]);
 
         // Assign swerve modules to the array for easier access
-        m_swerveModules[INDEX_FL] = LT_FRNT_MODULE;
-        m_swerveModules[INDEX_BL] = LT_BACK_MODULE;
-        m_swerveModules[INDEX_BR] = RT_BACK_MODULE;
         m_swerveModules[INDEX_FR] = RT_FRNT_MODULE;
+        m_swerveModules[INDEX_BR] = RT_BACK_MODULE;
+        m_swerveModules[INDEX_BL] = LT_BACK_MODULE;
+        m_swerveModules[INDEX_FL] = LT_FRNT_MODULE;
 
 
         //---------------------------------------------------------------------------------
@@ -142,7 +142,7 @@ public class CatzDrivetrain extends SubsystemBase {
         });
     }
 
-
+    Pose2d pose = new Pose2d();
 
     @Override
     public void periodic() {
@@ -152,6 +152,9 @@ public class CatzDrivetrain extends SubsystemBase {
         for (CatzSwerveModule module : m_swerveModules) {
             module.periodic();
         }
+
+        pose = pose.interpolate(tracker.getEstimatedPose(), 0.05);
+        Logger.recordOutput("pose", pose);
 
         //-----------------------------------------------------------------------------------------------------
         // Attempt to update gyro inputs and log

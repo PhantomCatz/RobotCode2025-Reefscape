@@ -14,6 +14,9 @@ import java.io.FileReader;
 import java.util.*;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
+
+import javax.lang.model.util.ElementScanner14;
+
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -286,9 +289,8 @@ public class LocalADStar implements Pathfinder {
           requestReset = false;
         }
 
-        if (minor) {
+        if (minor || major) {
           requestMinor = false;
-        } else if (major && (eps - 0.5) <= 1.0) {
           requestMajor = false;
         }
         requestLock.readLock().unlock();
@@ -351,7 +353,7 @@ public class LocalADStar implements Pathfinder {
     while(frontier.size() > 0){
         iterations += 1;
         GridPosition currentPos = frontier.remove();
-        if(currentPos.compareTo(sGoal) == 0 || iterations > 1e3){
+        if(currentPos.compareTo(sGoal) == 0 || iterations > 1e4){
             break;
         }
 
@@ -387,8 +389,12 @@ public class LocalADStar implements Pathfinder {
     List<GridPosition> simplifiedPath = new ArrayList<>();
     simplifiedPath.add(path.get(path.size()-1));
     for (int i = path.size() - 1; i > 0; i--) {
-      if (!walkable(simplifiedPath.get(simplifiedPath.size() - 1), path.get(i - 1), obstacles)) {
-        simplifiedPath.add(path.get(i));
+      for (int j = i - 1; j > 0; j--) {
+        if (!walkable(path.get(i), path.get(j), obstacles)) {
+          i = j + 1;
+          simplifiedPath.add(path.get(j));
+          break;
+        }
       }
     }
     simplifiedPath.add(path.get(0));
@@ -455,40 +461,32 @@ public class LocalADStar implements Pathfinder {
   }
 
   private boolean walkable(GridPosition s1, GridPosition s2, Set<GridPosition> obstacles) {
-    int x0 = s1.x;
-    int y0 = s1.y;
-    int x1 = s2.x;
-    int y1 = s2.y;
+    Translation2d slope = new Translation2d(s2.x-s1.x, s2.y-s1.y);
+    double n = 1 + Math.max(Math.abs(slope.getX()), Math.abs(slope.getY())); 
 
-    int dx = Math.abs(x1 - x0);
-    int dy = Math.abs(y1 - y0);
-    int x = x0;
-    int y = y0;
-    int n = 1 + dx + dy;
-    int xInc = (x1 > x0) ? 1 : -1;
-    int yInc = (y1 > y0) ? 1 : -1;
-    int error = dx - dy;
-    dx *= 2;
-    dy *= 2;
+    if(slope.getX() == 0 || slope.getY() == 0){
+      slope = slope.div(slope.getNorm());
+    }else{
+      slope = slope.div(Math.max(slope.getX(), slope.getY()));
+    }
 
-    for (; n > 0; n--) {
-      if (obstacles.contains(new GridPosition(x, y))) {
+    double x = s1.x;
+    double y = s1.y;
+    
+    while(n >= 0){
+      x += slope.getX();
+      y += slope.getY();
+
+      int gx = (int) Math.round(x);
+      int gy = (int) Math.round(y);
+
+      if(obstacles.contains(new GridPosition(gx, gy))){
         return false;
       }
-
-      if (error > 0) {
-        x += xInc;
-        error -= dy;
-      } else if (error < 0) {
-        y += yInc;
-        error += dx;
-      } else {
-        x += xInc;
-        y += yInc;
-        error -= dy;
-        error += dx;
-        n--;
+      if(gx == s2.x && gy == s2.y){
+        break;
       }
+      n--;
     }
 
     return true;
@@ -546,9 +544,6 @@ public class LocalADStar implements Pathfinder {
         }
         updateState(s, sStart, sGoal, obstacles);
       }
-    }
-    for(GridPosition pos: g.keySet()){
-        System.out.println(pos + " " + g.get(pos));
     }
   }
 

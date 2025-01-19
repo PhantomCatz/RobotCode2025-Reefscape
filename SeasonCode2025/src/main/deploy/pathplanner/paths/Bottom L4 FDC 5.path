@@ -1,0 +1,54 @@
+{
+  "version": "2025.0",
+  "waypoints": [
+    {
+      "anchor": {
+        "x": 1.2587090163934425,
+        "y": 1.046055327868852
+      },
+      "prevControl": null,
+      "nextControl": {
+        "x": 2.28965163934183,
+        "y": 1.777305327875381
+      },
+      "isLocked": false,
+      "linkedName": "Coral-Bottom"
+    },
+    {
+      "anchor": {
+        "x": 3.452459016393442,
+        "y": 2.7722848360655736
+      },
+      "prevControl": {
+        "x": 2.2656762295081965,
+        "y": 1.753329918032787
+      },
+      "nextControl": null,
+      "isLocked": false,
+      "linkedName": "Reef-C"
+    }
+  ],
+  "rotationTargets": [],
+  "constraintZones": [],
+  "pointTowardsZones": [],
+  "eventMarkers": [],
+  "globalConstraints": {
+    "maxVelocity": 3.0,
+    "maxAcceleration": 3.0,
+    "maxAngularVelocity": 540.0,
+    "maxAngularAcceleration": 720.0,
+    "nominalVoltage": 12.0,
+    "unlimited": false
+  },
+  "goalEndState": {
+    "velocity": 0,
+    "rotation": 61.460014812040036
+  },
+  "reversed": false,
+  "folder": "Bottom L4 FDC Paths",
+  "idealStartingState": {
+    "velocity": 0,
+    "rotation": -126.25383773744477
+  },
+  "useDefaultConstraints": true
+}

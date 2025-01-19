@@ -2,7 +2,16 @@
   "robotWidth": 0.9,
   "robotLength": 0.9,
   "holonomicMode": true,
-  "pathFolders": [],
+  "pathFolders": [
+    "Bottom L4 FDC Paths",
+    "L4 E Paths",
+    "L4 F Paths",
+    "L4 G Paths",
+    "L4 H Paths",
+    "L4 I Paths",
+    "L4 J Paths",
+    "Top L4 ILK Paths"
+  ],
   "autoFolders": [],
   "defaultMaxVel": 3.0,
   "defaultMaxAccel": 3.0,

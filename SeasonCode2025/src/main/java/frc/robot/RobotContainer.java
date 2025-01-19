@@ -5,6 +5,8 @@
 package frc.robot;
 
 
+import java.util.HashMap;
+
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 import org.littletonrobotics.junction.networktables.LoggedDashboardNumber;
 import org.littletonrobotics.junction.networktables.LoggedNetworkNumber;
@@ -25,10 +27,11 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
-import frc.robot.Autonomous.CatzAutonomousExternal;
+import frc.robot.Autonomous.CatzAutonomous;
 import frc.robot.CatzConstants.AllianceColor;
 import frc.robot.CatzConstants.RobotSenario;
 import frc.robot.CatzConstants.XboxInterfaceConstants;
+import frc.robot.FieldConstants.Reef;
 import frc.robot.CatzSubsystems.DriveAndRobotOrientation.CatzRobotTracker;
 import frc.robot.CatzSubsystems.DriveAndRobotOrientation.Drivetrain.CatzDrivetrain;
 import frc.robot.CatzSubsystems.DriveAndRobotOrientation.Drivetrain.DriveConstants;
@@ -74,7 +77,7 @@ public class RobotContainer {
   //-----------------------------------------------------------------------------------------------------------------
   private CommandXboxController xboxDrv = new CommandXboxController(0);
   private CommandXboxController xboxAux = new CommandXboxController(1);
-
+  
   //-------------------------------------------------------------------------------------------------------------------
   // Alert Declaration
   //-------------------------------------------------------------------------------------------------------------------
@@ -87,10 +90,9 @@ public class RobotContainer {
   // Auto Declaration
   //---------------------------------------------------------------------------------------------------------------------
   private AutomatedSequenceCmds autosequence = new AutomatedSequenceCmds();
-  private CatzAutonomousExternal autoEx = new CatzAutonomousExternal(this);
+  private CatzAutonomous auto = new CatzAutonomous(this);
 
   public RobotContainer() {
-
     // Drive And Aux Command Mapping
     configureBindings();
 
@@ -125,28 +127,56 @@ public class RobotContainer {
   //  Button mapping to commands
   //
   //---------------------------------------------------------------------------
-  Command pathfindToOrigin = Commands.runOnce(()->{});
-  private void configureBindings() { // TODO organize by function
-    
-    /* XBOX AUX */
+  Command currentPathfindingCommand = Commands.runOnce(()->{});
+  int POVReefAngle = 0; // 0 = none, x = x/6 revolutions
+  int bumperLeftRight = 0; // 0 = none, 1 = left, -1 = right
 
+  private void configureBindings() {
+    /* XBOX AUX */
 
     /* XBOX DRIVE */
     xboxDrv.start().onTrue(drive.cancelTrajectory());
 
     // Auto Driving
-   // xboxDrv.y().onTrue(new FaceTarget(FieldConstants.Speaker.centerSpeakerOpening.toTranslation2d(), drive));
-    xboxDrv.b().toggleOnTrue(Commands.startEnd(
-      () -> {
-        pathfindToOrigin = autoEx.getPathfindingCommand(new Pose2d(2, 7, new Rotation2d()));
-        pathfindToOrigin.schedule();
-        System.out.println("scheduled");
-    }, 
-      () -> {
-        pathfindToOrigin.cancel();
-        System.out.println("Canceled");
+    //   xboxDrv.y().onTrue(new FaceTarget(FieldConstants.Speaker.centerSpeakerOpening.toTranslation2d(), drive));
+    //   xboxDrv.b().toggleOnTrue(Commands.runOnce(() -> {
+    //       pathfindToOrigin = auto.getPathfindingCommand(new Pose2d(2, 7, new Rotation2d()));
+    //       pathfindToOrigin.schedule();
+    //   }));
+
+    //   xboxDrv.b().toggleOnFalse(Commands.runOnce(() -> {
+    //     pathfindToOrigin.cancel();
+    //   }));
+
+    xboxDrv.povUp().onTrue(Commands.runOnce(() ->        POVReefAngle = 0));
+    xboxDrv.povUpLeft().onTrue(Commands.runOnce(() ->    POVReefAngle = 1));
+    xboxDrv.povDownLeft().onTrue(Commands.runOnce(() ->  POVReefAngle = 2));
+    xboxDrv.povDown().onTrue(Commands.runOnce(() ->      POVReefAngle = 3));
+    xboxDrv.povDownRight().onTrue(Commands.runOnce(() -> POVReefAngle = 4));
+    xboxDrv.povUpRight().onTrue(Commands.runOnce(() ->   POVReefAngle = 5));
+
+    xboxDrv.leftBumper().onTrue(Commands.runOnce(() -> bumperLeftRight = 1));
+    xboxDrv.leftBumper().onFalse(Commands.runOnce(() -> bumperLeftRight = 0));
+    xboxDrv.rightBumper().onTrue(Commands.runOnce(() -> bumperLeftRight = -1));
+    xboxDrv.rightBumper().onFalse(Commands.runOnce(() -> bumperLeftRight = 0));
+
+    xboxDrv.a().onTrue(Commands.runOnce(() -> {
+      Rotation2d selectedAngle = Rotation2d.fromRotations(POVReefAngle / 6.0);
+      Translation2d unitRadius = new Translation2d(selectedAngle.getCos(), selectedAngle.getSin());
+      Translation2d unitLeftRight = unitRadius.rotateBy(Rotation2d.fromDegrees(90));
+
+      Translation2d radius = unitRadius.times(Reef.reefOrthogonalRadius + Reef.scoringDistance);
+      Translation2d leftRight = unitLeftRight.times(bumperLeftRight * Reef.leftRightDistance);
+      if (unitLeftRight.getY() < 0){
+        leftRight = leftRight.times(-1);
+      }
+      Translation2d scoringPos = radius.plus(leftRight).plus(Reef.center);
+      
+      currentPathfindingCommand = auto.getPathfindingCommand(new Pose2d(scoringPos, selectedAngle));
+      currentPathfindingCommand.schedule();
     }));
 
+    xboxDrv.a().onFalse(Commands.runOnce(() -> currentPathfindingCommand.cancel()));
     xboxDrv.a().toggleOnTrue(outtake.startIntaking().alongWith(Commands.print("pressed a")));
     xboxDrv.y().toggleOnTrue(outtake.runMotor().alongWith(Commands.print("pressed y")));
 
@@ -210,6 +240,6 @@ public class RobotContainer {
   }
 
   public Command getAutonomousCommand() {
-    return autoEx.getCommand();
+    return auto.getCommand();
   }
 }

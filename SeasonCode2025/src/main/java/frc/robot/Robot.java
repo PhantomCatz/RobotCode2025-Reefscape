@@ -27,6 +27,8 @@ import org.littletonrobotics.junction.wpilog.WPILOGWriter;
 
 import com.pathplanner.lib.pathfinding.Pathfinding;
 
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.StringSubscriber;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -42,6 +44,7 @@ import frc.robot.CatzConstants.RobotSenario;
 import frc.robot.CatzSubsystems.DriveAndRobotOrientation.CatzRobotTracker;
 import frc.robot.CatzSubsystems.LEDs.CatzLED;
 import frc.robot.Commands.ControllerModeAbstraction;
+import frc.robot.FieldConstants.Reef;
 import frc.robot.Utilities.Alert;
 import frc.robot.Utilities.AllianceFlipUtil;
 import frc.robot.Utilities.LocalADStarAK;
@@ -371,6 +374,7 @@ public class Robot extends LoggedRobot {
     }
 
     teleStart = Timer.getFPGATimestamp();
+    CatzRobotTracker.getInstance().resetPose(new Pose2d(Reef.center, new Rotation2d()));
   }
 
 

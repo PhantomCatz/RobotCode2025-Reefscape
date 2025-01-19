@@ -101,7 +101,6 @@ public class TrajectoryDriveCmd extends Command {
         this.path = newPath;
         this.m_driveTrain = drivetrain;
         this.eventScheduler = new EventScheduler();
-
         addRequirements(m_driveTrain);
 
         // Add all event scheduler requirements to this command's requirements
