@@ -24,7 +24,7 @@ import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.Voltage;
-import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.Drivetrain.DriveConstants.ModuleIDsAndCurrentLimits;
+import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.Drivetrain.DriveConstants.ModuleIDs;
 import org.littletonrobotics.junction.Logger;
 
 public class ModuleIORealFoc implements ModuleIO {
@@ -72,9 +72,9 @@ public class ModuleIORealFoc implements ModuleIO {
   // Module Name
   private final String MODULE_NAME;
 
-  ModuleIDsAndCurrentLimits m_config;
+  ModuleIDs m_config;
 
-  public ModuleIORealFoc(ModuleIDsAndCurrentLimits config, String name) {
+  public ModuleIORealFoc(ModuleIDs config, String name) {
     MODULE_NAME = name;
 
     encoder = new CANcoder(config.absoluteEncoderChannel(), "*");

@@ -53,24 +53,27 @@ public class DriveConstants {
   private static final double kA_ANGULAR_ACCEL = 0.0;
   private static final double kA_LINEAR_ACCEL = 0.0;
 
+  // Common Constants
+  private static final double ROBOT_WIDTH = 29.0;
+
   public static final DriveConfig DRIVE_CONFIG =
       switch (CatzConstants.getRobotType()) {
         case SN_TEST, SN2 ->
             DriveConfig.builder()
-                .wheelRadius(Units.inchesToMeters(1.8))
+                .wheelRadius(Units.inchesToMeters(2.0)) // TODO make these repeated numbers into constants
                 .robotLengthX(Units.inchesToMeters(29.0))
                 .robotWidthY(Units.inchesToMeters(29.0))
-                .bumperWidthX(Units.inchesToMeters(37))
-                .bumperWidthY(Units.inchesToMeters(33))
+                .bumperWidthX(Units.inchesToMeters(32))
+                .bumperWidthY(Units.inchesToMeters(32))
                 .maxLinearVelocity(Units.feetToMeters(17))
-                .maxLinearAcceleration(Math.pow(Units.feetToMeters(17), 2)) // TODO why square
+                .maxLinearAcceleration(Math.pow(Units.feetToMeters(17), 2)) // TODO emperically calculate
                 .maxAngularVelocity(Units.degreesToRadians(600)) // Radians
                 .maxAngularAcceleration(
                     Units.degreesToRadians(600)) // Radians // TODO verify angle constraints
                 .build();
         case SN1, SN1_2024 ->
-            new DriveConfig(
-                Units.inchesToMeters(2.01834634),
+            new DriveConfig( //TODO make the builder the same way for these configurations
+                Units.inchesToMeters(2.0),
                 Units.inchesToMeters(29.0),
                 Units.inchesToMeters(29.0),
                 Units.inchesToMeters(37),
@@ -99,7 +102,7 @@ public class DriveConstants {
                 5.5,
                 0.6,
                 0.0,
-                1.2, // 1.2, //TODO fix to account for non foc
+                1.2, // 1.2, //TODO fix to account for non foc // TODO characterize individual motors to ensure consistency before sn2
                 0.0,
                 0.001,
                 0.000,
@@ -132,7 +135,7 @@ public class DriveConstants {
   // -------------------------------------------------------------------------------
   // Odometry Constants
   // -------------------------------------------------------------------------------
-  public static final double ODOMETRY_FREQUENCY =
+  public static final double GYRO_UPDATE_FREQUENCY =
       switch (CatzConstants.getRobotType()) {
         case SN_TEST -> 50.0;
         case SN1, SN1_2024 -> 100.0;
@@ -149,37 +152,37 @@ public class DriveConstants {
   public static final LoggedTunableNumber steerkP = new LoggedTunableNumber("Drive/Module/steerkP", MODULE_GAINS_AND_RATIOS.steerkP());
   public static final LoggedTunableNumber steerkD = new LoggedTunableNumber("Drive/Module/steerkD", MODULE_GAINS_AND_RATIOS.steerkD());
 
-  public static final ModuleIDsAndCurrentLimits[] MODULE_CONFIGS =
+  public static final ModuleIDs[] MODULE_CONFIGS = //TODO use index to determine Module ID record
       switch (CatzConstants.getRobotType()) {
         case SN2 ->
-            new ModuleIDsAndCurrentLimits[] {
-              new ModuleIDsAndCurrentLimits(1, 2, 9, 1.4196464857 / Math.PI / 2 + 0.5, false),
-              new ModuleIDsAndCurrentLimits(3, 4, 10, 4.6208462275 / Math.PI / 2 + 0.5, false),
-              new ModuleIDsAndCurrentLimits(5, 6, 11, 0.6691969510 / Math.PI / 2, false),
-              new ModuleIDsAndCurrentLimits(7, 8, 12, 2.0568857418 / Math.PI / 2, false)
+            new ModuleIDs[] {
+              new ModuleIDs(1, 2, 9, 1.4196464857 / Math.PI / 2 + 0.5, false),
+              new ModuleIDs(3, 4, 10, 4.6208462275 / Math.PI / 2 + 0.5, false),
+              new ModuleIDs(5, 6, 11, 0.6691969510 / Math.PI / 2, false),
+              new ModuleIDs(7, 8, 12, 2.0568857418 / Math.PI / 2, false)
             };
 
         case SN1 ->
-            new ModuleIDsAndCurrentLimits[] {
-                new ModuleIDsAndCurrentLimits(1, 2, 11, 0.8887, false), // FR
-                new ModuleIDsAndCurrentLimits(3, 4, 12, -1.6421, false), // BR
-                new ModuleIDsAndCurrentLimits(5, 6, 13, -0.882, false), // BL
-                new ModuleIDsAndCurrentLimits(7, 8, 14, -0.7688, false) // FL
+            new ModuleIDs[] {
+                new ModuleIDs(1, 2, 11, 0.8887, false), // FR
+                new ModuleIDs(3, 4, 12, -1.6421, false), // BR
+                new ModuleIDs(5, 6, 13, -0.882, false), // BL
+                new ModuleIDs(7, 8, 14, -0.7688, false) // FL
             };
         case SN_TEST ->
-            new ModuleIDsAndCurrentLimits[] {
-              new ModuleIDsAndCurrentLimits(1, 2, 9, 0.0, false),
-              new ModuleIDsAndCurrentLimits(3, 4, 8, 0.0, false),
-              new ModuleIDsAndCurrentLimits(5, 6, 7, 0.0, false),
-              new ModuleIDsAndCurrentLimits(7, 8, 6, 0.0, false)
+            new ModuleIDs[] {
+              new ModuleIDs(1, 2, 9, 0.0, false),
+              new ModuleIDs(3, 4, 8, 0.0, false),
+              new ModuleIDs(5, 6, 7, 0.0, false),
+              new ModuleIDs(7, 8, 6, 0.0, false)
             };
 
         case SN1_2024 ->
-            new ModuleIDsAndCurrentLimits[] {
-              new ModuleIDsAndCurrentLimits(1, 2, 1, 0.7066, false), // FL
-              new ModuleIDsAndCurrentLimits(3, 4, 2, 1.0682, false), // BL
-              new ModuleIDsAndCurrentLimits(5, 6, 3, 1.2969, false), // BR
-              new ModuleIDsAndCurrentLimits(7, 8, 4, 1.4919, false) // FR
+            new ModuleIDs[] {
+              new ModuleIDs(1, 2, 1, 0.7066, false), // FL
+              new ModuleIDs(3, 4, 2, 1.0682, false), // BL
+              new ModuleIDs(5, 6, 3, 1.2969, false), // BR
+              new ModuleIDs(7, 8, 4, 1.4919, false) // FR
             };
       };
 
@@ -288,7 +291,7 @@ public class DriveConstants {
    * Record and Enum types
    *
    *******************************************************************************************/
-  public record ModuleIDsAndCurrentLimits(
+  public record ModuleIDs(
       int driveID,
       int steerID,
       int absoluteEncoderChannel,
