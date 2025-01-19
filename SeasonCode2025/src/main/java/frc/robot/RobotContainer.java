@@ -136,9 +136,7 @@ public class RobotContainer {
     xboxDrv.povUpRight().onTrue(Commands.runOnce(() -> POVReefAngle = 5));
 
     xboxDrv.leftBumper().onTrue(Commands.runOnce(() -> bumperLeftRight = 1));
-    xboxDrv.leftBumper().onFalse(Commands.runOnce(() -> bumperLeftRight = 0));
     xboxDrv.rightBumper().onTrue(Commands.runOnce(() -> bumperLeftRight = -1));
-    xboxDrv.rightBumper().onFalse(Commands.runOnce(() -> bumperLeftRight = 0));
 
     xboxDrv
         .a()
@@ -160,7 +158,7 @@ public class RobotContainer {
                   Translation2d scoringPos = radius.plus(leftRight).plus(Reef.center);
 
                   currentPathfindingCommand =
-                      auto.getPathfindingCommand(new Pose2d(scoringPos, selectedAngle));
+                      auto.getPathfindingCommand(new Pose2d(scoringPos, selectedAngle.plus(Rotation2d.fromDegrees(180.0))));
                   currentPathfindingCommand.schedule();
                 }));
 

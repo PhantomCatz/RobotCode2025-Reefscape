@@ -270,7 +270,7 @@ public class DriveConstants {
       new ModuleConfig(
           DRIVE_CONFIG.wheelRadius(),
           DRIVE_CONFIG.maxLinearVelocity()
-              * 0.8, // TODO possibly need to scale down to prevent wheel slip
+              * 8, // TODO possibly need to scale down to prevent wheel slip
           TREAD_COEF_FRICTION,
           DCMotor.getKrakenX60(1).withReduction(MODULE_GAINS_AND_RATIOS.driveReduction()),
           DRIVE_CURRENT_LIMIT,
