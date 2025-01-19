@@ -36,7 +36,7 @@ public class DriveConstants {
     //---------------------------------------------------------------------------------------------------------------
     // Disabled flag for testing
     //---------------------------------------------------------------------------------------------------------------
-    public static final boolean IS_DRIVE_DISABLED = false;
+    public static final boolean IS_DRIVE_DISABLED = true;
 
     //---------------------------------------------------------------------------------------------------------------
     // Module organizations
@@ -187,9 +187,9 @@ public class DriveConstants {
             case SN1_2024 ->
                 new ModuleIDsAndCurrentLimits[] {
                     new ModuleIDsAndCurrentLimits(1, 2, 1, 0.7066, false), //FL
-                    new ModuleIDsAndCurrentLimits(3, 4, 2, 0.5682, false), //BL
-                    new ModuleIDsAndCurrentLimits(5, 6, 3, 0.7969, false), //BR
-                    new ModuleIDsAndCurrentLimits(7, 8, 4, 0.9919, false) //FR
+                    new ModuleIDsAndCurrentLimits(3, 4, 2, 1.0682, false), //BL
+                    new ModuleIDsAndCurrentLimits(5, 6, 3, 1.2969, false), //BR
+                    new ModuleIDsAndCurrentLimits(7, 8, 4, 1.4919, false) //FR
                 };
         };
 

@@ -4,7 +4,6 @@
 
 package frc.robot;
 
-import static frc.robot.CatzSubsystems.DriveAndRobotOrientation.DepreciatedVision.VisionConstants.SOBA_TRANSFORM;
 
 import java.util.HashMap;
 
@@ -16,6 +15,7 @@ import com.pathplanner.lib.commands.PathfindingCommand;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
@@ -33,13 +33,18 @@ import frc.robot.CatzConstants.RobotSenario;
 import frc.robot.CatzConstants.XboxInterfaceConstants;
 import frc.robot.FieldConstants.Reef;
 import frc.robot.CatzSubsystems.DriveAndRobotOrientation.CatzRobotTracker;
-import frc.robot.CatzSubsystems.DriveAndRobotOrientation.DepreciatedVision.VisionIOLimeLight;
 import frc.robot.CatzSubsystems.DriveAndRobotOrientation.Drivetrain.CatzDrivetrain;
 import frc.robot.CatzSubsystems.DriveAndRobotOrientation.Drivetrain.DriveConstants;
 import frc.robot.CatzSubsystems.DriveAndRobotOrientation.Vision.CatzVision;
 import frc.robot.CatzSubsystems.DriveAndRobotOrientation.Vision.VisionIO;
+import frc.robot.CatzSubsystems.DriveAndRobotOrientation.Vision.VisionIOLimelight;
 import frc.robot.CatzSubsystems.DriveAndRobotOrientation.Vision.VisionIOPhotonVisionSim;
 import frc.robot.CatzSubsystems.LEDs.CatzLED;
+import frc.robot.CatzSubsystems.Outtake.CatzOuttake;
+import frc.robot.CatzSubsystems.Outtake.OuttakeIO;
+import frc.robot.CatzSubsystems.Outtake.OuttakeIOSparkmax;
+import frc.robot.CatzSubsystems.Outtake.CatzOuttake.outtakeStates;
+import frc.robot.CatzSubsystems.Elevator.*;
 import frc.robot.Commands.AutomatedSequenceCmds;
 import frc.robot.Commands.ControllerModeAbstraction;
 import frc.robot.Commands.DriveAndRobotOrientationCmds.FaceTarget;
@@ -57,11 +62,15 @@ public class RobotContainer {
   //-------------------------------------------------------------------------------------------------------------------
   // Primary subsystem declaration
   private static CatzDrivetrain   drive                = new CatzDrivetrain();
+
   
   // Assistance Subsystem declaration
   private static CatzLED          led = CatzLED.getInstance();
   private static CatzRobotTracker robotTracker = CatzRobotTracker.getInstance();
-  private static CatzVision       vision = new CatzVision(new VisionIOPhotonVisionSim("SOBA", SOBA_TRANSFORM, () -> robotTracker.getEstimatedPose()));
+  private static CatzVision       vision = new CatzVision(new VisionIOLimelight("limelight-soba"));
+
+  private static CatzOuttake      outtake = new CatzOuttake();
+  private static CatzElevator     elevator = new CatzElevator();
 
   //------------------------------------------------------------------------------------------------------------------
   // Drive Controller Declaration
@@ -168,11 +177,17 @@ public class RobotContainer {
     }));
 
     xboxDrv.a().onFalse(Commands.runOnce(() -> currentPathfindingCommand.cancel()));
+    xboxDrv.a().toggleOnTrue(outtake.startIntaking().alongWith(Commands.print("pressed a")));
+    xboxDrv.y().toggleOnTrue(outtake.runMotor().alongWith(Commands.print("pressed y")));
+
+    xboxAux.a().toggleOnTrue(elevator.runMotor().alongWith(Commands.print("pressed elevator a")));
+    xboxAux.y().toggleOnTrue(elevator.runMotorBck().alongWith(Commands.print("pressed elevator y")));
     
     drive.setDefaultCommand(new TeleopDriveCmd(() -> xboxDrv.getLeftX(), 
                                                () -> xboxDrv.getLeftY(), 
                                                () -> xboxDrv.getRightX(), drive));
     //TODO add triggers to put default as priority    
+
   }
 
   //---------------------------------------------------------------------------

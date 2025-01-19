@@ -135,21 +135,23 @@ public class CatzRobotTracker {
 
   /** Add Vision Observation */
   public void addVisionObservation(VisionObservation observation) {
-    // If measurement is old enough to be outside the pose buffer's timespan, skip.
-    try {
-      if (POSE_BUFFER.getInternalBuffer().lastKey() - poseBufferSizeSeconds
-          > observation.timestamp()) {
-        return;
-      }
-    } catch (NoSuchElementException ex) {
-      return;
-    }
+    // // If measurement is old enough to be outside the pose buffer's timespan, skip.
+    // try {
+    //   if (POSE_BUFFER.getInternalBuffer().lastKey() - poseBufferSizeSeconds
+    //       > observation.timestamp()) {
+    //     return;
+    //   }
+    // } catch (NoSuchElementException ex) {
+    //   return;
+    // }
+    //System.out.println("exceptio");
     // Get odometry based pose at timestamp
     var sample = POSE_BUFFER.getSample(observation.timestamp());
     if (sample.isEmpty()) {
       // exit if not there
       return;
     }
+    //System.out.println("empty sample");
 
     // sample --> odometryPose transform and backwards of that
     var sampleToOdometryTransform = new Transform2d(sample.get(), odometryPose);
@@ -188,6 +190,7 @@ public class CatzRobotTracker {
 
     // Recalculate current estimate by applying scaled transform to old estimate
     // then replaying odometry data
+    //System.out.println(transform.getX());
     estimatedPose = estimateAtTime.plus(scaledTransform).plus(sampleToOdometryTransform);
   } //end of addVisionObservation(OdometryObservation observation)
 

@@ -70,16 +70,17 @@ public class VisionIOLimelight implements VisionIO {
 
         // Update orientation for MegaTag 2
         orientationPublisher.accept(new double[] {rotationSupplier.get().getDegrees(), 0.0, 0.0, 0.0, 0.0, 0.0});
+        //System.out.println(rotationSupplier.get().getDegrees());
         NetworkTableInstance.getDefault().flush(); // Increases network traffic but recommended by Limelight
 
         // Read new pose observations from NetworkTables
         Set<Integer> tagIds = new HashSet<>();
         List<PoseObservation> poseObservations = new LinkedList<>();
         for (var rawSample : megatag1Subscriber.readQueue()) {
-            if (rawSample.value.length == 0) continue;
-            for (int i = 10; i < rawSample.value.length; i += 7) {
-                tagIds.add((int) rawSample.value[i]);
-            }
+            // if (rawSample.value.length == 0) continue;
+            // for (int i = 10; i < rawSample.value.length; i += 7) {
+            //     tagIds.add((int) rawSample.value[i]);
+            // }
             poseObservations.add(new PoseObservation(
                     // Timestamp, based on server timestamp of publish and latency
                     rawSample.timestamp * 1.0e-9 - rawSample.value[7] * 1.0e-3,
@@ -91,7 +92,7 @@ public class VisionIOLimelight implements VisionIO {
                     rawSample.value.length >= 17 ? rawSample.value[16] : 0.0,
 
                     // Tag count
-                    (int) rawSample.value[8],
+                    (int) rawSample.value[7],
 
                     // Average tag distance
                     rawSample.value[10],
@@ -100,10 +101,11 @@ public class VisionIOLimelight implements VisionIO {
                     PoseObservationType.MEGATAG_1));
         }
         for (var rawSample : megatag2Subscriber.readQueue()) {
-            if (rawSample.value.length == 0) continue;
-            for (int i = 10; i < rawSample.value.length; i += 7) {
-                tagIds.add((int) rawSample.value[i]);
-            }
+            // System.out.println(rawSample.value.length);
+            // if (rawSample.value.length == 0) continue;
+            // for (int i = 10; i < rawSample.value.length; i += 7) {
+            //     tagIds.add((int) rawSample.value[i]);
+            // }
             poseObservations.add(new PoseObservation(
                     // Timestamp, based on server timestamp of publish and latency
                     rawSample.timestamp * 1.0e-9 - rawSample.value[7] * 1.0e-3,
@@ -115,7 +117,7 @@ public class VisionIOLimelight implements VisionIO {
                     0.0,
 
                     // Tag count
-                    (int) rawSample.value[8],
+                    (int) rawSample.value[7],
 
                     // Average tag distance
                     rawSample.value[10],

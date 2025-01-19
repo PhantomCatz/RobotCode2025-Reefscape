@@ -13,9 +13,6 @@ import frc.robot.RobotContainer;
 /** Place where any sequencing/nonPosition Based robot state logic is held */
 public class AutomatedSequenceCmds {
 
-
-
-
     public static Command testSequence(RobotContainer container) {
         return Commands.none();
     }
