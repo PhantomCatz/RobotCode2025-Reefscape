@@ -97,7 +97,7 @@ public class DriveConstants {
                     1.0 / DCMotor.getKrakenX60Foc(1).KtNMPerAmp, // A/(N*m)
                     0.2,
                     0.0,
-                    0.01,
+                    0.30,
                     0.005, 
                     Mk4iReductions.L2_PLUS.reduction,
                     Mk4iReductions.steer.reduction);
@@ -172,7 +172,7 @@ public class DriveConstants {
             case SN1 ->
                 new ModuleIDsAndCurrentLimits[] {
                     new ModuleIDsAndCurrentLimits(7, 8, 14, -0.7688, false),  // FL
-                    new ModuleIDsAndCurrentLimits(5, 6, 13, -0.2185, false),    // BL
+                    new ModuleIDsAndCurrentLimits(5, 6, 13, -0.632, false),    // BL
                     new ModuleIDsAndCurrentLimits(3, 4, 12, -1.6421, false),    // BR
                     new ModuleIDsAndCurrentLimits(1, 2, 11, 0.8887, false) // FR
                 };
