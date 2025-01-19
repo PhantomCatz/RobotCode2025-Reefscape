@@ -70,7 +70,8 @@ public class CatzDrivetrain extends SubsystemBase {
         gyroIO = new GyroIOPigeon();
         break;
       case REPLAY:
-        gyroIO = new GyroIOPigeon() {};
+        gyroIO = new GyroIOPigeon() {
+        };
         break;
       default:
         gyroIO = null;
@@ -157,23 +158,20 @@ public class CatzDrivetrain extends SubsystemBase {
     // ----------------------------------------------------------------------------------------------------
     SwerveModulePosition[] wheelPositions = getModulePositions();
     // Grab latest gyro measurments
-    Rotation2d gyroAngle2d =
-        (CatzConstants.hardwareMode == CatzConstants.RobotHardwareMode.SIM)
-            ? null
-            : getRotation2d();
+    Rotation2d gyroAngle2d = (CatzConstants.hardwareMode == CatzConstants.RobotHardwareMode.SIM)
+        ? null
+        : getRotation2d();
 
     // Add observations to robot tracker
-    OdometryObservation observation =
-        new OdometryObservation(
-            wheelPositions, getModuleStates(), gyroAngle2d, Timer.getFPGATimestamp());
+    OdometryObservation observation = new OdometryObservation(
+        wheelPositions, getModuleStates(), gyroAngle2d, Timer.getFPGATimestamp());
     CatzRobotTracker.getInstance().addOdometryObservation(observation);
 
     // Update current velocities use gyro when possible
     Twist2d robotRelativeVelocity = getTwist2dSpeeds();
-    robotRelativeVelocity.dtheta =
-        gyroInputs.gyroConnected
-            ? Math.toRadians(gyroInputs.gyroYawVel)
-            : robotRelativeVelocity.dtheta;
+    robotRelativeVelocity.dtheta = gyroInputs.gyroConnected
+        ? Math.toRadians(gyroInputs.gyroYawVel)
+        : robotRelativeVelocity.dtheta;
     CatzRobotTracker.getInstance().addVelocityData(robotRelativeVelocity);
 
     // --------------------------------------------------------------
@@ -187,7 +185,7 @@ public class CatzDrivetrain extends SubsystemBase {
 
   // --------------------------------------------------------------------------------------------------------------------------
   //
-  //          Driving methods
+  // Driving methods
   //
   // --------------------------------------------------------------------------------------------------------------------------
   public void drive(ChassisSpeeds chassisSpeeds) {
@@ -195,8 +193,7 @@ public class CatzDrivetrain extends SubsystemBase {
     // --------------------------------------------------------
     // Convert chassis speeds to individual module states and set module states
     // --------------------------------------------------------
-    SwerveModuleState[] moduleStates =
-        DriveConstants.SWERVE_KINEMATICS.toSwerveModuleStates(chassisSpeeds);
+    SwerveModuleState[] moduleStates = DriveConstants.SWERVE_KINEMATICS.toSwerveModuleStates(chassisSpeeds);
 
     // --------------------------------------------------------
     // Scale down wheel speeds
@@ -208,7 +205,8 @@ public class CatzDrivetrain extends SubsystemBase {
     // Optimize Wheel Angles
     // --------------------------------------------------------
     for (int i = 0; i < 4; i++) {
-      // The module returns the optimized state that prevents it from overturn, useful for logging
+      // The module returns the optimized state that prevents it from overturn, useful
+      // for logging
       optimizedDesiredStates[i] = m_swerveModules[i].optimizeWheelAngles(moduleStates[i]);
 
       // Set module states to each of the swerve modules
@@ -224,11 +222,11 @@ public class CatzDrivetrain extends SubsystemBase {
   }
 
   public void simpleDrive(ChassisSpeeds speeds) {
-    SwerveModuleState[] moduleStates =
-        DriveConstants.SWERVE_KINEMATICS.toSwerveModuleStates(speeds);
+    SwerveModuleState[] moduleStates = DriveConstants.SWERVE_KINEMATICS.toSwerveModuleStates(speeds);
 
     for (int i = 0; i < 4; i++) {
-      // The module returns the optimized state that prevents it from overturn, useful for logging
+      // The module returns the optimized state that prevents it from overturn, useful
+      // for logging
       optimizedDesiredStates[i] = m_swerveModules[i].optimizeWheelAngles(moduleStates[i]);
 
       // Set module states to each of the swerve modules
@@ -261,7 +259,7 @@ public class CatzDrivetrain extends SubsystemBase {
 
   // -----------------------------------------------------------------------------------------------------------
   //
-  //      Drivetrain Misc Methods
+  // Drivetrain Misc Methods
   //
   // -----------------------------------------------------------------------------------------------------------
   /** Get the position of all drive wheels in radians. */
@@ -279,34 +277,34 @@ public class CatzDrivetrain extends SubsystemBase {
   }
 
   /**
-   * Returns command that orients all modules to {@code orientation}, ending when the modules have
+   * Returns command that orients all modules to {@code orientation}, ending when
+   * the modules have
    * rotated.
    */
   public Command orientModules(Rotation2d orientation) {
-    return orientModules(new Rotation2d[] {orientation, orientation, orientation, orientation});
+    return orientModules(new Rotation2d[] { orientation, orientation, orientation, orientation });
   }
 
   /**
-   * Returns command that orients all modules to {@code orientations[]}, ending when the modules
+   * Returns command that orients all modules to {@code orientations[]}, ending
+   * when the modules
    * have rotated.
    */
   public Command orientModules(Rotation2d[] orientations) {
     return run(() -> {
-          for (int i = 0; i < orientations.length; i++) {
-            m_swerveModules[i].setModuleAngleAndVelocity(
-                new SwerveModuleState(0.0, orientations[i]));
-            // new SwerveModuleState(0.0, new Rotation2d()));
-          }
-        })
+      for (int i = 0; i < orientations.length; i++) {
+        m_swerveModules[i].setModuleAngleAndVelocity(
+            new SwerveModuleState(0.0, orientations[i]));
+        // new SwerveModuleState(0.0, new Rotation2d()));
+      }
+    })
         .until(
-            () ->
-                Arrays.stream(m_swerveModules)
-                    .allMatch(
-                        module ->
-                            EqualsUtil.epsilonEquals(
-                                module.getAngle().getDegrees(),
-                                module.getModuleState().angle.getDegrees(),
-                                2.0)))
+            () -> Arrays.stream(m_swerveModules)
+                .allMatch(
+                    module -> EqualsUtil.epsilonEquals(
+                        module.getAngle().getDegrees(),
+                        module.getModuleState().angle.getDegrees(),
+                        2.0)))
         .withName("Orient Modules");
   }
 
@@ -339,17 +337,17 @@ public class CatzDrivetrain extends SubsystemBase {
 
   // -----------------------------------------------------------------------------------------------------------
   //
-  //      Drivetrain Getters
+  // Drivetrain Getters
   //
   // -----------------------------------------------------------------------------------------------------------
   /**
-   * Dependant on the installation of the gyro, the value of this method may be negative
+   * Dependant on the installation of the gyro, the value of this method may be
+   * negative
    *
    * @return The Heading of the robot dependant on where it's been instantiated
    */
   private double getGyroHeading() {
-    return -gyroInputs
-        .gyroAngle; // Negative on Forte due to instalation, gyro's left is not robot left
+    return -gyroInputs.gyroAngle; // Negative on Forte due to instalation, gyro's left is not robot left
   }
 
   /** Get the Rotation2d object based on the gyro angle */
@@ -366,7 +364,9 @@ public class CatzDrivetrain extends SubsystemBase {
     return moduleStates;
   }
 
-  /** Returns the measured speeds of the robot in the robot's frame of reference. */
+  /**
+   * Returns the measured speeds of the robot in the robot's frame of reference.
+   */
   @AutoLogOutput(key = "Drive/MeasuredSpeeds")
   private Twist2d getTwist2dSpeeds() {
     return DriveConstants.SWERVE_KINEMATICS.toTwist2d(getModulePositions());
