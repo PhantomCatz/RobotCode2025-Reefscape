@@ -18,9 +18,17 @@ public interface OuttakeIO {
         public double torqueCurrentAmps = 0.0;
         public double tempCelsius = 0.0;
 
+        public boolean bbreakFrntTriggered;
+        public boolean bbreakBackTriggered;
+
     }
 
-    public default void runMotor(double Speed) {}
+    public default void updateInputs(OuttakeIOInputs inputs) {}
+
+    public default void runMotorLeft(double speed) {}
+    public default void runMotorRight(double speed) {}
+
+    public default void runMotor(double Speed, double speed2) {}
     
     public default void runMotorBck(double Speed) {}
 

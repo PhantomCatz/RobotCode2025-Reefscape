@@ -1,9 +1,9 @@
 package frc.robot.CatzSubsystems.DriveAndRobotOrientation.vision;
     
+import static frc.robot.CatzSubsystems.DriveAndRobotOrientation.vision.VisionConstants.*;
+
 import java.util.ArrayList;
 import java.util.List;
-
-import static frc.robot.CatzSubsystems.DriveAndRobotOrientation.vision.VisionConstants.*;
 
 import org.littletonrobotics.junction.Logger;
 
@@ -19,6 +19,7 @@ import frc.robot.RobotContainer;
 import frc.robot.CatzConstants.RobotHardwareMode;
 import frc.robot.CatzSubsystems.DriveAndRobotOrientation.CatzRobotTracker;
 import frc.robot.CatzSubsystems.DriveAndRobotOrientation.CatzRobotTracker.VisionObservation;
+import frc.robot.CatzSubsystems.DriveAndRobotOrientation.vision.VisionIOInputsAutoLogged;
 
 public class CatzVision extends SubsystemBase {
 

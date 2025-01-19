@@ -24,14 +24,16 @@ import frc.robot.CatzConstants.AllianceColor;
 import frc.robot.CatzConstants.RobotSenario;
 import frc.robot.CatzConstants.XboxInterfaceConstants;
 import frc.robot.CatzSubsystems.DriveAndRobotOrientation.CatzRobotTracker;
-import frc.robot.CatzSubsystems.DriveAndRobotOrientation.drivetrain.CatzDrivetrain;
-import frc.robot.CatzSubsystems.DriveAndRobotOrientation.drivetrain.DriveConstants;
 import frc.robot.CatzSubsystems.DriveAndRobotOrientation.vision.CatzVision;
 import frc.robot.CatzSubsystems.DriveAndRobotOrientation.vision.VisionIO;
 import frc.robot.CatzSubsystems.DriveAndRobotOrientation.vision.VisionIOLimeLight;
+import frc.robot.CatzSubsystems.DriveAndRobotOrientation.drivetrain.CatzDrivetrain;
+import frc.robot.CatzSubsystems.DriveAndRobotOrientation.drivetrain.DriveConstants;
 import frc.robot.CatzSubsystems.LEDs.CatzLED;
 import frc.robot.CatzSubsystems.Outtake.CatzOuttake;
+import frc.robot.CatzSubsystems.Outtake.OuttakeIO;
 import frc.robot.CatzSubsystems.Outtake.OuttakeIOSparkmax;
+import frc.robot.CatzSubsystems.Outtake.CatzOuttake.outtakeStates;
 import frc.robot.CatzSubsystems.Elevator.*;
 import frc.robot.Commands.AutomatedSequenceCmds;
 import frc.robot.Commands.ControllerModeAbstraction;
@@ -129,8 +131,8 @@ public class RobotContainer {
     xboxDrv.b().onTrue(auto.autoFindPathStation());
     xboxDrv.x().onTrue(auto.autoFindPathSpeaker());
 
-    xboxDrv.a().toggleOnTrue(outtake.runMotor().alongWith(Commands.print("pressed a")));
-    xboxDrv.y().toggleOnTrue(outtake.runMotorBck().alongWith(Commands.print("pressed y")));
+    xboxDrv.a().toggleOnTrue(outtake.startIntaking().alongWith(Commands.print("pressed a")));
+    xboxDrv.y().toggleOnTrue(outtake.runMotor().alongWith(Commands.print("pressed y")));
 
     xboxAux.a().toggleOnTrue(elevator.runMotor().alongWith(Commands.print("pressed elevator a")));
     xboxAux.y().toggleOnTrue(elevator.runMotorBck().alongWith(Commands.print("pressed elevator y")));

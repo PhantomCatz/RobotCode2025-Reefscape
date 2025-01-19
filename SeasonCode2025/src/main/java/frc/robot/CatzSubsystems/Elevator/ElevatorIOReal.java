@@ -45,7 +45,6 @@ public class ElevatorIOReal implements ElevatorIO{
 
     @Override
     public void runMotor(double speed) {
-        System.out.println(speed);
         elevatorMotor1.set(speed);
         elevatorMotor2.set(-speed);
 
