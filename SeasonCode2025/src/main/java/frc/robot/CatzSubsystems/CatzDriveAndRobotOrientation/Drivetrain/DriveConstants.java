@@ -142,18 +142,12 @@ public class DriveConstants {
   // ---------------------------------------------------------------------------------------------------------------------
   // Logged Tunable PIDF values for swerve modules
   // ---------------------------------------------------------------------------------------------------------------------
-  public static final LoggedTunableNumber drivekP =
-      new LoggedTunableNumber("Drive/Module/DrivekP", MODULE_GAINS_AND_RATIOS.drivekP());
-  public static final LoggedTunableNumber drivekD =
-      new LoggedTunableNumber("Drive/Module/DrivekD", MODULE_GAINS_AND_RATIOS.drivekD());
-  public static final LoggedTunableNumber drivekS =
-      new LoggedTunableNumber("Drive/Module/DrivekS", MODULE_GAINS_AND_RATIOS.driveFFkS());
-  public static final LoggedTunableNumber drivekV =
-      new LoggedTunableNumber("Drive/Module/DrivekV", MODULE_GAINS_AND_RATIOS.driveFFkV());
-  public static final LoggedTunableNumber steerkP =
-      new LoggedTunableNumber("Drive/Module/steerkP", MODULE_GAINS_AND_RATIOS.steerkP());
-  public static final LoggedTunableNumber steerkD =
-      new LoggedTunableNumber("Drive/Module/steerkD", MODULE_GAINS_AND_RATIOS.steerkD());
+  public static final LoggedTunableNumber drivekP = new LoggedTunableNumber("Drive/Module/DrivekP", MODULE_GAINS_AND_RATIOS.drivekP());
+  public static final LoggedTunableNumber drivekD = new LoggedTunableNumber("Drive/Module/DrivekD", MODULE_GAINS_AND_RATIOS.drivekD());
+  public static final LoggedTunableNumber drivekS = new LoggedTunableNumber("Drive/Module/DrivekS", MODULE_GAINS_AND_RATIOS.driveFFkS());
+  public static final LoggedTunableNumber drivekV = new LoggedTunableNumber("Drive/Module/DrivekV", MODULE_GAINS_AND_RATIOS.driveFFkV());
+  public static final LoggedTunableNumber steerkP = new LoggedTunableNumber("Drive/Module/steerkP", MODULE_GAINS_AND_RATIOS.steerkP());
+  public static final LoggedTunableNumber steerkD = new LoggedTunableNumber("Drive/Module/steerkD", MODULE_GAINS_AND_RATIOS.steerkD());
 
   public static final ModuleIDsAndCurrentLimits[] MODULE_CONFIGS =
       switch (CatzConstants.getRobotType()) {
@@ -167,10 +161,10 @@ public class DriveConstants {
 
         case SN1 ->
             new ModuleIDsAndCurrentLimits[] {
-              new ModuleIDsAndCurrentLimits(7, 8, 14, -0.7688, false), // FL
-              new ModuleIDsAndCurrentLimits(5, 6, 13, -0.632, false), // BL
-              new ModuleIDsAndCurrentLimits(3, 4, 12, -1.6421, false), // BR
-              new ModuleIDsAndCurrentLimits(1, 2, 11, 0.8887, false) // FR
+                new ModuleIDsAndCurrentLimits(1, 2, 11, 0.8887, false), // FR
+                new ModuleIDsAndCurrentLimits(3, 4, 12, -1.6421, false), // BR
+                new ModuleIDsAndCurrentLimits(5, 6, 13, -0.882, false), // BL
+                new ModuleIDsAndCurrentLimits(7, 8, 14, -0.7688, false) // FL
             };
         case SN_TEST ->
             new ModuleIDsAndCurrentLimits[] {
