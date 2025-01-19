@@ -41,7 +41,7 @@ public class DriveConstants {
     //---------------------------------------------------------------------------------------------------------------
     // Module organizations
     //---------------------------------------------------------------------------------------------------------------
-    public static final String[] MODULE_NAMES = new String[] {"FL", "BL", "BR", "FR"};
+    public static final String[] MODULE_NAMES = new String[] {"FR", "BR", "BL", "FL"};
     public static final int INDEX_FR = 0;
     public static final int INDEX_BR = 1;
     public static final int INDEX_BL = 2;
