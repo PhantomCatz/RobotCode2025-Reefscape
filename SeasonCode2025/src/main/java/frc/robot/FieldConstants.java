@@ -1,11 +1,14 @@
+// Copyright (c) 2025 FRC 2637
+// https://github.com/PhantomCatz
+//
+// Use of this source code is governed by an MIT-style
+// license that can be found in the LICENSE file at
+// the root directory of this project.
+
 package frc.robot;
 
 import edu.wpi.first.math.geometry.*;
 import edu.wpi.first.math.util.Units;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 /**
  * Contains various field dimensions and useful reference points. All units are in meters and poses
@@ -14,16 +17,21 @@ import java.util.Map;
 public class FieldConstants {
   public static final double FIELD_LENGTH_MTRS = Units.inchesToMeters(690.876);
   public static final double FIELD_WIDTH = Units.inchesToMeters(317);
-  public static final double STARTING_LINE_X = Units.inchesToMeters(299.438); // Measured from the inside of starting line
+  public static final double STARTING_LINE_X =
+      Units.inchesToMeters(299.438); // Measured from the inside of starting line
 
   public static class Processor {
-    public static final Pose2d centerFace = new Pose2d(Units.inchesToMeters(235.726), 0, Rotation2d.fromDegrees(90));
+    public static final Pose2d centerFace =
+        new Pose2d(Units.inchesToMeters(235.726), 0, Rotation2d.fromDegrees(90));
   }
 
   public static class Barge {
-    public static final Translation2d farCage    = new Translation2d(Units.inchesToMeters(345.428), Units.inchesToMeters(286.779));
-    public static final Translation2d middleCage = new Translation2d(Units.inchesToMeters(345.428), Units.inchesToMeters(242.855));
-    public static final Translation2d closeCage  = new Translation2d(Units.inchesToMeters(345.428), Units.inchesToMeters(199.947));
+    public static final Translation2d farCage =
+        new Translation2d(Units.inchesToMeters(345.428), Units.inchesToMeters(286.779));
+    public static final Translation2d middleCage =
+        new Translation2d(Units.inchesToMeters(345.428), Units.inchesToMeters(242.855));
+    public static final Translation2d closeCage =
+        new Translation2d(Units.inchesToMeters(345.428), Units.inchesToMeters(199.947));
 
     // Measured from floor to bottom of cage
     public static final double deepHeight = Units.inchesToMeters(3.125);
@@ -44,14 +52,21 @@ public class FieldConstants {
   }
 
   public static class Reef {
-    public static final Translation2d center = new Translation2d(Units.inchesToMeters(176.746), Units.inchesToMeters(158.501));
-    public static final double faceToZoneLine = Units.inchesToMeters(12); // Side of the reef to the inside of the reef zone line
-    public static final double scoringDistance = Units.inchesToMeters(24); // Scoring distance from the side of the reef
-    public static final double reefOrthogonalRadius = Units.inchesToMeters(32.743); // Distance from the center to the side of the reef
-    public static final double leftRightDistance = Units.inchesToMeters(18); // Center of each face to the left and right sides of each face
+    public static final Translation2d center =
+        new Translation2d(Units.inchesToMeters(176.746), Units.inchesToMeters(158.501));
+    public static final double faceToZoneLine =
+        Units.inchesToMeters(12); // Side of the reef to the inside of the reef zone line
+    public static final double scoringDistance =
+        Units.inchesToMeters(24); // Scoring distance from the side of the reef
+    public static final double reefOrthogonalRadius =
+        Units.inchesToMeters(32.743); // Distance from the center to the side of the reef
+    public static final double leftRightDistance =
+        Units.inchesToMeters(18); // Center of each face to the left and right sides of each face
 
-    // public static final Pose2d[] centerFaces = new Pose2d[6]; // Starting facing the driver station in clockwise order
-    // public static final List<Map<ReefHeight, Pose3d>> branchPositions = new ArrayList<>(); // Starting at the right branch facing the driver station in clockwise
+    // public static final Pose2d[] centerFaces = new Pose2d[6]; // Starting facing the driver
+    // station in clockwise order
+    // public static final List<Map<ReefHeight, Pose3d>> branchPositions = new ArrayList<>(); //
+    // Starting at the right branch facing the driver station in clockwise
 
     // static {
     //   // Initialize faces

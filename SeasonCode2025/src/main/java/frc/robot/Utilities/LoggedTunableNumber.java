@@ -1,17 +1,20 @@
-
+// Copyright (c) 2025 FRC 2637
+// https://github.com/PhantomCatz
+//
+// Use of this source code is governed by an MIT-style
+// license that can be found in the LICENSE file at
+// the root directory of this project.
 
 package frc.robot.Utilities;
 
+import frc.robot.CatzConstants;
+import frc.robot.CatzConstants.RobotSenario;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Consumer;
 import java.util.function.DoubleSupplier;
-import org.littletonrobotics.junction.networktables.LoggedDashboardNumber;
 import org.littletonrobotics.junction.networktables.LoggedNetworkNumber;
-
-import frc.robot.CatzConstants;
-import frc.robot.CatzConstants.RobotSenario;
 
 /**
  * Class for a tunable number. Gets value from dashboard in tuning mode, returns default if not or
@@ -70,7 +73,9 @@ public class LoggedTunableNumber implements DoubleSupplier {
     if (!hasDefault) {
       return 0.0;
     } else {
-      return CatzConstants.robotSenario == RobotSenario.TUNING ? dashboardNumber.get() : defaultValue;
+      return CatzConstants.robotSenario == RobotSenario.TUNING
+          ? dashboardNumber.get()
+          : defaultValue;
     }
   }
 
