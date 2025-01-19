@@ -1,6 +1,4 @@
-package frc.robot.CatzSubsystems.DriveAndRobotOrientation.drivetrain;
-
-import static frc.robot.CatzSubsystems.DriveAndRobotOrientation.drivetrain.DriveConstants.MODULE_GAINS_AND_RATIOS;
+package frc.robot.CatzSubsystems.DriveAndRobotOrientation.Drivetrain;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
@@ -15,7 +13,10 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.simulation.DCMotorSim;
 import frc.robot.CatzConstants;
-import frc.robot.CatzSubsystems.DriveAndRobotOrientation.drivetrain.DriveConstants.ModuleIDsAndCurrentLimits;
+import frc.robot.CatzSubsystems.DriveAndRobotOrientation.Drivetrain.DriveConstants.ModuleIDsAndCurrentLimits;
+
+import static frc.robot.CatzSubsystems.DriveAndRobotOrientation.Drivetrain.DriveConstants.MODULE_GAINS_AND_RATIOS;
+
 import org.ironmaple.simulation.drivesims.SwerveModuleSimulation;
 import org.ironmaple.simulation.motorsims.SimulatedMotorController;
 

@@ -1,5 +1,15 @@
 package frc.robot;
 
+import static frc.robot.CatzSubsystems.DriveAndRobotOrientation.Drivetrain.DriveConstants.DRIVE_CURRENT_LIMIT;
+import static frc.robot.CatzSubsystems.DriveAndRobotOrientation.Drivetrain.DriveConstants.ROBOT_MASS;
+import static frc.robot.CatzSubsystems.DriveAndRobotOrientation.Drivetrain.DriveConstants.ROBOT_MOI;
+import static frc.robot.CatzSubsystems.DriveAndRobotOrientation.Drivetrain.DriveConstants.TRAJECTORY_MODULE_TRANSLATIONS;
+import static frc.robot.CatzSubsystems.DriveAndRobotOrientation.Drivetrain.DriveConstants.TREAD_COEF_FRICTION;
+
+import com.pathplanner.lib.config.ModuleConfig;
+import com.pathplanner.lib.config.RobotConfig;
+
+import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.util.Color;
 import frc.robot.Utilities.Alert;
@@ -55,7 +65,8 @@ public final class CatzConstants {
   public static enum RobotID {
     SN1,
     SN2,
-    SN_TEST // Select alternate test robot parameters
+    SN_TEST, // Select alternate test robot parameters
+    SN1_2024
   }
 
   public static enum AllianceColor {

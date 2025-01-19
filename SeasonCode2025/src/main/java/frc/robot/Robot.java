@@ -25,6 +25,8 @@ import org.littletonrobotics.junction.networktables.NT4Publisher;
 import org.littletonrobotics.junction.wpilog.WPILOGReader;
 import org.littletonrobotics.junction.wpilog.WPILOGWriter;
 
+import com.pathplanner.lib.pathfinding.Pathfinding;
+
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.StringSubscriber;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -42,6 +44,7 @@ import frc.robot.CatzSubsystems.LEDs.CatzLED;
 import frc.robot.Commands.ControllerModeAbstraction;
 import frc.robot.Utilities.Alert;
 import frc.robot.Utilities.AllianceFlipUtil;
+import frc.robot.Utilities.LocalADStarAK;
 import frc.robot.Utilities.VirtualSubsystem;
 import frc.robot.Utilities.Alert.AlertType;
 import lombok.Getter;
@@ -89,7 +92,7 @@ public class Robot extends LoggedRobot {
   private final Alert SAME_BATTERY_ALERT = new Alert("The battery has not been changed since the last match.", AlertType.kError);
 
   // Garbage Collection Alerts
-  private final Alert GC_COLLECTION_ALERT = new Alert("Please wait to enable, collecting garbage. 🗑️", AlertType.kWarning);
+  private final Alert GC_COLLECTION_ALERT = new Alert("Please wait to enable, collecting garbage.", AlertType.kWarning);
   private int garbageCollectionCounter = 0;
 
   // DriverStation related alerts
@@ -113,6 +116,7 @@ public class Robot extends LoggedRobot {
   //--------------------------------------------------------------------------------------------------------
   @Override
   public void robotInit() {
+    Pathfinding.setPathfinder(new LocalADStarAK());
     System.gc();
 
     // Record metadata

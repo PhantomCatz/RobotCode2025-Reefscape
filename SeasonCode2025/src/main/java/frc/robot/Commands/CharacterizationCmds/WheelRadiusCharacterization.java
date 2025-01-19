@@ -5,8 +5,8 @@ import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.CatzSubsystems.DriveAndRobotOrientation.CatzRobotTracker;
-import frc.robot.CatzSubsystems.DriveAndRobotOrientation.drivetrain.CatzDrivetrain;
-import frc.robot.CatzSubsystems.DriveAndRobotOrientation.drivetrain.DriveConstants;
+import frc.robot.CatzSubsystems.DriveAndRobotOrientation.Drivetrain.CatzDrivetrain;
+import frc.robot.CatzSubsystems.DriveAndRobotOrientation.Drivetrain.DriveConstants;
 import frc.robot.Utilities.LoggedTunableNumber;
 
 import java.util.function.DoubleSupplier;

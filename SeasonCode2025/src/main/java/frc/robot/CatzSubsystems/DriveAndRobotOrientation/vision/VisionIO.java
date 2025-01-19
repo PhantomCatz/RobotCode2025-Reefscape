@@ -1,57 +1,49 @@
-package frc.robot.CatzSubsystems.DriveAndRobotOrientation.vision;
+// Copyright 2021-2025 FRC 6328
+// http://github.com/Mechanical-Advantage
+//
+// This program is free software; you can redistribute it and/or
+// modify it under the terms of the GNU General Public License
+// version 3 as published by the Free Software Foundation or
+// available in the root directory of this project.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+// GNU General Public License for more details.
 
+package frc.robot.CatzSubsystems.DriveAndRobotOrientation.Vision;
+
+import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import org.littletonrobotics.junction.AutoLog;
-
-import edu.wpi.first.math.Matrix;
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.numbers.N1;
-import edu.wpi.first.math.numbers.N3;
 
 public interface VisionIO {
     
     @AutoLog
-    public class VisionIOInputs {
-        public double x; //new x pose estimator coordinate value based off limelight
-        public double y; //new y pose estimator coordinate value based off limelight
-        public double rotation; //new rotation pose estimator coordinate value based off limelight
-        public double timestamp;
-        public boolean isNewVisionPose; // is it a new pose from a new apriltag estimate
+    public static class VisionIOInputs {
+        public boolean connected = false;
+        public TargetObservation latestTargetObservation = new TargetObservation(new Rotation2d(), new Rotation2d());
+        public PoseObservation[] poseObservations = new PoseObservation[0];
+        public int[] tagIds = new int[0];
+    }
 
-        public int id;                 // Tag ID
-        public double txnc;         // X offset (no crosshair)
-        public double tync;         // Y offset (no crosshair)
-        public double ta_Fiducial;   // Target area
-        public double distToCamera;  // Distance to camera
-        public double distToRobot;    // Distance to robot
-        public double ambiguity;   // Tag pose ambiguity
+    /** Represents the angle to a simple target, not used for pose estimation. */
+    public static record TargetObservation(Rotation2d tx, Rotation2d ty) {}
 
-        public double primaryApriltagID; //closest apirltag id that the limelight is communicating with
+    /** Represents a robot pose sample used for pose estimation. */
+    public static record PoseObservation(
+            double timestamp,
+            Pose3d pose,
+            double ambiguity,
+            int tagCount,
+            double averageTagDistance,
+            PoseObservationType type) {}
 
-        public double ty; //vertical offset from crosshair to target in degrees
-        public double tx; //horizontal offset from crosshair to target
-        public boolean hasTarget; //whether the limelight has any vaild targets
-        public double ta; //target area of the limelight from 0%-100%...how much does the apirltage take up on the frame
-
-        public int tagCount;
-        public double totalLatency;
-
-        public boolean isMegaTag2;
-
-
-        // Nerual detector inputs
-        public int classID;
-        public double corner0X;
-        public double corner0Y;
+    public static enum PoseObservationType {
+        MEGATAG_1,
+        MEGATAG_2,
+        PHOTONVISION
     }
 
     public default void updateInputs(VisionIOInputs inputs) {}
-
-    public default String getName() {
-        return "";
-    }
-
-    public default void setReferencePose(Pose2d pose) {}
-
-    public default void getHorizontalAngle() {}
-    
 }
