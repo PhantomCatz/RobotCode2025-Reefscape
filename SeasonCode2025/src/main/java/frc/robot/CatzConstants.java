@@ -1,42 +1,43 @@
+// Copyright (c) 2025 FRC 2637
+// https://github.com/PhantomCatz
+//
+// Use of this source code is governed by an MIT-style
+// license that can be found in the LICENSE file at
+// the root directory of this project.
+
 package frc.robot;
 
-import com.pathplanner.lib.config.ModuleConfig;
-import com.pathplanner.lib.config.RobotConfig;
-
-import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.util.Color;
 import frc.robot.Utilities.Alert;
 import frc.robot.Utilities.Alert.AlertType;
 
-
-
 /***
  * CatzConstants
- * 
+ *
  * @version 1.0
  * @author Kynam Lenghiem
- * 
+ *
  *         This class is where reusable constants are defined
  ***/
 public final class CatzConstants {
 
-  //----------------------------------------------------
+  // ----------------------------------------------------
   //
   //  Robot Modes
   //
-  //--------------------------------------------------/
-  public static final RobotSenario robotSenario      = RobotSenario.PRACTICE;
-  public static final RobotHardwareMode hardwareMode = RobotHardwareMode.REAL;
-  private static RobotID robotType                   = RobotID.SN1;
-  private static AlertPriority alertWarningPriority  = AlertPriority.ONE;
-  
+  // --------------------------------------------------/
+  public static final RobotSenario robotSenario = RobotSenario.PRACTICE;
+  public static final RobotHardwareMode hardwareMode = RobotHardwareMode.SIM;
+  private static RobotID robotType = RobotID.SN_TEST;
+  private static AlertPriority alertWarningPriority = AlertPriority.ONE;
+
   public static final double LOOP_TIME = 0.02;
 
   public static enum RobotSenario {
-    TUNING, //In PID enviroment with logged tunable numbers
-    PRACTICE, //Driver Practice + Testing
-    COMPETITION //Competition Setting
+    TUNING, // In PID enviroment with logged tunable numbers
+    PRACTICE, // Driver Practice + Testing
+    COMPETITION // Competition Setting
   }
 
   public static enum RobotHardwareMode {
@@ -63,7 +64,8 @@ public final class CatzConstants {
   }
 
   public static enum AllianceColor {
-    Blue, Red
+    Blue,
+    Red
   }
 
   public static final class XboxInterfaceConstants {
@@ -82,8 +84,7 @@ public final class CatzConstants {
 
   public static enum AlertPriority {
     ONE, // Includes only critical Error Alerts
-    TWO,  // Includes critical Error and Warning Alerts
+    TWO, // Includes critical Error and Warning Alerts
     THREE, // Includes Critical Error, Warning, and Info Alerts
   }
-
 }

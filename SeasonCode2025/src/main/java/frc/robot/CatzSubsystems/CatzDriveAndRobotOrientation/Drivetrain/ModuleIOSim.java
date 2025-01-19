@@ -1,3 +1,10 @@
+// Copyright (c) 2025 FRC 2637
+// https://github.com/PhantomCatz
+//
+// Use of this source code is governed by an MIT-style
+// license that can be found in the LICENSE file at
+// the root directory of this project.
+
 package frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.Drivetrain;
 
 import edu.wpi.first.math.MathUtil;
@@ -15,16 +22,23 @@ import edu.wpi.first.wpilibj.simulation.DCMotorSim;
 import frc.robot.CatzConstants;
 import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.Drivetrain.DriveConstants.ModuleIDsAndCurrentLimits;
 
-
 public class ModuleIOSim implements ModuleIO {
-  private final LinearSystem<N2, N1, N2> plantDrive = LinearSystemId.createDCMotorSystem(DCMotor.getKrakenX60(1), 0.025, DriveConstants.MODULE_GAINS_AND_RATIOS.driveReduction());
-  private final LinearSystem<N2, N1, N2> plantSteer = LinearSystemId.createDCMotorSystem(DCMotor.getKrakenX60(1), 0.004, DriveConstants.MODULE_GAINS_AND_RATIOS.driveReduction());
+  private final LinearSystem<N2, N1, N2> plantDrive =
+      LinearSystemId.createDCMotorSystem(
+          DCMotor.getKrakenX60(1), 0.025, DriveConstants.MODULE_GAINS_AND_RATIOS.driveReduction());
+  private final LinearSystem<N2, N1, N2> plantSteer =
+      LinearSystemId.createDCMotorSystem(
+          DCMotor.getKrakenX60(1), 0.004, DriveConstants.MODULE_GAINS_AND_RATIOS.driveReduction());
 
-  private final DCMotorSim driveSim = new DCMotorSim(plantDrive, DCMotor.getKrakenX60Foc(1), 0.0, 0.0);
-  private final DCMotorSim steerSim = new DCMotorSim(plantSteer, DCMotor.getKrakenX60Foc(1), 0.0, 0.0);
+  private final DCMotorSim driveSim =
+      new DCMotorSim(plantDrive, DCMotor.getKrakenX60Foc(1), 0.0, 0.0);
+  private final DCMotorSim steerSim =
+      new DCMotorSim(plantSteer, DCMotor.getKrakenX60Foc(1), 0.0, 0.0);
 
-  private final PIDController driveFeedback = new PIDController(0.1, 0.0, 0.0, CatzConstants.LOOP_TIME);
-  private final PIDController steerFeedback = new PIDController(10.0, 0.0, 0.0, CatzConstants.LOOP_TIME);
+  private final PIDController driveFeedback =
+      new PIDController(0.1, 0.0, 0.0, CatzConstants.LOOP_TIME);
+  private final PIDController steerFeedback =
+      new PIDController(10.0, 0.0, 0.0, CatzConstants.LOOP_TIME);
 
   private double driveAppliedVolts = 0.0;
   private double steerAppliedVolts = 0.0;
@@ -34,7 +48,8 @@ public class ModuleIOSim implements ModuleIO {
   private SlewRateLimiter driveVoltsLimiter = new SlewRateLimiter(2.5);
 
   public ModuleIOSim(ModuleIDsAndCurrentLimits config) {
-    steerAbsoluteInitPosition = Rotation2d.fromRadians(Units.rotationsToRadians(config.absoluteEncoderOffset()));
+    steerAbsoluteInitPosition =
+        Rotation2d.fromRadians(Units.rotationsToRadians(config.absoluteEncoderOffset()));
     steerFeedback.enableContinuousInput(-Math.PI, Math.PI);
   }
 
@@ -50,12 +65,14 @@ public class ModuleIOSim implements ModuleIO {
     driveSim.update(CatzConstants.LOOP_TIME);
     steerSim.update(CatzConstants.LOOP_TIME);
 
-    inputs.driveVelocityRPS =   driveSim.getAngularVelocityRPM()/60; //Convert to RPS
-    inputs.drivePositionUnits = driveSim.getAngularPositionRad()/(2*Math.PI) * 4; // Fudged number to get better result
+    inputs.driveVelocityRPS = driveSim.getAngularVelocityRPM() / 60; // Convert to RPS
+    inputs.drivePositionUnits =
+        driveSim.getAngularPositionRad() / (2 * Math.PI) * 4; // Fudged number to get better result
     inputs.driveAppliedVolts = driveAppliedVolts;
     inputs.driveSupplyCurrentAmps = Math.abs(driveSim.getCurrentDrawAmps());
 
-    inputs.steerAbsPosition = new Rotation2d(steerSim.getAngularPositionRad()).plus(steerAbsoluteInitPosition);
+    inputs.steerAbsPosition =
+        new Rotation2d(steerSim.getAngularPositionRad()).plus(steerAbsoluteInitPosition);
     inputs.steerPosition = Rotation2d.fromRadians(steerSim.getAngularPositionRad());
     inputs.steerVelocityRadsPerSec = steerSim.getAngularVelocityRadPerSec();
     inputs.steerSupplyCurrentAmps = steerAppliedVolts;
@@ -65,7 +82,6 @@ public class ModuleIOSim implements ModuleIO {
         new double[] {driveSim.getAngularPositionRad() * DriveConstants.DRIVE_CONFIG.wheelRadius()};
     inputs.odometrySteerPositions =
         new Rotation2d[] {Rotation2d.fromRadians(steerSim.getAngularPositionRad())};
-
   }
 
   private void runDriveVolts(double volts) {
@@ -104,5 +120,4 @@ public class ModuleIOSim implements ModuleIO {
   public void setSteerPID(double kP, double kI, double kD) {
     steerFeedback.setPID(kP, kI, kD);
   }
-
 }

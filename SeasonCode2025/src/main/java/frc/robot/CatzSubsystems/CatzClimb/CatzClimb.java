@@ -1,24 +1,25 @@
-// Copyright (c) FIRST and other WPILib contributors.
-// Open Source Software; you can modify and/or share it under the terms of
-// the WPILib BSD license file in the root directory of this project.
+// Copyright (c) 2025 FRC 2637
+// https://github.com/PhantomCatz
+//
+// Use of this source code is governed by an MIT-style
+// license that can be found in the LICENSE file at
+// the root directory of this project.
 
 package frc.robot.CatzSubsystems.CatzClimb;
-
-import java.util.function.DoubleSupplier;
-
-import org.littletonrobotics.junction.Logger;
 
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Utilities.LoggedTunableNumber;
+import java.util.function.DoubleSupplier;
 import lombok.RequiredArgsConstructor;
+import org.littletonrobotics.junction.Logger;
 
 public class CatzClimb extends SubsystemBase {
- 
- private final ClimbIO io;
+
+  private final ClimbIO io;
   private final ClimbIOInputsAutoLogged inputs = new ClimbIOInputsAutoLogged();
-  
+
   private Position PositionType;
   static double position;
   static LoggedTunableNumber tunnablePos = new LoggedTunableNumber("Climb/TunnablePosition", 1);
@@ -32,21 +33,22 @@ public class CatzClimb extends SubsystemBase {
 
   /** Creates a new PositionSubsystem. */
   public CatzClimb() {
-        // io = new PositionIOKraken() {};
-        io = new ClimbIOReal() {};
+    // io = new PositionIOKraken() {};
+    io = new ClimbIOReal() {};
 
-        io.setPID(kP.getAsDouble(), kI.getAsDouble(), kD.getAsDouble());
+    io.setPID(kP.getAsDouble(), kI.getAsDouble(), kD.getAsDouble());
   }
-  //==========================================================//
+
+  // ==========================================================//
   // ^^ Hallo make sure you set this to the correct motor ^^  //
-  //==========================================================//
+  // ==========================================================//
   @RequiredArgsConstructor
   public enum Position {
-
     ZERO(() -> 0.0),
     TUNNABLE(tunnablePos);
 
     private final DoubleSupplier motionType;
+
     private double getTargetMotionPosition() {
       return motionType.getAsDouble();
     }
@@ -57,7 +59,7 @@ public class CatzClimb extends SubsystemBase {
     io.updateInputs(inputs);
     Logger.processInputs("Position", inputs);
     // System.out.println(position);
-    if(DriverStation.isDisabled()) {
+    if (DriverStation.isDisabled()) {
 
     } else {
       io.setPosition(position);
@@ -66,6 +68,8 @@ public class CatzClimb extends SubsystemBase {
   }
 
   public Command setPosition() {
-    return startEnd(() -> position = Position.TUNNABLE.getTargetMotionPosition(), () -> position = Position.ZERO.getTargetMotionPosition());
+    return startEnd(
+        () -> position = Position.TUNNABLE.getTargetMotionPosition(),
+        () -> position = Position.ZERO.getTargetMotionPosition());
   }
 }

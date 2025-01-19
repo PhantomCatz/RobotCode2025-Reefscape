@@ -1,14 +1,20 @@
-package frc.robot.Utilities;
+// Copyright (c) 2025 FRC 2637
+// https://github.com/PhantomCatz
+//
+// Use of this source code is governed by an MIT-style
+// license that can be found in the LICENSE file at
+// the root directory of this project.
 
-import edu.wpi.first.math.Pair;
-import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.wpilibj.Timer;
+package frc.robot.Utilities;
 
 import com.pathplanner.lib.path.GoalEndState;
 import com.pathplanner.lib.path.PathConstraints;
 import com.pathplanner.lib.path.PathPlannerPath;
 import com.pathplanner.lib.path.PathPoint;
 import com.pathplanner.lib.pathfinding.Pathfinder;
+import edu.wpi.first.math.Pair;
+import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.wpilibj.Timer;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -128,7 +134,8 @@ public class LocalADStarAK implements Pathfinder {
 
       List<PathPoint> pathPoints = new ArrayList<>();
       for (int i = 0; i < pointsLogged.length; i += 2) {
-        pathPoints.add(new PathPoint(new Translation2d(pointsLogged[i], pointsLogged[i + 1]), null));
+        pathPoints.add(
+            new PathPoint(new Translation2d(pointsLogged[i], pointsLogged[i + 1]), null));
       }
 
       currentPathPoints = pathPoints;
@@ -144,7 +151,7 @@ public class LocalADStarAK implements Pathfinder {
       time.reset();
       time.start();
 
-      while(!adStar.isNewPathAvailable() && time.get() < TIMEOUT){
+      while (!adStar.isNewPathAvailable() && time.get() < TIMEOUT) {
         Timer.delay(0.02);
       }
       currentPath = adStar.getCurrentPath(constraints, goalEndState);

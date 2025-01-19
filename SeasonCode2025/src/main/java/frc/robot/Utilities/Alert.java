@@ -1,6 +1,9 @@
-// Copyright (c) FIRST and other WPILib contributors.
-// Open Source Software; you can modify and/or share it under the terms of
-// the WPILib BSD license file in the root directory of this project.
+// Copyright (c) 2025 FRC 2637
+// https://github.com/PhantomCatz
+//
+// Use of this source code is governed by an MIT-style
+// license that can be found in the LICENSE file at
+// the root directory of this project.
 
 package frc.robot.Utilities;
 
@@ -219,13 +222,13 @@ public class Alert implements AutoCloseable {
      * @return the SendableAlerts for the group
      */
     private static SendableAlerts forGroup(String group) {
-          return groups.computeIfAbsent(
-              group,
-              _group -> {
-                var sendable = new SendableAlerts();
-                SmartDashboard.putData(_group, sendable);
-                return sendable;
-              });
+      return groups.computeIfAbsent(
+          group,
+          _group -> {
+            var sendable = new SendableAlerts();
+            SmartDashboard.putData(_group, sendable);
+            return sendable;
+          });
     }
   }
 }

@@ -1,33 +1,39 @@
-package frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.Drivetrain;
+// Copyright (c) 2025 FRC 2637
+// https://github.com/PhantomCatz
+//
+// Use of this source code is governed by an MIT-style
+// license that can be found in the LICENSE file at
+// the root directory of this project.
 
-import org.littletonrobotics.junction.Logger;
+package frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.Drivetrain;
 
 import com.studica.frc.AHRS;
 
 public class GyroIONavX implements GyroIO {
-    private final AHRS navX;
+  private final AHRS navX;
 
-    public GyroIONavX() {
-        navX = new AHRS(AHRS.NavXComType.kI2C, (byte) 200);
-        navX.enableLogging(true);
+  public GyroIONavX() {
+    navX = new AHRS(AHRS.NavXComType.kI2C, (byte) 200);
+    navX.enableLogging(true);
 
-        new Thread(() -> {
-          try {
-            Thread.sleep(1000);
-            navX.reset();
-          } catch (Exception E) {
-            
-          }
-        }).start();
-        navX.reset(); // implicitly sets the gyro to 0 heading
-    }
+    new Thread(
+            () -> {
+              try {
+                Thread.sleep(1000);
+                navX.reset();
+              } catch (Exception E) {
 
-    @Override
-    public void updateInputs(GyroIOInputs inputs) {
-      inputs.gyroConnected    = navX.isConnected();
+              }
+            })
+        .start();
+    navX.reset(); // implicitly sets the gyro to 0 heading
+  }
 
-      inputs.gyroAngle        = navX.getAngle(); //Acumulated Yaw no rollover
-      inputs.gyroYawDegrees   = navX.getYaw();
-    }
+  @Override
+  public void updateInputs(GyroIOInputs inputs) {
+    inputs.gyroConnected = navX.isConnected();
 
+    inputs.gyroAngle = navX.getAngle(); // Acumulated Yaw no rollover
+    inputs.gyroYawDegrees = navX.getYaw();
+  }
 }

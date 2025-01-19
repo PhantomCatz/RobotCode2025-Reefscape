@@ -1,15 +1,31 @@
-// Copyright (c) FIRST and other WPILib contributors.
-// Open Source Software; you can modify and/or share it under the terms of
-// the WPILib BSD license file in the root directory of this project.
+// Copyright (c) 2025 FRC 2637
+// https://github.com/PhantomCatz
+//
+// Use of this source code is governed by an MIT-style
+// license that can be found in the LICENSE file at
+// the root directory of this project.
 
 package frc.robot;
 
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Paths;
+import com.pathplanner.lib.pathfinding.Pathfinding;
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.wpilibj.RobotController;
+import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import frc.robot.CatzConstants.RobotHardwareMode;
+import frc.robot.CatzConstants.RobotID;
+import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.CatzRobotTracker;
+import frc.robot.CatzSubsystems.CatzLEDs.CatzLED;
+import frc.robot.Commands.ControllerModeAbstraction;
+import frc.robot.FieldConstants.Reef;
+import frc.robot.Utilities.Alert;
+import frc.robot.Utilities.Alert.AlertType;
+import frc.robot.Utilities.LocalADStarAK;
+import frc.robot.Utilities.VirtualSubsystem;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
@@ -17,7 +33,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.BiConsumer;
-
+import lombok.Getter;
 import org.littletonrobotics.junction.LogFileUtil;
 import org.littletonrobotics.junction.LoggedRobot;
 import org.littletonrobotics.junction.Logger;
@@ -25,50 +41,22 @@ import org.littletonrobotics.junction.networktables.NT4Publisher;
 import org.littletonrobotics.junction.wpilog.WPILOGReader;
 import org.littletonrobotics.junction.wpilog.WPILOGWriter;
 
-import com.pathplanner.lib.pathfinding.Pathfinding;
-
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.networktables.NetworkTableInstance;
-import edu.wpi.first.networktables.StringSubscriber;
-import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.DriverStation.Alliance;
-import edu.wpi.first.wpilibj.RobotController;
-import edu.wpi.first.wpilibj.Timer;
-import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.CommandScheduler;
-import frc.robot.CatzConstants.AllianceColor;
-import frc.robot.CatzConstants.RobotHardwareMode;
-import frc.robot.CatzConstants.RobotID;
-import frc.robot.CatzConstants.RobotSenario;
-import frc.robot.CatzSubsystems.CatzLEDs.CatzLED;
-import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.CatzRobotTracker;
-import frc.robot.Commands.ControllerModeAbstraction;
-import frc.robot.FieldConstants.Reef;
-import frc.robot.Utilities.Alert;
-import frc.robot.Utilities.AllianceFlipUtil;
-import frc.robot.Utilities.LocalADStarAK;
-import frc.robot.Utilities.VirtualSubsystem;
-import frc.robot.Utilities.Alert.AlertType;
-import lombok.Getter;
-
-
 public class Robot extends LoggedRobot {
-  //-------------------------------------------------------------------------------------------------------------
+  // -------------------------------------------------------------------------------------------------------------
   //  Essential Robot.java object declaration
-  //--------------------------------------------------------------------------------------------------------------
+  // --------------------------------------------------------------------------------------------------------------
   private Command m_autonomousCommand;
   private RobotContainer m_robotContainer;
   private Optional<Alliance> alliance = Optional.empty();
 
-  //-------------------------------------------------------------------------------------------------------------
+  // -------------------------------------------------------------------------------------------------------------
   //  MISC
-  //--------------------------------------------------------------------------------------------------------------
+  // --------------------------------------------------------------------------------------------------------------
   // Robot Timers
-  private final Timer DISABLED_TIMER           = new Timer(); // TODO make these finals to conventions
-  private final Timer CAN_INITIAL_ERROR_TIMER  = new Timer();
-  private final Timer CAN_ERROR_TIMER          = new Timer();
-  private final Timer CANIVORE_ERROR_TIMER     = new Timer();
+  private final Timer DISABLED_TIMER = new Timer(); // TODO make these finals to conventions
+  private final Timer CAN_INITIAL_ERROR_TIMER = new Timer();
+  private final Timer CAN_ERROR_TIMER = new Timer();
+  private final Timer CANIVORE_ERROR_TIMER = new Timer();
 
   // Can Error Detection variables
   private static final double CAN_ERROR_TIME_THRESHOLD = 0.5; // Seconds to disable alert //TODO
@@ -83,40 +71,48 @@ public class Robot extends LoggedRobot {
   private static double teleElapsedTime = 0.0;
   @Getter private static double autoElapsedTime = 0.0;
 
-
-  //--------------------------------------------------------------------------------------------------------
+  // --------------------------------------------------------------------------------------------------------
   //        Alerts
-  //--------------------------------------------------------------------------------------------------------
+  // --------------------------------------------------------------------------------------------------------
   // CAN
-  private final Alert CAN_ERROR_ALERT = new Alert("CAN errors detected, robot may not be controllable.", AlertType.kError);
+  private final Alert CAN_ERROR_ALERT =
+      new Alert("CAN errors detected, robot may not be controllable.", AlertType.kError);
 
   // Battery Alerts
-  private final Alert LOW_BATTERY_ALERT = new Alert("Battery voltage is very low, consider turning off the robot or replacing the battery.", AlertType.kWarning);
-  private final Alert SAME_BATTERY_ALERT = new Alert("The battery has not been changed since the last match.", AlertType.kError);
+  private final Alert LOW_BATTERY_ALERT =
+      new Alert(
+          "Battery voltage is very low, consider turning off the robot or replacing the battery.",
+          AlertType.kWarning);
+  private final Alert SAME_BATTERY_ALERT =
+      new Alert("The battery has not been changed since the last match.", AlertType.kError);
 
   // Garbage Collection Alerts
-  private final Alert GC_COLLECTION_ALERT = new Alert("Please wait to enable, collecting garbage.", AlertType.kWarning);
+  private final Alert GC_COLLECTION_ALERT =
+      new Alert("Please wait to enable, collecting garbage.", AlertType.kWarning);
   private int garbageCollectionCounter = 0;
 
   // DriverStation related alerts
-  private final Alert DS_DISCONNECT_ALERT = new Alert("Driverstation is not online, alliance selection will not work", AlertType.kError);
-  private final Alert FMS_DISCONNECT_ALERT = new Alert("fms is offline, robot cannot compete in match", AlertType.kError);
+  private final Alert DS_DISCONNECT_ALERT =
+      new Alert("Driverstation is not online, alliance selection will not work", AlertType.kError);
+  private final Alert FMS_DISCONNECT_ALERT =
+      new Alert("fms is offline, robot cannot compete in match", AlertType.kError);
 
   // Last deployment logging
-  Date date = Calendar.getInstance().getTime();	
-  SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd kk.mm.ss");;
+  Date date = Calendar.getInstance().getTime();
+  SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd kk.mm.ss");
+  ;
   String dateFormatted = sdf.format(date);
-  private final Alert LAST_DEPLOYMENT_WARNING = new Alert("Last Deployment: " + dateFormatted , AlertType.kInfo);
+  private final Alert LAST_DEPLOYMENT_WARNING =
+      new Alert("Last Deployment: " + dateFormatted, AlertType.kInfo);
 
   // reset Position Logging
   public static boolean isResetPositionUsedInAuto = false;
 
-
-  //--------------------------------------------------------------------------------------------------------
+  // --------------------------------------------------------------------------------------------------------
   //
   //        Robot
   //
-  //--------------------------------------------------------------------------------------------------------
+  // --------------------------------------------------------------------------------------------------------
   @Override
   public void robotInit() {
     Pathfinding.setPathfinder(new LocalADStarAK());
@@ -129,42 +125,43 @@ public class Robot extends LoggedRobot {
     Logger.recordMetadata("GitDate", BuildConstants.GIT_DATE);
     Logger.recordMetadata("GitBranch", BuildConstants.GIT_BRANCH);
     switch (BuildConstants.DIRTY) {
-        case 0:
-            Logger.recordMetadata("GitDirty", "All changes committed");
-            break;
-        case 1:
-            Logger.recordMetadata("GitDirty", "Uncomitted changes");
-            break;
-        default:
-            Logger.recordMetadata("GitDirty", "Unknown");
-            break;
+      case 0:
+        Logger.recordMetadata("GitDirty", "All changes committed");
+        break;
+      case 1:
+        Logger.recordMetadata("GitDirty", "Uncomitted changes");
+        break;
+      default:
+        Logger.recordMetadata("GitDirty", "Unknown");
+        break;
     }
 
     // Set up data receivers & replay source
     switch (CatzConstants.hardwareMode) {
-        case REAL:
-            // Running on a real robot, log to a USB stick ("/U/logs")
-            Logger.addDataReceiver(new WPILOGWriter());
-            Logger.addDataReceiver(new WPILOGWriter("E:/Logs"));
-            Logger.addDataReceiver(new NT4Publisher());
-            break;
+      case REAL:
+        // Running on a real robot, log to a USB stick ("/U/logs")
+        Logger.addDataReceiver(new WPILOGWriter());
+        Logger.addDataReceiver(new WPILOGWriter("E:/Logs"));
+        Logger.addDataReceiver(new NT4Publisher());
+        break;
 
-        case SIM:
-            // Running a physics simulator, log to NT
-            //Logger.addDataReceiver(new WPILOGWriter("F:/robotics code projects/loggingfiles/"));
-            Logger.addDataReceiver(new NT4Publisher());
-            break;
+      case SIM:
+        // Running a physics simulator, log to NT
+        // Logger.addDataReceiver(new WPILOGWriter("F:/robotics code projects/loggingfiles/"));
+        Logger.addDataReceiver(new NT4Publisher());
+        break;
 
-        case REPLAY:
-            // Replaying a log, set up replay source
-            setUseTiming(false); // Run as fast as possible
-            String logPath = LogFileUtil.findReplayLog();
-            Logger.setReplaySource(new WPILOGReader(logPath));
-            Logger.addDataReceiver(new WPILOGWriter(LogFileUtil.addPathSuffix(logPath, "_sim")));
-            break;
+      case REPLAY:
+        // Replaying a log, set up replay source
+        setUseTiming(false); // Run as fast as possible
+        String logPath = LogFileUtil.findReplayLog();
+        Logger.setReplaySource(new WPILOGReader(logPath));
+        Logger.addDataReceiver(new WPILOGWriter(LogFileUtil.addPathSuffix(logPath, "_sim")));
+        break;
     }
 
-    // Start AdvantageKit logger //TODO enable this in autonomous and telop init for comp setting // make advantage kit an on demand feature
+    // Start AdvantageKit logger //TODO enable this in autonomous and telop init for comp setting //
+    // make advantage kit an on demand feature
     Logger.start();
 
     // Instantiate robotContainer
@@ -210,28 +207,27 @@ public class Robot extends LoggedRobot {
     System.out.println("Mode: " + CatzConstants.hardwareMode.toString());
     System.out.println("Type: " + CatzConstants.getRobotType().toString());
 
-
     // Run hardware mode check
-    if(Robot.isReal()) { //REAL ROBOT
-      if(CatzConstants.hardwareMode == RobotHardwareMode.SIM) {
+    if (Robot.isReal()) { // REAL ROBOT
+      if (CatzConstants.hardwareMode == RobotHardwareMode.SIM) {
         System.out.println("Wrong Robot Constant selection, Check CatzConstants hardwareMode");
         System.exit(0);
       }
 
-      if(CatzConstants.getRobotType() == RobotID.SN_TEST) {
+      if (CatzConstants.getRobotType() == RobotID.SN_TEST) {
         System.out.println("Wrong Robot ID selection, Check CatzConstants robotID");
         System.exit(0);
       }
 
-    } else { //SIM ROBOT
-      if(CatzConstants.hardwareMode == RobotHardwareMode.REAL) {
+    } else { // SIM ROBOT
+      if (CatzConstants.hardwareMode == RobotHardwareMode.REAL) {
         System.out.println("Wrong Robot Constant selection, Check CatzConstants hardwareMode");
         System.exit(0);
       }
 
-      if(CatzConstants.getRobotType() != RobotID.SN_TEST) {
-        if(CatzConstants.hardwareMode == RobotHardwareMode.SIM) {
-          System.out.println("Wrong Robot ID selection, Check CatzConstants robotID"); 
+      if (CatzConstants.getRobotType() != RobotID.SN_TEST) {
+        if (CatzConstants.hardwareMode == RobotHardwareMode.SIM) {
+          System.out.println("Wrong Robot ID selection, Check CatzConstants robotID");
           System.exit(0);
         }
       }
@@ -239,8 +235,6 @@ public class Robot extends LoggedRobot {
 
     DriverStation.silenceJoystickConnectionWarning(true);
   }
-
-
 
   @Override
   public void robotPeriodic() {
@@ -269,7 +263,9 @@ public class Robot extends LoggedRobot {
     m_robotContainer.updateAlerts();
 
     // Check CAN status
-    var canStatus = RobotController.getCANStatus(); // TODO find benifits of getCANStatus and evaluate whether it  
+    var canStatus =
+        RobotController
+            .getCANStatus(); // TODO find benifits of getCANStatus and evaluate whether it
     if (canStatus.transmitErrorCount > 0 || canStatus.receiveErrorCount > 0) {
       CAN_ERROR_TIMER.restart();
     }
@@ -287,20 +283,16 @@ public class Robot extends LoggedRobot {
       CatzLED.getInstance().lowBatteryAlert = true;
     }
   }
-  
 
-
-  //--------------------------------------------------------------------------------------------------------
+  // --------------------------------------------------------------------------------------------------------
   //
   //        Disabled
   //
-  //--------------------------------------------------------------------------------------------------------
+  // --------------------------------------------------------------------------------------------------------
   @Override
   public void disabledInit() {
     isResetPositionUsedInAuto = false;
   }
-
-
 
   @Override
   public void disabledPeriodic() {
@@ -313,27 +305,23 @@ public class Robot extends LoggedRobot {
 
     // Garbage Collection alert
     GC_COLLECTION_ALERT.set(Timer.getFPGATimestamp() < 45.0);
-    if((garbageCollectionCounter > 5*60*4)) { // 1 second * 60sec * 4 min
+    if ((garbageCollectionCounter > 5 * 60 * 4)) { // 1 second * 60sec * 4 min
       System.gc();
       GC_COLLECTION_ALERT.set(false);
       GC_COLLECTION_ALERT.set(true);
       garbageCollectionCounter = 0;
     }
     garbageCollectionCounter++;
-
   }
-
-
 
   @Override
   public void disabledExit() {}
 
-
-  //--------------------------------------------------------------------------------------------------------
+  // --------------------------------------------------------------------------------------------------------
   //
   //        Autonomous
   //
-  //--------------------------------------------------------------------------------------------------------  
+  // --------------------------------------------------------------------------------------------------------
   @Override
   public void autonomousInit() {
     // deployment benchmark
@@ -346,25 +334,19 @@ public class Robot extends LoggedRobot {
     }
   }
 
-
-
   @Override
   public void autonomousPeriodic() {
     autoElapsedTime = Timer.getFPGATimestamp() - autoStart;
-
   }
-
-
 
   @Override
   public void autonomousExit() {}
 
-
-  //--------------------------------------------------------------------------------------------------------
+  // --------------------------------------------------------------------------------------------------------
   //
   //        teleop
   //
-  //--------------------------------------------------------------------------------------------------------
+  // --------------------------------------------------------------------------------------------------------
   @Override
   public void teleopInit() {
     // deployment benchmark
@@ -377,28 +359,21 @@ public class Robot extends LoggedRobot {
     CatzRobotTracker.getInstance().resetPose(new Pose2d(Reef.center, new Rotation2d()));
   }
 
-
-
   @Override
   public void teleopPeriodic() {
     teleElapsedTime = Timer.getFPGATimestamp() - teleStart;
 
     ControllerModeAbstraction.periodicDebug();
-
-    
   }
-
-
 
   @Override
   public void teleopExit() {}
 
-
-  //--------------------------------------------------------------------------------------------------------
+  // --------------------------------------------------------------------------------------------------------
   //
   //        test
   //
-  //--------------------------------------------------------------------------------------------------------
+  // --------------------------------------------------------------------------------------------------------
   @Override
   public void testInit() {
     CommandScheduler.getInstance().cancelAll();

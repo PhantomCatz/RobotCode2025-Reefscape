@@ -1,6 +1,10 @@
-// Copyright (c) FIRST and other WPILib contributors.
-// Open Source Software; you can modify and/or share it under the terms of
-// the WPILib BSD license file in the root directory of this project.
+// Copyright (c) 2025 FRC 2637
+// https://github.com/PhantomCatz
+//
+// Use of this source code is governed by an MIT-style
+// license that can be found in the LICENSE file at
+// the root directory of this project.
+
 package frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation;
 
 import edu.wpi.first.math.*;
@@ -11,101 +15,91 @@ import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.numbers.N1;
-import edu.wpi.first.math.numbers.N2;
 import edu.wpi.first.math.numbers.N3;
-import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
-import frc.robot.CatzConstants;
-import frc.robot.FieldConstants;
 import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.CatzRobotTracker.VisionObservation;
 import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.Drivetrain.DriveConstants;
-import frc.robot.Utilities.AllianceFlipUtil;
 import frc.robot.Utilities.GeomUtil;
-import frc.robot.Utilities.LoggedTunableNumber;
-
 import java.util.NoSuchElementException;
-import java.util.Optional;
-import java.util.function.BooleanSupplier;
-
 import lombok.Getter;
-import lombok.Setter;
 import lombok.experimental.ExtensionMethod;
 import org.littletonrobotics.junction.AutoLogOutput;
 
 @ExtensionMethod({GeomUtil.class})
 public class CatzRobotTracker {
-
-  private static final LoggedTunableNumber autoLookahead = new LoggedTunableNumber("CatzRobotTracker/AutoLookahead", 0.5);
-  private static final LoggedTunableNumber lookahead = new LoggedTunableNumber("CatzRobotTracker/lookaheadS", 0.35);
-  private static final double poseBufferSizeSeconds = 2.0;
+  private static final double POSE_BUFFER_SIZE_SEC = 2.0;
+  private static final Matrix<N3, N1> ODOMETRY_STD_DEVS =
+      new Matrix<>(VecBuilder.fill(0.003, 0.003, 0.002));
 
   private static CatzRobotTracker instance;
+
   public static CatzRobotTracker getInstance() {
     if (instance == null) instance = new CatzRobotTracker();
     return instance;
   }
 
-  //------------------------------------------------------------------------------------------------------
+  // ------------------------------------------------------------------------------------------------------
   //  Pose estimation Members
-  //------------------------------------------------------------------------------------------------------
+  // ------------------------------------------------------------------------------------------------------
+  @Getter
+  @AutoLogOutput(key = "CatzRobotTracker/PureOdometryPose")
   private Pose2d odometryPose = new Pose2d();
+
+  @Getter
+  @AutoLogOutput(key = "CatzRobotTracker/EstimatedPose")
   private Pose2d estimatedPose = new Pose2d();
-  private Pose2d trajectorySetpoint = new Pose2d();
 
-
-  private final TimeInterpolatableBuffer<Pose2d> POSE_BUFFER = TimeInterpolatableBuffer.createBuffer(poseBufferSizeSeconds);
+  private final TimeInterpolatableBuffer<Pose2d> POSE_BUFFER =
+      TimeInterpolatableBuffer.createBuffer(POSE_BUFFER_SIZE_SEC);
   private final Matrix<N3, N1> TRACKER_STD_DEVS = new Matrix<>(Nat.N3(), Nat.N1());
-
-  public static final Matrix<N3, N1> odometryStateStdDevs =
-      switch (CatzConstants.getRobotType()) {
-        default -> new Matrix<>(VecBuilder.fill(0.003, 0.003, 0.0002));
-  };
 
   // Odometry
   private final SwerveDriveKinematics KINEMATICS;
   private SwerveModulePosition[] lastWheelPositions =
-            new SwerveModulePosition[] {
-              new SwerveModulePosition(),
-              new SwerveModulePosition(),
-              new SwerveModulePosition(),
-              new SwerveModulePosition()
-  };
-  @Getter private SwerveModuleState[] currentModuleStates = 
+      new SwerveModulePosition[] {
+        new SwerveModulePosition(),
+        new SwerveModulePosition(),
+        new SwerveModulePosition(),
+        new SwerveModulePosition()
+      };
+
+  @Getter
+  private SwerveModuleState[] currentModuleStates =
       new SwerveModuleState[] {
-        new SwerveModuleState(), 
-        new SwerveModuleState(), 
-        new SwerveModuleState(), 
+        new SwerveModuleState(),
+        new SwerveModuleState(),
+        new SwerveModuleState(),
         new SwerveModuleState()
-  };
+      };
 
   private Rotation2d lastGyroAngle = new Rotation2d();
   private Twist2d robotVelocity = new Twist2d();
   private Twist2d robotAccelerations = new Twist2d();
   private Twist2d trajectoryVelocity = new Twist2d();
   private ChassisSpeeds m_lastChassisSpeeds = new ChassisSpeeds();
-  @Setter private BooleanSupplier lookaheadDisable = () -> false;
-  //------------------------------------------------------------------------------------------------------
+
+  // ------------------------------------------------------------------------------------------------------
   //
   //  Constructor
   //
-  //------------------------------------------------------------------------------------------------------
+  // ------------------------------------------------------------------------------------------------------
   private CatzRobotTracker() {
     for (int i = 0; i < 3; ++i) {
-      TRACKER_STD_DEVS.set(i, 0, Math.pow(odometryStateStdDevs.get(i, 0), 2));
+      TRACKER_STD_DEVS.set(i, 0, Math.pow(ODOMETRY_STD_DEVS.get(i, 0), 2));
     }
     KINEMATICS = DriveConstants.SWERVE_KINEMATICS;
   }
 
-  //------------------------------------------------------------------------------------------------------
+  // ------------------------------------------------------------------------------------------------------
   //
   //  Pose Estimation adder methods
   //
-  
-  //------------------------------------------------------------------------------------------------------
+  // ------------------------------------------------------------------------------------------------------
   /** Add odometry observation */
   public void addOdometryObservation(OdometryObservation observation) {
     currentModuleStates = observation.moduleStates;
-    // Calculate twist from last wheel positions to current wheel positions, useful for when gyro is disabled
+    // Calculate twist from last wheel positions to current wheel positions, useful for when gyro is
+    // disabled
     Twist2d twist = KINEMATICS.toTwist2d(lastWheelPositions, observation.wheelPositions());
     lastWheelPositions = observation.wheelPositions();
     // Check gyro connected
@@ -125,33 +119,36 @@ public class CatzRobotTracker {
 
     // Collect Velocity and Accerleration values
     var chassisSpeeds = KINEMATICS.toChassisSpeeds(observation.moduleStates);
-    robotAccelerations = new Twist2d(
-            (chassisSpeeds.vxMetersPerSecond - m_lastChassisSpeeds.vxMetersPerSecond) / observation.timestamp,
-            (chassisSpeeds.vyMetersPerSecond - m_lastChassisSpeeds.vyMetersPerSecond) / observation.timestamp,
+    robotAccelerations =
+        new Twist2d(
+            (chassisSpeeds.vxMetersPerSecond - m_lastChassisSpeeds.vxMetersPerSecond)
+                / observation.timestamp,
+            (chassisSpeeds.vyMetersPerSecond - m_lastChassisSpeeds.vyMetersPerSecond)
+                / observation.timestamp,
             (chassisSpeeds.omegaRadiansPerSecond - m_lastChassisSpeeds.omegaRadiansPerSecond)
-                    / observation.timestamp);
+                / observation.timestamp);
     m_lastChassisSpeeds = chassisSpeeds;
-  } //end of addOdometryObservation
+  } // end of addOdometryObservation
 
   /** Add Vision Observation */
   public void addVisionObservation(VisionObservation observation) {
-    // // If measurement is old enough to be outside the pose buffer's timespan, skip.
-    // try {
-    //   if (POSE_BUFFER.getInternalBuffer().lastKey() - poseBufferSizeSeconds
-    //       > observation.timestamp()) {
-    //     return;
-    //   }
-    // } catch (NoSuchElementException ex) {
-    //   return;
-    // }
-    //System.out.println("exceptio");
+    // If measurement is old enough to be outside the pose buffer's timespan, skip.
+    try {
+      if (POSE_BUFFER.getInternalBuffer().lastKey() - POSE_BUFFER_SIZE_SEC
+          > observation.timestamp()) {
+        return;
+      }
+    } catch (NoSuchElementException ex) {
+      return;
+    }
+    System.out.println("exceptio");
     // Get odometry based pose at timestamp
     var sample = POSE_BUFFER.getSample(observation.timestamp());
     if (sample.isEmpty()) {
       // exit if not there
       return;
     }
-    //System.out.println("empty sample");
+    // System.out.println("empty sample");
 
     // sample --> odometryPose transform and backwards of that
     var sampleToOdometryTransform = new Transform2d(sample.get(), odometryPose);
@@ -190,24 +187,17 @@ public class CatzRobotTracker {
 
     // Recalculate current estimate by applying scaled transform to old estimate
     // then replaying odometry data
-    //System.out.println(transform.getX());
     estimatedPose = estimateAtTime.plus(scaledTransform).plus(sampleToOdometryTransform);
-  } //end of addVisionObservation(OdometryObservation observation)
+  } // end of addVisionObservation(OdometryObservation observation)
 
   public void addVelocityData(Twist2d robotVelocity) {
     this.robotVelocity = robotVelocity;
   }
 
-  public void addFeedFowardData() {
-
-  }
+  public void addFeedFowardData() {}
 
   public void addTrajectoryVelocityData(Twist2d robotVelocity) {
     trajectoryVelocity = robotVelocity;
-  }
-
-  public void addTrajectorySetpointData(Pose2d targetPose) {
-    this.trajectorySetpoint = targetPose;
   }
 
   /**
@@ -221,22 +211,17 @@ public class CatzRobotTracker {
     POSE_BUFFER.clear();
   }
 
-  //------------------------------------------------------------------------------------------------------
+  // ------------------------------------------------------------------------------------------------------
   //
   //  CatzRobotTracker Getters
   //
-  //------------------------------------------------------------------------------------------------------
+  // ------------------------------------------------------------------------------------------------------
   @AutoLogOutput(key = "CatzRobotTracker/FieldVelocity")
   public Twist2d fieldVelocity() {
-    Translation2d linearFieldVelocity = new Translation2d(robotVelocity.dx, robotVelocity.dy).rotateBy(estimatedPose.getRotation());
-    return new Twist2d(linearFieldVelocity.getX(), 
-                       linearFieldVelocity.getY(), 
-                       robotVelocity.dtheta);
-  }
-
-  @AutoLogOutput(key = "CatzRobotTracker/EstimatedPose")
-  public Pose2d getEstimatedPose() {
-    return estimatedPose;
+    Translation2d linearFieldVelocity =
+        new Translation2d(robotVelocity.dx, robotVelocity.dy).rotateBy(estimatedPose.getRotation());
+    return new Twist2d(
+        linearFieldVelocity.getX(), linearFieldVelocity.getY(), robotVelocity.dtheta);
   }
 
   /**
@@ -258,24 +243,21 @@ public class CatzRobotTracker {
                 Rotation2d.fromRadians(velocity.dtheta * rotationLookaheadS)));
   }
 
-  @AutoLogOutput(key = "CatzRobotTracker/PureOdometryPose")
-  public Pose2d getOdometryPose() {
-    return odometryPose;
-  }
-
   @AutoLogOutput(key = "CatzRobotTracker/RecordedChassisSpeeds")
   public ChassisSpeeds getRobotChassisSpeeds() {
     return m_lastChassisSpeeds;
   }
 
   /********************************************************************************************************************************
-   * 
+   *
    * Odometry and Vision Record types
-   * 
+   *
    ********************************************************************************************************************************/
   public record OdometryObservation(
-      SwerveModulePosition[] wheelPositions, SwerveModuleState[] moduleStates, Rotation2d gyroAngle, double timestamp) {}
+      SwerveModulePosition[] wheelPositions,
+      SwerveModuleState[] moduleStates,
+      Rotation2d gyroAngle,
+      double timestamp) {}
 
   public record VisionObservation(Pose2d visionPose, double timestamp, Matrix<N3, N1> stdDevs) {}
-
 }

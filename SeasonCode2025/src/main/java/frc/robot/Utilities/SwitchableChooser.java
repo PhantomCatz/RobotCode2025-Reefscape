@@ -1,3 +1,10 @@
+// Copyright (c) 2025 FRC 2637
+// https://github.com/PhantomCatz
+//
+// Use of this source code is governed by an MIT-style
+// license that can be found in the LICENSE file at
+// the root directory of this project.
+
 package frc.robot.Utilities;
 
 import edu.wpi.first.networktables.NetworkTableInstance;
@@ -6,9 +13,7 @@ import edu.wpi.first.networktables.StringPublisher;
 import java.util.Arrays;
 import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.networktables.LoggedNetworkInput;
-import org.littletonrobotics.junction.networktables.LoggedDashboardString;
 import org.littletonrobotics.junction.networktables.LoggedNetworkString;
-
 
 /** A string chooser for the dashboard where the options can be changed on-the-fly. */
 public class SwitchableChooser extends LoggedNetworkInput {
