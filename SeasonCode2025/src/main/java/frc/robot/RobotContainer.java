@@ -37,6 +37,11 @@ import frc.robot.CatzSubsystems.DriveAndRobotOrientation.Vision.CatzVision;
 import frc.robot.CatzSubsystems.DriveAndRobotOrientation.Vision.VisionIO;
 import frc.robot.CatzSubsystems.DriveAndRobotOrientation.Vision.VisionIOPhotonVisionSim;
 import frc.robot.CatzSubsystems.LEDs.CatzLED;
+import frc.robot.CatzSubsystems.Outtake.CatzOuttake;
+import frc.robot.CatzSubsystems.Outtake.OuttakeIO;
+import frc.robot.CatzSubsystems.Outtake.OuttakeIOSparkmax;
+import frc.robot.CatzSubsystems.Outtake.CatzOuttake.outtakeStates;
+import frc.robot.CatzSubsystems.Elevator.*;
 import frc.robot.Commands.AutomatedSequenceCmds;
 import frc.robot.Commands.ControllerModeAbstraction;
 import frc.robot.Commands.DriveAndRobotOrientationCmds.FaceTarget;
@@ -54,11 +59,15 @@ public class RobotContainer {
   //-------------------------------------------------------------------------------------------------------------------
   // Primary subsystem declaration
   private static CatzDrivetrain   drive                = new CatzDrivetrain();
+
   
   // Assistance Subsystem declaration
   private static CatzLED          led = CatzLED.getInstance();
   private static CatzRobotTracker robotTracker = CatzRobotTracker.getInstance();
   private static CatzVision       vision = new CatzVision(new VisionIOPhotonVisionSim("SOBA", SOBA_TRANSFORM, () -> robotTracker.getEstimatedPose()));
+
+  private static CatzOuttake      outtake = new CatzOuttake();
+  private static CatzElevator     elevator = new CatzElevator();
 
   //------------------------------------------------------------------------------------------------------------------
   // Drive Controller Declaration
@@ -138,12 +147,17 @@ public class RobotContainer {
         System.out.println("Canceled");
     }));
 
+    xboxDrv.a().toggleOnTrue(outtake.startIntaking().alongWith(Commands.print("pressed a")));
+    xboxDrv.y().toggleOnTrue(outtake.runMotor().alongWith(Commands.print("pressed y")));
 
+    xboxAux.a().toggleOnTrue(elevator.runMotor().alongWith(Commands.print("pressed elevator a")));
+    xboxAux.y().toggleOnTrue(elevator.runMotorBck().alongWith(Commands.print("pressed elevator y")));
     
     drive.setDefaultCommand(new TeleopDriveCmd(() -> xboxDrv.getLeftX(), 
                                                () -> xboxDrv.getLeftY(), 
                                                () -> xboxDrv.getRightX(), drive));
     //TODO add triggers to put default as priority    
+
   }
 
   //---------------------------------------------------------------------------
