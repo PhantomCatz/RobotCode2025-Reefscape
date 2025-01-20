@@ -7,10 +7,16 @@
 
 package frc.robot.CatzSubsystems.CatzElevator;
 
+import static frc.robot.CatzSubsystems.CatzElevator.ElevatorConstants.*;
+
+import java.util.function.DoubleSupplier;
+
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.CatzConstants;
 import frc.robot.Utilities.LoggedTunableNumber;
+import lombok.RequiredArgsConstructor;
+
 import org.littletonrobotics.junction.Logger;
 
 public class CatzElevator extends SubsystemBase {
@@ -23,17 +29,40 @@ public class CatzElevator extends SubsystemBase {
 
   private double elevatorSpeed = 0.0;
 
+  @RequiredArgsConstructor
+  public static enum ElevatorPosition {
+      PosL1Home(() -> 25.0),
+      PosL2(() -> 50.0),
+      PosL3(() -> 75.0),
+      PosL4(() -> 100.0),
+      PosManual(new LoggedTunableNumber("Elevator/ScoreSourceSetpoint",0.0));
+
+    private final DoubleSupplier elevatorSetpointSupplier;
+
+    private double getTargetPositionRotations() {
+      return elevatorSetpointSupplier.getAsDouble();
+    }
+  }
+
   public CatzElevator() {
-    switch (CatzConstants.hardwareMode) {
-      case REAL:
-        io = new ElevatorIOReal();
+    if(isElevatorDisabled) { //Comes from elevator Constants
+      io = new ElevatorIONull();
+      System.out.println("Elevator Unconfigured");
+    } else {
+      switch (CatzConstants.hardwareMode) {
+        case REAL:
+          io = new ElevatorIOReal();
+          System.out.println("Elevator Configured for Real");
         break;
-      case REPLAY:
-        io = new ElevatorIOReal() {};
+        case REPLAY:
+          io = new ElevatorIOReal() {};
+          System.out.println("Elevator Configured for Replayed simulation");
         break;
-      default:
-        io = new ElevatorIOReal();
+        default:
+          io = null;
+          System.out.println("Elevator Unconfigured");
         break;
+      }
     }
   }
 
@@ -45,8 +74,8 @@ public class CatzElevator extends SubsystemBase {
     io.runMotor(elevatorSpeed); // System.out.println(tunableNumber.get());
   }
 
-  public Command runMotor() {
-    return startEnd(() -> elevatorSpeed = tunableNumber.getAsDouble(), () -> elevatorSpeed = 0);
+  public Command setElevatorPos() {
+    return runOnce(() ->  = tunableNumber.getAsDouble(), () -> elevatorSpeed = 0);
   }
 
   public Command runMotorBck() {
