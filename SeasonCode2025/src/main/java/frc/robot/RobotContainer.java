@@ -147,7 +147,6 @@ public class RobotContainer {
                   Translation2d unitRadius =
                       new Translation2d(selectedAngle.getCos(), selectedAngle.getSin());
                   Translation2d unitLeftRight = unitRadius.rotateBy(Rotation2d.fromDegrees(90));
-
                   Translation2d radius =
                       unitRadius.times(Reef.reefOrthogonalRadius + Reef.scoringDistance);
                   Translation2d leftRight =
