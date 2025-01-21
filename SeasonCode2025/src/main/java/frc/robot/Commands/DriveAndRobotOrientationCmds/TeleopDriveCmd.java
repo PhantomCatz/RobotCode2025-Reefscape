@@ -79,9 +79,7 @@ public class TeleopDriveCmd extends Command {
     // Obtain realtime joystick inputs with supplier methods
     m_headingAndVelocity_X = -m_headingPctOutput_Y.get();
     m_headingAndVelocity_Y = -m_headingPctOutput_X.get();
-    turningVelocity =
-        -m_angVelocityPctOutput
-            .get(); // alliance flip shouldn't change for turing speed when switching alliances
+    turningVelocity        = -m_angVelocityPctOutput.get(); // alliance flip shouldn't change for turing speed when switching alliances
 
     // Flip Directions for left joystick if alliance is red
     if (AllianceFlipUtil.shouldFlipToRed()) {
@@ -89,8 +87,7 @@ public class TeleopDriveCmd extends Command {
       m_headingAndVelocity_Y = -m_headingAndVelocity_Y;
     }
 
-    // Apply deadbands to prevent modules from receiving unintentional pwr due to joysticks having
-    // offset
+    // Apply deadbands to prevent modules from receiving unintentional pwr due to joysticks having offset
     m_headingAndVelocity_X =
         Math.abs(m_headingAndVelocity_X) > XboxInterfaceConstants.kDeadband
             ? m_headingAndVelocity_X * DriveConstants.DRIVE_CONFIG.maxLinearVelocity()
@@ -104,13 +101,10 @@ public class TeleopDriveCmd extends Command {
             ? turningVelocity * DriveConstants.DRIVE_CONFIG.maxAngularVelocity()
             : 0.0;
 
-    // Construct desired chassis speeds
-    Rotation2d flipped =
-        Rotation2d.fromDegrees(
-            -CatzRobotTracker.getInstance().getEstimatedPose().getRotation().getDegrees());
-    chassisSpeeds =
-        ChassisSpeeds.fromRobotRelativeSpeeds(
-            m_headingAndVelocity_X, m_headingAndVelocity_Y, turningVelocity, flipped);
+    // Construct desired chassis speeds 
+    //TODO understand why we need to flip the robot relative speeds on a live test on feild, Issue presented during 2025 api updates
+    Rotation2d flipped = Rotation2d.fromDegrees(-CatzRobotTracker.getInstance().getEstimatedPose().getRotation().getDegrees());
+    chassisSpeeds = ChassisSpeeds.fromRobotRelativeSpeeds(m_headingAndVelocity_X, m_headingAndVelocity_Y, turningVelocity, flipped);
 
     // Send new chassisspeeds object to the drivetrain
     m_drivetrain.drive(chassisSpeeds);
