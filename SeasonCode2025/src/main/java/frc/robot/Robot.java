@@ -347,6 +347,8 @@ public class Robot extends LoggedRobot {
   //        teleop
   //
   // --------------------------------------------------------------------------------------------------------
+
+
   @Override
   public void teleopInit() {
     // deployment benchmark
@@ -357,10 +359,12 @@ public class Robot extends LoggedRobot {
 
     teleStart = Timer.getFPGATimestamp();
     CatzRobotTracker.getInstance().resetPose(new Pose2d(Reef.center, new Rotation2d()));
+
   }
 
   @Override
   public void teleopPeriodic() {
+
     teleElapsedTime = Timer.getFPGATimestamp() - teleStart;
 
     ControllerModeAbstraction.periodicDebug();

@@ -224,4 +224,8 @@ public class RobotContainer {
   public Command getAutonomousCommand() {
     return auto.getCommand();
   }
+
+  public CatzAutonomous getAutonomous(){
+    return auto;
+  }
 }

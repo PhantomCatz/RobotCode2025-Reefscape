@@ -152,39 +152,38 @@ public class DriveConstants {
   public static final LoggedTunableNumber steerkP = new LoggedTunableNumber("Drive/Module/steerkP", MODULE_GAINS_AND_RATIOS.steerkP());
   public static final LoggedTunableNumber steerkD = new LoggedTunableNumber("Drive/Module/steerkD", MODULE_GAINS_AND_RATIOS.steerkD());
 
-  public static final ModuleIDs[] MODULE_CONFIGS = //TODO use index to determine Module ID record
-      switch (CatzConstants.getRobotType()) {
-        case SN2 ->
-            new ModuleIDs[] {
-              new ModuleIDs(1, 2, 9, 1.4196464857 / Math.PI / 2 + 0.5, false),
-              new ModuleIDs(3, 4, 10, 4.6208462275 / Math.PI / 2 + 0.5, false),
-              new ModuleIDs(5, 6, 11, 0.6691969510 / Math.PI / 2, false),
-              new ModuleIDs(7, 8, 12, 2.0568857418 / Math.PI / 2, false)
-            };
+  public static final ModuleIDs[] MODULE_CONFIGS = new ModuleIDs[4];
+  static{
+    switch(CatzConstants.getRobotType()){
+        case SN2:
+            MODULE_CONFIGS[INDEX_FR] = new ModuleIDs(1, 2, 9, 1.4196464857 / Math.PI / 2 + 0.5, false);
+            MODULE_CONFIGS[INDEX_BR] = new ModuleIDs(3, 4, 10, 4.6208462275 / Math.PI / 2 + 0.5, false);
+            MODULE_CONFIGS[INDEX_BL] = new ModuleIDs(5, 6, 11, 0.6691969510 / Math.PI / 2, false);
+            MODULE_CONFIGS[INDEX_FL] = new ModuleIDs(7, 8, 12, 2.0568857418 / Math.PI / 2, false);
+        break;
 
-        case SN1 ->
-            new ModuleIDs[] {
-                new ModuleIDs(1, 2, 11, 0.8887, false), // FR
-                new ModuleIDs(3, 4, 12, -1.6421, false), // BR
-                new ModuleIDs(5, 6, 13, -0.882, false), // BL
-                new ModuleIDs(7, 8, 14, -0.7688, false) // FL
-            };
-        case SN_TEST ->
-            new ModuleIDs[] {
-              new ModuleIDs(1, 2, 9, 0.0, false),
-              new ModuleIDs(3, 4, 8, 0.0, false),
-              new ModuleIDs(5, 6, 7, 0.0, false),
-              new ModuleIDs(7, 8, 6, 0.0, false)
-            };
+        case SN1:
+            MODULE_CONFIGS[INDEX_FR] = new ModuleIDs(1, 2, 11, 0.8887, false);
+            MODULE_CONFIGS[INDEX_BR] = new ModuleIDs(3, 4, 12, -1.6421, false);
+            MODULE_CONFIGS[INDEX_BL] = new ModuleIDs(5, 6, 13, -0.882, false);
+            MODULE_CONFIGS[INDEX_FL] = new ModuleIDs(7, 8, 14, -0.7688, false);
+        break;
 
-        case SN1_2024 ->
-            new ModuleIDs[] {
-              new ModuleIDs(1, 2, 1, 0.7066, false), // FL
-              new ModuleIDs(3, 4, 2, 1.0682, false), // BL
-              new ModuleIDs(5, 6, 3, 1.2969, false), // BR
-              new ModuleIDs(7, 8, 4, 1.4919, false) // FR
-            };
-      };
+        case SN_TEST:
+            MODULE_CONFIGS[INDEX_FR] = new ModuleIDs(1, 2, 9, 0.0, false);
+            MODULE_CONFIGS[INDEX_BR] = new ModuleIDs(3, 4, 8, 0.0, false);
+            MODULE_CONFIGS[INDEX_BL] = new ModuleIDs(5, 6, 7, 0.0, false);
+            MODULE_CONFIGS[INDEX_FL] = new ModuleIDs(7, 8, 6, 0.0, false);
+        break;
+
+        case SN1_2024:
+            MODULE_CONFIGS[INDEX_FR] = new ModuleIDs(1, 2, 1, 0.7066, false);
+            MODULE_CONFIGS[INDEX_BR] = new ModuleIDs(3, 4, 2, 1.0682, false);
+            MODULE_CONFIGS[INDEX_BL] = new ModuleIDs(5, 6, 3, 1.2969, false);
+            MODULE_CONFIGS[INDEX_FL] = new ModuleIDs(7, 8, 4, 1.4919, false);
+        break;
+    }
+  }
 
   // -----------------------------------------------------------------------------------------------------------------------------
   //
@@ -197,34 +196,16 @@ public class DriveConstants {
               DRIVE_CONFIG.maxLinearAcceleration, // max vel causing messup
           DRIVE_CONFIG.maxAngularVelocity, DRIVE_CONFIG.maxAngularAcceleration);
 
-  public static final Translation2d[] MODULE_TRANSLATIONS =
-      new Translation2d[] {
-        new Translation2d(DRIVE_CONFIG.robotLengthX(), -DRIVE_CONFIG.robotWidthY())
-            .div(2.0), // RT FRONT
-        new Translation2d(-DRIVE_CONFIG.robotLengthX(), -DRIVE_CONFIG.robotWidthY())
-            .div(2.0), // RT BACK
-        new Translation2d(-DRIVE_CONFIG.robotLengthX(), DRIVE_CONFIG.robotWidthY())
-            .div(2.0), // LT BACK
-        new Translation2d(DRIVE_CONFIG.robotLengthX(), DRIVE_CONFIG.robotWidthY())
-            .div(2.0) // LT FRONT
-      };
-
-  public static final Translation2d[] TRAJECTORY_MODULE_TRANSLATIONS =
-      new Translation2d[] {
-        new Translation2d(DRIVE_CONFIG.robotLengthX(), DRIVE_CONFIG.robotWidthY())
-            .div(2.0), // LT FRONT
-        new Translation2d(DRIVE_CONFIG.robotLengthX(), -DRIVE_CONFIG.robotWidthY())
-            .div(2.0), // RT FRONT
-        new Translation2d(-DRIVE_CONFIG.robotLengthX(), DRIVE_CONFIG.robotWidthY())
-            .div(2.0), // LT BACK
-        new Translation2d(-DRIVE_CONFIG.robotLengthX(), -DRIVE_CONFIG.robotWidthY())
-            .div(2.0), // RT BACK
-      };
+  public static final Translation2d[] MODULE_TRANSLATIONS = new Translation2d[4];
+  static {
+    MODULE_TRANSLATIONS[INDEX_FR] = new Translation2d(DRIVE_CONFIG.robotLengthX(), -DRIVE_CONFIG.robotWidthY()).div(2.0);
+    MODULE_TRANSLATIONS[INDEX_BR] = new Translation2d(-DRIVE_CONFIG.robotLengthX(), -DRIVE_CONFIG.robotWidthY()).div(2.0);
+    MODULE_TRANSLATIONS[INDEX_BL] = new Translation2d(-DRIVE_CONFIG.robotLengthX(), DRIVE_CONFIG.robotWidthY()).div(2.0);
+    MODULE_TRANSLATIONS[INDEX_FL] = new Translation2d(DRIVE_CONFIG.robotLengthX(), DRIVE_CONFIG.robotWidthY()).div(2.0);
+  }
 
   // calculates the orientation and speed of individual swerve modules when given
   // the motion of the whole robot
-  public static final SwerveDriveKinematics TRAJECTORY_SWERVE_KINEMATICS =
-      new SwerveDriveKinematics(TRAJECTORY_MODULE_TRANSLATIONS);
   public static final SwerveDriveKinematics SWERVE_KINEMATICS =
       new SwerveDriveKinematics(MODULE_TRANSLATIONS);
 
@@ -278,7 +259,7 @@ public class DriveConstants {
 
   public static final RobotConfig TRAJECTORY_CONFIG =
       new RobotConfig(
-          ROBOT_MASS, ROBOT_MOI, TRAJECTORY_MODULE_CONFIG, TRAJECTORY_MODULE_TRANSLATIONS);
+          ROBOT_MASS, ROBOT_MOI, TRAJECTORY_MODULE_CONFIG, MODULE_TRANSLATIONS);
 
   // -----------------------------------------------------------------------------------------------------------------------------
   //
