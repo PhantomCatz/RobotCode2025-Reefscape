@@ -41,6 +41,11 @@ public class DriveConstants {
   public static final int INDEX_BL = 2;
   public static final int INDEX_FL = 3;
 
+  public static final int TRAJ_INDEX_FL = 0;
+  public static final int TRAJ_INDEX_FR = 1;
+  public static final int TRAJ_INDEX_BL = 2;
+  public static final int TRAJ_INDEX_BR = 3;
+
   public static final int GYRO_ID = 0;
 
   // ---------------------------------------------------------------------------------------------------------------
@@ -204,6 +209,14 @@ public class DriveConstants {
     MODULE_TRANSLATIONS[INDEX_FL] = new Translation2d(DRIVE_CONFIG.robotLengthX(), DRIVE_CONFIG.robotWidthY()).div(2.0);
   }
 
+  public static final Translation2d[] TRAJECTORY_MODULE_TRANSLATIONS = new Translation2d[4];
+  static {
+    TRAJECTORY_MODULE_TRANSLATIONS[TRAJ_INDEX_FL] = new Translation2d(DRIVE_CONFIG.robotLengthX(), DRIVE_CONFIG.robotWidthY()).div(2.0);
+    TRAJECTORY_MODULE_TRANSLATIONS[TRAJ_INDEX_FR] = new Translation2d(DRIVE_CONFIG.robotLengthX(), -DRIVE_CONFIG.robotWidthY()).div(2.0);
+    TRAJECTORY_MODULE_TRANSLATIONS[TRAJ_INDEX_BL] = new Translation2d(-DRIVE_CONFIG.robotLengthX(), DRIVE_CONFIG.robotWidthY()).div(2.0);
+    TRAJECTORY_MODULE_TRANSLATIONS[TRAJ_INDEX_BR] = new Translation2d(-DRIVE_CONFIG.robotLengthX(), -DRIVE_CONFIG.robotWidthY()).div(2.0);
+  }
+
   // calculates the orientation and speed of individual swerve modules when given
   // the motion of the whole robot
   public static final SwerveDriveKinematics SWERVE_KINEMATICS =
@@ -259,7 +272,7 @@ public class DriveConstants {
 
   public static final RobotConfig TRAJECTORY_CONFIG =
       new RobotConfig(
-          ROBOT_MASS, ROBOT_MOI, TRAJECTORY_MODULE_CONFIG, MODULE_TRANSLATIONS);
+          ROBOT_MASS, ROBOT_MOI, TRAJECTORY_MODULE_CONFIG, TRAJECTORY_MODULE_TRANSLATIONS);
 
   // -----------------------------------------------------------------------------------------------------------------------------
   //
