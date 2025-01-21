@@ -20,7 +20,7 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.simulation.DCMotorSim;
 import frc.robot.CatzConstants;
-import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.Drivetrain.DriveConstants.ModuleIDsAndCurrentLimits;
+import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.Drivetrain.DriveConstants.ModuleIDs;
 
 public class ModuleIOSim implements ModuleIO {
   private final LinearSystem<N2, N1, N2> plantDrive =
@@ -47,7 +47,7 @@ public class ModuleIOSim implements ModuleIO {
   private boolean driveCoast = false;
   private SlewRateLimiter driveVoltsLimiter = new SlewRateLimiter(2.5);
 
-  public ModuleIOSim(ModuleIDsAndCurrentLimits config) {
+  public ModuleIOSim(ModuleIDs config) {
     steerAbsoluteInitPosition =
         Rotation2d.fromRadians(Units.rotationsToRadians(config.absoluteEncoderOffset()));
     steerFeedback.enableContinuousInput(-Math.PI, Math.PI);
