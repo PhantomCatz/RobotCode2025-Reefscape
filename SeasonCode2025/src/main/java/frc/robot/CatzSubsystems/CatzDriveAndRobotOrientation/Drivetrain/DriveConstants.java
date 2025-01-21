@@ -195,25 +195,26 @@ public class DriveConstants {
   //      Drivebase controller/object definements
   //
   // -----------------------------------------------------------------------------------------------------------------------------
-  public static final PathConstraints PATHFINDING_CONSTRAINTS =
-      new PathConstraints( // 540 // 720
-          DRIVE_CONFIG.maxLinearVelocity,
-              DRIVE_CONFIG.maxLinearAcceleration, // max vel causing messup
-          DRIVE_CONFIG.maxAngularVelocity, DRIVE_CONFIG.maxAngularAcceleration);
+  public static final PathConstraints PATHFINDING_CONSTRAINTS = new PathConstraints( // 540 // 720
+                                                                        DRIVE_CONFIG.maxLinearVelocity,
+                                                                        DRIVE_CONFIG.maxLinearAcceleration, // max vel causing messup
+                                                                        DRIVE_CONFIG.maxAngularVelocity, 
+                                                                        DRIVE_CONFIG.maxAngularAcceleration
+                                                                );
 
   public static final Translation2d[] MODULE_TRANSLATIONS = new Translation2d[4];
   static {
-    MODULE_TRANSLATIONS[INDEX_FR] = new Translation2d(DRIVE_CONFIG.robotLengthX(), -DRIVE_CONFIG.robotWidthY()).div(2.0);
+    MODULE_TRANSLATIONS[INDEX_FR] = new Translation2d( DRIVE_CONFIG.robotLengthX(), -DRIVE_CONFIG.robotWidthY()).div(2.0);
     MODULE_TRANSLATIONS[INDEX_BR] = new Translation2d(-DRIVE_CONFIG.robotLengthX(), -DRIVE_CONFIG.robotWidthY()).div(2.0);
-    MODULE_TRANSLATIONS[INDEX_BL] = new Translation2d(-DRIVE_CONFIG.robotLengthX(), DRIVE_CONFIG.robotWidthY()).div(2.0);
-    MODULE_TRANSLATIONS[INDEX_FL] = new Translation2d(DRIVE_CONFIG.robotLengthX(), DRIVE_CONFIG.robotWidthY()).div(2.0);
+    MODULE_TRANSLATIONS[INDEX_BL] = new Translation2d(-DRIVE_CONFIG.robotLengthX(),  DRIVE_CONFIG.robotWidthY()).div(2.0);
+    MODULE_TRANSLATIONS[INDEX_FL] = new Translation2d( DRIVE_CONFIG.robotLengthX(),  DRIVE_CONFIG.robotWidthY()).div(2.0);
   }
 
   public static final Translation2d[] TRAJECTORY_MODULE_TRANSLATIONS = new Translation2d[4];
   static {
-    TRAJECTORY_MODULE_TRANSLATIONS[TRAJ_INDEX_FL] = new Translation2d(DRIVE_CONFIG.robotLengthX(), DRIVE_CONFIG.robotWidthY()).div(2.0);
-    TRAJECTORY_MODULE_TRANSLATIONS[TRAJ_INDEX_FR] = new Translation2d(DRIVE_CONFIG.robotLengthX(), -DRIVE_CONFIG.robotWidthY()).div(2.0);
-    TRAJECTORY_MODULE_TRANSLATIONS[TRAJ_INDEX_BL] = new Translation2d(-DRIVE_CONFIG.robotLengthX(), DRIVE_CONFIG.robotWidthY()).div(2.0);
+    TRAJECTORY_MODULE_TRANSLATIONS[TRAJ_INDEX_FL] = new Translation2d( DRIVE_CONFIG.robotLengthX(),  DRIVE_CONFIG.robotWidthY()).div(2.0);
+    TRAJECTORY_MODULE_TRANSLATIONS[TRAJ_INDEX_FR] = new Translation2d( DRIVE_CONFIG.robotLengthX(), -DRIVE_CONFIG.robotWidthY()).div(2.0);
+    TRAJECTORY_MODULE_TRANSLATIONS[TRAJ_INDEX_BL] = new Translation2d(-DRIVE_CONFIG.robotLengthX(),  DRIVE_CONFIG.robotWidthY()).div(2.0);
     TRAJECTORY_MODULE_TRANSLATIONS[TRAJ_INDEX_BR] = new Translation2d(-DRIVE_CONFIG.robotLengthX(), -DRIVE_CONFIG.robotWidthY()).div(2.0);
   }
 
@@ -251,20 +252,15 @@ public class DriveConstants {
 
   public static final double ROBOT_MASS = 68.0;
   public static final double ROBOT_MOI =
-      (1.0 / 12.0)
-          * ROBOT_MASS
-          * (Math.pow(DRIVE_CONFIG.bumperWidthX(), 2)
-              + Math.pow(
-                  DRIVE_CONFIG.bumperWidthY(),
-                  2)); // ROBOT_MASS * (2/2) * (kA_ANGULAR_ACCEL/kA_LINEAR_ACCEL); // TODO need to
+      (1.0 / 12.0) * ROBOT_MASS * (Math.pow(DRIVE_CONFIG.bumperWidthX(), 2) + Math.pow(DRIVE_CONFIG.bumperWidthY(),2)); // ROBOT_MASS * (2/2) * (kA_ANGULAR_ACCEL/kA_LINEAR_ACCEL); // TODO need to
   // recaculate with formula on Pathplanner
+
   public static final double TREAD_COEF_FRICTION = 1.542;
 
   public static final ModuleConfig TRAJECTORY_MODULE_CONFIG =
       new ModuleConfig(
           DRIVE_CONFIG.wheelRadius(),
-          DRIVE_CONFIG.maxLinearVelocity()
-              * 8, // TODO possibly need to scale down to prevent wheel slip
+          DRIVE_CONFIG.maxLinearVelocity() * 8, // TODO possibly need to scale down to prevent wheel slip, only here for sim implementation
           TREAD_COEF_FRICTION,
           DCMotor.getKrakenX60(1).withReduction(MODULE_GAINS_AND_RATIOS.driveReduction()),
           DRIVE_CURRENT_LIMIT,

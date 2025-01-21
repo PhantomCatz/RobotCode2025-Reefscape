@@ -56,14 +56,10 @@ public class RobotContainer {
   // -------------------------------------------------------------------------------------------------------------------
   // Alert Declaration
   // -------------------------------------------------------------------------------------------------------------------
-  private final Alert disconnectedAlertDrive =
-      new Alert("Driver controller disconnected (port 0).", AlertType.kWarning);
-  private final Alert disconnectedAlertAux =
-      new Alert("Operator controller disconnected (port 1).", AlertType.kWarning);
-  private final LoggedNetworkNumber endgameAlert1 =
-      new LoggedNetworkNumber("Endgame Alert #1", 30.0);
-  private final LoggedNetworkNumber endgameAlert2 =
-      new LoggedNetworkNumber("Endgame Alert #2", 15.0);
+  private final Alert disconnectedAlertDrive      = new Alert("Driver controller disconnected (port 0).", AlertType.kWarning);
+  private final Alert disconnectedAlertAux        = new Alert("Operator controller disconnected (port 1).", AlertType.kWarning);
+  private final LoggedNetworkNumber endgameAlert1 = new LoggedNetworkNumber("Endgame Alert #1", 30.0);
+  private final LoggedNetworkNumber endgameAlert2 = new LoggedNetworkNumber("Endgame Alert #2", 15.0);
 
   // -------------------------------------------------------------------------------------------------------------------
   // Auto Declaration
