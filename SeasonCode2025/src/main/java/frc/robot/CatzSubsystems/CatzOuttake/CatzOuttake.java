@@ -23,7 +23,6 @@ public class CatzOuttake extends SubsystemBase {
   public enum outtakeStates {
     ADJ_INIT,
     ADJ_BACK,
-    ADJ_FINAL,
     SCORE,
     STOP
   }
@@ -63,40 +62,13 @@ public class CatzOuttake extends SubsystemBase {
       case ADJ_BACK:
         case_adjustBack();
         break;
-      case ADJ_FINAL:
-        case_adjustFinal();
-        break;
       case SCORE:
         case_shoot();
         break;
-        // case STOP: runMotor(1.0,1.0);
-        // break;
+      case STOP: io.runMotor(0,0);
+        break;
     }
     // previousState = currentState;
-  }
-
-  public Command runMotor() {
-    return run(() -> io.runMotor(outtakeLeft, outtakeRight));
-  }
-
-  public Command runMotorBck(double spd) {
-    return run(() -> io.runMotorBck(spd));
-  }
-
-  public Command runMotorLeft(double spd) {
-    return run(() -> runMotorLeft(spd));
-  }
-
-  public Command runMotorRight(double spd) {
-    return run(() -> runMotorRight(spd));
-  }
-
-  public Command startIntaking() {
-    return run(() -> currentState = outtakeStates.ADJ_INIT);
-  }
-
-  public Command startOuttake() {
-    return run(() -> currentState = outtakeStates.SCORE);
   }
 
   // ============================================
@@ -106,32 +78,45 @@ public class CatzOuttake extends SubsystemBase {
   // ============================================
 
   private void case_adjustInit() {
-    // runMotor(adj_speed);
-
+    System.out.println("using case_adjustInit");
+    io.runMotor(adj_speed, adj_speed);
     if (inputs.bbreakFrntTriggered) {
       currentState = outtakeStates.ADJ_BACK;
     }
   }
 
   private void case_adjustBack() {
-    if (!inputs.bbreakBackTriggered) {
-      runMotorBck(adj_speed);
-      currentState = outtakeStates.ADJ_FINAL;
-    }
-  }
+    System.out.println("using case_adjustBack");
 
-  private void case_adjustFinal() {
+    io.runMotor(-adj_speed, -adj_speed);
     if (inputs.bbreakBackTriggered) {
       currentState = outtakeStates.STOP;
     }
   }
 
   private void case_shoot() {
-    runMotorLeft(outtakeLeft);
-    runMotorRight(outtakeRight);
-    // if(!inputs.bbreakFrntTriggered) {
-    //     currentState = outtakeStates.STOP;
-    // }
+    System.out.println("using case_shoot");
 
+    io.runMotor(outtakeLeft, outtakeRight);    
+    if(!inputs.bbreakFrntTriggered) {
+        currentState = outtakeStates.STOP;
+    }
   }
+
+
+  //=========================================================
+  //
+  //      Command access methods
+  //
+  //=========================================================
+
+  
+  public Command startIntaking() {
+    return run(() -> currentState = outtakeStates.ADJ_INIT);
+  }
+
+  public Command startOuttake() {
+    return run(() -> currentState = outtakeStates.SCORE);
+  }
+
 }
