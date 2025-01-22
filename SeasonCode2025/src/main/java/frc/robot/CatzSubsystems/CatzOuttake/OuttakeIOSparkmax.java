@@ -20,21 +20,22 @@ public class OuttakeIOSparkmax implements OuttakeIO {
   private final DigitalInput beamBreakBck;
   private final DigitalInput beamBreakFrnt;
 
-  private final SparkMax OuttakeLeftMtr;
-  private final SparkMax OuttakeRightMtr;
+  private final SparkMax outtakeMotor1;
+  private final SparkMax outtakeMotor2;
 
   public OuttakeIOSparkmax() {
-    OuttakeLeftMtr = new SparkMax(1, MotorType.kBrushless);
-    OuttakeRightMtr = new SparkMax(2, MotorType.kBrushless);
+    outtakeMotor1 = new SparkMax(1, MotorType.kBrushless);
+    outtakeMotor2 = new SparkMax(2, MotorType.kBrushless);
 
     SparkMaxConfig globalConfig = new SparkMaxConfig();
 
-    globalConfig.smartCurrentLimit(50);
+    globalConfig.smartCurrentLimit(50).idleMode(IdleMode.kBrake);
     globalConfig.idleMode(IdleMode.kBrake);
-    globalConfig.voltageCompensation(12);
 
-    OuttakeLeftMtr.configure(globalConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
-    OuttakeRightMtr.configure(globalConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+    outtakeMotor1.configure(
+        globalConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+    outtakeMotor2.configure(
+        globalConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 
     beamBreakBck = new DigitalInput(3);
     beamBreakFrnt = new DigitalInput(6);
@@ -49,23 +50,23 @@ public class OuttakeIOSparkmax implements OuttakeIO {
   @Override
   public void runMotor(double speed, double speed2) {
 
-    OuttakeLeftMtr.set(-speed);
-    OuttakeRightMtr.set(speed);
+    outtakeMotor1.set(-speed);
+    outtakeMotor2.set(speed);
   }
 
   @Override
   public void runMotorBck(double speed) {
-    OuttakeLeftMtr.set(speed);
-    OuttakeRightMtr.set(-speed);
+    outtakeMotor1.set(speed);
+    outtakeMotor2.set(-speed);
   }
 
   @Override
   public void runMotorLeft(double speed) {
-    OuttakeLeftMtr.set(-speed);
+    outtakeMotor1.set(-speed);
   }
 
   @Override
   public void runMotorRight(double speed) {
-    OuttakeRightMtr.set(speed);
+    outtakeMotor2.set(speed);
   }
 }

@@ -356,7 +356,7 @@ public class Robot extends LoggedRobot {
     }
 
     teleStart = Timer.getFPGATimestamp();
-    CatzRobotTracker.getInstance().resetPose(new Pose2d(Reef.center, new Rotation2d())); //TODO remove
+    CatzRobotTracker.getInstance().resetPose(new Pose2d(Reef.center, new Rotation2d()));
   }
 
   @Override
