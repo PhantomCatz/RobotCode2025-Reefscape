@@ -75,35 +75,25 @@ public class Robot extends LoggedRobot {
   //        Alerts
   // --------------------------------------------------------------------------------------------------------
   // CAN
-  private final Alert CAN_ERROR_ALERT =
-      new Alert("CAN errors detected, robot may not be controllable.", AlertType.kError);
+  private final Alert CAN_ERROR_ALERT = new Alert("CAN errors detected", AlertType.kError);
 
   // Battery Alerts
-  private final Alert LOW_BATTERY_ALERT =
-      new Alert(
-          "Battery voltage is very low, consider turning off the robot or replacing the battery.",
-          AlertType.kWarning);
-  private final Alert SAME_BATTERY_ALERT =
-      new Alert("The battery has not been changed since the last match.", AlertType.kError);
+  private final Alert LOW_BATTERY_ALERT  = new Alert("Battery voltage is below 11 volts, replace battery", AlertType.kWarning);
+  private final Alert SAME_BATTERY_ALERT = new Alert("The battery not changed since last match.", AlertType.kError);
 
   // Garbage Collection Alerts
-  private final Alert GC_COLLECTION_ALERT =
-      new Alert("Please wait to enable, collecting garbage.", AlertType.kWarning);
+  private final Alert GC_COLLECTION_ALERT = new Alert("Please wait to enable, collecting garbage.", AlertType.kWarning);
   private int garbageCollectionCounter = 0;
 
   // DriverStation related alerts
-  private final Alert DS_DISCONNECT_ALERT =
-      new Alert("Driverstation is not online, alliance selection will not work", AlertType.kError);
-  private final Alert FMS_DISCONNECT_ALERT =
-      new Alert("fms is offline, robot cannot compete in match", AlertType.kError);
+  private final Alert DS_DISCONNECT_ALERT = new Alert("Driverstation is not online, alliance selection will not work", AlertType.kError);
+  private final Alert FMS_DISCONNECT_ALERT = new Alert("fms is offline, robot cannot compete in match", AlertType.kError);
 
   // Last deployment logging
   Date date = Calendar.getInstance().getTime();
   SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd kk.mm.ss");
-  ;
   String dateFormatted = sdf.format(date);
-  private final Alert LAST_DEPLOYMENT_WARNING =
-      new Alert("Last Deployment: " + dateFormatted, AlertType.kInfo);
+  private final Alert LAST_DEPLOYMENT_WARNING = new Alert("Last Deployment: " + dateFormatted, AlertType.kInfo);
 
   // reset Position Logging
   public static boolean isResetPositionUsedInAuto = false;
@@ -347,6 +337,8 @@ public class Robot extends LoggedRobot {
   //        teleop
   //
   // --------------------------------------------------------------------------------------------------------
+
+
   @Override
   public void teleopInit() {
     // deployment benchmark
@@ -361,6 +353,7 @@ public class Robot extends LoggedRobot {
 
   @Override
   public void teleopPeriodic() {
+
     teleElapsedTime = Timer.getFPGATimestamp() - teleStart;
 
     ControllerModeAbstraction.periodicDebug();

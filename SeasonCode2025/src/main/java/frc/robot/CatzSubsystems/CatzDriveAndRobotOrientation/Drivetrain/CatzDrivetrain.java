@@ -163,9 +163,12 @@ public class CatzDrivetrain extends SubsystemBase {
             : getRotation2d();
 
     // Add observations to robot tracker
-    OdometryObservation observation =
-        new OdometryObservation(
-            wheelPositions, getModuleStates(), gyroAngle2d, Timer.getFPGATimestamp());
+    OdometryObservation observation = new OdometryObservation(
+                                                    wheelPositions, 
+                                                    getModuleStates(), 
+                                                    gyroAngle2d, 
+                                                    Timer.getFPGATimestamp()
+                                          );
     CatzRobotTracker.getInstance().addOdometryObservation(observation);
 
     // Update current velocities use gyro when possible
@@ -195,14 +198,12 @@ public class CatzDrivetrain extends SubsystemBase {
     // --------------------------------------------------------
     // Convert chassis speeds to individual module states and set module states
     // --------------------------------------------------------
-    SwerveModuleState[] moduleStates =
-        DriveConstants.SWERVE_KINEMATICS.toSwerveModuleStates(chassisSpeeds);
+    SwerveModuleState[] moduleStates = DriveConstants.SWERVE_KINEMATICS.toSwerveModuleStates(chassisSpeeds);
 
     // --------------------------------------------------------
     // Scale down wheel speeds
     // --------------------------------------------------------
-    SwerveDriveKinematics.desaturateWheelSpeeds(
-        moduleStates, DriveConstants.DRIVE_CONFIG.maxLinearVelocity());
+    SwerveDriveKinematics.desaturateWheelSpeeds(moduleStates, DriveConstants.DRIVE_CONFIG.maxLinearVelocity());
 
     // --------------------------------------------------------
     // Optimize Wheel Angles

@@ -41,6 +41,11 @@ public class DriveConstants {
   public static final int INDEX_BL = 2;
   public static final int INDEX_FL = 3;
 
+  public static final int TRAJ_INDEX_FL = 0;
+  public static final int TRAJ_INDEX_FR = 1;
+  public static final int TRAJ_INDEX_BL = 2;
+  public static final int TRAJ_INDEX_BR = 3;
+
   public static final int GYRO_ID = 0;
 
   // ---------------------------------------------------------------------------------------------------------------
@@ -53,24 +58,27 @@ public class DriveConstants {
   private static final double kA_ANGULAR_ACCEL = 0.0;
   private static final double kA_LINEAR_ACCEL = 0.0;
 
+  // Common Constants
+  private static final double ROBOT_WIDTH = 29.0;
+
   public static final DriveConfig DRIVE_CONFIG =
       switch (CatzConstants.getRobotType()) {
         case SN_TEST, SN2 ->
             DriveConfig.builder()
-                .wheelRadius(Units.inchesToMeters(1.8))
+                .wheelRadius(Units.inchesToMeters(2.0)) // TODO make these repeated numbers into constants
                 .robotLengthX(Units.inchesToMeters(29.0))
                 .robotWidthY(Units.inchesToMeters(29.0))
-                .bumperWidthX(Units.inchesToMeters(37))
-                .bumperWidthY(Units.inchesToMeters(33))
+                .bumperWidthX(Units.inchesToMeters(32))
+                .bumperWidthY(Units.inchesToMeters(32))
                 .maxLinearVelocity(Units.feetToMeters(17))
-                .maxLinearAcceleration(Math.pow(Units.feetToMeters(17), 2)) // TODO why square
+                .maxLinearAcceleration(Math.pow(Units.feetToMeters(17), 2)) // TODO emperically calculate
                 .maxAngularVelocity(Units.degreesToRadians(600)) // Radians
                 .maxAngularAcceleration(
                     Units.degreesToRadians(600)) // Radians // TODO verify angle constraints
                 .build();
         case SN1, SN1_2024 ->
-            new DriveConfig(
-                Units.inchesToMeters(2.01834634),
+            new DriveConfig( //TODO make the builder the same way for these configurations
+                Units.inchesToMeters(2.0),
                 Units.inchesToMeters(29.0),
                 Units.inchesToMeters(29.0),
                 Units.inchesToMeters(37),
@@ -99,7 +107,7 @@ public class DriveConstants {
                 5.5,
                 0.6,
                 0.0,
-                1.2, // 1.2, //TODO fix to account for non foc
+                1.2, // 1.2, //TODO fix to account for non foc // TODO characterize individual motors to ensure consistency before sn2
                 0.0,
                 0.001,
                 0.000,
@@ -132,7 +140,7 @@ public class DriveConstants {
   // -------------------------------------------------------------------------------
   // Odometry Constants
   // -------------------------------------------------------------------------------
-  public static final double ODOMETRY_FREQUENCY =
+  public static final double GYRO_UPDATE_FREQUENCY =
       switch (CatzConstants.getRobotType()) {
         case SN_TEST -> 50.0;
         case SN1, SN1_2024 -> 100.0;
@@ -142,92 +150,76 @@ public class DriveConstants {
   // ---------------------------------------------------------------------------------------------------------------------
   // Logged Tunable PIDF values for swerve modules
   // ---------------------------------------------------------------------------------------------------------------------
-  public static final LoggedTunableNumber drivekP =
-      new LoggedTunableNumber("Drive/Module/DrivekP", MODULE_GAINS_AND_RATIOS.drivekP());
-  public static final LoggedTunableNumber drivekD =
-      new LoggedTunableNumber("Drive/Module/DrivekD", MODULE_GAINS_AND_RATIOS.drivekD());
-  public static final LoggedTunableNumber drivekS =
-      new LoggedTunableNumber("Drive/Module/DrivekS", MODULE_GAINS_AND_RATIOS.driveFFkS());
-  public static final LoggedTunableNumber drivekV =
-      new LoggedTunableNumber("Drive/Module/DrivekV", MODULE_GAINS_AND_RATIOS.driveFFkV());
-  public static final LoggedTunableNumber steerkP =
-      new LoggedTunableNumber("Drive/Module/steerkP", MODULE_GAINS_AND_RATIOS.steerkP());
-  public static final LoggedTunableNumber steerkD =
-      new LoggedTunableNumber("Drive/Module/steerkD", MODULE_GAINS_AND_RATIOS.steerkD());
+  public static final LoggedTunableNumber drivekP = new LoggedTunableNumber("Drive/Module/DrivekP", MODULE_GAINS_AND_RATIOS.drivekP());
+  public static final LoggedTunableNumber drivekD = new LoggedTunableNumber("Drive/Module/DrivekD", MODULE_GAINS_AND_RATIOS.drivekD());
+  public static final LoggedTunableNumber drivekS = new LoggedTunableNumber("Drive/Module/DrivekS", MODULE_GAINS_AND_RATIOS.driveFFkS());
+  public static final LoggedTunableNumber drivekV = new LoggedTunableNumber("Drive/Module/DrivekV", MODULE_GAINS_AND_RATIOS.driveFFkV());
+  public static final LoggedTunableNumber steerkP = new LoggedTunableNumber("Drive/Module/steerkP", MODULE_GAINS_AND_RATIOS.steerkP());
+  public static final LoggedTunableNumber steerkD = new LoggedTunableNumber("Drive/Module/steerkD", MODULE_GAINS_AND_RATIOS.steerkD());
 
-  public static final ModuleIDsAndCurrentLimits[] MODULE_CONFIGS =
-      switch (CatzConstants.getRobotType()) {
-        case SN2 ->
-            new ModuleIDsAndCurrentLimits[] {
-              new ModuleIDsAndCurrentLimits(1, 2, 9, 1.4196464857 / Math.PI / 2 + 0.5, false),
-              new ModuleIDsAndCurrentLimits(3, 4, 10, 4.6208462275 / Math.PI / 2 + 0.5, false),
-              new ModuleIDsAndCurrentLimits(5, 6, 11, 0.6691969510 / Math.PI / 2, false),
-              new ModuleIDsAndCurrentLimits(7, 8, 12, 2.0568857418 / Math.PI / 2, false)
-            };
+  public static final ModuleIDs[] MODULE_CONFIGS = new ModuleIDs[4];
+  static{
+    switch(CatzConstants.getRobotType()){
+        case SN2:
+            MODULE_CONFIGS[INDEX_FR] = new ModuleIDs(1, 2, 9, 1.4196464857 / Math.PI / 2 + 0.5, false);
+            MODULE_CONFIGS[INDEX_BR] = new ModuleIDs(3, 4, 10, 4.6208462275 / Math.PI / 2 + 0.5, false);
+            MODULE_CONFIGS[INDEX_BL] = new ModuleIDs(5, 6, 11, 0.6691969510 / Math.PI / 2, false);
+            MODULE_CONFIGS[INDEX_FL] = new ModuleIDs(7, 8, 12, 2.0568857418 / Math.PI / 2, false);
+        break;
 
-        case SN1 ->
-            new ModuleIDsAndCurrentLimits[] {
-              new ModuleIDsAndCurrentLimits(7, 8, 14, -0.7688, false), // FL
-              new ModuleIDsAndCurrentLimits(5, 6, 13, -0.632, false), // BL
-              new ModuleIDsAndCurrentLimits(3, 4, 12, -1.6421, false), // BR
-              new ModuleIDsAndCurrentLimits(1, 2, 11, 0.8887, false) // FR
-            };
-        case SN_TEST ->
-            new ModuleIDsAndCurrentLimits[] {
-              new ModuleIDsAndCurrentLimits(1, 2, 9, 0.0, false),
-              new ModuleIDsAndCurrentLimits(3, 4, 8, 0.0, false),
-              new ModuleIDsAndCurrentLimits(5, 6, 7, 0.0, false),
-              new ModuleIDsAndCurrentLimits(7, 8, 6, 0.0, false)
-            };
+        case SN1:
+            MODULE_CONFIGS[INDEX_FR] = new ModuleIDs(1, 2, 11, 0.8887, false);
+            MODULE_CONFIGS[INDEX_BR] = new ModuleIDs(3, 4, 12, -1.6421, false);
+            MODULE_CONFIGS[INDEX_BL] = new ModuleIDs(5, 6, 13, -0.882, false);
+            MODULE_CONFIGS[INDEX_FL] = new ModuleIDs(7, 8, 14, -0.7688, false);
+        break;
 
-        case SN1_2024 ->
-            new ModuleIDsAndCurrentLimits[] {
-              new ModuleIDsAndCurrentLimits(1, 2, 1, 0.7066, false), // FL
-              new ModuleIDsAndCurrentLimits(3, 4, 2, 1.0682, false), // BL
-              new ModuleIDsAndCurrentLimits(5, 6, 3, 1.2969, false), // BR
-              new ModuleIDsAndCurrentLimits(7, 8, 4, 1.4919, false) // FR
-            };
-      };
+        case SN_TEST:
+            MODULE_CONFIGS[INDEX_FR] = new ModuleIDs(1, 2, 9, 0.0, false);
+            MODULE_CONFIGS[INDEX_BR] = new ModuleIDs(3, 4, 8, 0.0, false);
+            MODULE_CONFIGS[INDEX_BL] = new ModuleIDs(5, 6, 7, 0.0, false);
+            MODULE_CONFIGS[INDEX_FL] = new ModuleIDs(7, 8, 6, 0.0, false);
+        break;
+
+        case SN1_2024:
+            MODULE_CONFIGS[INDEX_FR] = new ModuleIDs(1, 2, 1, 0.7066, false);
+            MODULE_CONFIGS[INDEX_BR] = new ModuleIDs(3, 4, 2, 1.0682, false);
+            MODULE_CONFIGS[INDEX_BL] = new ModuleIDs(5, 6, 3, 1.2969, false);
+            MODULE_CONFIGS[INDEX_FL] = new ModuleIDs(7, 8, 4, 1.4919, false);
+        break;
+    }
+  }
 
   // -----------------------------------------------------------------------------------------------------------------------------
   //
   //      Drivebase controller/object definements
   //
   // -----------------------------------------------------------------------------------------------------------------------------
-  public static final PathConstraints PATHFINDING_CONSTRAINTS =
-      new PathConstraints( // 540 // 720
-          DRIVE_CONFIG.maxLinearVelocity,
-              DRIVE_CONFIG.maxLinearAcceleration, // max vel causing messup
-          DRIVE_CONFIG.maxAngularVelocity, DRIVE_CONFIG.maxAngularAcceleration);
+  public static final PathConstraints PATHFINDING_CONSTRAINTS = new PathConstraints( // 540 // 720
+                                                                        DRIVE_CONFIG.maxLinearVelocity,
+                                                                        DRIVE_CONFIG.maxLinearAcceleration, // max vel causing messup
+                                                                        DRIVE_CONFIG.maxAngularVelocity, 
+                                                                        DRIVE_CONFIG.maxAngularAcceleration
+                                                                );
 
-  public static final Translation2d[] MODULE_TRANSLATIONS =
-      new Translation2d[] {
-        new Translation2d(DRIVE_CONFIG.robotLengthX(), -DRIVE_CONFIG.robotWidthY())
-            .div(2.0), // RT FRONT
-        new Translation2d(-DRIVE_CONFIG.robotLengthX(), -DRIVE_CONFIG.robotWidthY())
-            .div(2.0), // RT BACK
-        new Translation2d(-DRIVE_CONFIG.robotLengthX(), DRIVE_CONFIG.robotWidthY())
-            .div(2.0), // LT BACK
-        new Translation2d(DRIVE_CONFIG.robotLengthX(), DRIVE_CONFIG.robotWidthY())
-            .div(2.0) // LT FRONT
-      };
+  public static final Translation2d[] MODULE_TRANSLATIONS = new Translation2d[4];
+  static {
+    MODULE_TRANSLATIONS[INDEX_FR] = new Translation2d( DRIVE_CONFIG.robotLengthX(), -DRIVE_CONFIG.robotWidthY()).div(2.0);
+    MODULE_TRANSLATIONS[INDEX_BR] = new Translation2d(-DRIVE_CONFIG.robotLengthX(), -DRIVE_CONFIG.robotWidthY()).div(2.0);
+    MODULE_TRANSLATIONS[INDEX_BL] = new Translation2d(-DRIVE_CONFIG.robotLengthX(),  DRIVE_CONFIG.robotWidthY()).div(2.0);
+    MODULE_TRANSLATIONS[INDEX_FL] = new Translation2d( DRIVE_CONFIG.robotLengthX(),  DRIVE_CONFIG.robotWidthY()).div(2.0);
+  }
 
-  public static final Translation2d[] TRAJECTORY_MODULE_TRANSLATIONS =
-      new Translation2d[] {
-        new Translation2d(DRIVE_CONFIG.robotLengthX(), DRIVE_CONFIG.robotWidthY())
-            .div(2.0), // LT FRONT
-        new Translation2d(DRIVE_CONFIG.robotLengthX(), -DRIVE_CONFIG.robotWidthY())
-            .div(2.0), // RT FRONT
-        new Translation2d(-DRIVE_CONFIG.robotLengthX(), DRIVE_CONFIG.robotWidthY())
-            .div(2.0), // LT BACK
-        new Translation2d(-DRIVE_CONFIG.robotLengthX(), -DRIVE_CONFIG.robotWidthY())
-            .div(2.0), // RT BACK
-      };
+  public static final Translation2d[] TRAJECTORY_MODULE_TRANSLATIONS = new Translation2d[4];
+  static {
+    TRAJECTORY_MODULE_TRANSLATIONS[TRAJ_INDEX_FL] = new Translation2d( DRIVE_CONFIG.robotLengthX(),  DRIVE_CONFIG.robotWidthY()).div(2.0);
+    TRAJECTORY_MODULE_TRANSLATIONS[TRAJ_INDEX_FR] = new Translation2d( DRIVE_CONFIG.robotLengthX(), -DRIVE_CONFIG.robotWidthY()).div(2.0);
+    TRAJECTORY_MODULE_TRANSLATIONS[TRAJ_INDEX_BL] = new Translation2d(-DRIVE_CONFIG.robotLengthX(),  DRIVE_CONFIG.robotWidthY()).div(2.0);
+    TRAJECTORY_MODULE_TRANSLATIONS[TRAJ_INDEX_BR] = new Translation2d(-DRIVE_CONFIG.robotLengthX(), -DRIVE_CONFIG.robotWidthY()).div(2.0);
+  }
 
   // calculates the orientation and speed of individual swerve modules when given
   // the motion of the whole robot
-  public static final SwerveDriveKinematics TRAJECTORY_SWERVE_KINEMATICS =
-      new SwerveDriveKinematics(TRAJECTORY_MODULE_TRANSLATIONS);
   public static final SwerveDriveKinematics SWERVE_KINEMATICS =
       new SwerveDriveKinematics(MODULE_TRANSLATIONS);
 
@@ -260,20 +252,15 @@ public class DriveConstants {
 
   public static final double ROBOT_MASS = 68.0;
   public static final double ROBOT_MOI =
-      (1.0 / 12.0)
-          * ROBOT_MASS
-          * (Math.pow(DRIVE_CONFIG.bumperWidthX(), 2)
-              + Math.pow(
-                  DRIVE_CONFIG.bumperWidthY(),
-                  2)); // ROBOT_MASS * (2/2) * (kA_ANGULAR_ACCEL/kA_LINEAR_ACCEL); // TODO need to
+      (1.0 / 12.0) * ROBOT_MASS * (Math.pow(DRIVE_CONFIG.bumperWidthX(), 2) + Math.pow(DRIVE_CONFIG.bumperWidthY(),2)); // ROBOT_MASS * (2/2) * (kA_ANGULAR_ACCEL/kA_LINEAR_ACCEL); // TODO need to
   // recaculate with formula on Pathplanner
+
   public static final double TREAD_COEF_FRICTION = 1.542;
 
   public static final ModuleConfig TRAJECTORY_MODULE_CONFIG =
       new ModuleConfig(
           DRIVE_CONFIG.wheelRadius(),
-          DRIVE_CONFIG.maxLinearVelocity()
-              * 0.8, // TODO possibly need to scale down to prevent wheel slip
+          DRIVE_CONFIG.maxLinearVelocity() * 8, // TODO possibly need to scale down to prevent wheel slip, only here for sim implementation
           TREAD_COEF_FRICTION,
           DCMotor.getKrakenX60(1).withReduction(MODULE_GAINS_AND_RATIOS.driveReduction()),
           DRIVE_CURRENT_LIMIT,
@@ -294,7 +281,7 @@ public class DriveConstants {
    * Record and Enum types
    *
    *******************************************************************************************/
-  public record ModuleIDsAndCurrentLimits(
+  public record ModuleIDs(
       int driveID,
       int steerID,
       int absoluteEncoderChannel,
