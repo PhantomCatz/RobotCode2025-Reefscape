@@ -18,12 +18,12 @@ jobs:
           java-version: "17"
       - name: Grant execute permission
         run: chmod +x SeasonCode2025/gradlew
-      - name: Check formatting
-        working-directory: SeasonCode2025
-        run: ./gradlew spotlessCheck
       - name: Fix Formatting
         working-directory: SeasonCode2025
         run: ./gradlew :spotlessApply
+      - name: Check formatting
+        working-directory: SeasonCode2025
+        run: ./gradlew spotlessCheck
       - name: Build robot code
         working-directory: SeasonCode2025
         run: ./gradlew build
