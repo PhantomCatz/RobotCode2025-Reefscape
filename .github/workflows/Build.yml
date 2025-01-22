@@ -19,6 +19,8 @@ jobs:
       - name: Grant execute permission
         run: chmod +x SeasonCode2025/gradlew
       - name: Check formatting
-        run: SeasonCode2025/gradlew spotlessCheck
+        working-directory: SeasonCode2025
+        run: ./gradlew spotlessCheck
       - name: Build robot code
-        run: SeasonCode2025/gradlew build
+        working-directory: SeasonCode2025
+        run: ./gradlew build
