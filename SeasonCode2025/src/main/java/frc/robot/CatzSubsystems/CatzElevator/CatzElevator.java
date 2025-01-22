@@ -75,7 +75,7 @@ public class CatzElevator extends SubsystemBase {
   }
 
   public Command setElevatorPos() {
-    return runOnce(() ->  = tunableNumber.getAsDouble(), () -> elevatorSpeed = 0);
+    return runOnce(() ->  elevatorSpeed = tunableNumber.getAsDouble());
   }
 
   public Command runMotorBck() {
