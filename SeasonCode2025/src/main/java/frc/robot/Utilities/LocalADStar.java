@@ -329,12 +329,13 @@ public class LocalADStar implements Pathfinder {
     if (needsReset) {
       reset(sStart, sGoal);
     }
+    System.out.println("doing work: " + doMinor + doMajor);
 
     if (doMinor || doMajor) {
       List<GridPosition> pathPositions = findReversePath(sStart, sGoal, obstacles);
+      System.out.println("created waypoints");
       List<Waypoint> waypoints =
           createWaypoints(pathPositions, realStartPos, realGoalPos, obstacles);
-
       pathLock.writeLock().lock();
       currentPathFull = pathPositions;
       currentWaypoints = waypoints;
@@ -394,15 +395,23 @@ public class LocalADStar implements Pathfinder {
 
     List<GridPosition> simplifiedPath = new ArrayList<>();
     simplifiedPath.add(path.get(path.size() - 1));
-    for (int i = path.size() - 1; i > 0; i--) {
-      for (int j = i - 1; j > 0; j--) {
-        if (!walkable(path.get(i), path.get(j), obstacles)) {
-          i = j + 1;
-          simplifiedPath.add(path.get(j));
-          break;
-        }
+    // for (int i = path.size() - 1; i > 0; i--) { //this cuts off too much for some reason, so the robot sometimes clips into the reef
+    //   for (int j = i - 1; j > 0; j--) {
+    //     if (!walkable(path.get(i), path.get(j), obstacles)) {
+    //       i = j + 1;
+    //       simplifiedPath.add(path.get(j));
+    //       break;
+    //     }
+    //   }
+    // }
+
+
+    for (int i = path.size() - 1; i > 0; i--) { //this never clips but it does slightly jiggle on the diagonals of the reef. im not sure how signficant this is irl
+      if (!walkable(simplifiedPath.get(path.size() - 1), path.get(i - 1), obstacles)) {
+        simplifiedPath.add(path.get(i));
       }
     }
+
     simplifiedPath.add(path.get(0));
 
     List<Translation2d> fieldPosPath = new ArrayList<>();

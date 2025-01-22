@@ -7,12 +7,10 @@
 
 package frc.robot.CatzSubsystems.CatzOuttake;
 
-import com.revrobotics.spark.SparkBase.PersistMode;
-import com.revrobotics.spark.SparkBase.ResetMode;
+
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkMax;
-import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
-import com.revrobotics.spark.config.SparkMaxConfig;
+
 import edu.wpi.first.wpilibj.DigitalInput;
 
 public class OuttakeIOSparkmax implements OuttakeIO {
@@ -27,7 +25,7 @@ public class OuttakeIOSparkmax implements OuttakeIO {
     OuttakeLeftMtr = new SparkMax(1, MotorType.kBrushless);
     OuttakeRightMtr = new SparkMax(2, MotorType.kBrushless);
 
-    SparkMaxConfig globalConfig = new SparkMaxConfig();
+    // SparkBaseConfig globalConfig = new SparkBaseConfig();
 
     globalConfig.smartCurrentLimit(50);
     globalConfig.idleMode(IdleMode.kBrake);
