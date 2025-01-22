@@ -17,8 +17,8 @@ jobs:
           distribution: "temurin"
           java-version: "17"
       - name: Grant execute permission
-        run: chmod +x gradlew
+        run: chmod +x gradle
       - name: Check formatting
-        run: ./gradlew spotlessCheck
+        run: ./gradle spotlessCheck
       - name: Build robot code
-        run: ./gradlew build
+        run: ./gradle build
