@@ -21,6 +21,9 @@ jobs:
       - name: Check formatting
         working-directory: SeasonCode2025
         run: ./gradlew spotlessCheck
+      - name: Fix Formatting
+        working-directory: SeasonCode2025
+        run: ./gradlew :spotlessApply
       - name: Build robot code
         working-directory: SeasonCode2025
         run: ./gradlew build
