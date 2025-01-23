@@ -24,6 +24,7 @@ import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
 import frc.robot.CatzConstants;
 import frc.robot.Utilities.LoggedTunableNumber;
+import frc.robot.Utilities.Swerve.ModuleLimits;
 import lombok.Builder;
 
 public class DriveConstants {
@@ -137,6 +138,9 @@ public class DriveConstants {
                 Mk4iReductions.steer.reduction);
       };
 
+  public static final ModuleLimits moduleLimitsFree =
+      new ModuleLimits(14, 17, Units.degreesToRadians(1080.0));
+
   // -------------------------------------------------------------------------------
   // Odometry Constants
   // -------------------------------------------------------------------------------
@@ -217,6 +221,7 @@ public class DriveConstants {
     TRAJECTORY_MODULE_TRANSLATIONS[TRAJ_INDEX_BL] = new Translation2d(-DRIVE_CONFIG.robotLengthX(),  DRIVE_CONFIG.robotWidthY()).div(2.0);
     TRAJECTORY_MODULE_TRANSLATIONS[TRAJ_INDEX_BR] = new Translation2d(-DRIVE_CONFIG.robotLengthX(), -DRIVE_CONFIG.robotWidthY()).div(2.0);
   }
+
 
   // calculates the orientation and speed of individual swerve modules when given
   // the motion of the whole robot
