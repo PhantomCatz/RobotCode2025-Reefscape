@@ -8,15 +8,15 @@
 package frc.robot.CatzSubsystems;
 
 public class CatzSuperstructure {
-    private CoralAlgae coralAlgae = CoralAlgae.CORAL;
+    private Gamepiece coralAlgae = Gamepiece.CORAL;
     private int level = 1;
 
-    public enum CoralAlgae{
+    public enum Gamepiece{
         CORAL,
         ALGAE
     }
 
-    public CoralAlgae getCoralAlgae(){
+    public Gamepiece getCoralAlgae(){
         return coralAlgae;
     }
 
@@ -24,7 +24,7 @@ public class CatzSuperstructure {
         return level;
     }
 
-    public void setCoralAlgae(CoralAlgae ca){
+    public void setCoralAlgae(Gamepiece ca){
         this.coralAlgae = ca;
     }
 

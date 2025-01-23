@@ -15,7 +15,7 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Autonomous.CatzAutonomous;
 import frc.robot.CatzSubsystems.CatzSuperstructure;
-import frc.robot.CatzSubsystems.CatzSuperstructure.CoralAlgae;
+import frc.robot.CatzSubsystems.CatzSuperstructure.Gamepiece;
 import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.CatzRobotTracker;
 import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.Drivetrain.CatzDrivetrain;
 import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.Vision.CatzVision;
@@ -102,9 +102,6 @@ public class RobotContainer {
   //  Button mapping to commands
   //
   // ---------------------------------------------------------------------------
-
-
-
   public enum LeftRight{
     LEFT(1),
     RIGHT(-1);
@@ -120,7 +117,6 @@ public class RobotContainer {
   int POVReefAngle = 0; // 0 = none, x = x/6 revolutions
   LeftRight leftRightReef = LeftRight.LEFT;
 
-
   private void configureBindings() {
     /* XBOX AUX */
 
@@ -128,17 +124,6 @@ public class RobotContainer {
     xboxDrv.start().onTrue(drive.cancelTrajectory());
 
     // Auto Driving
-    //   xboxDrv.y().onTrue(new
-    // FaceTarget(FieldConstants.Speaker.centerSpeakerOpening.toTranslation2d(), drive));
-    //   xboxDrv.b().toggleOnTrue(Commands.runOnce(() -> {
-    //       pathfindToOrigin = auto.getPathfindingCommand(new Pose2d(2, 7, new Rotation2d()));
-    //       pathfindToOrigin.schedule();
-    //   }));
-
-    //   xboxDrv.b().toggleOnFalse(Commands.runOnce(() -> {
-    //     pathfindToOrigin.cancel();
-    //   }));
-
     xboxDrv.povUp().onTrue(Commands.runOnce(() -> POVReefAngle = 0));
     xboxDrv.povUpLeft().onTrue(Commands.runOnce(() -> POVReefAngle = 1));
     xboxDrv.povDownLeft().onTrue(Commands.runOnce(() -> POVReefAngle = 2));
@@ -154,8 +139,8 @@ public class RobotContainer {
     xboxAux.povLeft().onTrue(Commands.runOnce(() -> superstructure.setLevel(3)));
     xboxAux.povDown().onTrue(Commands.runOnce(() -> superstructure.setLevel(4)));
 
-    xboxAux.leftBumper().onTrue(Commands.runOnce(() -> superstructure.setCoralAlgae(CoralAlgae.CORAL)));
-    xboxAux.rightBumper().onTrue(Commands.runOnce(() -> superstructure.setCoralAlgae(CoralAlgae.ALGAE)));
+    xboxAux.leftBumper().onTrue(Commands.runOnce(() -> superstructure.setCoralAlgae(Gamepiece.CORAL)));
+    xboxAux.rightBumper().onTrue(Commands.runOnce(() -> superstructure.setCoralAlgae(Gamepiece.ALGAE)));
 
     xboxAux.a().onTrue(Commands.runOnce(()->{
       System.out.println("L:"+superstructure.getLevel()+", "+superstructure.getCoralAlgae());
