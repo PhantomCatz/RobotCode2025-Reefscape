@@ -31,6 +31,8 @@ import frc.robot.Autonomous.CatzAutonomous.AutoScoringOptions;
 import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.*;
 import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.Drivetrain.DriveConstants;
 import frc.robot.Commands.DriveAndRobotOrientationCmds.TrajectoryDriveCmd;
+import frc.robot.FieldConstants.Reef;
+import frc.robot.RobotContainer.LeftRight;
 import frc.robot.RobotContainer;
 import frc.robot.Utilities.AllianceFlipUtil;
 import frc.robot.Utilities.JSONUtil;
@@ -176,7 +178,7 @@ public class CatzAutonomous extends VirtualSubsystem {
   //
   // ---------------------------------------------------------------------------------------------------------
 
-  public Command getPathfindingCommand(Pose2d goal) {
+  private Command getPathfindingCommand(Pose2d goal) {
     Translation2d robotPos = CatzRobotTracker.getInstance().getEstimatedPose().getTranslation();
     if (AllianceFlipUtil.shouldFlipToRed()) {
       robotPos = FlippingUtil.flipFieldPosition(robotPos);
@@ -193,6 +195,24 @@ public class CatzAutonomous extends VirtualSubsystem {
       return new TrajectoryDriveCmd(path, m_container.getCatzDrivetrain());
     }
   }
+
+  public Command calculateReefPos(int reefAngle, LeftRight leftRightPos){
+    Rotation2d selectedAngle = Rotation2d.fromRotations(reefAngle / 6.0);
+    Translation2d unitRadius =
+        new Translation2d(selectedAngle.getCos(), selectedAngle.getSin());
+    Translation2d unitLeftRight = unitRadius.rotateBy(Rotation2d.fromDegrees(90));
+    Translation2d radius =
+        unitRadius.times(Reef.reefOrthogonalRadius + Reef.scoringDistance);
+    Translation2d leftRight =
+        unitLeftRight.times(leftRightPos.NUM * Reef.leftRightDistance);
+    if (unitLeftRight.getY() < 0) {
+      leftRight = leftRight.times(-1);
+    }
+    Translation2d scoringPos = radius.plus(leftRight).plus(Reef.center);
+
+    return getPathfindingCommand(new Pose2d(scoringPos, selectedAngle.plus(Rotation2d.k180deg)));
+  }
+
 
   public Command pathfindThenFollowPath(AutoScoringOptions option) {
     Pose2d goal = new Pose2d(0, 0, new Rotation2d());

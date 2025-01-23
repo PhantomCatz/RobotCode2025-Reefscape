@@ -7,9 +7,6 @@
 
 package frc.robot;
 
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -17,6 +14,8 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Autonomous.CatzAutonomous;
+import frc.robot.CatzSubsystems.CatzSuperstructure;
+import frc.robot.CatzSubsystems.CatzSuperstructure.CoralAlgae;
 import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.CatzRobotTracker;
 import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.Drivetrain.CatzDrivetrain;
 import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.Vision.CatzVision;
@@ -26,7 +25,6 @@ import frc.robot.CatzSubsystems.CatzLEDs.CatzLED;
 import frc.robot.CatzSubsystems.CatzOuttake.CatzOuttake;
 import frc.robot.Commands.AutomatedSequenceCmds;
 import frc.robot.Commands.DriveAndRobotOrientationCmds.TeleopDriveCmd;
-import frc.robot.FieldConstants.Reef;
 import frc.robot.Utilities.Alert;
 import frc.robot.Utilities.Alert.AlertType;
 import org.littletonrobotics.junction.networktables.LoggedNetworkNumber;
@@ -46,6 +44,8 @@ public class RobotContainer {
 
   private static CatzOuttake outtake = new CatzOuttake();
   private static CatzElevator elevator = new CatzElevator();
+
+  private static CatzSuperstructure superstructure = new CatzSuperstructure();
 
   // ------------------------------------------------------------------------------------------------------------------
   // Drive Controller Declaration
@@ -102,9 +102,24 @@ public class RobotContainer {
   //  Button mapping to commands
   //
   // ---------------------------------------------------------------------------
+
+
+
+  public enum LeftRight{
+    LEFT(1),
+    RIGHT(-1);
+
+    public final int NUM;
+
+    private LeftRight(int num){
+      this.NUM  = num;
+    }
+  }
+
   Command currentPathfindingCommand = Commands.runOnce(() -> {});
   int POVReefAngle = 0; // 0 = none, x = x/6 revolutions
-  int bumperLeftRight = 0; // 0 = none, 1 = left, -1 = right
+  LeftRight leftRightReef = LeftRight.LEFT;
+
 
   private void configureBindings() {
     /* XBOX AUX */
@@ -131,30 +146,27 @@ public class RobotContainer {
     xboxDrv.povDownRight().onTrue(Commands.runOnce(() -> POVReefAngle = 4));
     xboxDrv.povUpRight().onTrue(Commands.runOnce(() -> POVReefAngle = 5));
 
-    xboxDrv.leftBumper().onTrue(Commands.runOnce(() -> bumperLeftRight = 1));
-    xboxDrv.rightBumper().onTrue(Commands.runOnce(() -> bumperLeftRight = -1));
+    xboxDrv.leftBumper().onTrue(Commands.runOnce(() -> leftRightReef = LeftRight.LEFT));
+    xboxDrv.rightBumper().onTrue(Commands.runOnce(() -> leftRightReef = LeftRight.RIGHT));
+
+    xboxAux.povRight().onTrue(Commands.runOnce(()->superstructure.setLevel(1)));
+    xboxAux.povUp().onTrue(Commands.runOnce(() -> superstructure.setLevel(2)));
+    xboxAux.povLeft().onTrue(Commands.runOnce(() -> superstructure.setLevel(3)));
+    xboxAux.povDown().onTrue(Commands.runOnce(() -> superstructure.setLevel(4)));
+
+    xboxAux.leftBumper().onTrue(Commands.runOnce(() -> superstructure.setCoralAlgae(CoralAlgae.CORAL)));
+    xboxAux.rightBumper().onTrue(Commands.runOnce(() -> superstructure.setCoralAlgae(CoralAlgae.ALGAE)));
+
+    xboxAux.a().onTrue(Commands.runOnce(()->{
+      System.out.println("L:"+superstructure.getLevel()+", "+superstructure.getCoralAlgae());
+    }));
 
     xboxDrv
         .a()
         .onTrue(
             Commands.runOnce(
                 () -> {
-                  System.out.println("pressed numtototontotnon");
-                  Rotation2d selectedAngle = Rotation2d.fromRotations(POVReefAngle / 6.0);
-                  Translation2d unitRadius =
-                      new Translation2d(selectedAngle.getCos(), selectedAngle.getSin());
-                  Translation2d unitLeftRight = unitRadius.rotateBy(Rotation2d.fromDegrees(90));
-                  Translation2d radius =
-                      unitRadius.times(Reef.reefOrthogonalRadius + Reef.scoringDistance);
-                  Translation2d leftRight =
-                      unitLeftRight.times(bumperLeftRight * Reef.leftRightDistance);
-                  if (unitLeftRight.getY() < 0) {
-                    leftRight = leftRight.times(-1);
-                  }
-                  Translation2d scoringPos = radius.plus(leftRight).plus(Reef.center);
-
-                  currentPathfindingCommand =
-                      auto.getPathfindingCommand(new Pose2d(scoringPos, selectedAngle.plus(Rotation2d.fromDegrees(180.0))));
+                  currentPathfindingCommand = auto.calculateReefPos(POVReefAngle, leftRightReef);
                   currentPathfindingCommand.schedule();
                 }));
 
