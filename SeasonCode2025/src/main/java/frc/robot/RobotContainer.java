@@ -139,6 +139,7 @@ public class RobotContainer {
         .onTrue(
             Commands.runOnce(
                 () -> {
+                  System.out.println("pressed numtototontotnon");
                   Rotation2d selectedAngle = Rotation2d.fromRotations(POVReefAngle / 6.0);
                   Translation2d unitRadius =
                       new Translation2d(selectedAngle.getCos(), selectedAngle.getSin());

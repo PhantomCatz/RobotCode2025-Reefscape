@@ -103,6 +103,9 @@ public class LocalADStar implements Pathfinder {
 
         nodeSize = ((Number) json.get("nodeSizeMeters")).doubleValue();
         JSONArray grid = (JSONArray) json.get("grid");
+
+        System.out.println(grid.size());
+
         nodesY = grid.size();
         for (int row = 0; row < grid.size(); row++) {
           JSONArray rowArray = (JSONArray) grid.get(row);
@@ -112,9 +115,13 @@ public class LocalADStar implements Pathfinder {
           for (int col = 0; col < rowArray.size(); col++) {
             boolean isObstacle = (boolean) rowArray.get(col);
             if (isObstacle) {
+              System.out.print("#");
               staticObstacles.add(new GridPosition(col, row));
+            } else {
+              System.out.print("_");
             }
           }
+          System.out.println();
         }
 
         JSONObject fieldSize = (JSONObject) json.get("field_size");
@@ -329,11 +336,9 @@ public class LocalADStar implements Pathfinder {
     if (needsReset) {
       reset(sStart, sGoal);
     }
-    System.out.println("doing work: " + doMinor + doMajor);
 
     if (doMinor || doMajor) {
       List<GridPosition> pathPositions = findReversePath(sStart, sGoal, obstacles);
-      System.out.println("created waypoints");
       List<Waypoint> waypoints =
           createWaypoints(pathPositions, realStartPos, realGoalPos, obstacles);
       pathLock.writeLock().lock();
@@ -395,23 +400,15 @@ public class LocalADStar implements Pathfinder {
 
     List<GridPosition> simplifiedPath = new ArrayList<>();
     simplifiedPath.add(path.get(path.size() - 1));
-    // for (int i = path.size() - 1; i > 0; i--) { //this cuts off too much for some reason, so the robot sometimes clips into the reef
-    //   for (int j = i - 1; j > 0; j--) {
-    //     if (!walkable(path.get(i), path.get(j), obstacles)) {
-    //       i = j + 1;
-    //       simplifiedPath.add(path.get(j));
-    //       break;
-    //     }
-    //   }
-    // }
-
-
-    for (int i = path.size() - 1; i > 0; i--) { //this never clips but it does slightly jiggle on the diagonals of the reef. im not sure how signficant this is irl
-      if (!walkable(simplifiedPath.get(path.size() - 1), path.get(i - 1), obstacles)) {
-        simplifiedPath.add(path.get(i));
+    for (int i = path.size() - 1; i > 0; i--) { //this cuts off too much for some reason, so the robot sometimes clips into the reef
+      for (int j = i - 1; j > 0; j--) {
+        if (!walkable(path.get(i), path.get(j), obstacles)) {
+          i = j + 1;
+          simplifiedPath.add(path.get(j));
+          break;
+        }
       }
     }
-
     simplifiedPath.add(path.get(0));
 
     List<Translation2d> fieldPosPath = new ArrayList<>();
@@ -528,111 +525,6 @@ public class LocalADStar implements Pathfinder {
     open.put(sGoal, key(sGoal, sStart));
   }
 
-  private void computeOrImprovePath(
-      GridPosition sStart, GridPosition sGoal, Set<GridPosition> obstacles) {
-
-    while (true) {
-      var sv = topKey();
-      if (sv == null) {
-        break;
-      }
-      var s = sv.getFirst();
-      var v = sv.getSecond();
-
-      if (comparePair(v, key(sStart, sStart)) >= 0 && rhs.get(sStart).equals(g.get(sStart))) {
-        break;
-      }
-
-      open.remove(s);
-
-      if (g.get(s) > rhs.get(s)) {
-        g.put(s, rhs.get(s));
-        closed.add(s);
-
-        for (GridPosition sn : getOpenNeighbors(s, obstacles)) {
-          updateState(sn, sStart, sGoal, obstacles);
-        }
-      } else {
-        g.put(s, Double.POSITIVE_INFINITY);
-        for (GridPosition sn : getOpenNeighbors(s, obstacles)) {
-          updateState(sn, sStart, sGoal, obstacles);
-        }
-        updateState(s, sStart, sGoal, obstacles);
-      }
-    }
-  }
-
-  private void updateState(
-      GridPosition s, GridPosition sStart, GridPosition sGoal, Set<GridPosition> obstacles) {
-    if (!s.equals(sGoal)) {
-      rhs.put(s, Double.POSITIVE_INFINITY);
-
-      for (GridPosition x : getOpenNeighbors(s, obstacles)) {
-        rhs.put(s, Math.min(rhs.get(s), g.get(x) + cost(s, x, obstacles)));
-      }
-    }
-
-    open.remove(s);
-
-    if (!g.get(s).equals(rhs.get(s))) {
-      if (!closed.contains(s)) {
-        open.put(s, key(s, sStart));
-      } else {
-        incons.put(s, Pair.of(0.0, 0.0));
-      }
-    }
-  }
-
-  private double cost(GridPosition sStart, GridPosition sGoal, Set<GridPosition> obstacles) {
-    if (isCollision(sStart, sGoal, obstacles)) {
-      return Double.POSITIVE_INFINITY;
-    }
-
-    return heuristic(sStart, sGoal);
-  }
-
-  private boolean isCollision(GridPosition sStart, GridPosition sEnd, Set<GridPosition> obstacles) {
-    if (obstacles.contains(sStart) || obstacles.contains(sEnd)) {
-      return true;
-    }
-
-    if (sStart.x != sEnd.x && sStart.y != sEnd.y) {
-      GridPosition s1;
-      GridPosition s2;
-
-      if (sEnd.x - sStart.x == sStart.y - sEnd.y) {
-        s1 = new GridPosition(Math.min(sStart.x, sEnd.x), Math.min(sStart.y, sEnd.y));
-        s2 = new GridPosition(Math.max(sStart.x, sEnd.x), Math.max(sStart.y, sEnd.y));
-      } else {
-        s1 = new GridPosition(Math.min(sStart.x, sEnd.x), Math.max(sStart.y, sEnd.y));
-        s2 = new GridPosition(Math.max(sStart.x, sEnd.x), Math.min(sStart.y, sEnd.y));
-      }
-
-      return obstacles.contains(s1) || obstacles.contains(s2);
-    }
-
-    return false;
-  }
-
-  private List<GridPosition> getOpenNeighbors(GridPosition s, Set<GridPosition> obstacles) {
-    List<GridPosition> ret = new ArrayList<>();
-
-    for (int xMove = -1; xMove <= 1; xMove++) {
-      for (int yMove = -1; yMove <= 1; yMove++) {
-        GridPosition sNext = new GridPosition(s.x + xMove, s.y + yMove);
-        if (!obstacles.contains(sNext)
-            && sNext.compareTo(s) != 0
-            && sNext.x >= 0
-            && sNext.x < nodesX
-            && sNext.y >= 0
-            && sNext.y < nodesY) {
-          ret.add(sNext);
-        }
-      }
-    }
-    return ret;
-  }
-
   private List<GridPosition> getAllNeighbors(GridPosition s) {
     List<GridPosition> ret = new ArrayList<>();
 
@@ -655,44 +547,19 @@ public class LocalADStar implements Pathfinder {
     }
   }
 
-  private Pair<GridPosition, Pair<Double, Double>> topKey() {
-    Map.Entry<GridPosition, Pair<Double, Double>> min = null;
-    for (var entry : open.entrySet()) {
-      if (min == null || comparePair(entry.getValue(), min.getValue()) < 0) {
-        min = entry;
-      }
-    }
-
-    if (min == null) {
-      return null;
-    }
-
-    return Pair.of(min.getKey(), min.getValue());
-  }
-
   private double heuristic(GridPosition sStart, GridPosition sGoal) {
     return Math.hypot(sGoal.x - sStart.x, sGoal.y - sStart.y);
   }
 
-  private int comparePair(Pair<Double, Double> a, Pair<Double, Double> b) {
-    int first = Double.compare(a.getFirst(), b.getFirst());
-    if (first == 0) {
-      return Double.compare(a.getSecond(), b.getSecond());
-    } else {
-      return first;
-    }
-  }
-
   private GridPosition getGridPos(Translation2d pos) {
-    int x = (int) Math.floor(pos.getX() / nodeSize);
-    int y = (int) Math.floor(pos.getY() / nodeSize);
+    int x = (int) Math.round(pos.getX() / nodeSize);
+    int y = (int) Math.round(pos.getY() / nodeSize);
 
     return new GridPosition(x, y);
   }
 
   private Translation2d gridPosToTranslation2d(GridPosition pos) {
-    return new Translation2d(
-        (pos.x * nodeSize) + (nodeSize / 2.0), (pos.y * nodeSize) + (nodeSize / 2.0));
+    return new Translation2d(pos.x * nodeSize, pos.y * nodeSize);
   }
 
   /**

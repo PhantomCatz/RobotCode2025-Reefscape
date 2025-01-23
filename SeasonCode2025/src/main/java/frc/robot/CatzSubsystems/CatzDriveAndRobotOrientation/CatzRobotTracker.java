@@ -102,7 +102,7 @@ public class CatzRobotTracker {
     // disabled
     Twist2d twist = KINEMATICS.toTwist2d(lastWheelPositions, observation.wheelPositions());
     lastWheelPositions = observation.wheelPositions();
-    // Check gyro connected
+    //Check gyro connected
     if (observation.gyroAngle != null) {
       // Update dtheta for twist if gyro connected
       twist =
@@ -110,7 +110,7 @@ public class CatzRobotTracker {
               twist.dx, twist.dy, observation.gyroAngle().minus(lastGyroAngle).getRadians());
       lastGyroAngle = observation.gyroAngle();
     }
-    // Add twist to odometry pose
+    //Add twist to odometry pose
     odometryPose = odometryPose.exp(twist);
     // Add pose to buffer at timestamp
     POSE_BUFFER.addSample(observation.timestamp(), odometryPose);
