@@ -24,7 +24,7 @@ import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.Voltage;
-import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.Drivetrain.DriveConstants.ModuleIDsAndCurrentLimits;
+import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.Drivetrain.DriveConstants.ModuleIDs;
 import org.littletonrobotics.junction.Logger;
 
 public class ModuleIORealFoc implements ModuleIO {
@@ -55,26 +55,23 @@ public class ModuleIORealFoc implements ModuleIO {
   private final TalonFXConfiguration steerTalonConfig = new TalonFXConfiguration();
 
   // Control
-  private final VoltageOut voltageControl = new VoltageOut(0).withUpdateFreqHz(0);
-  private final DutyCycleOut dutyCycleOutControl = new DutyCycleOut(0).withUpdateFreqHz(0);
-  private final TorqueCurrentFOC currentControl = new TorqueCurrentFOC(0).withUpdateFreqHz(0);
-  private final VelocityTorqueCurrentFOC velocityTorqueCurrentFOC =
-      new VelocityTorqueCurrentFOC(0).withUpdateFreqHz(0);
-  private final VelocityVoltage velocityVoltage = new VelocityVoltage(0).withUpdateFreqHz(0);
-  private final PositionDutyCycle positionControl = new PositionDutyCycle(0).withUpdateFreqHz(0);
-  private final NeutralOut neutralControl = new NeutralOut().withUpdateFreqHz(0);
-  private final PIDController steerFeedback =
-      new PIDController(MODULE_GAINS_AND_RATIOS.steerkP(), 0.0, MODULE_GAINS_AND_RATIOS.steerkD());
+  private final VoltageOut voltageControl                         = new VoltageOut(0).withUpdateFreqHz(0);
+  private final DutyCycleOut dutyCycleOutControl                  = new DutyCycleOut(0).withUpdateFreqHz(0);
+  private final TorqueCurrentFOC currentControl                   = new TorqueCurrentFOC(0).withUpdateFreqHz(0);
+  private final VelocityTorqueCurrentFOC velocityTorqueCurrentFOC = new VelocityTorqueCurrentFOC(0).withUpdateFreqHz(0);
+  private final VelocityVoltage velocityVoltage                   = new VelocityVoltage(0).withUpdateFreqHz(0);
+  private final PositionDutyCycle positionControl                 = new PositionDutyCycle(0).withUpdateFreqHz(0);
+  private final NeutralOut neutralControl                         = new NeutralOut().withUpdateFreqHz(0);
+  private final PIDController steerFeedback                       = new PIDController(MODULE_GAINS_AND_RATIOS.steerkP(), 0.0, MODULE_GAINS_AND_RATIOS.steerkD());
 
   // Status Code Initialization
   private StatusCode initializationStatus = StatusCode.StatusCodeNotInitialized;
 
-  // Module Name
+  // Module Name/config
   private final String MODULE_NAME;
+  ModuleIDs m_config;
 
-  ModuleIDsAndCurrentLimits m_config;
-
-  public ModuleIORealFoc(ModuleIDsAndCurrentLimits config, String name) {
+  public ModuleIORealFoc(ModuleIDs config, String name) {
     MODULE_NAME = name;
 
     encoder = new CANcoder(config.absoluteEncoderChannel(), "*");
@@ -185,25 +182,22 @@ public class ModuleIORealFoc implements ModuleIO {
             .isOK();
 
     // Refresh drive motor values
-    inputs.drivePositionUnits = drivePosition.getValueAsDouble();
-    inputs.driveVelocityRPS = driveVelocity.getValueAsDouble();
-    inputs.driveAppliedVolts = driveAppliedVolts.getValueAsDouble();
+    inputs.drivePositionUnits     = drivePosition.getValueAsDouble();
+    inputs.driveVelocityRPS       = driveVelocity.getValueAsDouble();
+    inputs.driveAppliedVolts      = driveAppliedVolts.getValueAsDouble();
     inputs.driveSupplyCurrentAmps = driveSupplyCurrent.getValueAsDouble();
     inputs.driveTorqueCurrentAmps = driveTorqueCurrent.getValueAsDouble();
 
     // Refresh steer Motor Values
     inputs.rawAbsEncValueRotation = encoder.getPosition().getValueAsDouble();
-    inputs.steerAbsPosition =
-        Rotation2d.fromRotations(
-            inputs.rawAbsEncValueRotation - absoluteEncoderOffset.getRotations());
+    inputs.steerAbsPosition       = Rotation2d.fromRotations(inputs.rawAbsEncValueRotation - absoluteEncoderOffset.getRotations());
 
     inputs.steerVelocityRadsPerSec = Units.rotationsToRadians(steerVelocity.getValueAsDouble());
-    inputs.steerSupplyCurrentAmps = steerSupplyCurrent.getValueAsDouble();
-    inputs.steerTorqueCurrentAmps = steerTorqueCurrent.getValueAsDouble();
+    inputs.steerSupplyCurrentAmps  = steerSupplyCurrent.getValueAsDouble();
+    inputs.steerTorqueCurrentAmps  = steerTorqueCurrent.getValueAsDouble();
 
-    inputs.odometryDrivePositionsMeters =
-        new double[] {drivePosition.getValueAsDouble() * DRIVE_CONFIG.wheelRadius()};
-    inputs.odometrySteerPositions = new Rotation2d[] {inputs.steerAbsPosition};
+    inputs.odometryDrivePositionsMeters = new double[] {drivePosition.getValueAsDouble() * DRIVE_CONFIG.wheelRadius()};
+    inputs.odometrySteerPositions       = new Rotation2d[] {inputs.steerAbsPosition};
   }
 
   public void runDriveVolts(double volts) {
@@ -232,7 +226,8 @@ public class ModuleIORealFoc implements ModuleIO {
   public void runSteerPositionSetpoint(double currentAngleRads, double targetAngleRads) {
     steerTalon.setControl(
         dutyCycleOutControl.withOutput(
-            -steerFeedback.calculate(currentAngleRads, targetAngleRads)));
+            -steerFeedback.calculate(currentAngleRads, targetAngleRads))
+    );
 
     Logger.recordOutput("Module " + MODULE_NAME + "/steer Target Angle", targetAngleRads);
     Logger.recordOutput("Module " + MODULE_NAME + "/steer current Angle", currentAngleRads);

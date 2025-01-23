@@ -43,7 +43,7 @@ public class CatzSwerveModule {
   //  CatzServeModule() - Constructor
   //
   // ----------------------------------------------------------------------------------------------
-  public CatzSwerveModule(ModuleIDsAndCurrentLimits config, String moduleName) {
+  public CatzSwerveModule(ModuleIDs config, String moduleName) {
     this.m_moduleName = moduleName;
     // Run Subsystem disconnect check
     if (DriveConstants.IS_DRIVE_DISABLED) {

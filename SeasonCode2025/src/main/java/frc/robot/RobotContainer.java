@@ -56,14 +56,10 @@ public class RobotContainer {
   // -------------------------------------------------------------------------------------------------------------------
   // Alert Declaration
   // -------------------------------------------------------------------------------------------------------------------
-  private final Alert disconnectedAlertDrive =
-      new Alert("Driver controller disconnected (port 0).", AlertType.kWarning);
-  private final Alert disconnectedAlertAux =
-      new Alert("Operator controller disconnected (port 1).", AlertType.kWarning);
-  private final LoggedNetworkNumber endgameAlert1 =
-      new LoggedNetworkNumber("Endgame Alert #1", 30.0);
-  private final LoggedNetworkNumber endgameAlert2 =
-      new LoggedNetworkNumber("Endgame Alert #2", 15.0);
+  private final Alert disconnectedAlertDrive      = new Alert("Driver controller disconnected (port 0).", AlertType.kWarning);
+  private final Alert disconnectedAlertAux        = new Alert("Operator controller disconnected (port 1).", AlertType.kWarning);
+  private final LoggedNetworkNumber endgameAlert1 = new LoggedNetworkNumber("Endgame Alert #1", 30.0);
+  private final LoggedNetworkNumber endgameAlert2 = new LoggedNetworkNumber("Endgame Alert #2", 15.0);
 
   // -------------------------------------------------------------------------------------------------------------------
   // Auto Declaration
@@ -147,7 +143,6 @@ public class RobotContainer {
                   Translation2d unitRadius =
                       new Translation2d(selectedAngle.getCos(), selectedAngle.getSin());
                   Translation2d unitLeftRight = unitRadius.rotateBy(Rotation2d.fromDegrees(90));
-
                   Translation2d radius =
                       unitRadius.times(Reef.reefOrthogonalRadius + Reef.scoringDistance);
                   Translation2d leftRight =
@@ -158,7 +153,7 @@ public class RobotContainer {
                   Translation2d scoringPos = radius.plus(leftRight).plus(Reef.center);
 
                   currentPathfindingCommand =
-                      auto.getPathfindingCommand(new Pose2d(scoringPos, selectedAngle));
+                      auto.getPathfindingCommand(new Pose2d(scoringPos, selectedAngle.plus(Rotation2d.fromDegrees(180.0))));
                   currentPathfindingCommand.schedule();
                 }));
 
@@ -224,5 +219,9 @@ public class RobotContainer {
 
   public Command getAutonomousCommand() {
     return auto.getCommand();
+  }
+
+  public CatzAutonomous getAutonomous(){
+    return auto;
   }
 }
