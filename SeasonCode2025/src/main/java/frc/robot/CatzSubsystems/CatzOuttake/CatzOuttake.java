@@ -97,7 +97,7 @@ public class CatzOuttake extends SubsystemBase {
   private void case_shoot() {
     System.out.println("using case_shoot");
 
-    io.runMotor(outtakeLeft, outtakeRight);    
+    io.runMotor(outtakeLeft, outtakeRight);
     if(!inputs.bbreakFrntTriggered) {
         currentState = outtakeStates.STOP;
     }
@@ -110,7 +110,7 @@ public class CatzOuttake extends SubsystemBase {
   //
   //=========================================================
 
-  
+
   public Command startIntaking() {
     return run(() -> currentState = outtakeStates.ADJ_INIT);
   }

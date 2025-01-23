@@ -17,6 +17,7 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Autonomous.CatzAutonomous;
+import frc.robot.CatzSubsystems.CatzClimb.CatzClimb;
 import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.CatzRobotTracker;
 import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.Drivetrain.CatzDrivetrain;
 import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.Vision.CatzVision;
@@ -46,6 +47,8 @@ public class RobotContainer {
 
   private static CatzOuttake outtake = new CatzOuttake();
   private static CatzElevator elevator = new CatzElevator();
+  private static CatzClimb Climb = new CatzClimb();
+
 
   // ------------------------------------------------------------------------------------------------------------------
   // Drive Controller Declaration
@@ -159,12 +162,23 @@ public class RobotContainer {
 
     xboxDrv.a().onFalse(Commands.runOnce(() -> currentPathfindingCommand.cancel()));
     xboxDrv.a().toggleOnTrue(outtake.startIntaking().alongWith(Commands.print("pressed a")));
-    xboxDrv.y().toggleOnTrue(outtake.runMotor().alongWith(Commands.print("pressed y")));
-
-    xboxAux.a().toggleOnTrue(elevator.runMotor().alongWith(Commands.print("pressed elevator a")));
+    xboxDrv.y().toggleOnTrue(Climb.Climb_Retract().alongWith(Commands.print("pressed y")));
+    xboxDrv.x().toggleOnTrue(Climb.Climb_Home().alongWith(Commands.print("pressed x")));
+    xboxDrv.b().toggleOnTrue(Climb.Climb_Full().alongWith(Commands.print("pressed b")));
+    //xboxDrv.povUp().toggleOnTrue(Climb.setClimbPos(Position.HOME)).alongWith(Commands.print("pressed uppad"));
+    // xboxAux.a().toggleOnTrue(elevator.runMotor().alongWith(Commands.print("pressed elevator a")));
     xboxAux
         .y()
         .toggleOnTrue(elevator.runMotorBck().alongWith(Commands.print("pressed elevator y")));
+    xboxAux
+        .x()
+        .toggleOnTrue(elevator.runMotorBck().alongWith(Commands.print("pressed elevator x")));
+    xboxAux
+        .b()
+        .toggleOnTrue(elevator.runMotorBck().alongWith(Commands.print("pressed elevator b")));
+    xboxAux
+        .povUp()
+        .toggleOnTrue(elevator.runMotorBck().alongWith(Commands.print("pressed elevator uppad")));
 
     drive.setDefaultCommand(
         new TeleopDriveCmd(

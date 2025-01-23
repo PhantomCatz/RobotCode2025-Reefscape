@@ -23,7 +23,7 @@ import edu.wpi.first.units.measure.Voltage;
 /** Add your docs here. */
 public class ClimbIOReal implements ClimbIO {
 
-  TalonFX climbMotor = new TalonFX(4);
+  TalonFX climbMotor = new TalonFX(30);
 
   private PIDController shooterPivotFeedback = new PIDController(100, 0, 0, 0.02); // Prayer numbers
 
@@ -93,8 +93,7 @@ public class ClimbIOReal implements ClimbIO {
 
   @Override
   public void setPosition(double pos) // Set the motor position in mechanism rotations
-      {
-    CatzClimb.position = pos;
+  {
     climbMotor.setControl(positionControl.withPosition(pos));
     // System.out.println(pos);
   }

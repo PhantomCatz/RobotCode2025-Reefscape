@@ -43,8 +43,11 @@ public class CatzClimb extends SubsystemBase {
   // ^^ Hallo make sure you set this to the correct motor ^^  //
   // ==========================================================//
   @RequiredArgsConstructor
-  public enum Position {
-    ZERO(() -> 0.0),
+  public enum Position { //In degrees
+    RETRACT(() -> -46),
+    HOME(() -> 0.0),
+    STOW(() -> 40.0),
+    FULLTURN(() -> 90),
     TUNNABLE(tunnablePos);
 
     private final DoubleSupplier motionType;
@@ -58,7 +61,7 @@ public class CatzClimb extends SubsystemBase {
   public void periodic() {
     io.updateInputs(inputs);
     Logger.processInputs("Position", inputs);
-    // System.out.println(position);
+    System.out.println(position);
     if (DriverStation.isDisabled()) {
 
     } else {
@@ -67,9 +70,27 @@ public class CatzClimb extends SubsystemBase {
     Logger.recordOutput("Position/targetPosition", position);
   }
 
-  public Command setPosition() {
-    return startEnd(
-        () -> position = Position.TUNNABLE.getTargetMotionPosition(),
-        () -> position = Position.ZERO.getTargetMotionPosition());
+  public Command Climb_Stow() {
+    return runOnce(() -> setClimbPos(Position.STOW));
+  }
+
+  public Command Climb_Home() {
+    return runOnce(() -> setClimbPos(Position.HOME));
+  }
+
+  public Command Climb_Retract() {
+    return runOnce(() -> setClimbPos(Position.RETRACT));
+  }
+
+  public Command Climb_Full() {
+    return runOnce(() -> setClimbPos(Position.FULLTURN));
+  }
+
+  public Command Climb_Tunnable() {
+    return runOnce(() -> setClimbPos(Position.TUNNABLE));
+  }
+
+  public void setClimbPos(Position target) {
+    position = target.getTargetMotionPosition();
   }
 }
