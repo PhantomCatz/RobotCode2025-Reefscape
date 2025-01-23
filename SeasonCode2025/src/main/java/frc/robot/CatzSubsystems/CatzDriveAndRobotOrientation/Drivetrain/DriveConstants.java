@@ -198,7 +198,7 @@ public class DriveConstants {
   public static final PathConstraints PATHFINDING_CONSTRAINTS = new PathConstraints( // 540 // 720
                                                                         DRIVE_CONFIG.maxLinearVelocity,
                                                                         DRIVE_CONFIG.maxLinearAcceleration, // max vel causing messup
-                                                                        DRIVE_CONFIG.maxAngularVelocity, 
+                                                                        DRIVE_CONFIG.maxAngularVelocity,
                                                                         DRIVE_CONFIG.maxAngularAcceleration
                                                                 );
 
