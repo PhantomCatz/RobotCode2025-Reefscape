@@ -358,6 +358,7 @@ public class Robot extends LoggedRobot {
     teleElapsedTime = Timer.getFPGATimestamp() - teleStart;
 
     ControllerModeAbstraction.periodicDebug();
+
   }
 
   @Override

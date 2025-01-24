@@ -101,7 +101,7 @@ public class TeleopDriveCmd extends Command {
             ? turningVelocity * DriveConstants.DRIVE_CONFIG.maxAngularVelocity()
             : 0.0;
 
-    // Construct desired chassis speeds 
+    // Construct desired chassis speeds
     //TODO understand why we need to flip the robot relative speeds on a live test on feild, Issue presented during 2025 api updates
     Rotation2d flipped = Rotation2d.fromDegrees(-CatzRobotTracker.getInstance().getEstimatedPose().getRotation().getDegrees());
     chassisSpeeds = ChassisSpeeds.fromRobotRelativeSpeeds(m_headingAndVelocity_X, m_headingAndVelocity_Y, turningVelocity, flipped);

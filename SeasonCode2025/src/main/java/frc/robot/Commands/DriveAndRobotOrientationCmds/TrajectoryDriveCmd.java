@@ -100,6 +100,7 @@ public class TrajectoryDriveCmd extends Command {
   @Override
   public void initialize() {
     // Flip path if necessary
+    System.out.println("trajec start");
     PathPlannerPath usePath = path;
     if (AllianceFlipUtil.shouldFlipToRed()) {
       usePath = path.flipPath();
