@@ -12,6 +12,8 @@ import static frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.Drivetrain.D
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.pathplanner.lib.pathfinding.Pathfinding;
 import com.pathplanner.lib.util.PathPlannerLogging;
+
+import edu.wpi.first.math.estimator.PoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Twist2d;
@@ -72,6 +74,7 @@ public class CatzDrivetrain extends SubsystemBase {
   public final CatzSwerveModule RT_BACK_MODULE;
   public final CatzSwerveModule LT_BACK_MODULE;
   public final CatzSwerveModule LT_FRNT_MODULE;
+
 
   // Swerve setpoint generator
   private final Field2d field;
