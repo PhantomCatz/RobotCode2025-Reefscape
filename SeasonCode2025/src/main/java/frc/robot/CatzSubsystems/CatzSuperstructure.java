@@ -8,7 +8,7 @@
 package frc.robot.CatzSubsystems;
 
 public class CatzSuperstructure {
-    private Gamepiece coralAlgae = Gamepiece.CORAL;
+    private Gamepiece chosenGamepiece = Gamepiece.CORAL;
     private int level = 1;
 
     public enum Gamepiece{
@@ -16,19 +16,31 @@ public class CatzSuperstructure {
         ALGAE
     }
 
-    public Gamepiece getCoralAlgae(){
-        return coralAlgae;
+    public Gamepiece getGamepieceSelection(){
+        return chosenGamepiece;
     }
 
     public int getLevel(){
         return level;
     }
 
-    public void setCoralAlgae(Gamepiece ca){
-        this.coralAlgae = ca;
+    public void setGamepieceChoice(Gamepiece choice){
+        this.chosenGamepiece = choice;
     }
 
     public void setLevel(int lvl){
         this.level = lvl;
     }
+
+
+    public enum LeftRight{
+        LEFT(1),
+        RIGHT(-1);
+    
+        public final int NUM;
+    
+        private LeftRight(int num){
+          this.NUM  = num;
+        }
+      }
 }

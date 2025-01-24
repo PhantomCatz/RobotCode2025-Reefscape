@@ -16,6 +16,7 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Autonomous.CatzAutonomous;
 import frc.robot.CatzSubsystems.CatzSuperstructure;
 import frc.robot.CatzSubsystems.CatzSuperstructure.Gamepiece;
+import frc.robot.CatzSubsystems.CatzSuperstructure.LeftRight;
 import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.CatzRobotTracker;
 import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.Drivetrain.CatzDrivetrain;
 import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.Vision.CatzVision;
@@ -102,16 +103,6 @@ public class RobotContainer {
   //  Button mapping to commands
   //
   // ---------------------------------------------------------------------------
-  public enum LeftRight{
-    LEFT(1),
-    RIGHT(-1);
-
-    public final int NUM;
-
-    private LeftRight(int num){
-      this.NUM  = num;
-    }
-  }
 
   Command currentPathfindingCommand = Commands.runOnce(() -> {});
   int POVReefAngle = 0; // 0 = none, x = x/6 revolutions
@@ -139,11 +130,11 @@ public class RobotContainer {
     xboxAux.povLeft().onTrue(Commands.runOnce(() -> superstructure.setLevel(3)));
     xboxAux.povDown().onTrue(Commands.runOnce(() -> superstructure.setLevel(4)));
 
-    xboxAux.leftBumper().onTrue(Commands.runOnce(() -> superstructure.setCoralAlgae(Gamepiece.CORAL)));
-    xboxAux.rightBumper().onTrue(Commands.runOnce(() -> superstructure.setCoralAlgae(Gamepiece.ALGAE)));
+    xboxAux.leftBumper().onTrue(Commands.runOnce(() -> superstructure.setGamepieceChoice(Gamepiece.CORAL)));
+    xboxAux.rightBumper().onTrue(Commands.runOnce(() -> superstructure.setGamepieceChoice(Gamepiece.ALGAE)));
 
     xboxAux.a().onTrue(Commands.runOnce(()->{
-      System.out.println("L:"+superstructure.getLevel()+", "+superstructure.getCoralAlgae());
+      System.out.println("L:"+superstructure.getLevel()+", "+superstructure.getGamepieceSelection());
     }));
 
     xboxDrv
