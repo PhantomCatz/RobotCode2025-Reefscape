@@ -24,7 +24,8 @@ public class CatzOuttake extends SubsystemBase {
     ADJ_INIT,
     ADJ_BACK,
     SCORE,
-    STOP
+    STOP,
+    TEMP_RUN
   }
 
   private outtakeStates currentState = outtakeStates.STOP;
@@ -67,6 +68,7 @@ public class CatzOuttake extends SubsystemBase {
         break;
       case STOP: io.runMotor(0,0);
         break;
+      case TEMP_RUN: io.runMotor(outtakeLeft, outtakeRight);
     }
     // previousState = currentState;
   }
@@ -113,6 +115,10 @@ public class CatzOuttake extends SubsystemBase {
   
   public Command startIntaking() {
     return run(() -> currentState = outtakeStates.ADJ_INIT);
+  }
+
+  public Command tempIntake() {
+    return runOnce(() -> currentState = outtakeStates.TEMP_RUN);
   }
 
   public Command startOuttake() {

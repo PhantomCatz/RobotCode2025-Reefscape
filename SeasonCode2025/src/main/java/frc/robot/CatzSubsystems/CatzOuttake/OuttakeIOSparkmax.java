@@ -55,7 +55,7 @@ public class OuttakeIOSparkmax implements OuttakeIO {
   public void runMotor(double speed, double speed2) {
 
     OuttakeLeftMtr.set(-speed);
-    OuttakeRightMtr.set(speed);
+    OuttakeRightMtr.set(speed2);
   }
 
   @Override
