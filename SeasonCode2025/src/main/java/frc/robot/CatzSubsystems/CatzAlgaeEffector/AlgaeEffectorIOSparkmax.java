@@ -8,8 +8,12 @@
 package frc.robot.CatzSubsystems.CatzAlgaeEffector;
 
 
+import com.revrobotics.spark.SparkBase.PersistMode;
+import com.revrobotics.spark.SparkBase.ResetMode;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkMax;
+import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
+import com.revrobotics.spark.config.SparkMaxConfig;
 
 import edu.wpi.first.wpilibj.DigitalInput;
 
@@ -23,6 +27,15 @@ public class AlgaeEffectorIOSparkmax implements AlgaeEffectorIO {
   public AlgaeEffectorIOSparkmax() {
     algaeEffectorMotor1 = new SparkMax(1, MotorType.kBrushless);
     algaeEffectorMotor2 = new SparkMax(2, MotorType.kBrushless);
+
+    SparkMaxConfig globalConfig = new SparkMaxConfig();
+
+    globalConfig.smartCurrentLimit(50);
+    globalConfig.idleMode(IdleMode.kBrake);
+    globalConfig.voltageCompensation(12);
+
+    algaeEffectorMotor1.configure(globalConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+    algaeEffectorMotor2.configure(globalConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 
     beamBreak = new DigitalInput(3);
   }
