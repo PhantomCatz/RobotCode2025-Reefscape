@@ -47,7 +47,7 @@ public class AlgaeEffectorIOSparkmax implements AlgaeEffectorIO {
 
   @Override
   public void runMotor(double speed, double speed2) {
-
+    System.out.println(speed + " " + speed2);
     algaeEffectorMotor1.set(-speed);
     algaeEffectorMotor2.set(speed);
   }
