@@ -21,11 +21,13 @@ public class OuttakeIOSparkmax implements OuttakeIO {
   private final SparkMax outtakeMotor1;
   private final SparkMax outtakeMotor2;
 
+  // private SparkBaseConfig globalConfig;
+
   public OuttakeIOSparkmax() {
     outtakeMotor1 = new SparkMax(1, MotorType.kBrushless);
     outtakeMotor2 = new SparkMax(2, MotorType.kBrushless);
 
-    // SparkBaseConfig globalConfig = new SparkBaseConfig();
+    // globalConfig = new SparkBaseConfig();
 
     // globalConfig.smartCurrentLimit(50).idleMode(IdleMode.kBrake);
     // globalConfig.idleMode(IdleMode.kBrake);
