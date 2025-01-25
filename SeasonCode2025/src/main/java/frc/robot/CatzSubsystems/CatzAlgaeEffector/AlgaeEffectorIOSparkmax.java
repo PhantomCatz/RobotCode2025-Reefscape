@@ -21,12 +21,12 @@ public class AlgaeEffectorIOSparkmax implements AlgaeEffectorIO {
 
   private final DigitalInput beamBreak;
 
-  private final SparkMax algaeEffectorMotor1;
-  private final SparkMax algaeEffectorMotor2;
+  private final SparkMax algaeEffectorMotorTop;
+  private final SparkMax algaeEffectorMotorBot;
 
   public AlgaeEffectorIOSparkmax() {
-    algaeEffectorMotor1 = new SparkMax(1, MotorType.kBrushless);
-    algaeEffectorMotor2 = new SparkMax(2, MotorType.kBrushless);
+    algaeEffectorMotorTop = new SparkMax(23, MotorType.kBrushless);
+    algaeEffectorMotorBot = new SparkMax(24, MotorType.kBrushless);
 
     SparkMaxConfig globalConfig = new SparkMaxConfig();
 
@@ -34,8 +34,8 @@ public class AlgaeEffectorIOSparkmax implements AlgaeEffectorIO {
     globalConfig.idleMode(IdleMode.kBrake);
     globalConfig.voltageCompensation(12);
 
-    algaeEffectorMotor1.configure(globalConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
-    algaeEffectorMotor2.configure(globalConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+    algaeEffectorMotorTop.configure(globalConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+    algaeEffectorMotorBot.configure(globalConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 
     beamBreak = new DigitalInput(3);
   }
@@ -48,23 +48,23 @@ public class AlgaeEffectorIOSparkmax implements AlgaeEffectorIO {
   @Override
   public void runMotor(double speed, double speed2) {
     System.out.println(speed + " " + speed2);
-    algaeEffectorMotor1.set(-speed);
-    algaeEffectorMotor2.set(speed);
+    algaeEffectorMotorTop.set(-speed);
+    algaeEffectorMotorBot.set(speed);
   }
 
   @Override
   public void runMotorBck(double speed) {
-    algaeEffectorMotor1.set(speed);
-    algaeEffectorMotor2.set(-speed);
+    algaeEffectorMotorTop.set(speed);
+    algaeEffectorMotorBot.set(-speed);
   }
 
   @Override
   public void runMotorTop(double speed) {
-    algaeEffectorMotor1.set(-speed);
+    algaeEffectorMotorTop.set(-speed);
   }
 
   @Override
   public void runMotorBottom(double speed) {
-    algaeEffectorMotor2.set(speed);
+    algaeEffectorMotorBot.set(speed);
   }
 }

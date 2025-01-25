@@ -47,7 +47,7 @@ public class CatzAlgaeEffector extends SubsystemBase {
   }
 
   public Command runMotor() {
-    return run(() -> io.runMotor(algaeEffectorTop, algaeEffectorBottom));
+    return runOnce(() -> io.runMotor(algaeEffectorTop, algaeEffectorBottom));
   }
 
   public Command runMotorBck(double spd) {
