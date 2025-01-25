@@ -160,13 +160,19 @@ public class RobotContainer {
                   currentPathfindingCommand.schedule();
                 }));
 
-    xboxDrv.a().onFalse(Commands.runOnce(() -> currentPathfindingCommand.cancel()));
-    xboxDrv.a().toggleOnTrue(outtake.startIntaking().alongWith(Commands.print("pressed a")));
+    // xboxDrv.a().onFalse(Commands.runOnce(() -> currentPathfindingCommand.cancel()));
+
+    Trigger LeftJoystickTrigger = new Trigger(
+      () -> Math.abs(xboxDrv.getRightY()) > 0.1);
+    LeftJoystickTrigger.onTrue(Climb.ClimbManualMode(() -> xboxDrv.getRightY()).alongWith(Commands.print("Using manual climb")));
+    LeftJoystickTrigger.onFalse(Climb.ClimbManualMode(() -> 0.0));
+    // xboxDrv.a().toggleOnTrue(Climb.ClimbManualMode(() -> xboxDrv.getRightY()).alongWith(Commands.print("pressed a")));
     xboxDrv.y().toggleOnTrue(Climb.Climb_Retract().alongWith(Commands.print("pressed y")));
     xboxDrv.x().toggleOnTrue(Climb.Climb_Home().alongWith(Commands.print("pressed x")));
     xboxDrv.b().toggleOnTrue(Climb.Climb_Full().alongWith(Commands.print("pressed b")));
     //xboxDrv.povUp().toggleOnTrue(Climb.setClimbPos(Position.HOME)).alongWith(Commands.print("pressed uppad"));
-    // xboxAux.a().toggleOnTrue(elevator.runMotor().alongWith(Commands.print("pressed elevator a")));
+    // xboxAux.a().toggle
+    // OnTrue(elevator.runMotor().alongWith(Commands.print("pressed elevator a")));
     xboxAux
         .y()
         .toggleOnTrue(elevator.runMotorBck().alongWith(Commands.print("pressed elevator y")));

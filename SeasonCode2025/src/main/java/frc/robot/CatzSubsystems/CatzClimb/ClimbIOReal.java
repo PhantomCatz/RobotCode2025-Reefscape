@@ -13,7 +13,6 @@ import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.PositionVoltage;
 import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.TalonFX;
-import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Current;
@@ -25,7 +24,6 @@ public class ClimbIOReal implements ClimbIO {
 
   TalonFX climbMotor = new TalonFX(30);
 
-  private PIDController shooterPivotFeedback = new PIDController(100, 0, 0, 0.02); // Prayer numbers
 
   private final PositionVoltage positionControl = new PositionVoltage(0).withUpdateFreqHz(0.0);
   private final VoltageOut voltageControl = new VoltageOut(0).withUpdateFreqHz(0.0);
@@ -56,15 +54,15 @@ public class ClimbIOReal implements ClimbIO {
         climbTorqueCurrent,
         climbTempCelsius);
 
-    config.Slot0.kP = 4;
+    config.Slot0.kP = 12.0;
     config.Slot0.kI = 0;
     config.Slot0.kD = 0;
 
     config.CurrentLimits.SupplyCurrentLimit = 60.0;
     config.CurrentLimits.SupplyCurrentLimitEnable = true;
 
-    config.MotionMagic.MotionMagicCruiseVelocity = 4;
-    config.MotionMagic.MotionMagicAcceleration = 8;
+    config.MotionMagic.MotionMagicCruiseVelocity = 80;
+    config.MotionMagic.MotionMagicAcceleration = 400;
     config.MotionMagic.MotionMagicJerk = 1600;
 
     climbMotor.getConfigurator().apply(config, 1.0);
@@ -99,6 +97,11 @@ public class ClimbIOReal implements ClimbIO {
   }
 
   @Override
+  public void setPower(double power) {
+    climbMotor.set(power);
+  }
+
+  @Override
   public void setPID(double kP, double kI, double kD) {
     config.Slot0.kP = kP;
     config.Slot0.kI = kI;
@@ -120,4 +123,5 @@ public class ClimbIOReal implements ClimbIO {
     System.out.println("kS: " + kS + " kV: " + kV + " kA: " + kA);
     climbMotor.getConfigurator().apply(config);
   }
+
 }

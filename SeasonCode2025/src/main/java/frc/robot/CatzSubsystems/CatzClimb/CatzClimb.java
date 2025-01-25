@@ -12,6 +12,8 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Utilities.LoggedTunableNumber;
 import java.util.function.DoubleSupplier;
+import java.util.function.Supplier;
+
 import lombok.RequiredArgsConstructor;
 import org.littletonrobotics.junction.Logger;
 
@@ -21,6 +23,8 @@ public class CatzClimb extends SubsystemBase {
   private final ClimbIOInputsAutoLogged inputs = new ClimbIOInputsAutoLogged();
 
   private Position PositionType;
+  static double manualPow = 0;
+  static boolean isManual;
   static double position;
   static LoggedTunableNumber tunnablePos = new LoggedTunableNumber("Climb/TunnablePosition", 1);
   static LoggedTunableNumber kP = new LoggedTunableNumber("Climb/kP", 0.17);
@@ -48,6 +52,7 @@ public class CatzClimb extends SubsystemBase {
     HOME(() -> 0.0),
     STOW(() -> 40.0),
     FULLTURN(() -> 90),
+    MANUAL(() -> manualPow),
     TUNNABLE(tunnablePos);
 
     private final DoubleSupplier motionType;
@@ -61,11 +66,15 @@ public class CatzClimb extends SubsystemBase {
   public void periodic() {
     io.updateInputs(inputs);
     Logger.processInputs("Position", inputs);
-    System.out.println(position);
+
     if (DriverStation.isDisabled()) {
 
     } else {
-      io.setPosition(position);
+      if(isManual) {
+        io.setPower(manualPow);
+      } else {
+        io.setPosition(position);
+      }
     }
     Logger.recordOutput("Position/targetPosition", position);
   }
@@ -92,5 +101,15 @@ public class CatzClimb extends SubsystemBase {
 
   public void setClimbPos(Position target) {
     position = target.getTargetMotionPosition();
+    isManual = false;
+  }
+
+  public void climbManual(Supplier<Double> manualSupplier) {
+    manualPow = manualSupplier.get();
+    isManual = true;
+  }
+
+  public Command ClimbManualMode(Supplier<Double> manualSupplier) {
+    return runOnce(() -> climbManual(manualSupplier));
   }
 }
