@@ -16,7 +16,9 @@ import edu.wpi.first.networktables.DoubleArraySubscriber;
 import edu.wpi.first.networktables.DoubleSubscriber;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.RobotController;
+import edu.wpi.first.wpilibj.Timer;
 import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.CatzRobotTracker;
+
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -82,7 +84,7 @@ public class VisionIOLimelight implements VisionIO {
       poseObservations.add(
           new PoseObservation(
               // Timestamp, based on server timestamp of publish and latency
-              rawSample.timestamp * 1.0e-9 - rawSample.value[6] * 1.0e-3,
+              Timer.getFPGATimestamp() - rawSample.value[6] * 1.0e-3,
 
               // 3D pose estimate
               parsePose(rawSample.value),
@@ -112,7 +114,7 @@ public class VisionIOLimelight implements VisionIO {
       poseObservations.add(
           new PoseObservation(
               // Timestamp, based on server timestamp of publish and latency
-              rawSample.timestamp * 1.0e-9 - rawSample.value[6] * 1.0e-3,
+              Timer.getFPGATimestamp() - rawSample.value[6] * 1.0e-3,
 
               // 3D pose estimate
               parsePose(rawSample.value),

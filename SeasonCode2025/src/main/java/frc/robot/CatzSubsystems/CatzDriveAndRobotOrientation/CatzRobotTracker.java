@@ -26,9 +26,11 @@ import frc.robot.Utilities.GeomUtil;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.NoSuchElementException;
+
 import lombok.Getter;
 import lombok.experimental.ExtensionMethod;
 import org.littletonrobotics.junction.AutoLogOutput;
+
 
 @ExtensionMethod({GeomUtil.class})
 public class CatzRobotTracker {
@@ -153,23 +155,22 @@ public class CatzRobotTracker {
 
   /** Add Vision Observation */
   public void addVisionObservation(VisionObservation observation) {
-    // If measurement is old enough to be outside the pose buffer's timespan, skip.
+    // // If measurement is old enough to be outside the pose buffer's timespan, skip.
     try {
-      if (POSE_BUFFER.getInternalBuffer().lastKey() - POSE_BUFFER_SIZE_SEC
-          > observation.timestamp()) {
+      if (POSE_BUFFER.getInternalBuffer().lastKey() - observation.timestamp() > POSE_BUFFER_SIZE_SEC) {
         return;
       }
-    } catch (NoSuchElementException ex) {
-      return;
-    }
-    System.out.println("exceptio");
+    } catch (NoSuchElementException e) {}
     // Get odometry based pose at timestamp
     var sample = POSE_BUFFER.getSample(observation.timestamp());
     if (sample.isEmpty()) {
       // exit if not there
       return;
     }
-    // System.out.println("empty sample");
+
+    // print out robot position relative to april tag
+    // Translation2d aprilPos = AllianceFlipUtil.apply(Reef.center).plus(new Translation2d(Reef.reefOrthogonalRadius, 0).rotateBy(Rotation2d.fromDegrees(-60)));
+    // System.out.println(observation.visionPose().relativeTo(new Pose2d(aprilPos, Rotation2d.fromDegrees(-60))));
 
     // sample --> odometryPose transform and backwards of that
     var sampleToOdometryTransform = new Transform2d(sample.get(), odometryPose);

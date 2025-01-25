@@ -14,7 +14,6 @@ import com.pathplanner.lib.path.GoalEndState;
 import com.pathplanner.lib.path.PathPlannerPath;
 import com.pathplanner.lib.pathfinding.Pathfinding;
 import com.pathplanner.lib.util.FileVersionException;
-import com.pathplanner.lib.util.FlippingUtil;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -37,6 +36,7 @@ import frc.robot.RobotContainer;
 import frc.robot.Utilities.AllianceFlipUtil;
 import frc.robot.Utilities.JSONUtil;
 import frc.robot.Utilities.VirtualSubsystem;
+
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
@@ -178,11 +178,9 @@ public class CatzAutonomous extends VirtualSubsystem {
   //
   // ---------------------------------------------------------------------------------------------------------
 
-  private Command getPathfindingCommand(Pose2d goal) {
+  public Command getPathfindingCommand(Pose2d goal) {
     Translation2d robotPos = CatzRobotTracker.getInstance().getEstimatedPose().getTranslation();
-    if (AllianceFlipUtil.shouldFlipToRed()) {
-      robotPos = FlippingUtil.flipFieldPosition(robotPos);
-    }
+
     Pathfinding.setStartPosition(robotPos);
     Pathfinding.setGoalPosition(goal.getTranslation());
     PathPlannerPath path =
@@ -192,11 +190,14 @@ public class CatzAutonomous extends VirtualSubsystem {
     if (path == null) {
       return new InstantCommand();
     } else {
+      if(AllianceFlipUtil.shouldFlipToRed()) {
+        path = path.flipPath();
+      }
       return new TrajectoryDriveCmd(path, m_container.getCatzDrivetrain());
     }
   }
 
-  public Command calculateReefPos(int reefAngle, LeftRight leftRightPos){
+  public Pose2d calculateReefPos(int reefAngle, LeftRight leftRightPos){
     Rotation2d selectedAngle = Rotation2d.fromRotations(reefAngle / 6.0);
     Translation2d unitRadius =
         new Translation2d(selectedAngle.getCos(), selectedAngle.getSin());
@@ -210,7 +211,7 @@ public class CatzAutonomous extends VirtualSubsystem {
     }
     Translation2d scoringPos = radius.plus(leftRight).plus(Reef.center);
 
-    return getPathfindingCommand(new Pose2d(scoringPos, selectedAngle.plus(Rotation2d.k180deg)));
+    return AllianceFlipUtil.apply(new Pose2d(scoringPos, selectedAngle));
   }
 
 

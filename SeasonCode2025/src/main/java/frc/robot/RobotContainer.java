@@ -142,7 +142,7 @@ public class RobotContainer {
         .onTrue(
             Commands.runOnce(
                 () -> {
-                  currentPathfindingCommand = auto.calculateReefPos(POVReefAngle, leftRightReef);
+                  currentPathfindingCommand = auto.getPathfindingCommand(auto.calculateReefPos(POVReefAngle, leftRightReef));
                   currentPathfindingCommand.schedule();
                 }));
 

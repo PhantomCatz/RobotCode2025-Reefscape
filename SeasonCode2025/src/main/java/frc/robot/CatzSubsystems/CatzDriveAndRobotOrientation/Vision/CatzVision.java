@@ -13,7 +13,6 @@ import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.Alert;
-import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.Alert.AlertType;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.CatzRobotTracker;
@@ -166,7 +165,7 @@ public class CatzVision extends SubsystemBase {
         //   txTyObservations.put(
         //       tagId, new TxTyObservation(tagId, frameIndex, tx, ty, distance, timestamp));
         }
-      
+
 
       // Save tx ty observation data
       for (var observation : txTyObservations.values()) {
