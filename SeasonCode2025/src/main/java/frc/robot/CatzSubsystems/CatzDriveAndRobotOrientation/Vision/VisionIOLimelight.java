@@ -66,9 +66,11 @@ public class VisionIOLimelight implements VisionIO {
     orientationPublisher.accept(
         new double[] {rotationSupplier.get().getDegrees(), 0.0, 0.0, 0.0, 0.0, 0.0});
     // System.out.println(rotationSupplier.get().getDegrees());
-    NetworkTableInstance.getDefault()
-        .flush(); // Increases network traffic but recommended by Limelight
+    NetworkTableInstance.getDefault().flush(); // Increases network traffic but recommended by Limelight
 
+    //----------------------------------------------------------------------------------------------
+    // Megatag 1 estimation
+    //----------------------------------------------------------------------------------------------
     // Read new pose observations from NetworkTables
     Set<Integer> tagIds = new HashSet<>();
     List<PoseObservation> poseObservations = new LinkedList<>();
@@ -97,6 +99,10 @@ public class VisionIOLimelight implements VisionIO {
               // Observation type
               PoseObservationType.MEGATAG_1));
     }
+
+    //----------------------------------------------------------------------------------------------
+    // Megatag 2 estimation
+    //----------------------------------------------------------------------------------------------
     for (var rawSample : megatag2Subscriber.readQueue()) {
       // System.out.println(rawSample.value.length);
       // if (rawSample.value.length == 0) continue;

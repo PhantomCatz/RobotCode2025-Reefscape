@@ -36,9 +36,9 @@ public class CatzSuperstructure {
     public enum LeftRight{
         LEFT(1),
         RIGHT(-1);
-    
+
         public final int NUM;
-    
+
         private LeftRight(int num){
           this.NUM  = num;
         }

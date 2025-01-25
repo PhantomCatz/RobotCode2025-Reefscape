@@ -7,10 +7,14 @@
 
 package frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.Vision;
 
+import frc.robot.CatzConstants;
+
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
+import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
+import edu.wpi.first.math.util.Units;
 
 public class VisionConstants {
 
@@ -43,6 +47,47 @@ public class VisionConstants {
         // new VisionIOLimeLight("limelight-udon", UDON_TRANSFORM),    //index 0 left
         new VisionIOLimelight("limelight-soba") // index 1 right
         // new VisionIOLimeLight("limelight-ramen", RAMEN_TRANSFORM)    //index 2 turret)
+      };
+
+ public static final Pose3d[] cameraPoses =
+      switch (CatzConstants.getRobotType()) {
+        case SN2 ->
+            new Pose3d[] {
+              new Pose3d(
+                  Units.inchesToMeters(8.875),
+                  Units.inchesToMeters(10.5),
+                  Units.inchesToMeters(8.25),
+                  new Rotation3d(0.0, Units.degreesToRadians(-28.125), 0.0)
+                      .rotateBy(new Rotation3d(0.0, 0.0, Units.degreesToRadians(30.0)))),
+              new Pose3d(
+                  Units.inchesToMeters(3.25),
+                  Units.inchesToMeters(5.0),
+                  Units.inchesToMeters(6.4),
+                  new Rotation3d(0.0, Units.degreesToRadians(-16.875), 0.0)
+                      .rotateBy(new Rotation3d(0.0, 0.0, Units.degreesToRadians(-4.709)))),
+              new Pose3d(
+                  Units.inchesToMeters(8.875),
+                  Units.inchesToMeters(-10.5),
+                  Units.inchesToMeters(8.25),
+                  new Rotation3d(0.0, Units.degreesToRadians(-28.125), 0.0)
+                      .rotateBy(new Rotation3d(0.0, 0.0, Units.degreesToRadians(-30.0)))),
+              new Pose3d(
+                  Units.inchesToMeters(-16.0),
+                  Units.inchesToMeters(-12.0),
+                  Units.inchesToMeters(8.5),
+                  new Rotation3d(0.0, Units.degreesToRadians(-33.75), 0.0)
+                      .rotateBy(new Rotation3d(0.0, 0.0, Units.degreesToRadians(176.386))))
+            };
+        case SN1 ->
+            new Pose3d[] {
+              new Pose3d(
+                  Units.inchesToMeters(8.875),
+                  Units.inchesToMeters(10.5),
+                  Units.inchesToMeters(8.25),
+                  new Rotation3d(0.0, Units.degreesToRadians(-28.125), 0.0)
+                      .rotateBy(new Rotation3d(0.0, 0.0, Units.degreesToRadians(30.0))))
+            };
+        default -> new Pose3d[] {};
       };
 
   // Standard deviation multipliers for each camera

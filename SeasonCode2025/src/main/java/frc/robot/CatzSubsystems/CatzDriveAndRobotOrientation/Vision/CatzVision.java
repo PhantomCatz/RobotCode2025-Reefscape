@@ -13,13 +13,19 @@ import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.Alert;
+import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.Alert.AlertType;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.CatzRobotTracker;
+import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.CatzRobotTracker.TxTyObservation;
 import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.CatzRobotTracker.VisionObservation;
 import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.Vision.VisionIO.PoseObservationType;
+
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
+
 import org.littletonrobotics.junction.Logger;
 
 public class CatzVision extends SubsystemBase {
@@ -65,8 +71,12 @@ public class CatzVision extends SubsystemBase {
     List<Pose3d> allRobotPoses = new LinkedList<>();
     List<Pose3d> allRobotPosesAccepted = new LinkedList<>();
     List<Pose3d> allRobotPosesRejected = new LinkedList<>();
+    Map<Integer, TxTyObservation> allTxTyObservations = new HashMap<>();
+    Map<Integer, TxTyObservation> txTyObservations = new HashMap<>();
 
-    // Loop over cameras
+    //------------------------------------------------------------------------------------------------------------------------------------
+    // Get Global Pose observation data
+    //------------------------------------------------------------------------------------------------------------------------------------
     for (int cameraIndex = 0; cameraIndex < io.length; cameraIndex++) {
       // Update disconnected alert
       disconnectedAlerts[cameraIndex].set(!inputs[cameraIndex].connected);
@@ -114,8 +124,7 @@ public class CatzVision extends SubsystemBase {
         }
 
         // Calculate standard deviations
-        double stdDevFactor =
-            Math.pow(observation.averageTagDistance(), 2.0) / observation.tagCount();
+        double stdDevFactor = Math.pow(observation.averageTagDistance(), 2.0) / observation.tagCount();
         double linearStdDev = linearStdDevBaseline * stdDevFactor;
         double angularStdDev = angularStdDevBaseline * stdDevFactor;
         if (observation.type() == PoseObservationType.MEGATAG_2) {
@@ -135,25 +144,38 @@ public class CatzVision extends SubsystemBase {
                     observation.timestamp(),
                     VecBuilder.fill(linearStdDev, linearStdDev, angularStdDev)));
         // System.out.println("===");
+
+        // Log camera datadata
+        Logger.recordOutput("Vision/Camera" + cameraIndex + "/TagPoses", tagPoses.toArray(new Pose3d[tagPoses.size()]));
+        Logger.recordOutput("Vision/Camera" + cameraIndex + "/RobotPoses", robotPoses.toArray(new Pose3d[robotPoses.size()]));
+        Logger.recordOutput("Vision/Camera" + cameraIndex + "/RobotPosesAccepted", robotPosesAccepted.toArray(new Pose3d[robotPosesAccepted.size()]));
+        Logger.recordOutput("Vision/Camera" + cameraIndex + "/RobotPosesRejected", robotPosesRejected.toArray(new Pose3d[robotPosesRejected.size()]));
+        allTagPoses.addAll(tagPoses);
+        allRobotPoses.addAll(robotPoses);
+        allRobotPosesAccepted.addAll(robotPosesAccepted);
+        allRobotPosesRejected.addAll(robotPosesRejected);
       }
 
-      // Log camera datadata
-      Logger.recordOutput(
-          "Vision/Camera" + cameraIndex + "/TagPoses",
-          tagPoses.toArray(new Pose3d[tagPoses.size()]));
-      Logger.recordOutput(
-          "Vision/Camera" + cameraIndex + "/RobotPoses",
-          robotPoses.toArray(new Pose3d[robotPoses.size()]));
-      Logger.recordOutput(
-          "Vision/Camera" + cameraIndex + "/RobotPosesAccepted",
-          robotPosesAccepted.toArray(new Pose3d[robotPosesAccepted.size()]));
-      Logger.recordOutput(
-          "Vision/Camera" + cameraIndex + "/RobotPosesRejected",
-          robotPosesRejected.toArray(new Pose3d[robotPosesRejected.size()]));
-      allTagPoses.addAll(tagPoses);
-      allRobotPoses.addAll(robotPoses);
-      allRobotPosesAccepted.addAll(robotPosesAccepted);
-      allRobotPosesRejected.addAll(robotPosesRejected);
+      //------------------------------------------------------------------------------------------------------------------------------------
+      // Get tag tx ty observation data
+      //------------------------------------------------------------------------------------------------------------------------------------
+      for (int frameIndex = 0; frameIndex < inputs.length; frameIndex++) {
+        // var timestamp = RobotController.getTime();
+
+
+        //   txTyObservations.put(
+        //       tagId, new TxTyObservation(tagId, frameIndex, tx, ty, distance, timestamp));
+        }
+      
+
+      // Save tx ty observation data
+      for (var observation : txTyObservations.values()) {
+        if (!allTxTyObservations.containsKey(observation.tagId())
+            || observation.distance() < allTxTyObservations.get(observation.tagId()).distance()) {
+          allTxTyObservations.put(observation.tagId(), observation);
+        }
+      }
+
     }
 
     // Log summary data
