@@ -17,6 +17,7 @@ import frc.robot.Autonomous.CatzAutonomous;
 import frc.robot.CatzSubsystems.CatzSuperstructure;
 import frc.robot.CatzSubsystems.CatzSuperstructure.Gamepiece;
 import frc.robot.CatzSubsystems.CatzSuperstructure.LeftRight;
+import frc.robot.CatzSubsystems.CatzSuperstructure.RobotAction;
 import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.CatzRobotTracker;
 import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.Drivetrain.CatzDrivetrain;
 import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.Vision.CatzVision;
@@ -28,6 +29,7 @@ import frc.robot.Commands.AutomatedSequenceCmds;
 import frc.robot.Commands.DriveAndRobotOrientationCmds.TeleopDriveCmd;
 import frc.robot.Utilities.Alert;
 import frc.robot.Utilities.Alert.AlertType;
+
 import org.littletonrobotics.junction.networktables.LoggedNetworkNumber;
 
 public class RobotContainer {
@@ -115,6 +117,7 @@ public class RobotContainer {
     xboxDrv.start().onTrue(drive.cancelTrajectory());
 
     // Auto Driving
+    // Autodriving Reef Position 0-5 CCW; 0 Facing Driver Stations
     xboxDrv.povUp().onTrue(Commands.runOnce(() -> POVReefAngle = 0));
     xboxDrv.povUpLeft().onTrue(Commands.runOnce(() -> POVReefAngle = 1));
     xboxDrv.povDownLeft().onTrue(Commands.runOnce(() -> POVReefAngle = 2));
@@ -122,6 +125,7 @@ public class RobotContainer {
     xboxDrv.povDownRight().onTrue(Commands.runOnce(() -> POVReefAngle = 4));
     xboxDrv.povUpRight().onTrue(Commands.runOnce(() -> POVReefAngle = 5));
 
+    // Rung Selection
     xboxDrv.leftBumper().onTrue(Commands.runOnce(() -> leftRightReef = LeftRight.LEFT));
     xboxDrv.rightBumper().onTrue(Commands.runOnce(() -> leftRightReef = LeftRight.RIGHT));
 
@@ -130,13 +134,18 @@ public class RobotContainer {
     xboxAux.povLeft().onTrue(Commands.runOnce(() -> superstructure.setLevel(3)));
     xboxAux.povDown().onTrue(Commands.runOnce(() -> superstructure.setLevel(4)));
 
-    xboxAux.leftBumper().onTrue(Commands.runOnce(() -> superstructure.setGamepieceChoice(Gamepiece.CORAL)));
-    xboxAux.rightBumper().onTrue(Commands.runOnce(() -> superstructure.setGamepieceChoice(Gamepiece.ALGAE)));
+    xboxAux.leftBumper().onTrue(Commands.runOnce(() -> superstructure.setChosenGamepiece(Gamepiece.CORAL)));
+    xboxAux.rightBumper().onTrue(Commands.runOnce(() -> superstructure.setChosenGamepiece(Gamepiece.ALGAE)));
 
-    xboxAux.a().onTrue(Commands.runOnce(()->{
-      System.out.println("L:"+superstructure.getLevel()+", "+superstructure.getGamepieceSelection());
-    }));
+    xboxAux.y().onTrue(Commands.runOnce(() -> superstructure.setCurrentRobotAction(RobotAction.OUTTAKE)).alongWith(Commands.print("OUTTAKE")));
+    xboxAux.x().onTrue(Commands.runOnce(() -> superstructure.setCurrentRobotAction(RobotAction.INTAKE)).alongWith(Commands.print("INTAKE")));
+    xboxAux.b().onTrue(Commands.runOnce(() -> superstructure.setCurrentRobotAction(RobotAction.INTAKE_GROUND)).alongWith(Commands.print("INTAKEGROUND")));
+    xboxAux.a().onTrue(Commands.runOnce(() -> superstructure.setCurrentRobotAction(RobotAction.STOW)).alongWith(Commands.print("STOWWW")));
 
+
+    xboxAux.a().onTrue(Commands.runOnce(()-> System.out.println("L:"+superstructure.getLevel()+", "+superstructure.getChosenGamepiece())));
+
+    // Autodrive Execution
     xboxDrv
         .a()
         .onTrue(
