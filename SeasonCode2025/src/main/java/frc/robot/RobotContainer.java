@@ -164,7 +164,7 @@ public class RobotContainer {
 
     Trigger LeftJoystickTrigger = new Trigger(
       () -> Math.abs(xboxDrv.getRightY()) > 0.1);
-    LeftJoystickTrigger.onTrue(Climb.ClimbManualMode(() -> xboxDrv.getRightY()).alongWith(Commands.print("Using manual climb")));
+    LeftJoystickTrigger.whileTrue(Climb.ClimbManualMode(() -> xboxDrv.getRightY()).alongWith(Commands.print("Using manual climb")));
     LeftJoystickTrigger.onFalse(Climb.ClimbManualMode(() -> 0.0));
     // xboxDrv.a().toggleOnTrue(Climb.ClimbManualMode(() -> xboxDrv.getRightY()).alongWith(Commands.print("pressed a")));
     xboxDrv.y().toggleOnTrue(Climb.Climb_Retract().alongWith(Commands.print("pressed y")));

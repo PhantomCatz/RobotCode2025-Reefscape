@@ -25,6 +25,7 @@ public class CatzClimb extends SubsystemBase {
   private Position PositionType;
   static double manualPow = 0;
   static boolean isManual;
+  static final double MANUAL_SCALE = 10;
   static double position;
   static LoggedTunableNumber tunnablePos = new LoggedTunableNumber("Climb/TunnablePosition", 1);
   static LoggedTunableNumber kP = new LoggedTunableNumber("Climb/kP", 0.17);
@@ -70,11 +71,11 @@ public class CatzClimb extends SubsystemBase {
     if (DriverStation.isDisabled()) {
 
     } else {
-      if(isManual) {
-        io.setPower(manualPow);
-      } else {
+      // if(isManual) {
+      //   io.setPower(manualPow);
+      // } else {
         io.setPosition(position);
-      }
+      // }
     }
     Logger.recordOutput("Position/targetPosition", position);
   }
@@ -105,11 +106,13 @@ public class CatzClimb extends SubsystemBase {
   }
 
   public void climbManual(Supplier<Double> manualSupplier) {
-    manualPow = manualSupplier.get();
-    isManual = true;
+    // manualPow = manualSupplier.get();
+    // isManual = true;
+    position += manualSupplier.get() * MANUAL_SCALE;
+    System.out.println(position);
   }
 
   public Command ClimbManualMode(Supplier<Double> manualSupplier) {
-    return runOnce(() -> climbManual(manualSupplier));
+    return run(() -> climbManual(manualSupplier));
   }
 }
