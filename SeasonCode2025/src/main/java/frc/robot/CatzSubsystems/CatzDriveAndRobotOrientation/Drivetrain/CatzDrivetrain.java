@@ -164,9 +164,9 @@ public class CatzDrivetrain extends SubsystemBase {
 
     // Add observations to robot tracker
     OdometryObservation observation = new OdometryObservation(
-                                                    wheelPositions, 
-                                                    getModuleStates(), 
-                                                    gyroAngle2d, 
+                                                    wheelPositions,
+                                                    getModuleStates(),
+                                                    gyroAngle2d,
                                                     Timer.getFPGATimestamp()
                                           );
     CatzRobotTracker.getInstance().addOdometryObservation(observation);

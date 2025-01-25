@@ -38,4 +38,6 @@ public interface ClimbIO {
 
   //   public default void updateInputs(ClimbIOInputs inputs) {}
 
+  public default void setPower(double power) {}
+
 }
