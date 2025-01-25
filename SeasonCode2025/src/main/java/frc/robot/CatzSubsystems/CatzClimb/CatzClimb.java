@@ -25,7 +25,7 @@ public class CatzClimb extends SubsystemBase {
   private Position PositionType;
   static double manualPow = 0;
   static boolean isManual;
-  static final double MANUAL_SCALE = 10;
+  static final double MANUAL_SCALE = 5;
   static double position;
   static LoggedTunableNumber tunnablePos = new LoggedTunableNumber("Climb/TunnablePosition", 1);
   static LoggedTunableNumber kP = new LoggedTunableNumber("Climb/kP", 0.17);
