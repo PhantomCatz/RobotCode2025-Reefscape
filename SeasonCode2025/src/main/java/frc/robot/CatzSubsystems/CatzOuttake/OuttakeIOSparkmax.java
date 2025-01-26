@@ -11,12 +11,11 @@ package frc.robot.CatzSubsystems.CatzOuttake;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkMax;
 
-import edu.wpi.first.wpilibj.DigitalInput;
 
 public class OuttakeIOSparkmax implements OuttakeIO {
 
-  private final DigitalInput beamBreakBck;
-  private final DigitalInput beamBreakFrnt;
+  // private final DigitalInput beamBreakBck;
+  // private final DigitalInput beamBreakFrnt;
 
   private final SparkMax outtakeMotor1;
   private final SparkMax outtakeMotor2;
@@ -37,14 +36,14 @@ public class OuttakeIOSparkmax implements OuttakeIO {
     // outtakeMotor2.configure(
     //     globalConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 
-    beamBreakBck = new DigitalInput(3);
-    beamBreakFrnt = new DigitalInput(6);
+    // beamBreakBck = new DigitalInput(3);
+    // beamBreakFrnt = new DigitalInput(6);
   }
 
   @Override
   public void updateInputs(OuttakeIOInputs inputs) {
-    inputs.bbreakFrntTriggered = !beamBreakFrnt.get();
-    inputs.bbreakBackTriggered = !beamBreakBck.get();
+    // inputs.bbreakFrntTriggered = !beamBreakFrnt.get();
+    // inputs.bbreakBackTriggered = !beamBreakBck.get();
   }
 
   @Override

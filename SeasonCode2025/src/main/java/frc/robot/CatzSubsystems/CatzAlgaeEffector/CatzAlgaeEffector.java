@@ -36,8 +36,8 @@ public class CatzAlgaeEffector extends SubsystemBase {
     }
   }
 
-  double algaeEffectorBottom = 0.5;
-  double algaeEffectorTop = 0.5;
+  double algaeEffectorBottom = -0.5;
+  double algaeEffectorTop = -0.5;
   double adj_speed = 0.2;
 
   @Override
@@ -46,7 +46,7 @@ public class CatzAlgaeEffector extends SubsystemBase {
     Logger.processInputs("effector", inputs);
   }
 
-  public Command runMotor() {
+  public Command runMoto() {
     return runOnce(() -> io.runMotor(algaeEffectorTop, algaeEffectorBottom));
   }
 

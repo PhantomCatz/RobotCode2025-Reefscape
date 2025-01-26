@@ -15,11 +15,10 @@ import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkMaxConfig;
 
-import edu.wpi.first.wpilibj.DigitalInput;
 
 public class AlgaeEffectorIOSparkmax implements AlgaeEffectorIO {
 
-  private final DigitalInput beamBreak;
+  //private final DigitalInput beamBreak;
 
   private final SparkMax algaeEffectorMotorTop;
   private final SparkMax algaeEffectorMotorBot;
@@ -37,19 +36,19 @@ public class AlgaeEffectorIOSparkmax implements AlgaeEffectorIO {
     algaeEffectorMotorTop.configure(globalConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
     algaeEffectorMotorBot.configure(globalConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 
-    beamBreak = new DigitalInput(3);
+    //beamBreak = new DigitalInput(3);
   }
 
   @Override
   public void updateInputs(AlgaeEffectorIOInputs inputs) {
-    inputs.bbreakTriggered = !beamBreak.get();
+    //inputs.bbreakTriggered = !beamBreak.get();
   }
 
   @Override
   public void runMotor(double speed, double speed2) {
     System.out.println(speed + " " + speed2);
     algaeEffectorMotorTop.set(-speed);
-    algaeEffectorMotorBot.set(speed);
+    algaeEffectorMotorBot.set(speed2);
   }
 
   @Override

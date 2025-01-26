@@ -160,13 +160,13 @@ public class RobotContainer {
                 }));
 
     xboxDrv.a().onFalse(Commands.runOnce(() -> currentPathfindingCommand.cancel()));
-    xboxAux.a().toggleOnTrue(algaeEffector.runMotor().alongWith(Commands.print("pressed a")));
-    xboxAux.y().toggleOnTrue(algaeEffector.runMotor().alongWith(Commands.print("pressed y")));
+    xboxAux.a().toggleOnTrue(algaeEffector.runMoto().alongWith(Commands.print("pressed a")));
+    xboxAux.y().toggleOnTrue(algaeEffector.runMoto().alongWith(Commands.print("pressed y")));
 
-    xboxAux.a().toggleOnTrue(elevator.runMotor().alongWith(Commands.print("pressed elevator a")));
-    xboxAux
-        .y()
-        .toggleOnTrue(elevator.runMotorBck().alongWith(Commands.print("pressed elevator y")));
+   // xboxAux.a().toggleOnTrue(elevator.runMotor().alongWith(Commands.print("pressed elevator a")));
+    // xboxAux
+    //     .y()
+    //     .toggleOnTrue(elevator.runMotorBck().alongWith(Commands.print("pressed elevator y")));
 
     drive.setDefaultCommand(
         new TeleopDriveCmd(
