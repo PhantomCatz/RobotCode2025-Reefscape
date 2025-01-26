@@ -11,10 +11,7 @@ package frc.robot.CatzSubsystems.CatzOuttake;
 import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkBase.ResetMode;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
-import com.revrobotics.spark.SparkBase;
 import com.revrobotics.spark.SparkMax;
-import com.revrobotics.spark.config.SignalsConfig;
-import com.revrobotics.spark.config.SparkBaseConfig;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkMaxConfig;
 
@@ -28,21 +25,25 @@ public class OuttakeIOSparkmax implements OuttakeIO {
   private final SparkMax OuttakeLeftMtr;
   private final SparkMax OuttakeRightMtr;
 
-  public OuttakeIOSparkmax() {
-    OuttakeLeftMtr = new SparkMax(1, MotorType.kBrushless);
-    OuttakeRightMtr = new SparkMax(2, MotorType.kBrushless);
+  private SparkMaxConfig globalConfig = new SparkMaxConfig();
 
-    SparkMaxConfig globalConfig = new SparkMaxConfig();
+  public OuttakeIOSparkmax() {
+
+    OuttakeLeftMtr = new SparkMax(2, MotorType.kBrushless);
+    OuttakeRightMtr = new SparkMax(1, MotorType.kBrushless);
 
     globalConfig.smartCurrentLimit(50);
     globalConfig.idleMode(IdleMode.kBrake);
     globalConfig.voltageCompensation(12);
-
-    OuttakeLeftMtr.configure(globalConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
-    OuttakeRightMtr.configure(globalConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+    updateConfig();
 
     beamBreakBck = new DigitalInput(3);
     beamBreakFrnt = new DigitalInput(6);
+  }
+
+  private void updateConfig(){
+    OuttakeLeftMtr.configure(globalConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+    OuttakeRightMtr.configure(globalConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
   }
 
   @Override
@@ -53,15 +54,8 @@ public class OuttakeIOSparkmax implements OuttakeIO {
 
   @Override
   public void runMotor(double speed, double speed2) {
-
-    OuttakeLeftMtr.set(-speed);
-    OuttakeRightMtr.set(speed2);
-  }
-
-  @Override
-  public void runMotorBck(double speed) {
     OuttakeLeftMtr.set(speed);
-    OuttakeRightMtr.set(-speed);
+    OuttakeRightMtr.set(-speed2);
   }
 
   @Override
@@ -72,5 +66,11 @@ public class OuttakeIOSparkmax implements OuttakeIO {
   @Override
   public void runMotorRight(double speed) {
     OuttakeRightMtr.set(speed);
+  }
+
+  @Override
+  public void setPIDF(double kP, double kI, double kD, double kF){
+    globalConfig.closedLoop.pidf(kP, kI, kD, kF);
+    updateConfig();
   }
 }

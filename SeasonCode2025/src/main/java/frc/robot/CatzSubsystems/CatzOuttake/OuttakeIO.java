@@ -22,7 +22,7 @@ public interface OuttakeIO {
     public double supplyCurrentAmps = 0.0;
     public double torqueCurrentAmps = 0.0;
     public double tempCelsius = 0.0;
-    
+
     public boolean bbreakFrntTriggered;
     public boolean bbreakBackTriggered;
   }
@@ -35,15 +35,7 @@ public interface OuttakeIO {
 
   public default void runMotor(double Speed, double speed2) {}
 
-  public default void runMotorBck(double Speed) {}
-
-  public default void runSparkMax(double Speed) {}
-
-  public default void updateInputs(OuttakeIOInputsAutoLogged inputs) {}
-
-  public default void setPID(double kP, double kI, double kD) {}
-
-  public default void setFF(double kS, double kV, double kA) {}
+  public default void setPIDF(double kP, double kI, double kD, double kF) {}
 
   public default void runCharacterizationMotor(double input) {}
 }

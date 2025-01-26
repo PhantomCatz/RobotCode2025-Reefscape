@@ -46,9 +46,10 @@ public class CatzOuttake extends SubsystemBase {
     }
   }
 
-  double outtakeRight = 0.5;
-  double outtakeLeft = 0.5;
-  double adj_speed = 0.2;
+  double outtakeRight = 0.3;
+  double outtakeLeft = 0.3;
+  double intakeSpeed = 0.3;
+  double adjustSpeed = 0.1;
 
   @Override
   public void periodic() {
@@ -81,17 +82,19 @@ public class CatzOuttake extends SubsystemBase {
 
   private void case_adjustInit() {
     System.out.println("using case_adjustInit");
-    io.runMotor(adj_speed, adj_speed);
+
+    io.runMotor(intakeSpeed, intakeSpeed);
+
     if (inputs.bbreakFrntTriggered) {
       currentState = outtakeStates.ADJ_BACK;
     }
   }
 
   private void case_adjustBack() {
-    System.out.println("using case_adjustBack");
+    System.out.println("using adjus");
 
-    io.runMotor(-adj_speed, -adj_speed);
-    if (inputs.bbreakBackTriggered) {
+    io.runMotor(adjustSpeed, adjustSpeed);
+    if (!inputs.bbreakBackTriggered) {
       currentState = outtakeStates.STOP;
     }
   }
@@ -99,7 +102,7 @@ public class CatzOuttake extends SubsystemBase {
   private void case_shoot() {
     System.out.println("using case_shoot");
 
-    io.runMotor(outtakeLeft, outtakeRight);    
+    io.runMotor(outtakeLeft, outtakeRight);
     if(!inputs.bbreakFrntTriggered) {
         currentState = outtakeStates.STOP;
     }
@@ -112,9 +115,9 @@ public class CatzOuttake extends SubsystemBase {
   //
   //=========================================================
 
-  
+
   public Command startIntaking() {
-    return run(() -> currentState = outtakeStates.ADJ_INIT);
+    return runOnce(() -> currentState = outtakeStates.ADJ_INIT);
   }
 
   public Command tempIntake() {
@@ -122,7 +125,7 @@ public class CatzOuttake extends SubsystemBase {
   }
 
   public Command startOuttake() {
-    return run(() -> currentState = outtakeStates.SCORE);
+    return runOnce(() -> currentState = outtakeStates.SCORE);
   }
 
 }
