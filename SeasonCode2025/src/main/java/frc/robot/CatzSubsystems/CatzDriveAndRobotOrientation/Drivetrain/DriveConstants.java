@@ -72,8 +72,8 @@ public class DriveConstants {
                 .bumperWidthX(Units.inchesToMeters(32))
                 .bumperWidthY(Units.inchesToMeters(32))
                 .maxLinearVelocity(Units.feetToMeters(17))
-                .maxLinearAcceleration(Math.pow(Units.feetToMeters(17), 2)) // TODO emperically calculate
-                .maxAngularVelocity(Units.degreesToRadians(600)) // Radians
+                .maxLinearAcceleration(26) // TODO emperically calculate
+                .maxAngularVelocity(26.0 / (29.0/2.0)) // Radians
                 .maxAngularAcceleration(
                     Units.degreesToRadians(600)) // Radians // TODO verify angle constraints
                 .build();
@@ -139,7 +139,7 @@ public class DriveConstants {
       };
 
   public static final ModuleLimits moduleLimitsFree =
-      new ModuleLimits(14, 17, Units.degreesToRadians(1080.0));
+      new ModuleLimits(DRIVE_CONFIG.maxLinearVelocity, DRIVE_CONFIG.maxLinearAcceleration, Units.degreesToRadians(1080.0));
 
   // -------------------------------------------------------------------------------
   // Odometry Constants

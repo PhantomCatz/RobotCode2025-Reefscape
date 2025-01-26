@@ -227,14 +227,9 @@ public class CatzRobotTracker {
     }
 
     // Average tx's and ty's
-    double tx = 0.0;
-    double ty = 0.0;
-    for (int i = 0; i < 4; i++) {
-      tx += observation.tx()[i];
-      ty += observation.ty()[i];
-    }
-    tx /= 4.0;
-    ty /= 4.0;
+    double tx = observation.tx();
+    double ty = observation.ty();
+
 
     Pose3d cameraPose = VisionConstants.cameraPoses[observation.camera()];
     // Use 2d distance and tag angle + tx to find robot pose
@@ -336,7 +331,7 @@ public class CatzRobotTracker {
   public record VisionObservation(Pose2d visionPose, double timestamp, Matrix<N3, N1> stdDevs) {}
 
   public record TxTyObservation(
-      int tagId, int camera, double[] tx, double[] ty, double distance, double timestamp) {}
+      int tagId, int camera, double tx, double ty, double distance, double timestamp) {}
 
   public record TxTyPoseRecord(Pose2d pose, double distance, double timestamp) {}
 }

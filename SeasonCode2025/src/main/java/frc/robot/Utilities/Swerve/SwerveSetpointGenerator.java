@@ -394,7 +394,7 @@ public class SwerveSetpointGenerator {
       final var deltaRotation =
           prevSetpoint.moduleStates()[i].angle.unaryMinus().rotateBy(retStates[i].angle);
       if (flipHeading(deltaRotation)) {
-        retStates[i].angle = retStates[i].angle.rotateBy(Rotation2d.fromRadians(Math.PI));
+        retStates[i].angle = retStates[i].angle.rotateBy(Rotation2d.fromRadians(-Math.PI)); // TODO possible need to move back
         retStates[i].speedMetersPerSecond *= -1.0;
       }
     }

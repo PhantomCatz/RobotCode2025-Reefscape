@@ -10,6 +10,8 @@ package frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.Vision;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform3d;
+import edu.wpi.first.wpilibj.Timer;
+
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -35,6 +37,7 @@ public class VisionIOPhotonVision implements VisionIO {
   @Override
   public void updateInputs(VisionIOInputs inputs) {
     inputs.connected = camera.isConnected();
+    double timestamp = Timer.getFPGATimestamp();
 
     // Read new camera observations
     Set<Short> tagIds = new HashSet<>();
@@ -44,10 +47,11 @@ public class VisionIOPhotonVision implements VisionIO {
       if (result.hasTargets()) {
         inputs.latestTargetObservation =
             new TargetObservation(
+                timestamp,
                 Rotation2d.fromDegrees(result.getBestTarget().getYaw()),
-                Rotation2d.fromDegrees(result.getBestTarget().getPitch()));
+                Rotation2d.fromDegrees(result.getBestTarget().getPitch()), 0);
       } else {
-        inputs.latestTargetObservation = new TargetObservation(new Rotation2d(), new Rotation2d());
+        inputs.latestTargetObservation = new TargetObservation(timestamp, new Rotation2d(), new Rotation2d(), 0);
       }
 
       // Add pose observation
