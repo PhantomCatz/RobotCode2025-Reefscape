@@ -14,7 +14,6 @@ import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Alert.AlertType;
-import edu.wpi.first.wpilibj.RobotState;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.CatzRobotTracker;
 import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.CatzRobotTracker.TxTyObservation;
@@ -164,16 +163,16 @@ public class CatzVision extends SubsystemBase {
       //------------------------------------------------------------------------------------------------------------------------------------;
       var targetObservation = inputs[cameraIndex].latestTargetObservation;
 
-      
+
       double distance = 0.1;
       txTyObservations.put(
-            targetObservation.tagID(), new TxTyObservation(targetObservation.tagID(), 
-                                                           cameraIndex, 
-                                                           targetObservation.tx().getDegrees(), 
-                                                           targetObservation.ty().getDegrees(), 
-                                                           distance, 
+            targetObservation.tagID(), new TxTyObservation(targetObservation.tagID(),
+                                                           cameraIndex,
+                                                           targetObservation.tx().getDegrees(),
+                                                           targetObservation.ty().getDegrees(),
+                                                           distance,
                                                            targetObservation.timestampe()));
-    
+
 
       // Save tx ty observation data
       for (var observation : txTyObservations.values()) {

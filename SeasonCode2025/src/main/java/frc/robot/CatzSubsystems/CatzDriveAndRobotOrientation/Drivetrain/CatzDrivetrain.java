@@ -214,7 +214,7 @@ public class CatzDrivetrain extends SubsystemBase {
   //
   // --------------------------------------------------------------------------------------------------------------------------
   public void drive(ChassisSpeeds chassisSpeeds) {
-    chassisSpeeds = ChassisSpeeds.discretize(chassisSpeeds, CatzConstants.LOOP_TIME);
+    //chassisSpeeds = ChassisSpeeds.discretize(chassisSpeeds, CatzConstants.LOOP_TIME);
     currentSetpoint =
             swerveSetpointGenerator.generateSetpoint(
                 DriveConstants.moduleLimitsFree,

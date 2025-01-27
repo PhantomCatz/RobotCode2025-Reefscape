@@ -8,6 +8,7 @@
 package frc.robot;
 
 import com.pathplanner.lib.pathfinding.Pathfinding;
+
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.RobotController;
@@ -16,9 +17,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import frc.robot.CatzConstants.RobotHardwareMode;
 import frc.robot.CatzConstants.RobotID;
-import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.CatzRobotTracker;
 import frc.robot.CatzSubsystems.CatzLEDs.CatzLED;
-import frc.robot.CatzSubsystems.CatzSuperstructure.LeftRight;
 import frc.robot.Commands.ControllerModeAbstraction;
 import frc.robot.Utilities.Alert;
 import frc.robot.Utilities.Alert.AlertType;
@@ -343,11 +342,11 @@ public class Robot extends LoggedRobot {
     LAST_DEPLOYMENT_WARNING.set(true);
     if (m_autonomousCommand != null) {
       m_autonomousCommand.cancel();
-      
+
     }
 
     teleStart = Timer.getFPGATimestamp();
-    CatzRobotTracker.getInstance().resetPose(m_robotContainer.getAutonomous().calculateReefPos(2, LeftRight.LEFT));
+    //CatzRobotTracker.getInstance().resetPose(m_robotContainer.getAutonomous().calculateReefPos(2, LeftRight.LEFT));
 
     //CatzRobotTracker.getInstance().resetPose(new Pose2d(Reef.center, Rotation2d.kZero));
   }

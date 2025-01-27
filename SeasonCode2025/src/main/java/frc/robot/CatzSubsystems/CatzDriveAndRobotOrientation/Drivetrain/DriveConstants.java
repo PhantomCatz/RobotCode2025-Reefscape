@@ -71,11 +71,10 @@ public class DriveConstants {
                 .robotWidthY(Units.inchesToMeters(29.0))
                 .bumperWidthX(Units.inchesToMeters(32))
                 .bumperWidthY(Units.inchesToMeters(32))
-                .maxLinearVelocity(Units.feetToMeters(17))
-                .maxLinearAcceleration(26) // TODO emperically calculate
-                .maxAngularVelocity(26.0 / (29.0/2.0)) // Radians
-                .maxAngularAcceleration(
-                    Units.degreesToRadians(600)) // Radians // TODO verify angle constraints
+                .maxLinearVelocity(Units.feetToMeters(15))
+                .maxLinearAcceleration(Units.feetToMeters(75.0)) // TODO emperically calculate
+                .maxAngularVelocity(12.0) // Radians
+                .maxAngularAcceleration(6.0) // Radians // TODO verify angle constraints
                 .build();
         case SN1, SN1_2024 ->
             new DriveConfig( //TODO make the builder the same way for these configurations
@@ -85,7 +84,7 @@ public class DriveConstants {
                 Units.inchesToMeters(37),
                 Units.inchesToMeters(33),
                 Units.feetToMeters(12.16),
-                Units.feetToMeters(21.32),
+                Units.feetToMeters(75.32),
                 7.93,
                 29.89);
       };
@@ -99,7 +98,7 @@ public class DriveConstants {
                 1.0 / DCMotor.getKrakenX60Foc(1).KtNMPerAmp, // A/(N*m)
                 0.2,
                 0.0,
-                0.30,
+                0.50,
                 0.005,
                 Mk4iReductions.L2_PLUS.reduction,
                 Mk4iReductions.steer.reduction);
@@ -138,8 +137,9 @@ public class DriveConstants {
                 Mk4iReductions.steer.reduction);
       };
 
+
   public static final ModuleLimits moduleLimitsFree =
-      new ModuleLimits(DRIVE_CONFIG.maxLinearVelocity, DRIVE_CONFIG.maxLinearAcceleration, Units.degreesToRadians(1080.0));
+      new ModuleLimits(25.0, DRIVE_CONFIG.maxLinearAcceleration, Units.degreesToRadians(1080.0));
 
   // -------------------------------------------------------------------------------
   // Odometry Constants
