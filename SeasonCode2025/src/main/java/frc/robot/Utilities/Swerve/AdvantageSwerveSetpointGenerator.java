@@ -37,7 +37,7 @@ import lombok.experimental.ExtensionMethod;
 @Builder
 @RequiredArgsConstructor
 @ExtensionMethod({GeomUtil.class, EqualsUtil.GeomExtensions.class})
-public class SwerveSetpointGenerator {
+public class AdvantageSwerveSetpointGenerator {
   private final SwerveDriveKinematics kinematics;
   private final Translation2d[] moduleLocations;
 
@@ -195,9 +195,9 @@ public class SwerveSetpointGenerator {
    * @return A Setpoint object that satisfies all of the KinematicLimits while converging to
    *     desiredState quickly.
    */
-  public SwerveSetpoint generateSetpoint(
+  public AdvantageSwerveSetpoint generateSetpoint(
       final ModuleLimits limits,
-      final SwerveSetpoint prevSetpoint,
+      final AdvantageSwerveSetpoint prevSetpoint,
       ChassisSpeeds desiredState,
       double dt) {
     final Translation2d[] modules = moduleLocations;
@@ -398,6 +398,6 @@ public class SwerveSetpointGenerator {
         retStates[i].speedMetersPerSecond *= -1.0;
       }
     }
-    return new SwerveSetpoint(retSpeeds, retStates);
+    return new AdvantageSwerveSetpoint(retSpeeds, retStates);
   }
 }

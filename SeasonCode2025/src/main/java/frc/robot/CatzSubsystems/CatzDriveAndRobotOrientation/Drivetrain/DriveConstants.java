@@ -71,8 +71,8 @@ public class DriveConstants {
                 .robotWidthY(Units.inchesToMeters(29.0))
                 .bumperWidthX(Units.inchesToMeters(32))
                 .bumperWidthY(Units.inchesToMeters(32))
-                .maxLinearVelocity(Units.feetToMeters(15))
-                .maxLinearAcceleration(Units.feetToMeters(75.0)) // TODO emperically calculate
+                .maxLinearVelocity(Units.feetToMeters(17))
+                .maxLinearAcceleration(Units.feetToMeters(120.0)) // TODO emperically calculate
                 .maxAngularVelocity(12.0) // Radians
                 .maxAngularAcceleration(6.0) // Radians // TODO verify angle constraints
                 .build();
@@ -139,7 +139,7 @@ public class DriveConstants {
 
 
   public static final ModuleLimits moduleLimitsFree =
-      new ModuleLimits(25.0, DRIVE_CONFIG.maxLinearAcceleration, Units.degreesToRadians(1080.0));
+      new ModuleLimits(DRIVE_CONFIG.maxLinearVelocity(), DRIVE_CONFIG.maxLinearAcceleration(), DRIVE_CONFIG.maxAngularVelocity());
 
   // -------------------------------------------------------------------------------
   // Odometry Constants
@@ -214,13 +214,6 @@ public class DriveConstants {
     MODULE_TRANSLATIONS[INDEX_FL] = new Translation2d( DRIVE_CONFIG.robotLengthX(),  DRIVE_CONFIG.robotWidthY()).div(2.0);
   }
 
-  public static final Translation2d[] TRAJECTORY_MODULE_TRANSLATIONS = new Translation2d[4];
-  static {
-    TRAJECTORY_MODULE_TRANSLATIONS[TRAJ_INDEX_FL] = new Translation2d( DRIVE_CONFIG.robotLengthX(),  DRIVE_CONFIG.robotWidthY()).div(2.0);
-    TRAJECTORY_MODULE_TRANSLATIONS[TRAJ_INDEX_FR] = new Translation2d( DRIVE_CONFIG.robotLengthX(), -DRIVE_CONFIG.robotWidthY()).div(2.0);
-    TRAJECTORY_MODULE_TRANSLATIONS[TRAJ_INDEX_BL] = new Translation2d(-DRIVE_CONFIG.robotLengthX(),  DRIVE_CONFIG.robotWidthY()).div(2.0);
-    TRAJECTORY_MODULE_TRANSLATIONS[TRAJ_INDEX_BR] = new Translation2d(-DRIVE_CONFIG.robotLengthX(), -DRIVE_CONFIG.robotWidthY()).div(2.0);
-  }
 
 
   // calculates the orientation and speed of individual swerve modules when given
@@ -258,14 +251,14 @@ public class DriveConstants {
   public static final double ROBOT_MASS = 68.0;
   public static final double ROBOT_MOI =
       (1.0 / 12.0) * ROBOT_MASS * (Math.pow(DRIVE_CONFIG.bumperWidthX(), 2) + Math.pow(DRIVE_CONFIG.bumperWidthY(),2)); // ROBOT_MASS * (2/2) * (kA_ANGULAR_ACCEL/kA_LINEAR_ACCEL); // TODO need to
-  // recaculate with formula on Pathplanner
+  // TODO recaculate with formula on Pathplanner
 
   public static final double TREAD_COEF_FRICTION = 1.542;
 
   public static final ModuleConfig TRAJECTORY_MODULE_CONFIG =
       new ModuleConfig(
           DRIVE_CONFIG.wheelRadius(),
-          DRIVE_CONFIG.maxLinearVelocity() * 8, // TODO possibly need to scale down to prevent wheel slip, only here for sim implementation
+          DRIVE_CONFIG.maxLinearVelocity(),
           TREAD_COEF_FRICTION,
           DCMotor.getKrakenX60(1).withReduction(MODULE_GAINS_AND_RATIOS.driveReduction()),
           DRIVE_CURRENT_LIMIT,
@@ -273,7 +266,7 @@ public class DriveConstants {
 
   public static final RobotConfig TRAJECTORY_CONFIG =
       new RobotConfig(
-          ROBOT_MASS, ROBOT_MOI, TRAJECTORY_MODULE_CONFIG, TRAJECTORY_MODULE_TRANSLATIONS);
+          ROBOT_MASS, ROBOT_MOI, TRAJECTORY_MODULE_CONFIG, MODULE_TRANSLATIONS);
 
   // -----------------------------------------------------------------------------------------------------------------------------
   //

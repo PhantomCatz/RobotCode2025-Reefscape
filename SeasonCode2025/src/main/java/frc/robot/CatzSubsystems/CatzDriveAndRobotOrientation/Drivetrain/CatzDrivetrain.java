@@ -11,7 +11,10 @@ import static frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.Drivetrain.D
 
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.pathplanner.lib.pathfinding.Pathfinding;
+import com.pathplanner.lib.util.DriveFeedforwards;
 import com.pathplanner.lib.util.PathPlannerLogging;
+import com.pathplanner.lib.util.swerve.SwerveSetpoint;
+import com.pathplanner.lib.util.swerve.SwerveSetpointGenerator;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -33,8 +36,8 @@ import frc.robot.Robot;
 import frc.robot.Utilities.Alert;
 import frc.robot.Utilities.EqualsUtil;
 import frc.robot.Utilities.LocalADStarAK;
-import frc.robot.Utilities.Swerve.SwerveSetpoint;
-import frc.robot.Utilities.Swerve.SwerveSetpointGenerator;
+import frc.robot.Utilities.Swerve.AdvantageSwerveSetpoint;
+import frc.robot.Utilities.Swerve.AdvantageSwerveSetpointGenerator;
 
 import java.util.Arrays;
 import org.littletonrobotics.junction.AutoLogOutput;
@@ -57,8 +60,17 @@ public class CatzDrivetrain extends SubsystemBase {
   private CatzSwerveModule[] m_swerveModules = new CatzSwerveModule[4];
   private SwerveModuleState[] optimizedDesiredStates = new SwerveModuleState[4];
 
-  private SwerveSetpoint currentSetpoint =
-      new SwerveSetpoint(
+  // Swerve modules representing each corner of the robot
+  public final CatzSwerveModule RT_FRNT_MODULE;
+  public final CatzSwerveModule RT_BACK_MODULE;
+  public final CatzSwerveModule LT_BACK_MODULE;
+  public final CatzSwerveModule LT_FRNT_MODULE;
+
+  //---------------------------------------------------------------------------------
+  //   Swerve Setpoint Generator
+  //---------------------------------------------------------------------------------
+  private AdvantageSwerveSetpoint advModuleSetpoint =
+      new AdvantageSwerveSetpoint(
           new ChassisSpeeds(),
           new SwerveModuleState[] {
             new SwerveModuleState(),
@@ -66,16 +78,10 @@ public class CatzDrivetrain extends SubsystemBase {
             new SwerveModuleState(),
             new SwerveModuleState()
           });
-  private final SwerveSetpointGenerator swerveSetpointGenerator;
-
-  // Swerve modules representing each corner of the robot
-  public final CatzSwerveModule RT_FRNT_MODULE;
-  public final CatzSwerveModule RT_BACK_MODULE;
-  public final CatzSwerveModule LT_BACK_MODULE;
-  public final CatzSwerveModule LT_FRNT_MODULE;
+  private final AdvantageSwerveSetpointGenerator swerveSetpointGenerator;
 
 
-  // Swerve setpoint generator
+
   private final Field2d field;
 
   public CatzDrivetrain() {
@@ -95,10 +101,6 @@ public class CatzDrivetrain extends SubsystemBase {
 
     gyroDisconnected = new Alert("Gyro disconnected!", Alert.AlertType.kWarning);
 
-
-    // Swerve Setpoint Generator
-    swerveSetpointGenerator = new SwerveSetpointGenerator(DriveConstants.SWERVE_KINEMATICS, DriveConstants.MODULE_TRANSLATIONS);
-
     // Create swerve modules for each corner of the robot
     RT_FRNT_MODULE = new CatzSwerveModule(DriveConstants.MODULE_CONFIGS[INDEX_FR], MODULE_NAMES[INDEX_FR]);
     RT_BACK_MODULE = new CatzSwerveModule(DriveConstants.MODULE_CONFIGS[INDEX_BR], MODULE_NAMES[INDEX_BR]);
@@ -110,6 +112,9 @@ public class CatzDrivetrain extends SubsystemBase {
     m_swerveModules[INDEX_BR] = RT_BACK_MODULE;
     m_swerveModules[INDEX_BL] = LT_BACK_MODULE;
     m_swerveModules[INDEX_FL] = LT_FRNT_MODULE;
+
+    // Swerve Setpoint Generator
+    swerveSetpointGenerator = new AdvantageSwerveSetpointGenerator(DriveConstants.SWERVE_KINEMATICS, DriveConstants.MODULE_TRANSLATIONS);
 
     // ---------------------------------------------------------------------------------
     // Pathplanner Logging
@@ -214,23 +219,24 @@ public class CatzDrivetrain extends SubsystemBase {
   //
   // --------------------------------------------------------------------------------------------------------------------------
   public void drive(ChassisSpeeds chassisSpeeds) {
-    //chassisSpeeds = ChassisSpeeds.discretize(chassisSpeeds, CatzConstants.LOOP_TIME);
-    currentSetpoint =
-            swerveSetpointGenerator.generateSetpoint(
-                DriveConstants.moduleLimitsFree,
-                currentSetpoint,
-                chassisSpeeds,
-                CatzConstants.LOOP_TIME);
-    SwerveModuleState[] setpointStates = currentSetpoint.moduleStates();
+    ChassisSpeeds descreteSpeeds = ChassisSpeeds.discretize(chassisSpeeds, CatzConstants.LOOP_TIME);
+    // 254 Setpoint Generator
+    advModuleSetpoint = swerveSetpointGenerator.generateSetpoint(
+                        DriveConstants.moduleLimitsFree,
+                        advModuleSetpoint,
+                        descreteSpeeds,
+                        CatzConstants.LOOP_TIME
+                      );
+    SwerveModuleState[] advModuleStates = advModuleSetpoint.moduleStates();
+
     // --------------------------------------------------------
     // Convert chassis speeds to individual module states and set module states
     // --------------------------------------------------------
-    SwerveModuleState[] unoptimizedModuleStates = DriveConstants.SWERVE_KINEMATICS.toSwerveModuleStates(chassisSpeeds);
+    SwerveModuleState[] unoptimizedModuleStates = DriveConstants.SWERVE_KINEMATICS.toSwerveModuleStates(descreteSpeeds);
     // --------------------------------------------------------
     // Scale down wheel speeds
     // --------------------------------------------------------
     SwerveDriveKinematics.desaturateWheelSpeeds(unoptimizedModuleStates, DriveConstants.DRIVE_CONFIG.maxLinearVelocity());
-
     // --------------------------------------------------------
     // Optimize Wheel Angles
     // --------------------------------------------------------
@@ -239,16 +245,16 @@ public class CatzDrivetrain extends SubsystemBase {
       optimizedDesiredStates[i] = m_swerveModules[i].optimizeWheelAngles(unoptimizedModuleStates[i]);
 
       // Set module states to each of the swerve modules
-      m_swerveModules[i].setModuleAngleAndVelocity(setpointStates[i]);
+      m_swerveModules[i].setModuleAngleAndVelocity(advModuleStates[i]);
     }
 
     // --------------------------------------------------------
     // Logging
     // --------------------------------------------------------
 
-    Logger.recordOutput("Drive/chassispeeds", chassisSpeeds);
+    Logger.recordOutput("Drive/chassispeeds", descreteSpeeds);
     Logger.recordOutput("Drive/modulestates", optimizedDesiredStates);
-    Logger.recordOutput("Drive/SetpointGeneratorModuleStates", setpointStates);
+    Logger.recordOutput("Drive/SetpointGeneratorModuleStates", advModuleStates);
   }
 
   public void simpleDrive(ChassisSpeeds speeds) {
