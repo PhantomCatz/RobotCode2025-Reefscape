@@ -83,8 +83,6 @@ public class CatzElevator extends SubsystemBase {
     io.updateInputs(inputs);
     Logger.processInputs("elevator", inputs);
 
-    io.runMotor(elevatorSpeed); // System.out.println(tunableNumber.get());
-
     io.runSetpoint(elevatorPos.getTargetPositionRotations(), ff.calculate(inputs.velocityRpm));
   }
 
