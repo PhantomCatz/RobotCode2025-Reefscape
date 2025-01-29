@@ -15,8 +15,9 @@ public class CatzSuperstructure extends VirtualSubsystem {
 
     @Getter @Setter
     private Gamepiece chosenGamepiece = Gamepiece.CORAL;
-    private int level = 1;
 
+    @Getter @Setter
+    private int level = 1;
 
     @Getter @Setter
     private RobotState currentRobotState = RobotState.STOW;
@@ -49,14 +50,6 @@ public class CatzSuperstructure extends VirtualSubsystem {
         INTAKE,
         INTAKE_GROUND,
         STOW
-    }
-
-    public int getLevel(){
-        return level;
-    }
-
-    public void setLevel(int lvl){
-        this.level = lvl;
     }
 
 

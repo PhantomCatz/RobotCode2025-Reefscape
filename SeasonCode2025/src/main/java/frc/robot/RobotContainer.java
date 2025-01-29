@@ -44,10 +44,8 @@ public class RobotContainer {
   private static CatzLED led = CatzLED.getInstance();
   private static CatzRobotTracker robotTracker = CatzRobotTracker.getInstance();
   private static CatzVision vision = new CatzVision(new VisionIOLimelight("limelight-soba"));
-
   private static CatzOuttake outtake = new CatzOuttake();
   private static CatzElevator elevator = new CatzElevator();
-
   private static CatzSuperstructure superstructure = new CatzSuperstructure();
 
   // ------------------------------------------------------------------------------------------------------------------
@@ -67,7 +65,6 @@ public class RobotContainer {
   // -------------------------------------------------------------------------------------------------------------------
   // Auto Declaration
   // ---------------------------------------------------------------------------------------------------------------------
-  private AutomatedSequenceCmds autosequence = new AutomatedSequenceCmds();
   private CatzAutonomous auto = new CatzAutonomous(this);
 
   public RobotContainer() {
@@ -111,10 +108,34 @@ public class RobotContainer {
   LeftRight leftRightReef = LeftRight.LEFT;
 
   private void configureBindings() {
-    /* XBOX AUX */
-
-    /* XBOX DRIVE */
+    //---------------------------------------------------------------------------------------------------------------------
+    // XBOX DRIVE
+    //---------------------------------------------------------------------------------------------------------------------
     xboxDrv.start().onTrue(drive.cancelTrajectory());
+
+    // Autodrive Execution
+    xboxDrv.a().onTrue(
+      Commands.runOnce(
+          () -> {
+            currentPathfindingCommand = auto.calculateReefPos(POVReefAngle, leftRightReef);
+            currentPathfindingCommand.schedule();
+          }
+      )
+    );
+
+    xboxDrv.a().onFalse(Commands.runOnce(() -> currentPathfindingCommand.cancel()));
+    xboxDrv.a().toggleOnTrue(outtake.startIntaking().alongWith(Commands.print("pressed a")));
+    xboxDrv.y().toggleOnTrue(outtake.runMotor().alongWith(Commands.print("pressed y")));
+
+    xboxAux.a().toggleOnTrue(elevator.runMotor().alongWith(Commands.print("pressed elevator a")));
+    xboxAux
+        .y()
+        .toggleOnTrue(elevator.runMotorBck().alongWith(Commands.print("pressed elevator y")));
+
+    drive.setDefaultCommand(
+        new TeleopDriveCmd(
+            () -> xboxDrv.getLeftX(), () -> xboxDrv.getLeftY(), () -> xboxDrv.getRightX(), drive));
+
 
     // Auto Driving
     // Autodriving Reef Position 0-5 CCW; 0 Facing Driver Stations
@@ -129,6 +150,9 @@ public class RobotContainer {
     xboxDrv.leftBumper().onTrue(Commands.runOnce(() -> leftRightReef = LeftRight.LEFT));
     xboxDrv.rightBumper().onTrue(Commands.runOnce(() -> leftRightReef = LeftRight.RIGHT));
 
+    //---------------------------------------------------------------------------------------------------------------------
+    // XBOX AUX 
+    //---------------------------------------------------------------------------------------------------------------------
     xboxAux.povRight().onTrue(Commands.runOnce(()->superstructure.setLevel(1)));
     xboxAux.povUp().onTrue(Commands.runOnce(() -> superstructure.setLevel(2)));
     xboxAux.povLeft().onTrue(Commands.runOnce(() -> superstructure.setLevel(3)));
@@ -144,31 +168,6 @@ public class RobotContainer {
 
 
     xboxAux.a().onTrue(Commands.runOnce(()-> System.out.println("L:"+superstructure.getLevel()+", "+superstructure.getChosenGamepiece())));
-
-    // Autodrive Execution
-    xboxDrv
-        .a()
-        .onTrue(
-            Commands.runOnce(
-                () -> {
-                  currentPathfindingCommand = auto.calculateReefPos(POVReefAngle, leftRightReef);
-                  currentPathfindingCommand.schedule();
-                }));
-
-    xboxDrv.a().onFalse(Commands.runOnce(() -> currentPathfindingCommand.cancel()));
-    xboxDrv.a().toggleOnTrue(outtake.startIntaking().alongWith(Commands.print("pressed a")));
-    xboxDrv.y().toggleOnTrue(outtake.runMotor().alongWith(Commands.print("pressed y")));
-
-    xboxAux.a().toggleOnTrue(elevator.runMotor().alongWith(Commands.print("pressed elevator a")));
-    xboxAux
-        .y()
-        .toggleOnTrue(elevator.runMotorBck().alongWith(Commands.print("pressed elevator y")));
-
-    drive.setDefaultCommand(
-        new TeleopDriveCmd(
-            () -> xboxDrv.getLeftX(), () -> xboxDrv.getLeftY(), () -> xboxDrv.getRightX(), drive));
-    // TODO add triggers to put default as priority
-
   }
 
   // ---------------------------------------------------------------------------
