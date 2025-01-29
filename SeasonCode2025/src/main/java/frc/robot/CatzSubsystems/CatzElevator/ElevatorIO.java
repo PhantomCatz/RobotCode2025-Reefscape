@@ -16,7 +16,7 @@ public interface ElevatorIO {
 
     public boolean isElevatorIOMotorConnected = true;
 
-    public double positionMechs = 0.0;
+    public double positionRotations = 0.0;
     public double velocityRpm = 0.0;
     public double appliedVolts = 0.0;
     public double supplyCurrentAmps = 0.0;
@@ -27,6 +27,8 @@ public interface ElevatorIO {
   public default void runMotor(double Speed) {}
 
   public default void runMotorBck(double Speed) {}
+
+  public default void runCurrent(double amps) {}
 
   public default void updateInputs(ElevatorIOInputsAutoLogged inputs) {}
 

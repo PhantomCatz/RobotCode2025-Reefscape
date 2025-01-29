@@ -16,10 +16,15 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.CatzConstants;
 import frc.robot.Utilities.LoggedTunableNumber;
 import lombok.RequiredArgsConstructor;
+import edu.wpi.first.math.controller.ElevatorFeedforward;
 
 import org.littletonrobotics.junction.Logger;
 
+import com.ctre.phoenix6.StatusSignal;
+import com.ctre.phoenix6.signals.ControlModeValue;
+
 public class CatzElevator extends SubsystemBase {
+
 
   private final ElevatorIO io;
   private final ElevatorIOInputsAutoLogged inputs = new ElevatorIOInputsAutoLogged();
@@ -28,10 +33,17 @@ public class CatzElevator extends SubsystemBase {
       new LoggedTunableNumber("Elevator/MotorPower", 0.1);
 
   private double elevatorSpeed = 0.0;
+  private boolean breakModeEnabled = true;
+  private boolean isCharacterizing = false;
+
+
+  private ElevatorPosition elevatorPos = ElevatorPosition.PosL1Home;
+
+  private ElevatorFeedforward ff;
 
   @RequiredArgsConstructor
   public static enum ElevatorPosition {
-      PosL1Home(() -> 25.0),
+      PosL1Home(() -> 25.0), //TBD
       PosL2(() -> 50.0),
       PosL3(() -> 75.0),
       PosL4(() -> 100.0),
@@ -72,6 +84,42 @@ public class CatzElevator extends SubsystemBase {
     Logger.processInputs("elevator", inputs);
 
     io.runMotor(elevatorSpeed); // System.out.println(tunableNumber.get());
+
+    io.runSetpoint(elevatorPos.getTargetPositionRotations(), ff.calculate(inputs.velocityRpm));
+  }
+
+  
+  //--------------------------------------------------------------------------
+  //
+  //
+  //
+  //--------------------------------------------------------------------------
+
+  public double getElevatorPositionRotations() {
+    return inputs.positionRotations;
+  }
+
+  public boolean isElevatorInPosition() {
+    return (Math.abs((getElevatorPositionRotations() - elevatorPos.getTargetPositionRotations())) < 5.0);
+  }
+
+  public void setBrakeMode(boolean enabled) {
+    if(breakModeEnabled == false) return;
+    breakModeEnabled = true;
+    io.setBrakeMode(breakModeEnabled);
+  }
+
+  public void runCharacterization(double amps) {
+    isCharacterizing = true;
+    io.runCurrent(amps);
+  }
+
+  public double getCharacterizationVelocity() {
+    return inputs.velocityRpm;
+  }
+
+  public void endCharacterization() {
+    isCharacterizing = false;
   }
 
   public Command setElevatorPos() {

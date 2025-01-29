@@ -7,41 +7,61 @@
 
 package frc.robot.CatzSubsystems.CatzElevator;
 
+import static frc.robot.CatzSubsystems.CatzElevator.ElevatorConstants.*;
+
+import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.*;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.*;
 
+import edu.wpi.first.units.measure.AngularVelocity;
+
 public class ElevatorIOReal implements ElevatorIO {
-  private final TalonFX elevatorMotor1;
-  private final TalonFX elevatorMotor2;
+  private final TalonFX leaderTalon;
+  private final TalonFX followerTalon;
   private final TalonFXConfiguration config = new TalonFXConfiguration();
   private final MotionMagicVoltage positionControl =
       new MotionMagicVoltage(0.0).withUpdateFreqHz(0.0);
 
+  //Needs to be initialzed TBD
+  // private final StatusSignal<ControlModeValue> motorState;
+  // private final StatusSignal<Double> internalPositionRotations;
+  // private final StatusSignal<Double> velocityRPM;
+  // private final StatusSignal<Double> appliedVoltage;
+  // private final StatusSignal<Double> supplyCurrent;
+  // private final StatusSignal<Double> torqueCurrent;
+  // private final StatusSignal<Double> tempCelsius;
+
   public ElevatorIOReal() {
-    elevatorMotor1 = new TalonFX(0);
-    elevatorMotor2 = new TalonFX(1);
+    leaderTalon = new TalonFX(leaderID);
+    followerTalon = new TalonFX(followerID);
     config.MotorOutput.NeutralMode = NeutralModeValue.Brake;
-    elevatorMotor1.getConfigurator().apply(config, 1.0);
-    elevatorMotor2.getConfigurator().apply(config, 1.0);
+    leaderTalon.getConfigurator().apply(config, 1.0);
+    followerTalon.getConfigurator().apply(config, 1.0);
+
+    // motorState = leaderTalon.getControlMode();
+    // velocityRPM = leaderTalon.getVelocity();
+    // internalPositionRotations = leaderTalon.getPosition();
+
   }
+
 
   @Override
   public void runSetpoint(double setpointRotations, double feedforward) {
     System.out.println(setpointRotations);
-    elevatorMotor1.setControl(positionControl.withPosition(setpointRotations).withFeedForward(feedforward));
+    leaderTalon.setControl(positionControl.withPosition(setpointRotations).withFeedForward(feedforward));
   }
 
   @Override
   public void setBrakeMode(boolean enabled) {
-    elevatorMotor1.setNeutralMode(enabled ? NeutralModeValue.Brake : NeutralModeValue.Coast);
-    elevatorMotor2.setNeutralMode(enabled ? NeutralModeValue.Brake : NeutralModeValue.Coast);
+    leaderTalon.setNeutralMode(enabled ? NeutralModeValue.Brake : NeutralModeValue.Coast);
+    followerTalon.setNeutralMode(enabled ? NeutralModeValue.Brake : NeutralModeValue.Coast);
   }
 
   @Override
   public void runMotor(double speed) {
-    elevatorMotor1.set(speed);
-    elevatorMotor2.set(-speed);
+    leaderTalon.set(speed);
+    followerTalon.set(-speed);
   }
 }
