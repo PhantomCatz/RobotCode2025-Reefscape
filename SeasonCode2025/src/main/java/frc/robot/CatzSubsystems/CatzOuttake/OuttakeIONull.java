@@ -7,5 +7,6 @@
 
 package frc.robot.CatzSubsystems.CatzOuttake;
 
-/** Add your docs here. */
-public class OuttakeIONull implements OuttakeIO{}
+public class OuttakeIONull {
+
+}

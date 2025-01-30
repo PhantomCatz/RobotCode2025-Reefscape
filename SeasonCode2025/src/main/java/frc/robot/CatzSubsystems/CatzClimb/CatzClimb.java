@@ -12,6 +12,8 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Utilities.LoggedTunableNumber;
 import java.util.function.DoubleSupplier;
+import java.util.function.Supplier;
+
 import lombok.RequiredArgsConstructor;
 import org.littletonrobotics.junction.Logger;
 
@@ -21,6 +23,9 @@ public class CatzClimb extends SubsystemBase {
   private final ClimbIOInputsAutoLogged inputs = new ClimbIOInputsAutoLogged();
 
   private Position PositionType;
+  static double manualPow = 0;
+  static boolean isManual;
+  static final double MANUAL_SCALE = 5;
   static double position;
   static LoggedTunableNumber tunnablePos = new LoggedTunableNumber("Climb/TunnablePosition", 1);
   static LoggedTunableNumber kP = new LoggedTunableNumber("Climb/kP", 0.17);
@@ -43,8 +48,12 @@ public class CatzClimb extends SubsystemBase {
   // ^^ Hallo make sure you set this to the correct motor ^^  //
   // ==========================================================//
   @RequiredArgsConstructor
-  public enum Position {
-    ZERO(() -> 0.0),
+  public enum Position { //In degrees
+    RETRACT(() -> -46),
+    HOME(() -> 0.0),
+    STOW(() -> 40.0),
+    FULLTURN(() -> 90),
+    MANUAL(() -> manualPow),
     TUNNABLE(tunnablePos);
 
     private final DoubleSupplier motionType;
@@ -57,19 +66,53 @@ public class CatzClimb extends SubsystemBase {
   @Override
   public void periodic() {
     io.updateInputs(inputs);
-    Logger.processInputs("Position", inputs);
+    Logger.processInputs("Climb/inputs", inputs);
     // System.out.println(position);
     if (DriverStation.isDisabled()) {
 
     } else {
-      io.setPosition(position);
+      // if(isManual) {
+      //   io.setPower(manualPow);
+      // } else {
+        io.setPosition(position);
+      // }
     }
     Logger.recordOutput("Position/targetPosition", position);
   }
 
-  public Command setPosition() {
-    return startEnd(
-        () -> position = Position.TUNNABLE.getTargetMotionPosition(),
-        () -> position = Position.ZERO.getTargetMotionPosition());
+  public Command Climb_Stow() {
+    return runOnce(() -> setClimbPos(Position.STOW));
+  }
+
+  public Command Climb_Home() {
+    return runOnce(() -> setClimbPos(Position.HOME));
+  }
+
+  public Command Climb_Retract() {
+    return runOnce(() -> setClimbPos(Position.RETRACT));
+  }
+
+  public Command Climb_Full() {
+    return runOnce(() -> setClimbPos(Position.FULLTURN));
+  }
+
+  public Command Climb_Tunnable() {
+    return runOnce(() -> setClimbPos(Position.TUNNABLE));
+  }
+
+  public void setClimbPos(Position target) {
+    position = target.getTargetMotionPosition();
+    isManual = false;
+  }
+
+  public void climbManual(Supplier<Double> manualSupplier) {
+    // manualPow = manualSupplier.get();
+    // isManual = true;
+    position += manualSupplier.get() * MANUAL_SCALE;
+    System.out.println(position);
+  }
+
+  public Command ClimbManualMode(Supplier<Double> manualSupplier) {
+    return run(() -> climbManual(manualSupplier));
   }
 }

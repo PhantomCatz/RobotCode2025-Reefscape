@@ -10,20 +10,25 @@ package frc.robot.CatzSubsystems.CatzOuttake;
 
 import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkBase.ResetMode;
+import com.revrobotics.spark.SparkBase.PersistMode;
+import com.revrobotics.spark.SparkBase.ResetMode;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkMaxConfig;
+import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
+import com.revrobotics.spark.config.SparkMaxConfig;
 
-import edu.wpi.first.wpilibj.DigitalInput;
 
 public class OuttakeIOReal implements OuttakeIO {
 
-  private final DigitalInput beamBreakBck;
-  private final DigitalInput beamBreakFrnt;
+  // private final DigitalInput beamBreakBck;
+  // private final DigitalInput beamBreakFrnt;
 
   private final SparkMax OuttakeLeftMtr;
   private final SparkMax OuttakeRightMtr;
+
+  // private SparkBaseConfig globalConfig;
 
   private SparkMaxConfig globalConfig = new SparkMaxConfig();
 
@@ -37,8 +42,8 @@ public class OuttakeIOReal implements OuttakeIO {
     globalConfig.voltageCompensation(12);
     updateConfig();
 
-    beamBreakBck = new DigitalInput(3);
-    beamBreakFrnt = new DigitalInput(6);
+    // beamBreakBck = new DigitalInput(3);
+    // beamBreakFrnt = new DigitalInput(6);
   }
 
   private void updateConfig(){
@@ -48,8 +53,8 @@ public class OuttakeIOReal implements OuttakeIO {
 
   @Override
   public void updateInputs(OuttakeIOInputs inputs) {
-    inputs.bbreakFrntTriggered = !beamBreakFrnt.get();
-    inputs.bbreakBackTriggered = !beamBreakBck.get();
+    // inputs.bbreakFrntTriggered = !beamBreakFrnt.get();
+    // inputs.bbreakBackTriggered = !beamBreakBck.get();
   }
 
   @Override
