@@ -15,21 +15,23 @@ import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkMaxConfig;
 
-import edu.wpi.first.wpilibj.DigitalInput;
 
 public class OuttakeIOSparkmax implements OuttakeIO {
 
-  private final DigitalInput beamBreakBck;
-  private final DigitalInput beamBreakFrnt;
+  // private final DigitalInput beamBreakBck;
+  // private final DigitalInput beamBreakFrnt;
 
   private final SparkMax OuttakeLeftMtr;
   private final SparkMax OuttakeRightMtr;
+
+  // private SparkBaseConfig globalConfig;
 
   public OuttakeIOSparkmax() {
     OuttakeLeftMtr = new SparkMax(1, MotorType.kBrushless);
     OuttakeRightMtr = new SparkMax(2, MotorType.kBrushless);
 
     SparkMaxConfig globalConfig = new SparkMaxConfig();
+
 
     globalConfig.smartCurrentLimit(50);
     globalConfig.idleMode(IdleMode.kBrake);
@@ -38,14 +40,14 @@ public class OuttakeIOSparkmax implements OuttakeIO {
     OuttakeLeftMtr.configure(globalConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
     OuttakeRightMtr.configure(globalConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 
-    beamBreakBck = new DigitalInput(3);
-    beamBreakFrnt = new DigitalInput(6);
+    // beamBreakBck = new DigitalInput(3);
+    // beamBreakFrnt = new DigitalInput(6);
   }
 
   @Override
   public void updateInputs(OuttakeIOInputs inputs) {
-    inputs.bbreakFrntTriggered = !beamBreakFrnt.get();
-    inputs.bbreakBackTriggered = !beamBreakBck.get();
+    // inputs.bbreakFrntTriggered = !beamBreakFrnt.get();
+    // inputs.bbreakBackTriggered = !beamBreakBck.get();
   }
 
   @Override

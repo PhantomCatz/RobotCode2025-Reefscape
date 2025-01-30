@@ -18,6 +18,7 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Autonomous.CatzAutonomous;
 import frc.robot.CatzSubsystems.CatzClimb.CatzClimb;
+import frc.robot.CatzSubsystems.CatzAlgaeEffector.CatzAlgaeRemover;
 import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.CatzRobotTracker;
 import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.Drivetrain.CatzDrivetrain;
 import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.Vision.CatzVision;
@@ -48,6 +49,7 @@ public class RobotContainer {
   private static CatzOuttake outtake = new CatzOuttake();
   private static CatzElevator elevator = new CatzElevator();
   private static CatzClimb Climb = new CatzClimb();
+  private static CatzAlgaeRemover algaeEffector = new CatzAlgaeRemover();
 
   // ------------------------------------------------------------------------------------------------------------------
   // Drive Controller Declaration
@@ -174,6 +176,13 @@ public class RobotContainer {
     // OnTrue(elevator.runMotor().alongWith(Commands.print("pressed elevator a")));
     xboxDrv.a().onFalse(Commands.runOnce(() -> currentPathfindingCommand.cancel()));
     xboxDrv.a().toggleOnTrue(outtake.startIntaking().alongWith(Commands.print("pressed a")));
+    xboxAux.a().toggleOnTrue(algaeEffector.eatAlgae().alongWith(Commands.print("pressed a")));
+    xboxAux.y().toggleOnTrue(algaeEffector.eatAlgae().alongWith(Commands.print("pressed y")));
+
+   // xboxAux.a().toggleOnTrue(elevator.runMotor().alongWith(Commands.print("pressed elevator a")));
+    // xboxAux
+    //     .y()
+    //     .toggleOnTrue(elevator.runMotorBck().alongWith(Commands.print("pressed elevator y")));
 
     drive.setDefaultCommand(
         new TeleopDriveCmd(
