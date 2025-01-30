@@ -29,9 +29,8 @@ public class ElevatorIOReal implements ElevatorIO {
 
   @Override
   public void runSetpoint(double setpointRotations, double feedforward) {
-    // System.out.println(setpointRotations);
-    elevatorMotor1.setControl(
-        positionControl.withPosition(setpointRotations).withFeedForward(feedforward));
+    System.out.println(setpointRotations);
+    elevatorMotor1.setControl(positionControl.withPosition(setpointRotations).withFeedForward(feedforward));
   }
 
   @Override
