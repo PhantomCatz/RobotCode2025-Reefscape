@@ -178,7 +178,6 @@ public class CatzVision extends SubsystemBase {
                                                            distance,
                                                            targetObservation.timestampe()));
 
-
       // Save tx ty observation data
       for (var observation : txTyObservations.values()) {
         if (!allTxTyObservations.containsKey(observation.tagId())

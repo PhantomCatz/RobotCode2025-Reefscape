@@ -5,16 +5,16 @@
 // license that can be found in the LICENSE file at
 // the root directory of this project.
 
-package frc.robot.CatzSubsystems.CatzOuttake;
+package frc.robot.CatzSubsystems.CatzAlgaeEffector;
 
 import org.littletonrobotics.junction.AutoLog;
 
-public interface OuttakeIO {
+public interface AlgaeRemoverIO {
 
   @AutoLog
-  public static class OuttakeIOInputs {
+  public static class AlgaeEffectorIOInputs {
 
-    public boolean isIntakeIOMotorConnected = true;
+    public boolean isAlgaeEffectorMotorConnected = true;
 
     public double positionMechs = 0.0;
     public double velocityRpm = 0.0;
@@ -23,19 +23,24 @@ public interface OuttakeIO {
     public double torqueCurrentAmps = 0.0;
     public double tempCelsius = 0.0;
 
-    public boolean bbreakFrntTriggered;
-    public boolean bbreakBackTriggered;
+    public boolean bbreakTriggered;
   }
 
-  public default void updateInputs(OuttakeIOInputs inputs) {}
+  public default void updateInputs(AlgaeEffectorIOInputs inputs) {}
 
-  public default void runMotorLeft(double speed) {}
+  public default void runMotorTop(double speed) {}
 
-  public default void runMotorRight(double speed) {}
+  public default void runMotorBottom(double speed) {}
 
   public default void runMotor(double Speed, double speed2) {}
 
-  public default void setPIDF(double kP, double kI, double kD, double kF) {}
+  public default void runMotorBck(double Speed) {}
+
+  public default void runSparkMax(double Speed) {}
+
+  public default void setPID(double kP, double kI, double kD) {}
+
+  public default void setFF(double kS, double kV, double kA) {}
 
   public default void runCharacterizationMotor(double input) {}
 }

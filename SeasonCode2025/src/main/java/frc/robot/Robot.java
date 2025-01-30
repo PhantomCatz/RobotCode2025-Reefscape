@@ -8,7 +8,6 @@
 package frc.robot;
 
 import com.pathplanner.lib.pathfinding.Pathfinding;
-
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.RobotController;
@@ -349,6 +348,7 @@ public class Robot extends LoggedRobot {
     //CatzRobotTracker.getInstance().resetPose(m_robotContainer.getAutonomous().calculateReefPos(2, LeftRight.LEFT));
 
     //CatzRobotTracker.getInstance().resetPose(new Pose2d(Reef.center, Rotation2d.kZero));
+
   }
 
   @Override

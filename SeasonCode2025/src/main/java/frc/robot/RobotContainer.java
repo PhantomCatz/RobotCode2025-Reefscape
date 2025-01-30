@@ -17,6 +17,9 @@ import frc.robot.Autonomous.CatzAutonomous;
 import frc.robot.CatzSubsystems.CatzSuperstructure;
 import frc.robot.CatzSubsystems.CatzSuperstructure.Gamepiece;
 import frc.robot.CatzSubsystems.CatzSuperstructure.LeftRight;
+import frc.robot.CatzSubsystems.CatzSuperstructure.RobotAction;
+import frc.robot.CatzSubsystems.CatzClimb.CatzClimb;
+import frc.robot.CatzSubsystems.CatzAlgaeEffector.CatzAlgaeRemover;
 import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.CatzRobotTracker;
 import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.Drivetrain.CatzDrivetrain;
 import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.Vision.CatzVision;
@@ -28,6 +31,7 @@ import frc.robot.Commands.AutomatedSequenceCmds;
 import frc.robot.Commands.DriveAndRobotOrientationCmds.TeleopDriveCmd;
 import frc.robot.Utilities.Alert;
 import frc.robot.Utilities.Alert.AlertType;
+
 import org.littletonrobotics.junction.networktables.LoggedNetworkNumber;
 
 public class RobotContainer {
@@ -42,11 +46,11 @@ public class RobotContainer {
   private static CatzLED led = CatzLED.getInstance();
   private static CatzRobotTracker robotTracker = CatzRobotTracker.getInstance();
   private static CatzVision vision = new CatzVision(new VisionIOLimelight("limelight-soba"));
-
   private static CatzOuttake outtake = new CatzOuttake();
   private static CatzElevator elevator = new CatzElevator();
-
   private static CatzSuperstructure superstructure = new CatzSuperstructure();
+  private static CatzClimb Climb = new CatzClimb();
+  private static CatzAlgaeRemover algaeEffector = new CatzAlgaeRemover();
 
   // ------------------------------------------------------------------------------------------------------------------
   // Drive Controller Declaration
@@ -65,7 +69,6 @@ public class RobotContainer {
   // -------------------------------------------------------------------------------------------------------------------
   // Auto Declaration
   // ---------------------------------------------------------------------------------------------------------------------
-  private AutomatedSequenceCmds autosequence = new AutomatedSequenceCmds();
   private CatzAutonomous auto = new CatzAutonomous(this);
 
   public RobotContainer() {
@@ -109,12 +112,51 @@ public class RobotContainer {
   LeftRight leftRightReef = LeftRight.LEFT;
 
   private void configureBindings() {
-    /* XBOX AUX */
-
-    /* XBOX DRIVE */
+    //---------------------------------------------------------------------------------------------------------------------
+    // XBOX DRIVE
+    //---------------------------------------------------------------------------------------------------------------------
     xboxDrv.start().onTrue(drive.cancelTrajectory());
 
+    // Autodrive Execution
+    xboxDrv.a().onTrue(
+      Commands.runOnce(
+          () -> {
+            currentPathfindingCommand = auto.calculateReefPos(POVReefAngle, leftRightReef);
+            currentPathfindingCommand.schedule();
+          }
+      )
+    );
+
+    // xboxDrv.a().onFalse(Commands.runOnce(() -> currentPathfindingCommand.cancel()));
+
+    Trigger LeftJoystickTrigger = new Trigger(
+      () -> Math.abs(xboxDrv.getRightY()) > 0.1);
+    LeftJoystickTrigger.onTrue(Climb.ClimbManualMode(() -> xboxDrv.getRightY()).alongWith(Commands.print("Using manual climb")));
+    LeftJoystickTrigger.onFalse(Climb.ClimbManualMode(() -> 0.0));
+    // xboxDrv.a().toggleOnTrue(Climb.ClimbManualMode(() -> xboxDrv.getRightY()).alongWith(Commands.print("pressed a")));
+    xboxDrv.y().toggleOnTrue(Climb.Climb_Retract().alongWith(Commands.print("pressed y")));
+    xboxDrv.x().toggleOnTrue(Climb.Climb_Home().alongWith(Commands.print("pressed x")));
+    xboxDrv.b().toggleOnTrue(Climb.Climb_Full().alongWith(Commands.print("pressed b")));
+    //xboxDrv.povUp().toggleOnTrue(Climb.setClimbPos(Position.HOME)).alongWith(Commands.print("pressed uppad"));
+    // xboxAux.a().toggle
+    // OnTrue(elevator.runMotor().alongWith(Commands.print("pressed elevator a")));
+    xboxDrv.a().onFalse(Commands.runOnce(() -> currentPathfindingCommand.cancel()));
+    xboxDrv.a().toggleOnTrue(outtake.startIntaking().alongWith(Commands.print("pressed a")));
+    xboxAux.a().toggleOnTrue(algaeEffector.eatAlgae().alongWith(Commands.print("pressed a")));
+    xboxAux.y().toggleOnTrue(algaeEffector.eatAlgae().alongWith(Commands.print("pressed y")));
+
+   // xboxAux.a().toggleOnTrue(elevator.runMotor().alongWith(Commands.print("pressed elevator a")));
+    // xboxAux
+    //     .y()
+    //     .toggleOnTrue(elevator.runMotorBck().alongWith(Commands.print("pressed elevator y")));
+
+    drive.setDefaultCommand(
+        new TeleopDriveCmd(
+            () -> xboxDrv.getLeftX(), () -> xboxDrv.getLeftY(), () -> xboxDrv.getRightX(), drive));
+
+
     // Auto Driving
+    // Autodriving Reef Position 0-5 CCW; 0 Facing Driver Stations
     xboxDrv.povUp().onTrue(Commands.runOnce(() -> POVReefAngle = 0));
     xboxDrv.povUpLeft().onTrue(Commands.runOnce(() -> POVReefAngle = 1));
     xboxDrv.povDownLeft().onTrue(Commands.runOnce(() -> POVReefAngle = 2));
@@ -122,44 +164,28 @@ public class RobotContainer {
     xboxDrv.povDownRight().onTrue(Commands.runOnce(() -> POVReefAngle = 4));
     xboxDrv.povUpRight().onTrue(Commands.runOnce(() -> POVReefAngle = 5));
 
+    // Rung Selection
     xboxDrv.leftBumper().onTrue(Commands.runOnce(() -> leftRightReef = LeftRight.LEFT));
     xboxDrv.rightBumper().onTrue(Commands.runOnce(() -> leftRightReef = LeftRight.RIGHT));
 
+    //---------------------------------------------------------------------------------------------------------------------
+    // XBOX AUX 
+    //---------------------------------------------------------------------------------------------------------------------
     xboxAux.povRight().onTrue(Commands.runOnce(()->superstructure.setLevel(1)));
     xboxAux.povUp().onTrue(Commands.runOnce(() -> superstructure.setLevel(2)));
     xboxAux.povLeft().onTrue(Commands.runOnce(() -> superstructure.setLevel(3)));
     xboxAux.povDown().onTrue(Commands.runOnce(() -> superstructure.setLevel(4)));
 
-    xboxAux.leftBumper().onTrue(Commands.runOnce(() -> superstructure.setGamepieceChoice(Gamepiece.CORAL)));
-    xboxAux.rightBumper().onTrue(Commands.runOnce(() -> superstructure.setGamepieceChoice(Gamepiece.ALGAE)));
+    xboxAux.leftBumper().onTrue(Commands.runOnce(() -> superstructure.setChosenGamepiece(Gamepiece.CORAL)));
+    xboxAux.rightBumper().onTrue(Commands.runOnce(() -> superstructure.setChosenGamepiece(Gamepiece.ALGAE)));
 
-    xboxAux.a().onTrue(Commands.runOnce(()->{
-      System.out.println("L:"+superstructure.getLevel()+", "+superstructure.getGamepieceSelection());
-    }));
+    xboxAux.y().onTrue(Commands.runOnce(() -> superstructure.setCurrentRobotAction(RobotAction.OUTTAKE)).alongWith(Commands.print("OUTTAKE")));
+    xboxAux.x().onTrue(Commands.runOnce(() -> superstructure.setCurrentRobotAction(RobotAction.INTAKE)).alongWith(Commands.print("INTAKE")));
+    xboxAux.b().onTrue(Commands.runOnce(() -> superstructure.setCurrentRobotAction(RobotAction.INTAKE_GROUND)).alongWith(Commands.print("INTAKEGROUND")));
+    xboxAux.a().onTrue(Commands.runOnce(() -> superstructure.setCurrentRobotAction(RobotAction.STOW)).alongWith(Commands.print("STOWWW")));
 
-    xboxDrv
-        .a()
-        .onTrue(
-            Commands.runOnce(
-                () -> {
-                  currentPathfindingCommand = auto.getPathfindingCommand(auto.calculateReefPos(POVReefAngle, leftRightReef));
-                  currentPathfindingCommand.schedule();
-                }));
 
-    xboxDrv.a().onFalse(Commands.runOnce(() -> currentPathfindingCommand.cancel()));
-    xboxDrv.a().toggleOnTrue(outtake.startIntaking().alongWith(Commands.print("pressed a")));
-    xboxDrv.y().toggleOnTrue(outtake.runMotor().alongWith(Commands.print("pressed y")));
-
-    xboxAux.a().toggleOnTrue(elevator.runMotor().alongWith(Commands.print("pressed elevator a")));
-    xboxAux
-        .y()
-        .toggleOnTrue(elevator.runMotorBck().alongWith(Commands.print("pressed elevator y")));
-
-    drive.setDefaultCommand(
-        new TeleopDriveCmd(
-            () -> xboxDrv.getLeftX(), () -> xboxDrv.getLeftY(), () -> xboxDrv.getRightX(), drive));
-    // TODO add triggers to put default as priority
-
+    xboxAux.a().onTrue(Commands.runOnce(()-> System.out.println("L:"+superstructure.getLevel()+", "+superstructure.getChosenGamepiece())));
   }
 
   // ---------------------------------------------------------------------------

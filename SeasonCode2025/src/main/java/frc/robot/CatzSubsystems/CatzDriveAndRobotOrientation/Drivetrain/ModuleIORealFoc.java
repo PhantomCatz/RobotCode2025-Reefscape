@@ -75,9 +75,6 @@ public class ModuleIORealFoc implements ModuleIO {
     MODULE_NAME = name;
 
     encoder = new CANcoder(config.absoluteEncoderChannel(), "*");
-    System.out.println(config.absoluteEncoderChannel());
-    System.out.println(config.driveID());
-    System.out.println(config.steerID());
     m_config = config;
     // Init drive controllers from config constants
     driveTalon = new TalonFX(config.driveID(), "*");
