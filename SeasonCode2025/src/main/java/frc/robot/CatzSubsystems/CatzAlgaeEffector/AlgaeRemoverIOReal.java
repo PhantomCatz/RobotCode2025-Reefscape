@@ -11,38 +11,36 @@ package frc.robot.CatzSubsystems.CatzAlgaeEffector;
 import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkBase.ResetMode;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
+
+import static frc.robot.CatzSubsystems.CatzAlgaeEffector.AlgaeRemoverConstants.*;
+
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkMaxConfig;
 
 
-public class AlgaeEffectorIOSparkmax implements AlgaeEffectorIO {
-
-  //private final DigitalInput beamBreak;
+public class AlgaeRemoverIOReal implements AlgaeRemoverIO {
 
   private final SparkMax algaeEffectorMotorTop;
   private final SparkMax algaeEffectorMotorBot;
 
-  public AlgaeEffectorIOSparkmax() {
-    algaeEffectorMotorTop = new SparkMax(23, MotorType.kBrushless);
-    algaeEffectorMotorBot = new SparkMax(24, MotorType.kBrushless);
+  public AlgaeRemoverIOReal() {
+    algaeEffectorMotorTop = new SparkMax(ALGAE_MOTOR_TOP_ID, MotorType.kBrushless);
+    algaeEffectorMotorBot = new SparkMax(ALGAE_MOTOR_BOT_ID, MotorType.kBrushless);
 
     SparkMaxConfig globalConfig = new SparkMaxConfig();
 
-    globalConfig.smartCurrentLimit(50);
+    globalConfig.smartCurrentLimit(STALL_CURRENT_LIMIT);
     globalConfig.idleMode(IdleMode.kBrake);
     globalConfig.voltageCompensation(12);
 
     algaeEffectorMotorTop.configure(globalConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
     algaeEffectorMotorBot.configure(globalConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 
-    //beamBreak = new DigitalInput(3);
   }
 
   @Override
-  public void updateInputs(AlgaeEffectorIOInputs inputs) {
-    //inputs.bbreakTriggered = !beamBreak.get();
-  }
+  public void updateInputs(AlgaeEffectorIOInputs inputs) {  }
 
   @Override
   public void runMotor(double speed, double speed2) {

@@ -9,7 +9,7 @@ package frc.robot.CatzSubsystems.CatzAlgaeEffector;
 
 import org.littletonrobotics.junction.AutoLog;
 
-public interface AlgaeEffectorIO {
+public interface AlgaeRemoverIO {
 
   @AutoLog
   public static class AlgaeEffectorIOInputs {
