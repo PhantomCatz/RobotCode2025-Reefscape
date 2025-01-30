@@ -9,13 +9,18 @@ package frc.robot.CatzSubsystems.CatzElevator;
 
 import static frc.robot.CatzSubsystems.CatzElevator.ElevatorConstants.*;
 
+import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.*;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.*;
 
+import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
+import edu.wpi.first.units.measure.Current;
+import edu.wpi.first.units.measure.Temperature;
+import edu.wpi.first.units.measure.Voltage;
 
 public class ElevatorIOReal implements ElevatorIO {
   private final TalonFX leaderTalon;
@@ -25,13 +30,13 @@ public class ElevatorIOReal implements ElevatorIO {
       new MotionMagicVoltage(0.0).withUpdateFreqHz(0.0);
 
   //Needs to be initialzed TBD
-  // private final StatusSignal<ControlModeValue> motorState;
-  // private final StatusSignal<Double> internalPositionRotations;
-  // private final StatusSignal<Double> velocityRPM;
-  // private final StatusSignal<Double> appliedVoltage;
-  // private final StatusSignal<Double> supplyCurrent;
-  // private final StatusSignal<Double> torqueCurrent;
-  // private final StatusSignal<Double> tempCelsius;
+  private final StatusSignal<ControlModeValue> motorState;
+  private final StatusSignal<Angle> internalPositionRotations;
+  private final StatusSignal<AngularVelocity> velocityRPM;
+  private final StatusSignal<Voltage> appliedVoltage;
+  private final StatusSignal<Current> supplyCurrent;
+  private final StatusSignal<Current> torqueCurrent;
+  private final StatusSignal<Temperature> tempCelsius;
 
   public ElevatorIOReal() {
     leaderTalon = new TalonFX(leaderID);
@@ -40,11 +45,35 @@ public class ElevatorIOReal implements ElevatorIO {
     leaderTalon.getConfigurator().apply(config, 1.0);
     followerTalon.getConfigurator().apply(config, 1.0);
 
-    // motorState = leaderTalon.getControlMode();
-    // velocityRPM = leaderTalon.getVelocity();
-    // internalPositionRotations = leaderTalon.getPosition();
+    motorState = leaderTalon.getControlMode();
+    velocityRPM = leaderTalon.getVelocity();
+    internalPositionRotations = leaderTalon.getPosition();
+    appliedVoltage = leaderTalon.getMotorVoltage();
+    supplyCurrent = leaderTalon.getSupplyCurrent();
+    torqueCurrent = leaderTalon.getTorqueCurrent();
+    tempCelsius = leaderTalon.getDeviceTemp();
 
   }
+
+    public void updateInputs(ElevatorIOInputs inputs) {
+      inputs.isElevatorIOMotorConnected =
+        BaseStatusSignal.refreshAll(
+          motorState,
+          internalPositionRotations,
+          velocityRPM,
+          appliedVoltage,
+          supplyCurrent,
+          torqueCurrent,
+          tempCelsius)
+          .isOK();
+      inputs.motorState        = motorState.getValueAsDouble();
+      inputs.leaderPositionRotations = internalPositionRotations.getValueAsDouble();
+      inputs.velocityRpm       = velocityRPM.getValueAsDouble();
+      inputs.appliedVolts      = appliedVoltage.getValueAsDouble();
+      inputs.supplyCurrentAmps = supplyCurrent.getValueAsDouble();
+      inputs.torqueCurrentAmps = torqueCurrent.getValueAsDouble();
+      inputs.tempCelsius       = tempCelsius.getValueAsDouble();
+    }
 
 
   @Override

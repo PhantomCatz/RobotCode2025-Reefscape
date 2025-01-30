@@ -11,17 +11,15 @@ import static frc.robot.CatzSubsystems.CatzElevator.ElevatorConstants.*;
 
 import java.util.function.DoubleSupplier;
 
-import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.CatzConstants;
 import frc.robot.Utilities.LoggedTunableNumber;
 import lombok.RequiredArgsConstructor;
 import edu.wpi.first.math.controller.ElevatorFeedforward;
+import edu.wpi.first.wpilibj.DriverStation;
 
 import org.littletonrobotics.junction.Logger;
 
-import com.ctre.phoenix6.StatusSignal;
-import com.ctre.phoenix6.signals.ControlModeValue;
 
 public class CatzElevator extends SubsystemBase {
 
@@ -37,7 +35,7 @@ public class CatzElevator extends SubsystemBase {
   private boolean isCharacterizing = false;
 
 
-  private ElevatorPosition elevatorPos = ElevatorPosition.PosL1Home;
+  private ElevatorPosition targetPosition = ElevatorPosition.PosL1Home;
 
   private ElevatorFeedforward ff;
 
@@ -81,12 +79,36 @@ public class CatzElevator extends SubsystemBase {
   @Override
   public void periodic() {
     io.updateInputs(inputs);
-    Logger.processInputs("elevator", inputs);
+    Logger.processInputs("Elevator/inputs", inputs);
 
-    io.runSetpoint(elevatorPos.getTargetPositionRotations(), ff.calculate(inputs.velocityRpm));
+    // Update controllers when user specifies
+    LoggedTunableNumber.ifChanged(
+        hashCode(), () -> io.setPID(kP.get(), kI.get(), kD.get()), kP, kI, kD);
+    LoggedTunableNumber.ifChanged(
+        hashCode(),
+        () -> ff = new ElevatorFeedforward(kS.get(), kG.get(), kV.get(), kA.get()),
+        kS,
+        kG,
+        kV,
+        kA);
+    LoggedTunableNumber.ifChanged(hashCode(),
+        ()-> io.setMotionMagicParameters(mmCruiseVelocity.get(), mmAcceleration.get(), mmJerk.get()),
+        mmCruiseVelocity,
+        mmAcceleration,
+        mmJerk);
+
+    if(DriverStation.isDisabled() || targetPosition == null) {
+      io.stop();
+    } else {
+      io.runSetpoint(targetPosition.getTargetPositionRotations(), ff.calculate(inputs.velocityRpm));
+    }
+
+    Logger.recordOutput("Elevator/CurrentRotations", getElevatorPositionRotations());
+    Logger.recordOutput("Elevator/isElevatorInPos", isElevatorInPosition());
+
   }
 
-  
+
   //--------------------------------------------------------------------------
   //
   //
@@ -98,7 +120,7 @@ public class CatzElevator extends SubsystemBase {
   }
 
   public boolean isElevatorInPosition() {
-    return (Math.abs((getElevatorPositionRotations() - elevatorPos.getTargetPositionRotations())) < 5.0);
+    return (Math.abs((getElevatorPositionRotations() - targetPosition.getTargetPositionRotations())) < 5.0);
   }
 
   public void setBrakeMode(boolean enabled) {
@@ -120,11 +142,9 @@ public class CatzElevator extends SubsystemBase {
     isCharacterizing = false;
   }
 
-  public Command setElevatorPos() {
-    return runOnce(() ->  elevatorSpeed = tunableNumber.getAsDouble());
+  public void setTargetPosition(ElevatorPosition targetPosition) {
+    this.targetPosition = targetPosition;
   }
 
-  public Command runMotorBck() {
-    return startEnd(() -> elevatorSpeed = tunableNumber.getAsDouble(), () -> elevatorSpeed = 0);
-  }
+
 }

@@ -15,7 +15,11 @@ public interface ElevatorIO {
   public static class ElevatorIOInputs {
 
     public boolean isElevatorIOMotorConnected = true;
+    public boolean isLeaderMotorConnected = true;
+    public boolean isFollowerMotorConnected = true;
 
+    public double motorState;
+    public double leaderPositionRotations = 0.0;
     public double positionRotations = 0.0;
     public double velocityRpm = 0.0;
     public double appliedVolts = 0.0;
@@ -41,4 +45,10 @@ public interface ElevatorIO {
   public default void runSetpoint(double setpointRotations, double feedforward) {}
 
   public default void setBrakeMode(boolean enabled) {}
+
+  public default void setMotionMagicParameters(double cruiseVelocity, double acceleration, double jerk) {}
+
+  public default void stop() {
+
+  }
 }
