@@ -41,9 +41,12 @@ public class ElevatorIOReal implements ElevatorIO {
   public ElevatorIOReal() {
     leaderTalon = new TalonFX(leaderID);
     followerTalon = new TalonFX(followerID);
+    config.TorqueCurrent.PeakForwardTorqueCurrent =  80.0;
+    config.TorqueCurrent.PeakReverseTorqueCurrent = -80.0;
     config.MotorOutput.NeutralMode = NeutralModeValue.Brake;
     leaderTalon.getConfigurator().apply(config, 1.0);
     followerTalon.getConfigurator().apply(config, 1.0);
+    
 
     motorState = leaderTalon.getControlMode();
     velocityRPM = leaderTalon.getVelocity();
