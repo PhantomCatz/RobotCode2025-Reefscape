@@ -6,19 +6,18 @@
 // the root directory of this project.
 
 package frc.robot.CatzSubsystems.CatzOuttake;
+import static frc.robot.CatzSubsystems.CatzOuttake.OuttakeConstants.*;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.CatzConstants;
+
 import org.littletonrobotics.junction.Logger;
 
 public class CatzOuttake extends SubsystemBase {
 
   private final OuttakeIO io;
   private final OuttakeIOInputsAutoLogged inputs = new OuttakeIOInputsAutoLogged();
-
-  // private static LoggedTunableNumber tunableNumber = new LoggedTunableNumber("Intake/MotorPower",
-  // 0.5);
 
   public enum outtakeStates {
     ADJ_INIT,
@@ -30,32 +29,32 @@ public class CatzOuttake extends SubsystemBase {
 
   private outtakeStates currentState = outtakeStates.STOP;
 
-  // private outtakeStates previousState = outtakeStates.STOP;
-
   public CatzOuttake() {
-    switch (CatzConstants.hardwareMode) {
-      case REAL:
-        io = new OuttakeIOSparkmax();
+    if(isOuttakeDisabled) { //Comes from elevator Constants
+      io = new OuttakeIONull();
+      System.out.println("Elevator Unconfigured");
+    } else {
+      switch (CatzConstants.hardwareMode) {
+        case REAL:
+          io = new OuttakeIOReal();
+          System.out.println("Elevator Configured for Real");
         break;
-      case REPLAY:
-        io = new OuttakeIOSparkmax() {};
+        case REPLAY:
+          io = new OuttakeIOReal() {};
+          System.out.println("Elevator Configured for Replayed simulation");
         break;
-      default:
-        io = new OuttakeIOSparkmax();
+        default:
+          io = null;
+          System.out.println("Elevator Unconfigured");
         break;
+      }
     }
   }
-
-  double outtakeRight = 0.3;
-  double outtakeLeft = 0.3;
-  double intakeSpeed = 0.3;
-  double adjustSpeed = 0.1;
 
   @Override
   public void periodic() {
     io.updateInputs(inputs);
-
-    Logger.processInputs("intake", inputs);
+    Logger.processInputs("inputs/Outtake", inputs);
 
     switch (currentState) {
       case ADJ_INIT:
@@ -69,7 +68,7 @@ public class CatzOuttake extends SubsystemBase {
         break;
       case STOP: io.runMotor(0,0);
         break;
-      case TEMP_RUN: io.runMotor(outtakeLeft, outtakeRight);
+      case TEMP_RUN: io.runMotor(OUTTAKE_LT, OUTTAKE_RT);
     }
     // previousState = currentState;
   }
@@ -83,7 +82,7 @@ public class CatzOuttake extends SubsystemBase {
   private void case_adjustInit() {
     System.out.println("using case_adjustInit");
 
-    io.runMotor(intakeSpeed, intakeSpeed);
+    io.runMotor(INTAKE_SPD, INTAKE_SPD);
 
     if (inputs.bbreakFrntTriggered) {
       currentState = outtakeStates.ADJ_BACK;
@@ -93,7 +92,7 @@ public class CatzOuttake extends SubsystemBase {
   private void case_adjustBack() {
     System.out.println("using adjus");
 
-    io.runMotor(adjustSpeed, adjustSpeed);
+    io.runMotor(ADJ_SPD, ADJ_SPD);
     if (!inputs.bbreakBackTriggered) {
       currentState = outtakeStates.STOP;
     }
@@ -102,7 +101,7 @@ public class CatzOuttake extends SubsystemBase {
   private void case_shoot() {
     System.out.println("using case_shoot");
 
-    io.runMotor(outtakeLeft, outtakeRight);
+    io.runMotor(OUTTAKE_LT, OUTTAKE_RT);
     if(!inputs.bbreakFrntTriggered) {
         currentState = outtakeStates.STOP;
     }
