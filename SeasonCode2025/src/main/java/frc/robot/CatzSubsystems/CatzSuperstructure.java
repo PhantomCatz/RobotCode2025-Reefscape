@@ -7,22 +7,24 @@
 
 package frc.robot.CatzSubsystems;
 
+import org.littletonrobotics.junction.AutoLogOutput;
+
 import frc.robot.Utilities.VirtualSubsystem;
 import lombok.Getter;
 import lombok.Setter;
 
 public class CatzSuperstructure extends VirtualSubsystem {
 
-    @Getter @Setter
+    @Getter @Setter @AutoLogOutput(key = "CatzSuperstructure/ChosenGamepiece")
     private Gamepiece chosenGamepiece = Gamepiece.CORAL;
 
-    @Getter @Setter
+    @Getter @Setter @AutoLogOutput(key = "CatzSuperstructure/Level")
     private int level = 1;
 
-    @Getter @Setter
+    @Getter @Setter @AutoLogOutput(key = "CatzSuperstructure/CurrentRobotState")
     private RobotState currentRobotState = RobotState.STOW;
 
-    @Getter @Setter
+    @Getter @Setter @AutoLogOutput(key = "CatzSuperstructure/CurrentRobotAction")
     private RobotAction currentRobotAction = RobotAction.STOW;
 
     public enum Gamepiece{

@@ -69,7 +69,7 @@ public class CatzElevator extends SubsystemBase {
           System.out.println("Elevator Configured for Replayed simulation");
         break;
         default:
-          io = null;
+          io = new ElevatorIONull();
           System.out.println("Elevator Unconfigured");
         break;
       }
