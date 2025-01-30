@@ -7,6 +7,7 @@
 
 package frc.robot;
 
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -115,47 +116,7 @@ public class RobotContainer {
     //---------------------------------------------------------------------------------------------------------------------
     // XBOX DRIVE
     //---------------------------------------------------------------------------------------------------------------------
-    xboxDrv.start().onTrue(drive.cancelTrajectory());
-
-    // Autodrive Execution
-    xboxDrv.a().onTrue(
-      Commands.runOnce(
-          () -> {
-            currentPathfindingCommand = auto.calculateReefPos(POVReefAngle, leftRightReef);
-            currentPathfindingCommand.schedule();
-          }
-      )
-    );
-
-    // xboxDrv.a().onFalse(Commands.runOnce(() -> currentPathfindingCommand.cancel()));
-
-    Trigger LeftJoystickTrigger = new Trigger(
-      () -> Math.abs(xboxDrv.getRightY()) > 0.1);
-    LeftJoystickTrigger.onTrue(Climb.ClimbManualMode(() -> xboxDrv.getRightY()).alongWith(Commands.print("Using manual climb")));
-    LeftJoystickTrigger.onFalse(Climb.ClimbManualMode(() -> 0.0));
-    // xboxDrv.a().toggleOnTrue(Climb.ClimbManualMode(() -> xboxDrv.getRightY()).alongWith(Commands.print("pressed a")));
-    xboxDrv.y().toggleOnTrue(Climb.Climb_Retract().alongWith(Commands.print("pressed y")));
-    xboxDrv.x().toggleOnTrue(Climb.Climb_Home().alongWith(Commands.print("pressed x")));
-    xboxDrv.b().toggleOnTrue(Climb.Climb_Full().alongWith(Commands.print("pressed b")));
-    //xboxDrv.povUp().toggleOnTrue(Climb.setClimbPos(Position.HOME)).alongWith(Commands.print("pressed uppad"));
-    // xboxAux.a().toggle
-    // OnTrue(elevator.runMotor().alongWith(Commands.print("pressed elevator a")));
-    xboxDrv.a().onFalse(Commands.runOnce(() -> currentPathfindingCommand.cancel()));
-    xboxDrv.a().toggleOnTrue(outtake.startIntaking().alongWith(Commands.print("pressed a")));
-    xboxAux.a().toggleOnTrue(algaeEffector.eatAlgae().alongWith(Commands.print("pressed a")));
-    xboxAux.y().toggleOnTrue(algaeEffector.eatAlgae().alongWith(Commands.print("pressed y")));
-
-   // xboxAux.a().toggleOnTrue(elevator.runMotor().alongWith(Commands.print("pressed elevator a")));
-    // xboxAux
-    //     .y()
-    //     .toggleOnTrue(elevator.runMotorBck().alongWith(Commands.print("pressed elevator y")));
-
-    drive.setDefaultCommand(
-        new TeleopDriveCmd(
-            () -> xboxDrv.getLeftX(), () -> xboxDrv.getLeftY(), () -> xboxDrv.getRightX(), drive));
-
-
-    // Auto Driving
+    // Autodrive to Reef
     // Autodriving Reef Position 0-5 CCW; 0 Facing Driver Stations
     xboxDrv.povUp().onTrue(Commands.runOnce(() -> POVReefAngle = 0));
     xboxDrv.povUpLeft().onTrue(Commands.runOnce(() -> POVReefAngle = 1));
@@ -163,19 +124,48 @@ public class RobotContainer {
     xboxDrv.povDown().onTrue(Commands.runOnce(() -> POVReefAngle = 3));
     xboxDrv.povDownRight().onTrue(Commands.runOnce(() -> POVReefAngle = 4));
     xboxDrv.povUpRight().onTrue(Commands.runOnce(() -> POVReefAngle = 5));
-
     // Rung Selection
     xboxDrv.leftBumper().onTrue(Commands.runOnce(() -> leftRightReef = LeftRight.LEFT));
     xboxDrv.rightBumper().onTrue(Commands.runOnce(() -> leftRightReef = LeftRight.RIGHT));
+    xboxDrv.a().onTrue(
+      Commands.runOnce(
+          () -> {
+            Pose2d targetPose = auto.calculateReefPos(POVReefAngle, leftRightReef);
+            currentPathfindingCommand = auto.getPathfindingCommand(targetPose); 
+            currentPathfindingCommand.schedule();
+          }
+      )
+    );
+    xboxDrv.a().onFalse(Commands.runOnce(() -> currentPathfindingCommand.cancel()));
+    
+    drive.setDefaultCommand(
+      new TeleopDriveCmd(
+          () -> xboxDrv.getLeftX(), () -> xboxDrv.getLeftY(), () -> xboxDrv.getRightX(), drive));
 
+
+    // Manual Climb Control
+    Trigger LeftJoystickTrigger = new Trigger(
+      () -> Math.abs(xboxDrv.getRightY()) > 0.1);
+    LeftJoystickTrigger.onTrue(Climb.ClimbManualMode(() -> xboxDrv.getRightY()).alongWith(Commands.print("Using manual climb")));
+    LeftJoystickTrigger.onFalse(Climb.ClimbManualMode(() -> 0.0));
+    
+    // Climb SetPosition Control
+    xboxDrv.y().toggleOnTrue(Climb.Climb_Retract().alongWith(Commands.print("pressed y")));
+    xboxDrv.x().toggleOnTrue(Climb.Climb_Home().alongWith(Commands.print("pressed x")));
+    xboxDrv.b().toggleOnTrue(Climb.Climb_Full().alongWith(Commands.print("pressed b")));
+
+  
+    
     //---------------------------------------------------------------------------------------------------------------------
     // XBOX AUX 
     //---------------------------------------------------------------------------------------------------------------------
+    // Scoring Level Determination
     xboxAux.povRight().onTrue(Commands.runOnce(()->superstructure.setLevel(1)));
     xboxAux.povUp().onTrue(Commands.runOnce(() -> superstructure.setLevel(2)));
     xboxAux.povLeft().onTrue(Commands.runOnce(() -> superstructure.setLevel(3)));
     xboxAux.povDown().onTrue(Commands.runOnce(() -> superstructure.setLevel(4)));
 
+    // Gamepiece Selection
     xboxAux.leftBumper().onTrue(Commands.runOnce(() -> superstructure.setChosenGamepiece(Gamepiece.CORAL)));
     xboxAux.rightBumper().onTrue(Commands.runOnce(() -> superstructure.setChosenGamepiece(Gamepiece.ALGAE)));
 
