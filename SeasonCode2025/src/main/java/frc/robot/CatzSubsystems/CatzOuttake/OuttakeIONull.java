@@ -8,13 +8,4 @@
 package frc.robot.CatzSubsystems.CatzOuttake;
 
 /** Add your docs here. */
-public class OuttakeConstants {
-
-    // Subsystem safety disable
-    public static final boolean isOuttakeDisabled = false;
-
-    static double OUTTAKE_RT = 0.3;
-    static double OUTTAKE_LT = 0.3;
-    static double INTAKE_SPD = 0.3;
-    static double ADJ_SPD = 0.1;
-}
+public class OuttakeIONull implements OuttakeIO{}

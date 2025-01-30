@@ -9,13 +9,11 @@ package frc.robot.CatzSubsystems.CatzElevator;
 
 import static frc.robot.CatzSubsystems.CatzElevator.ElevatorConstants.*;
 
-import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.*;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.*;
 
-import edu.wpi.first.units.measure.AngularVelocity;
 
 public class ElevatorIOReal implements ElevatorIO {
   private final TalonFX leaderTalon;

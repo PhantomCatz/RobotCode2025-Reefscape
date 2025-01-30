@@ -17,7 +17,7 @@ import com.revrobotics.spark.config.SparkMaxConfig;
 
 import edu.wpi.first.wpilibj.DigitalInput;
 
-public class OuttakeIOSparkmax implements OuttakeIO {
+public class OuttakeIOReal implements OuttakeIO {
 
   private final DigitalInput beamBreakBck;
   private final DigitalInput beamBreakFrnt;
@@ -27,7 +27,7 @@ public class OuttakeIOSparkmax implements OuttakeIO {
 
   private SparkMaxConfig globalConfig = new SparkMaxConfig();
 
-  public OuttakeIOSparkmax() {
+  public OuttakeIOReal() {
 
     OuttakeLeftMtr = new SparkMax(2, MotorType.kBrushless);
     OuttakeRightMtr = new SparkMax(1, MotorType.kBrushless);

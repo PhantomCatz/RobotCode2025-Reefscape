@@ -20,8 +20,6 @@ import edu.wpi.first.math.controller.ElevatorFeedforward;
 
 import org.littletonrobotics.junction.Logger;
 
-import com.ctre.phoenix6.StatusSignal;
-import com.ctre.phoenix6.signals.ControlModeValue;
 
 public class CatzElevator extends SubsystemBase {
 
@@ -86,7 +84,7 @@ public class CatzElevator extends SubsystemBase {
     io.runSetpoint(elevatorPos.getTargetPositionRotations(), ff.calculate(inputs.velocityRpm));
   }
 
-  
+
   //--------------------------------------------------------------------------
   //
   //
