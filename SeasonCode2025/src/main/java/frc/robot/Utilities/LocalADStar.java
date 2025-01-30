@@ -562,6 +562,7 @@ public class LocalADStar implements Pathfinder {
     return new Translation2d(pos.x * nodeSize, pos.y * nodeSize);
   }
 
+
   /**
    * Represents a node in the pathfinding grid
    *

@@ -19,8 +19,7 @@ import edu.wpi.first.math.util.Units;
 public class VisionConstants {
 
   // AprilTag layout
-  public static AprilTagFieldLayout aprilTagLayout =
-      AprilTagFieldLayout.loadField(AprilTagFields.kDefaultField);
+  public static AprilTagFieldLayout aprilTagLayout = AprilTagFieldLayout.loadField(AprilTagFields.kDefaultField);
 
   // Camera names, must match names configured on coprocessor
   public static String camera0Name = "camera_0";
@@ -39,8 +38,8 @@ public class VisionConstants {
 
   // Standard deviation baselines, for 1 meter distance and 1 tag
   // (Adjusted automatically based on distance and # of tags)
-  public static double linearStdDevBaseline = 0.02; // Meters
-  public static double angularStdDevBaseline = 0.06; // Radians
+  public static final double LINEAR_STD_DEV_BASELINE = 0.02; // Meters
+  public static final double ANGULAR_STD_DEV_BASELINE = 0.06; // Radians
 
   public static final VisionIO[] limelights =
       new VisionIO[] {
@@ -94,12 +93,13 @@ public class VisionConstants {
   // (Adjust to trust some cameras more than others)
   public static double[] cameraStdDevFactors =
       new double[] {
-        0.1, // Camera 0
+        2.0, // Camera 0
         1.0 // Camera 1
       };
 
+  public static final boolean USE_MEGATAG1 = true; // megatag 1 3d solve allows robot to fly
+
   // Multipliers to apply for MegaTag 2 observations
-  public static double linearStdDevMegatag2Factor = 0.1; // More stable than full 3D solve
-  public static double angularStdDevMegatag2Factor =
-      Double.POSITIVE_INFINITY; // No rotation data available
+  public static final double LINEAR_STD_DEV_MEGATAG2_SCALE_FACTOR = 1.0; // More stable than full 3D solve
+  public static final double ANGULAR_STD_DEV_MEGATAG2_SCALE_FACTOR = Double.POSITIVE_INFINITY; // No rotation data available
 }

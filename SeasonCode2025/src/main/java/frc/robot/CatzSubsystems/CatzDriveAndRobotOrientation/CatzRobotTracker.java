@@ -26,9 +26,11 @@ import frc.robot.Utilities.GeomUtil;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.NoSuchElementException;
+
 import lombok.Getter;
 import lombok.experimental.ExtensionMethod;
 import org.littletonrobotics.junction.AutoLogOutput;
+
 
 @ExtensionMethod({GeomUtil.class})
 public class CatzRobotTracker {
@@ -153,23 +155,22 @@ public class CatzRobotTracker {
 
   /** Add Vision Observation */
   public void addVisionObservation(VisionObservation observation) {
-    // If measurement is old enough to be outside the pose buffer's timespan, skip.
+    // // If measurement is old enough to be outside the pose buffer's timespan, skip.
     try {
-      if (POSE_BUFFER.getInternalBuffer().lastKey() - POSE_BUFFER_SIZE_SEC
-          > observation.timestamp()) {
+      if (POSE_BUFFER.getInternalBuffer().lastKey() - observation.timestamp() > POSE_BUFFER_SIZE_SEC) {
         return;
       }
-    } catch (NoSuchElementException ex) {
-      return;
-    }
-    System.out.println("exceptio");
+    } catch (NoSuchElementException e) {}
     // Get odometry based pose at timestamp
     var sample = POSE_BUFFER.getSample(observation.timestamp());
     if (sample.isEmpty()) {
       // exit if not there
       return;
     }
-    // System.out.println("empty sample");
+
+    // print out robot position relative to april tag
+    // Translation2d aprilPos = AllianceFlipUtil.apply(Reef.center).plus(new Translation2d(Reef.reefOrthogonalRadius, 0).rotateBy(Rotation2d.fromDegrees(-60)));
+    // System.out.println(observation.visionPose().relativeTo(new Pose2d(aprilPos, Rotation2d.fromDegrees(-60))));
 
     // sample --> odometryPose transform and backwards of that
     var sampleToOdometryTransform = new Transform2d(sample.get(), odometryPose);
@@ -226,14 +227,9 @@ public class CatzRobotTracker {
     }
 
     // Average tx's and ty's
-    double tx = 0.0;
-    double ty = 0.0;
-    for (int i = 0; i < 4; i++) {
-      tx += observation.tx()[i];
-      ty += observation.ty()[i];
-    }
-    tx /= 4.0;
-    ty /= 4.0;
+    double tx = observation.tx();
+    double ty = observation.ty();
+
 
     Pose3d cameraPose = VisionConstants.cameraPoses[observation.camera()];
     // Use 2d distance and tag angle + tx to find robot pose
@@ -335,7 +331,7 @@ public class CatzRobotTracker {
   public record VisionObservation(Pose2d visionPose, double timestamp, Matrix<N3, N1> stdDevs) {}
 
   public record TxTyObservation(
-      int tagId, int camera, double[] tx, double[] ty, double distance, double timestamp) {}
+      int tagId, int camera, double tx, double ty, double distance, double timestamp) {}
 
   public record TxTyPoseRecord(Pose2d pose, double distance, double timestamp) {}
 }

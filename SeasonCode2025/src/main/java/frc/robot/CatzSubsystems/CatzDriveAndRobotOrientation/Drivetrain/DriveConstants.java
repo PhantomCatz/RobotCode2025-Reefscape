@@ -72,10 +72,9 @@ public class DriveConstants {
                 .bumperWidthX(Units.inchesToMeters(32))
                 .bumperWidthY(Units.inchesToMeters(32))
                 .maxLinearVelocity(Units.feetToMeters(17))
-                .maxLinearAcceleration(Math.pow(Units.feetToMeters(17), 2)) // TODO emperically calculate
-                .maxAngularVelocity(Units.degreesToRadians(600)) // Radians
-                .maxAngularAcceleration(
-                    Units.degreesToRadians(600)) // Radians // TODO verify angle constraints
+                .maxLinearAcceleration(Units.feetToMeters(120.0)) // TODO emperically calculate
+                .maxAngularVelocity(12.0) // Radians
+                .maxAngularAcceleration(6.0) // Radians // TODO verify angle constraints
                 .build();
         case SN1, SN1_2024 ->
             new DriveConfig( //TODO make the builder the same way for these configurations
@@ -85,7 +84,7 @@ public class DriveConstants {
                 Units.inchesToMeters(37),
                 Units.inchesToMeters(33),
                 Units.feetToMeters(12.16),
-                Units.feetToMeters(21.32),
+                Units.feetToMeters(120.32),
                 7.93,
                 29.89);
       };
@@ -99,7 +98,7 @@ public class DriveConstants {
                 1.0 / DCMotor.getKrakenX60Foc(1).KtNMPerAmp, // A/(N*m)
                 0.2,
                 0.0,
-                0.30,
+                0.50,
                 0.005,
                 Mk4iReductions.L2_PLUS.reduction,
                 Mk4iReductions.steer.reduction);
@@ -138,8 +137,9 @@ public class DriveConstants {
                 Mk4iReductions.steer.reduction);
       };
 
+
   public static final ModuleLimits moduleLimitsFree =
-      new ModuleLimits(14, 17, Units.degreesToRadians(1080.0));
+      new ModuleLimits(DRIVE_CONFIG.maxLinearVelocity(), DRIVE_CONFIG.maxLinearAcceleration(), DRIVE_CONFIG.maxAngularVelocity());
 
   // -------------------------------------------------------------------------------
   // Odometry Constants
@@ -214,13 +214,6 @@ public class DriveConstants {
     MODULE_TRANSLATIONS[INDEX_FL] = new Translation2d( DRIVE_CONFIG.robotLengthX(),  DRIVE_CONFIG.robotWidthY()).div(2.0);
   }
 
-  public static final Translation2d[] TRAJECTORY_MODULE_TRANSLATIONS = new Translation2d[4];
-  static {
-    TRAJECTORY_MODULE_TRANSLATIONS[TRAJ_INDEX_FL] = new Translation2d( DRIVE_CONFIG.robotLengthX(),  DRIVE_CONFIG.robotWidthY()).div(2.0);
-    TRAJECTORY_MODULE_TRANSLATIONS[TRAJ_INDEX_FR] = new Translation2d( DRIVE_CONFIG.robotLengthX(), -DRIVE_CONFIG.robotWidthY()).div(2.0);
-    TRAJECTORY_MODULE_TRANSLATIONS[TRAJ_INDEX_BL] = new Translation2d(-DRIVE_CONFIG.robotLengthX(),  DRIVE_CONFIG.robotWidthY()).div(2.0);
-    TRAJECTORY_MODULE_TRANSLATIONS[TRAJ_INDEX_BR] = new Translation2d(-DRIVE_CONFIG.robotLengthX(), -DRIVE_CONFIG.robotWidthY()).div(2.0);
-  }
 
 
   // calculates the orientation and speed of individual swerve modules when given
@@ -258,14 +251,14 @@ public class DriveConstants {
   public static final double ROBOT_MASS = 68.0;
   public static final double ROBOT_MOI =
       (1.0 / 12.0) * ROBOT_MASS * (Math.pow(DRIVE_CONFIG.bumperWidthX(), 2) + Math.pow(DRIVE_CONFIG.bumperWidthY(),2)); // ROBOT_MASS * (2/2) * (kA_ANGULAR_ACCEL/kA_LINEAR_ACCEL); // TODO need to
-  // recaculate with formula on Pathplanner
+  // TODO recaculate with formula on Pathplanner
 
   public static final double TREAD_COEF_FRICTION = 1.542;
 
   public static final ModuleConfig TRAJECTORY_MODULE_CONFIG =
       new ModuleConfig(
           DRIVE_CONFIG.wheelRadius(),
-          DRIVE_CONFIG.maxLinearVelocity() * 8, // TODO possibly need to scale down to prevent wheel slip, only here for sim implementation
+          DRIVE_CONFIG.maxLinearVelocity(),
           TREAD_COEF_FRICTION,
           DCMotor.getKrakenX60(1).withReduction(MODULE_GAINS_AND_RATIOS.driveReduction()),
           DRIVE_CURRENT_LIMIT,
@@ -273,7 +266,7 @@ public class DriveConstants {
 
   public static final RobotConfig TRAJECTORY_CONFIG =
       new RobotConfig(
-          ROBOT_MASS, ROBOT_MOI, TRAJECTORY_MODULE_CONFIG, TRAJECTORY_MODULE_TRANSLATIONS);
+          ROBOT_MASS, ROBOT_MOI, TRAJECTORY_MODULE_CONFIG, MODULE_TRANSLATIONS);
 
   // -----------------------------------------------------------------------------------------------------------------------------
   //

@@ -341,9 +341,14 @@ public class Robot extends LoggedRobot {
     LAST_DEPLOYMENT_WARNING.set(true);
     if (m_autonomousCommand != null) {
       m_autonomousCommand.cancel();
+
     }
 
     teleStart = Timer.getFPGATimestamp();
+    //CatzRobotTracker.getInstance().resetPose(m_robotContainer.getAutonomous().calculateReefPos(2, LeftRight.LEFT));
+
+    //CatzRobotTracker.getInstance().resetPose(new Pose2d(Reef.center, Rotation2d.kZero));
+
   }
 
   @Override
