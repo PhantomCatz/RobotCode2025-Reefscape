@@ -46,7 +46,7 @@ public class ElevatorIOReal implements ElevatorIO {
     config.MotorOutput.NeutralMode = NeutralModeValue.Brake;
     leaderTalon.getConfigurator().apply(config, 1.0);
     followerTalon.getConfigurator().apply(config, 1.0);
-    
+
 
     motorState = leaderTalon.getControlMode();
     velocityRPM = leaderTalon.getVelocity();

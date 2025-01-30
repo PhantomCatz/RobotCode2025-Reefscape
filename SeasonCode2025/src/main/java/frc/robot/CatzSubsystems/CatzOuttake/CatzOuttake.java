@@ -32,20 +32,20 @@ public class CatzOuttake extends SubsystemBase {
   public CatzOuttake() {
     if(isOuttakeDisabled) { //Comes from elevator Constants
       io = new OuttakeIONull();
-      System.out.println("Elevator Unconfigured");
+      System.out.println("Outtake Unconfigured");
     } else {
       switch (CatzConstants.hardwareMode) {
         case REAL:
           io = new OuttakeIOReal();
-          System.out.println("Elevator Configured for Real");
+          System.out.println("Outtake Configured for Real");
         break;
         case REPLAY:
           io = new OuttakeIOReal() {};
-          System.out.println("Elevator Configured for Replayed simulation");
+          System.out.println("Outtake Configured for Replayed simulation");
         break;
         default:
-          io = null;
-          System.out.println("Elevator Unconfigured");
+          io = new OuttakeIONull();
+          System.out.println("Outtake Unconfigured");
         break;
       }
     }

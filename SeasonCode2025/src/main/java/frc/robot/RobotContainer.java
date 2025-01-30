@@ -28,7 +28,6 @@ import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.Vision.VisionIOLime
 import frc.robot.CatzSubsystems.CatzElevator.*;
 import frc.robot.CatzSubsystems.CatzLEDs.CatzLED;
 import frc.robot.CatzSubsystems.CatzOuttake.CatzOuttake;
-import frc.robot.Commands.AutomatedSequenceCmds;
 import frc.robot.Commands.DriveAndRobotOrientationCmds.TeleopDriveCmd;
 import frc.robot.Utilities.Alert;
 import frc.robot.Utilities.Alert.AlertType;
@@ -131,13 +130,13 @@ public class RobotContainer {
       Commands.runOnce(
           () -> {
             Pose2d targetPose = auto.calculateReefPos(POVReefAngle, leftRightReef);
-            currentPathfindingCommand = auto.getPathfindingCommand(targetPose); 
+            currentPathfindingCommand = auto.getPathfindingCommand(targetPose);
             currentPathfindingCommand.schedule();
           }
       )
     );
     xboxDrv.a().onFalse(Commands.runOnce(() -> currentPathfindingCommand.cancel()));
-    
+
     drive.setDefaultCommand(
       new TeleopDriveCmd(
           () -> xboxDrv.getLeftX(), () -> xboxDrv.getLeftY(), () -> xboxDrv.getRightX(), drive));
@@ -148,16 +147,16 @@ public class RobotContainer {
       () -> Math.abs(xboxDrv.getRightY()) > 0.1);
     LeftJoystickTrigger.onTrue(Climb.ClimbManualMode(() -> xboxDrv.getRightY()).alongWith(Commands.print("Using manual climb")));
     LeftJoystickTrigger.onFalse(Climb.ClimbManualMode(() -> 0.0));
-    
+
     // Climb SetPosition Control
     xboxDrv.y().toggleOnTrue(Climb.Climb_Retract().alongWith(Commands.print("pressed y")));
     xboxDrv.x().toggleOnTrue(Climb.Climb_Home().alongWith(Commands.print("pressed x")));
     xboxDrv.b().toggleOnTrue(Climb.Climb_Full().alongWith(Commands.print("pressed b")));
 
-  
-    
+
+
     //---------------------------------------------------------------------------------------------------------------------
-    // XBOX AUX 
+    // XBOX AUX
     //---------------------------------------------------------------------------------------------------------------------
     // Scoring Level Determination
     xboxAux.povRight().onTrue(Commands.runOnce(()->superstructure.setLevel(1)));
