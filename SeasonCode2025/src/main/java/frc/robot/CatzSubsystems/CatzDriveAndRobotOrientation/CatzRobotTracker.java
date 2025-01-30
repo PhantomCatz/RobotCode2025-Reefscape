@@ -17,9 +17,14 @@ import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.wpilibj.DriverStation;
+import frc.robot.FieldConstants;
 import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.CatzRobotTracker.VisionObservation;
 import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.Drivetrain.DriveConstants;
+import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.Vision.VisionConstants;
 import frc.robot.Utilities.GeomUtil;
+
+import java.util.HashMap;
+import java.util.Map;
 import java.util.NoSuchElementException;
 import lombok.Getter;
 import lombok.experimental.ExtensionMethod;
@@ -37,6 +42,22 @@ public class CatzRobotTracker {
     if (instance == null) instance = new CatzRobotTracker();
     return instance;
   }
+
+  private static final Map<Integer, Pose2d> tagPoses2d = new HashMap<>();
+
+  static {
+    for (int i = 1; i <= FieldConstants.aprilTagCount; i++) {
+      tagPoses2d.put(
+          i,
+          FieldConstants.defaultAprilTagType
+              .getLayout()
+              .getTagPose(i)
+              .map(Pose3d::toPose2d)
+              .orElse(new Pose2d()));
+    }
+  }
+
+  private final Map<Integer, TxTyPoseRecord> txTyPoses = new HashMap<>();
 
   // ------------------------------------------------------------------------------------------------------
   //  Pose estimation Members
@@ -102,7 +123,7 @@ public class CatzRobotTracker {
     // disabled
     Twist2d twist = KINEMATICS.toTwist2d(lastWheelPositions, observation.wheelPositions());
     lastWheelPositions = observation.wheelPositions();
-    // Check gyro connected
+    //Check gyro connected
     if (observation.gyroAngle != null) {
       // Update dtheta for twist if gyro connected
       twist =
@@ -110,7 +131,7 @@ public class CatzRobotTracker {
               twist.dx, twist.dy, observation.gyroAngle().minus(lastGyroAngle).getRadians());
       lastGyroAngle = observation.gyroAngle();
     }
-    // Add twist to odometry pose
+    //Add twist to odometry pose
     odometryPose = odometryPose.exp(twist);
     // Add pose to buffer at timestamp
     POSE_BUFFER.addSample(observation.timestamp(), odometryPose);
@@ -190,6 +211,58 @@ public class CatzRobotTracker {
     estimatedPose = estimateAtTime.plus(scaledTransform).plus(sampleToOdometryTransform);
   } // end of addVisionObservation(OdometryObservation observation)
 
+  public void addTxTyObservation(TxTyObservation observation) {
+    // Skip if current data for tag is newer
+    if (txTyPoses.containsKey(observation.tagId())
+        && txTyPoses.get(observation.tagId()).timestamp() >= observation.timestamp()) {
+      return;
+    }
+
+    // Get odometry based pose at timestamp
+    var sample = POSE_BUFFER.getSample(observation.timestamp());
+    if (sample.isEmpty()) {
+      // exit if not there
+      return;
+    }
+
+    // Average tx's and ty's
+    double tx = 0.0;
+    double ty = 0.0;
+    for (int i = 0; i < 4; i++) {
+      tx += observation.tx()[i];
+      ty += observation.ty()[i];
+    }
+    tx /= 4.0;
+    ty /= 4.0;
+
+    Pose3d cameraPose = VisionConstants.cameraPoses[observation.camera()];
+    // Use 2d distance and tag angle + tx to find robot pose
+    double distance2d = observation.distance() * Math.cos(-cameraPose.getRotation().getY() - ty);
+    Rotation2d camToTagRotation =
+        sample
+            .get()
+            .getRotation()
+            .plus(cameraPose.toPose2d().getRotation().plus(Rotation2d.fromRadians(-tx)));
+    var tagPose2d = tagPoses2d.get(observation.tagId());
+    if (tagPose2d == null) return;
+    Translation2d fieldToCameraTranslation =
+        new Pose2d(tagPose2d.getTranslation(), camToTagRotation.plus(Rotation2d.kPi))
+            .transformBy(GeomUtil.toTransform2d(distance2d, 0.0))
+            .getTranslation();
+    Pose2d robotPose =
+        new Pose2d(
+                fieldToCameraTranslation,
+                sample.get().getRotation().plus(cameraPose.toPose2d().getRotation()))
+            .transformBy(new Transform2d(cameraPose.toPose2d(), Pose2d.kZero));
+    // Use gyro angle at time for robot rotation
+    robotPose = new Pose2d(robotPose.getTranslation(), sample.get().getRotation());
+
+    // Add transform to current odometry based pose for latency correction
+    txTyPoses.put(
+        observation.tagId(), new TxTyPoseRecord(robotPose, distance2d, observation.timestamp()));
+  }
+
+
   public void addVelocityData(Twist2d robotVelocity) {
     this.robotVelocity = robotVelocity;
   }
@@ -260,4 +333,9 @@ public class CatzRobotTracker {
       double timestamp) {}
 
   public record VisionObservation(Pose2d visionPose, double timestamp, Matrix<N3, N1> stdDevs) {}
+
+  public record TxTyObservation(
+      int tagId, int camera, double[] tx, double[] ty, double distance, double timestamp) {}
+
+  public record TxTyPoseRecord(Pose2d pose, double distance, double timestamp) {}
 }

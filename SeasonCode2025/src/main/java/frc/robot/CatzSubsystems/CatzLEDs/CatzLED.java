@@ -17,10 +17,12 @@ import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.CatzConstants.CatzColorConstants;
+import frc.robot.Utilities.VirtualSubsystem;
+
 import java.util.List;
 import java.util.Optional;
 
-public class CatzLED extends SubsystemBase {
+public class CatzLED extends VirtualSubsystem {
   private static CatzLED instance = null;
 
   public static CatzLED getInstance() {
@@ -37,12 +39,12 @@ public class CatzLED extends SubsystemBase {
   public int loopCycleCount = 0;
   public boolean boost = false;
   public boolean intaking = false;
-  public boolean hasNoteSpeaker = false;
-  public boolean hasNoteAmp = false;
+  public boolean hasCoral = false;
+  public boolean hasAlgae = false;
 
   // Main Driver LED States
-  public boolean isAutoShootSpeaker = false;
-  public boolean isAmping = false;
+  public boolean isCoral = false;
+  public boolean isAlgae = false;
   public boolean isHoarding = false;
   public boolean isClimbing = false;
 
@@ -54,7 +56,7 @@ public class CatzLED extends SubsystemBase {
   public boolean endgameAlert = false;
   public boolean sameBattery = false;
   public boolean autoFinished = false;
-  public double autoFinishedTime = 0.0;
+  public double  autoFinishedTime = 0.0;
   public boolean lowBatteryAlert = false;
   public boolean demoMode = false;
 
@@ -184,13 +186,13 @@ public class CatzLED extends SubsystemBase {
           waveAllianceCycleLength,
           waveAllianceDuration);
 
-      if (trapping || isClimbing || autoDrive || isAutoShootSpeaker) {
+      if (trapping || isClimbing || autoDrive || isCoral) {
         rainbow(rainbowCycleLength, rainbowDuration);
       } else if (isHoarding) {
         wave(Color.kBlack, Color.kPurple, waveAllianceCycleLength, waveAllianceDuration);
-      } else if (hasNoteSpeaker) {
+      } else if (hasCoral) {
         solid(Color.kGreen);
-      } else if (hasNoteAmp) {
+      } else if (hasAlgae) {
         solid(Color.kOrange);
       }
 

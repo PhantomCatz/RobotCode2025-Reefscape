@@ -31,6 +31,7 @@ public final class CatzConstants {
   public static final RobotHardwareMode hardwareMode = RobotHardwareMode.REAL;
   private static RobotID robotType = RobotID.SN1;
   private static AlertPriority alertWarningPriority = AlertPriority.ONE;
+  public static boolean disableHAL = false;
 
   public static final double LOOP_TIME = 0.02;
 
@@ -54,6 +55,31 @@ public final class CatzConstants {
       robotType = RobotID.SN2;
     }
     return robotType;
+  }
+
+  public static void disableHAL() {
+    disableHAL = true;
+  }
+
+
+  /** Checks whether the correct robot is selected when deploying. */
+  public static class CheckDeploy {
+    public static void main(String... args) {
+      if (robotType == RobotID.SN_TEST) {
+        System.err.println("Cannot deploy, invalid robot selected: " + robotType);
+        System.exit(1);
+      }
+    }
+  }
+
+  /** Checks that the default robot is selected and tuning mode is disabled. */
+  public static class CheckPullRequest {
+    public static void main(String... args) {
+      if (robotType != RobotID.SN_TEST || robotSenario == RobotSenario.TUNING) {
+        System.err.println("Do not merge, non-default constants are configured.");
+        System.exit(1);
+      }
+    }
   }
 
   public static enum RobotID {

@@ -8,8 +8,6 @@
 package frc.robot;
 
 import com.pathplanner.lib.pathfinding.Pathfinding;
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.RobotController;
@@ -18,10 +16,8 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import frc.robot.CatzConstants.RobotHardwareMode;
 import frc.robot.CatzConstants.RobotID;
-import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.CatzRobotTracker;
 import frc.robot.CatzSubsystems.CatzLEDs.CatzLED;
 import frc.robot.Commands.ControllerModeAbstraction;
-import frc.robot.FieldConstants.Reef;
 import frc.robot.Utilities.Alert;
 import frc.robot.Utilities.Alert.AlertType;
 import frc.robot.Utilities.LocalADStarAK;
@@ -348,7 +344,6 @@ public class Robot extends LoggedRobot {
     }
 
     teleStart = Timer.getFPGATimestamp();
-    CatzRobotTracker.getInstance().resetPose(new Pose2d(Reef.center, new Rotation2d())); //TODO remove
   }
 
   @Override
@@ -357,6 +352,7 @@ public class Robot extends LoggedRobot {
     teleElapsedTime = Timer.getFPGATimestamp() - teleStart;
 
     ControllerModeAbstraction.periodicDebug();
+
   }
 
   @Override

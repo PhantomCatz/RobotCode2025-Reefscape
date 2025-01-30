@@ -7,9 +7,6 @@
 
 package frc.robot;
 
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -17,6 +14,10 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Autonomous.CatzAutonomous;
+import frc.robot.CatzSubsystems.CatzSuperstructure;
+import frc.robot.CatzSubsystems.CatzSuperstructure.Gamepiece;
+import frc.robot.CatzSubsystems.CatzSuperstructure.LeftRight;
+import frc.robot.CatzSubsystems.CatzSuperstructure.RobotAction;
 import frc.robot.CatzSubsystems.CatzClimb.CatzClimb;
 import frc.robot.CatzSubsystems.CatzAlgaeEffector.CatzAlgaeRemover;
 import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.CatzRobotTracker;
@@ -28,9 +29,9 @@ import frc.robot.CatzSubsystems.CatzLEDs.CatzLED;
 import frc.robot.CatzSubsystems.CatzOuttake.CatzOuttake;
 import frc.robot.Commands.AutomatedSequenceCmds;
 import frc.robot.Commands.DriveAndRobotOrientationCmds.TeleopDriveCmd;
-import frc.robot.FieldConstants.Reef;
 import frc.robot.Utilities.Alert;
 import frc.robot.Utilities.Alert.AlertType;
+
 import org.littletonrobotics.junction.networktables.LoggedNetworkNumber;
 
 public class RobotContainer {
@@ -45,9 +46,9 @@ public class RobotContainer {
   private static CatzLED led = CatzLED.getInstance();
   private static CatzRobotTracker robotTracker = CatzRobotTracker.getInstance();
   private static CatzVision vision = new CatzVision(new VisionIOLimelight("limelight-soba"));
-
   private static CatzOuttake outtake = new CatzOuttake();
   private static CatzElevator elevator = new CatzElevator();
+  private static CatzSuperstructure superstructure = new CatzSuperstructure();
   private static CatzClimb Climb = new CatzClimb();
   private static CatzAlgaeRemover algaeEffector = new CatzAlgaeRemover();
 
@@ -68,7 +69,6 @@ public class RobotContainer {
   // -------------------------------------------------------------------------------------------------------------------
   // Auto Declaration
   // ---------------------------------------------------------------------------------------------------------------------
-  private AutomatedSequenceCmds autosequence = new AutomatedSequenceCmds();
   private CatzAutonomous auto = new CatzAutonomous(this);
 
   public RobotContainer() {
@@ -106,60 +106,26 @@ public class RobotContainer {
   //  Button mapping to commands
   //
   // ---------------------------------------------------------------------------
+
   Command currentPathfindingCommand = Commands.runOnce(() -> {});
   int POVReefAngle = 0; // 0 = none, x = x/6 revolutions
-  int bumperLeftRight = 0; // 0 = none, 1 = left, -1 = right
+  LeftRight leftRightReef = LeftRight.LEFT;
 
   private void configureBindings() {
-    /* XBOX AUX */
-
-    /* XBOX DRIVE */
+    //---------------------------------------------------------------------------------------------------------------------
+    // XBOX DRIVE
+    //---------------------------------------------------------------------------------------------------------------------
     xboxDrv.start().onTrue(drive.cancelTrajectory());
 
-    // Auto Driving
-    //   xboxDrv.y().onTrue(new
-    // FaceTarget(FieldConstants.Speaker.centerSpeakerOpening.toTranslation2d(), drive));
-    //   xboxDrv.b().toggleOnTrue(Commands.runOnce(() -> {
-    //       pathfindToOrigin = auto.getPathfindingCommand(new Pose2d(2, 7, new Rotation2d()));
-    //       pathfindToOrigin.schedule();
-    //   }));
-
-    //   xboxDrv.b().toggleOnFalse(Commands.runOnce(() -> {
-    //     pathfindToOrigin.cancel();
-    //   }));
-
-    xboxDrv.povUp().onTrue(Commands.runOnce(() -> POVReefAngle = 0));
-    xboxDrv.povUpLeft().onTrue(Commands.runOnce(() -> POVReefAngle = 1));
-    xboxDrv.povDownLeft().onTrue(Commands.runOnce(() -> POVReefAngle = 2));
-    xboxDrv.povDown().onTrue(Commands.runOnce(() -> POVReefAngle = 3));
-    xboxDrv.povDownRight().onTrue(Commands.runOnce(() -> POVReefAngle = 4));
-    xboxDrv.povUpRight().onTrue(Commands.runOnce(() -> POVReefAngle = 5));
-
-    xboxDrv.leftBumper().onTrue(Commands.runOnce(() -> bumperLeftRight = 1));
-    xboxDrv.rightBumper().onTrue(Commands.runOnce(() -> bumperLeftRight = -1));
-
-    xboxDrv
-        .a()
-        .onTrue(
-            Commands.runOnce(
-                () -> {
-                  Rotation2d selectedAngle = Rotation2d.fromRotations(POVReefAngle / 6.0);
-                  Translation2d unitRadius =
-                      new Translation2d(selectedAngle.getCos(), selectedAngle.getSin());
-                  Translation2d unitLeftRight = unitRadius.rotateBy(Rotation2d.fromDegrees(90));
-                  Translation2d radius =
-                      unitRadius.times(Reef.reefOrthogonalRadius + Reef.scoringDistance);
-                  Translation2d leftRight =
-                      unitLeftRight.times(bumperLeftRight * Reef.leftRightDistance);
-                  if (unitLeftRight.getY() < 0) {
-                    leftRight = leftRight.times(-1);
-                  }
-                  Translation2d scoringPos = radius.plus(leftRight).plus(Reef.center);
-
-                  currentPathfindingCommand =
-                      auto.getPathfindingCommand(new Pose2d(scoringPos, selectedAngle.plus(Rotation2d.fromDegrees(180.0))));
-                  currentPathfindingCommand.schedule();
-                }));
+    // Autodrive Execution
+    xboxDrv.a().onTrue(
+      Commands.runOnce(
+          () -> {
+            currentPathfindingCommand = auto.calculateReefPos(POVReefAngle, leftRightReef);
+            currentPathfindingCommand.schedule();
+          }
+      )
+    );
 
     // xboxDrv.a().onFalse(Commands.runOnce(() -> currentPathfindingCommand.cancel()));
 
@@ -187,8 +153,39 @@ public class RobotContainer {
     drive.setDefaultCommand(
         new TeleopDriveCmd(
             () -> xboxDrv.getLeftX(), () -> xboxDrv.getLeftY(), () -> xboxDrv.getRightX(), drive));
-    // TODO add triggers to put default as priority
 
+
+    // Auto Driving
+    // Autodriving Reef Position 0-5 CCW; 0 Facing Driver Stations
+    xboxDrv.povUp().onTrue(Commands.runOnce(() -> POVReefAngle = 0));
+    xboxDrv.povUpLeft().onTrue(Commands.runOnce(() -> POVReefAngle = 1));
+    xboxDrv.povDownLeft().onTrue(Commands.runOnce(() -> POVReefAngle = 2));
+    xboxDrv.povDown().onTrue(Commands.runOnce(() -> POVReefAngle = 3));
+    xboxDrv.povDownRight().onTrue(Commands.runOnce(() -> POVReefAngle = 4));
+    xboxDrv.povUpRight().onTrue(Commands.runOnce(() -> POVReefAngle = 5));
+
+    // Rung Selection
+    xboxDrv.leftBumper().onTrue(Commands.runOnce(() -> leftRightReef = LeftRight.LEFT));
+    xboxDrv.rightBumper().onTrue(Commands.runOnce(() -> leftRightReef = LeftRight.RIGHT));
+
+    //---------------------------------------------------------------------------------------------------------------------
+    // XBOX AUX 
+    //---------------------------------------------------------------------------------------------------------------------
+    xboxAux.povRight().onTrue(Commands.runOnce(()->superstructure.setLevel(1)));
+    xboxAux.povUp().onTrue(Commands.runOnce(() -> superstructure.setLevel(2)));
+    xboxAux.povLeft().onTrue(Commands.runOnce(() -> superstructure.setLevel(3)));
+    xboxAux.povDown().onTrue(Commands.runOnce(() -> superstructure.setLevel(4)));
+
+    xboxAux.leftBumper().onTrue(Commands.runOnce(() -> superstructure.setChosenGamepiece(Gamepiece.CORAL)));
+    xboxAux.rightBumper().onTrue(Commands.runOnce(() -> superstructure.setChosenGamepiece(Gamepiece.ALGAE)));
+
+    xboxAux.y().onTrue(Commands.runOnce(() -> superstructure.setCurrentRobotAction(RobotAction.OUTTAKE)).alongWith(Commands.print("OUTTAKE")));
+    xboxAux.x().onTrue(Commands.runOnce(() -> superstructure.setCurrentRobotAction(RobotAction.INTAKE)).alongWith(Commands.print("INTAKE")));
+    xboxAux.b().onTrue(Commands.runOnce(() -> superstructure.setCurrentRobotAction(RobotAction.INTAKE_GROUND)).alongWith(Commands.print("INTAKEGROUND")));
+    xboxAux.a().onTrue(Commands.runOnce(() -> superstructure.setCurrentRobotAction(RobotAction.STOW)).alongWith(Commands.print("STOWWW")));
+
+
+    xboxAux.a().onTrue(Commands.runOnce(()-> System.out.println("L:"+superstructure.getLevel()+", "+superstructure.getChosenGamepiece())));
   }
 
   // ---------------------------------------------------------------------------
