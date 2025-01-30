@@ -79,6 +79,7 @@ public class VisionIOLimelight implements VisionIO {
     for (var rawSample : megatag1Subscriber.readQueue()) {
       // if sample is invalid, skip
       if (rawSample.value.length == 0) continue;
+
       poseObservations.add(
           new PoseObservation(
               // Timestamp, based on server timestamp of publish and latency
