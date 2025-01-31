@@ -203,22 +203,24 @@ public class AdvantageSwerveSetpointGenerator {
     final Translation2d[] modules = moduleLocations;
 
     SwerveModuleState[] desiredModuleState = kinematics.toSwerveModuleStates(desiredState);
+    //-------------------------------------------------------------------------------------------------------
     // Make sure desiredState respects velocity limits.
+    //-------------------------------------------------------------------------------------------------------
     if (limits.maxDriveVelocity() > 0.0) {
       SwerveDriveKinematics.desaturateWheelSpeeds(desiredModuleState, limits.maxDriveVelocity());
       desiredState = kinematics.toChassisSpeeds(desiredModuleState);
     }
 
-    // Special case: desiredState is a complete stop. In this case, module angle is arbitrary, so
-    // just use the previous angle.
-    boolean need_to_steer = true;
-    if (desiredState.toTwist2d().epsilonEquals(new Twist2d())) {
-      need_to_steer = false;
-      for (int i = 0; i < modules.length; ++i) {
-        desiredModuleState[i].angle = prevSetpoint.moduleStates()[i].angle;
-        desiredModuleState[i].speedMetersPerSecond = 0.0;
-      }
-    }
+    // // Special case: desiredState is a complete stop. In this case, module angle is arbitrary, so
+    // // just use the previous angle.
+    // boolean need_to_steer = true;
+    // if (desiredState.toTwist2d().epsilonEquals(new Twist2d())) {
+    //   need_to_steer = false;
+    //   for (int i = 0; i < modules.length; ++i) {
+    //     desiredModuleState[i].angle = prevSetpoint.moduleStates()[i].angle;
+    //     desiredModuleState[i].speedMetersPerSecond = 0.0;
+    //   }
+    // }
 
     // For each module, compute local Vx and Vy vectors.
     double[] prev_vx = new double[modules.length];
@@ -255,15 +257,19 @@ public class AdvantageSwerveSetpointGenerator {
         }
       }
     }
-    if (all_modules_should_flip
-        && !prevSetpoint.chassisSpeeds().toTwist2d().epsilonEquals(new Twist2d())
-        && !desiredState.toTwist2d().epsilonEquals(new Twist2d())) {
-      // It will (likely) be faster to stop the robot, rotate the modules in place to the complement
-      // of the desired
-      // angle, and accelerate again.
-      return generateSetpoint(limits, prevSetpoint, new ChassisSpeeds(), dt);
-    }
+    //TODO could be causing issue?
+    // if (all_modules_should_flip
+    //     && !prevSetpoint.chassisSpeeds().toTwist2d().epsilonEquals(new Twist2d())
+    //     && !desiredState.toTwist2d().epsilonEquals(new Twist2d())) {
+    //   // It will (likely) be faster to stop the robot, rotate the modules in place to the complement
+    //   // of the desired
+    //   // angle, and accelerate again.
+    //   return generateSetpoint(limits, prevSetpoint, new ChassisSpeeds(), dt);
+    // }
 
+    //-------------------------------------------------------------------------------------------
+    // Kinematic calculation
+    //-------------------------------------------------------------------------------------------
     // Compute the deltas between start and goal. We can then interpolate from the start state to
     // the goal state; then
     // find the amount we can move from start towards goal in this cycle such that no kinematic
@@ -288,10 +294,10 @@ public class AdvantageSwerveSetpointGenerator {
     // that is the active constraint.
     final double max_theta_step = dt * limits.maxSteeringVelocity();
     for (int i = 0; i < modules.length; ++i) {
-      if (!need_to_steer) {
-        overrideSteering.add(Optional.of(prevSetpoint.moduleStates()[i].angle));
-        continue;
-      }
+      // if (!need_to_steer) {
+      //   overrideSteering.add(Optional.of(prevSetpoint.moduleStates()[i].angle));
+      //   continue;
+      // }
       overrideSteering.add(Optional.empty());
       if (epsilonEquals(prevSetpoint.moduleStates()[i].speedMetersPerSecond, 0.0)) {
         // If module is stopped, we know that we will need to move straight to the final steering
@@ -346,8 +352,9 @@ public class AdvantageSwerveSetpointGenerator {
               kMaxIterations);
       min_s = Math.min(min_s, s);
     }
-
+    //--------------------------------------------------------------------------------------------------------------------------
     // Enforce drive wheel acceleration limits.
+    //--------------------------------------------------------------------------------------------------------------------------
     final double max_vel_step = dt * limits.maxDriveAcceleration();
     for (int i = 0; i < modules.length; ++i) {
       if (min_s == 0.0) {
@@ -376,6 +383,9 @@ public class AdvantageSwerveSetpointGenerator {
       min_s = Math.min(min_s, s);
     }
 
+    //------------------------------------------------------------------------------------------------------------
+    // Calculate Chassis speeds and Module states
+    //------------------------------------------------------------------------------------------------------------
     ChassisSpeeds retSpeeds =
         new ChassisSpeeds(
             prevSetpoint.chassisSpeeds().vxMetersPerSecond + min_s * dx,

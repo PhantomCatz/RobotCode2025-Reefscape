@@ -24,7 +24,7 @@ public class CatzSuperstructure extends VirtualSubsystem {
     @Getter @Setter @AutoLogOutput(key = "CatzSuperstructure/CurrentRobotState")
     private RobotState currentRobotState = RobotState.STOW;
 
-    @Getter @Setter @AutoLogOutput(key = "CatzSuperstructure/CurrentRobotAction")
+    @Getter @AutoLogOutput(key = "CatzSuperstructure/CurrentRobotAction")
     private RobotAction currentRobotAction = RobotAction.STOW;
 
     public enum Gamepiece{
@@ -66,9 +66,8 @@ public class CatzSuperstructure extends VirtualSubsystem {
         }
       }
 
-    @Override
-    public void periodic() {
-
+    public void setCurrentRobotAction(RobotAction action) {
+        this.currentRobotAction = action;
         switch(currentRobotAction) {
 
             // Outtaking Algae or Coral
@@ -144,5 +143,20 @@ public class CatzSuperstructure extends VirtualSubsystem {
                 break;
 
         }
+    }
+
+
+    @Override
+    public void periodic() {
+        //----------------------------------------------------------------------------------
+        // Logging
+        //----------------------------------------------------------------------------------
+        getChosenGamepiece();
+        getLevel();
+        getCurrentRobotState();
+        getCurrentRobotAction();
+
+
+        
     }
 }

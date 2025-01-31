@@ -17,7 +17,6 @@ import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import frc.robot.CatzConstants.RobotHardwareMode;
 import frc.robot.CatzConstants.RobotID;
 import frc.robot.CatzSubsystems.CatzLEDs.CatzLED;
-import frc.robot.Commands.ControllerModeAbstraction;
 import frc.robot.Utilities.Alert;
 import frc.robot.Utilities.Alert.AlertType;
 import frc.robot.Utilities.LocalADStarAK;
@@ -355,8 +354,6 @@ public class Robot extends LoggedRobot {
   public void teleopPeriodic() {
 
     teleElapsedTime = Timer.getFPGATimestamp() - teleStart;
-
-    ControllerModeAbstraction.periodicDebug();
 
   }
 
