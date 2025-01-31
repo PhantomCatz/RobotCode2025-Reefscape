@@ -14,6 +14,7 @@ import com.pathplanner.lib.path.GoalEndState;
 import com.pathplanner.lib.path.PathPlannerPath;
 import com.pathplanner.lib.pathfinding.Pathfinding;
 import com.pathplanner.lib.util.FileVersionException;
+
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -30,6 +31,8 @@ import frc.robot.Autonomous.CatzAutonomous.AutoScoringOptions;
 import frc.robot.CatzSubsystems.CatzSuperstructure.LeftRight;
 import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.*;
 import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.Drivetrain.DriveConstants;
+import frc.robot.Commands.CharacterizationCmds.WheelRadiusCharacterization;
+import frc.robot.Commands.CharacterizationCmds.WheelRadiusCharacterization.Direction;
 import frc.robot.Commands.DriveAndRobotOrientationCmds.TrajectoryDriveCmd;
 import frc.robot.FieldConstants.Reef;
 import frc.robot.RobotContainer;
@@ -170,6 +173,15 @@ public class CatzAutonomous extends VirtualSubsystem {
       e.printStackTrace();
     }
     lastProgram = selectedProgram;
+  }
+
+  //----------------------------------------------------------------------------------------------------------
+  //
+  //          Characterization
+  //
+  //----------------------------------------------------------------------------------------------------------
+  public Command wheelRadiusCharacterization() {
+    return new WheelRadiusCharacterization(m_container.getCatzDrivetrain(), Direction.COUNTER_CLOCKWISE);
   }
 
   // ---------------------------------------------------------------------------------------------------------
