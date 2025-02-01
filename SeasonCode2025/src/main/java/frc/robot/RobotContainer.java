@@ -16,11 +16,11 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Autonomous.CatzAutonomous;
 import frc.robot.CatzSubsystems.CatzSuperstructure;
+import frc.robot.CatzSubsystems.CatzAlgaeEffector.CatzAlgaeRemover.CatzAlgaeRemover;
 import frc.robot.CatzSubsystems.CatzSuperstructure.Gamepiece;
 import frc.robot.CatzSubsystems.CatzSuperstructure.LeftRight;
 import frc.robot.CatzSubsystems.CatzSuperstructure.RobotAction;
 import frc.robot.CatzSubsystems.CatzClimb.CatzClimb;
-import frc.robot.CatzSubsystems.CatzAlgaeEffector.CatzAlgaeRemover;
 import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.CatzRobotTracker;
 import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.Drivetrain.CatzDrivetrain;
 import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.Vision.CatzVision;
@@ -49,8 +49,8 @@ public class RobotContainer {
   private static CatzOuttake outtake = new CatzOuttake();
   private static CatzElevator elevator = new CatzElevator();
   private static CatzSuperstructure superstructure = new CatzSuperstructure();
-  private static CatzClimb Climb = new CatzClimb();
-  private static CatzAlgaeRemover algaeEffector = new CatzAlgaeRemover();
+  private static CatzClimb climb = new CatzClimb();
+  private static CatzAlgaeRemover algaeRemover = new CatzAlgaeRemover();
 
   // ------------------------------------------------------------------------------------------------------------------
   // Drive Controller Declaration
@@ -145,13 +145,13 @@ public class RobotContainer {
     // Manual Climb Control
     Trigger LeftJoystickTrigger = new Trigger(
       () -> Math.abs(xboxDrv.getRightY()) > 0.1);
-    LeftJoystickTrigger.onTrue(Climb.ClimbManualMode(() -> xboxDrv.getRightY()).alongWith(Commands.print("Using manual climb")));
-    LeftJoystickTrigger.onFalse(Climb.ClimbManualMode(() -> 0.0));
+    LeftJoystickTrigger.onTrue(climb.ClimbManualMode(() -> xboxDrv.getRightY()).alongWith(Commands.print("Using manual climb")));
+    LeftJoystickTrigger.onFalse(climb.ClimbManualMode(() -> 0.0));
 
     // Climb SetPosition Control
-    xboxDrv.y().toggleOnTrue(Climb.Climb_Retract().alongWith(Commands.print("pressed y")));
-    xboxDrv.x().toggleOnTrue(Climb.Climb_Home().alongWith(Commands.print("pressed x")));
-    xboxDrv.b().toggleOnTrue(Climb.Climb_Full().alongWith(Commands.print("pressed b")));
+    xboxDrv.y().toggleOnTrue(climb.Climb_Retract().alongWith(Commands.print("pressed y")));
+    xboxDrv.x().toggleOnTrue(climb.Climb_Home().alongWith(Commands.print("pressed x")));
+    xboxDrv.b().toggleOnTrue(climb.Climb_Full().alongWith(Commands.print("pressed b")));
 
 
 
@@ -221,6 +221,22 @@ public class RobotContainer {
     return drive;
   }
 
+  public CatzAlgaeRemover getCatzAlgaeRemover() {
+    return algaeRemover;
+  }
+
+  public CatzElevator getCatzElevator() {
+    return elevator;
+  }
+
+  public CatzClimb getCatzClimb() {
+    return climb;
+  }
+
+  public CatzOuttake getCatzOuttake() {
+    return outtake;
+  }
+
   public Command getAutonomousCommand() {
     return auto.getCommand();
   }
@@ -228,4 +244,5 @@ public class RobotContainer {
   public CatzAutonomous getAutonomous(){
     return auto;
   }
+
 }

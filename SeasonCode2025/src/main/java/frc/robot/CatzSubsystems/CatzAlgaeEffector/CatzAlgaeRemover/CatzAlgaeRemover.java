@@ -5,12 +5,13 @@
 // license that can be found in the LICENSE file at
 // the root directory of this project.
 
-package frc.robot.CatzSubsystems.CatzAlgaeEffector;
-import static frc.robot.CatzSubsystems.CatzAlgaeEffector.AlgaeRemoverConstants.*;
-
+package frc.robot.CatzSubsystems.CatzAlgaeEffector.CatzAlgaeRemover;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.CatzConstants;
+
+import static frc.robot.CatzSubsystems.CatzAlgaeEffector.CatzAlgaeRemover.AlgaeRemoverConstants.*;
+
 import org.littletonrobotics.junction.Logger;
 
 public class CatzAlgaeRemover extends SubsystemBase {
@@ -44,11 +45,11 @@ public class CatzAlgaeRemover extends SubsystemBase {
   //
   //=====================================================================================
   public Command eatAlgae() {
-    return runOnce(() -> io.runMotor(ALGAE_EFFECTOR_TOP, ALGAE_EFFECTOR_BOT));
+    return runOnce(() -> io.runMotor(ALGAE_REMOVER_POWER));
   }
 
-  public Command vomitAlgae(double spd) {
-    return runOnce(() -> io.runMotor(-ALGAE_EFFECTOR_TOP, -ALGAE_EFFECTOR_BOT));
+  public Command vomitAlgae() {
+    return runOnce(() -> io.runMotor(-ALGAE_REMOVER_POWER));
   }
 
   public Command runMotorTop(double spd) {
@@ -59,4 +60,7 @@ public class CatzAlgaeRemover extends SubsystemBase {
     return run(() -> runMotorBottom(spd));
   }
 
+  public Command stopAlgae() {
+    return runOnce(() -> io.runMotor(0));
+  }
 }

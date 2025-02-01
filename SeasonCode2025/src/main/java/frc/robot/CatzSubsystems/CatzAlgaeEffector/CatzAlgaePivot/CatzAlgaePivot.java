@@ -1,0 +1,113 @@
+// Copyright (c) 2025 FRC 2637
+// https://github.com/PhantomCatz
+//
+// Use of this source code is governed by an MIT-style
+// license that can be found in the LICENSE file at
+// the root directory of this project.
+
+package frc.robot.CatzSubsystems.CatzAlgaeEffector.CatzAlgaePivot;
+
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Utilities.LoggedTunableNumber;
+import java.util.function.DoubleSupplier;
+import java.util.function.Supplier;
+
+import lombok.RequiredArgsConstructor;
+import org.littletonrobotics.junction.Logger;
+
+public class CatzAlgaePivot extends SubsystemBase {
+
+  private final AlgaePivotIO io;
+  private final AlgaePivotIOInputsAutoLogged inputs = new AlgaePivotIOInputsAutoLogged();
+
+  private Position PositionType;
+  static double manualPow = 0;
+  static boolean isManual;
+  static final double MANUAL_SCALE = 5;
+  static double position;
+  static LoggedTunableNumber tunnablePos = new LoggedTunableNumber("AlgaePivot/TunnablePosition", 1);
+  static LoggedTunableNumber kP = new LoggedTunableNumber("AlgaePivot/kP", 0.17);
+  static LoggedTunableNumber kI = new LoggedTunableNumber("AlgaePivot/kI", 0.0);
+  static LoggedTunableNumber kD = new LoggedTunableNumber("AlgaePivot/kD", 0.0006);
+
+  static LoggedTunableNumber kS = new LoggedTunableNumber("AlgaePivot/kS", 0);
+  static LoggedTunableNumber kV = new LoggedTunableNumber("AlgaePivot/kV", 0);
+  static LoggedTunableNumber kA = new LoggedTunableNumber("AlgaePivot/kA", 0);
+
+  /** Creates a new PositionSubsystem. */
+  public CatzAlgaePivot() {
+    // io = new PositionIOKraken() {};
+    io = new AlgaePivotIOReal() {};
+
+    io.setPID(kP.getAsDouble(), kI.getAsDouble(), kD.getAsDouble());
+  }
+
+  // ==========================================================//
+  // ^^ Hallo make sure you set this to the correct motor ^^  //
+  // ==========================================================//
+  @RequiredArgsConstructor
+  public enum Position { //In degrees
+    STOW(() -> 0.0),
+    HORIZONTAL(() -> 90), // TBD
+    UNDISCLOSED(() -> 999), // TBD
+    MANUAL(() -> manualPow),
+    TUNNABLE(tunnablePos);
+
+    private final DoubleSupplier motionType;
+
+    private double getTargetMotionPosition() {
+      return motionType.getAsDouble();
+    }
+  }
+
+  @Override
+  public void periodic() {
+    io.updateInputs(inputs);
+    Logger.processInputs("AlgaePivot/inputs", inputs);
+    // System.out.println(position);
+    if (DriverStation.isDisabled()) {
+
+    } else {
+      // if(isManual) {
+      //   io.setPower(manualPow);
+      // } else {
+        io.setPosition(position);
+      // }
+    }
+    Logger.recordOutput("Position/targetPosition", position);
+  }
+
+  public Command AlgaePivot_Stow() {
+    return runOnce(() -> setAlgaePivotPos(Position.STOW));
+  }
+
+  public Command AlgaePivot_Horizontal() {
+    return runOnce(() -> setAlgaePivotPos(Position.HORIZONTAL));
+  }
+
+  public Command AlgaePivot_Undisclosed() {
+    return runOnce(() -> setAlgaePivotPos(Position.UNDISCLOSED));
+  }
+
+  public Command AlgaePivot_Tunnable() {
+    return runOnce(() -> setAlgaePivotPos(Position.TUNNABLE));
+  }
+
+  public void setAlgaePivotPos(Position target) {
+    position = target.getTargetMotionPosition();
+    isManual = false;
+  }
+
+  public void algaePivotManual(Supplier<Double> manualSupplier) {
+    // manualPow = manualSupplier.get();
+    // isManual = true;
+    position += manualSupplier.get() * MANUAL_SCALE;
+    System.out.println(position);
+  }
+
+  public Command AlgaePivotManualMode(Supplier<Double> manualSupplier) {
+    return run(() -> algaePivotManual(manualSupplier));
+  }
+}
