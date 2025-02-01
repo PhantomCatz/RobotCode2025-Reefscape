@@ -123,7 +123,7 @@ public class CatzAlgaePivot extends SubsystemBase {
     // manualPow = manualSupplier.get();
     // isManual = true;
     position += manualSupplier.get() * MANUAL_SCALE;
-    System.out.println(position);
+    System.out.println("algae:" +position);
   }
 
   public Command AlgaePivotManualMode(Supplier<Double> manualSupplier) {
