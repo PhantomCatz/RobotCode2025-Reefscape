@@ -8,6 +8,8 @@
 package frc.robot.CatzSubsystems.CatzAlgaeEffector.CatzAlgaePivot;
 
 public class AlgaePivotConstants {
+    public static final boolean isAlgaePivotDisabled = false;
+
     static final double ALGAE_PIVOT_POWER = 0.5; // TBD
 
     static final int ALGAE_PIVOT_MOTOR_ID = 22; // TBD

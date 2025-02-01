@@ -9,6 +9,7 @@ package frc.robot.CatzSubsystems.CatzAlgaeEffector.CatzAlgaeRemover;
 
 /** Add your docs here. */
 public class AlgaeRemoverConstants {
+    public static final boolean isAlgaeRemoverDisabled = false;
 
     static final double ALGAE_REMOVER_POWER = -0.5;
 

@@ -10,7 +10,11 @@ package frc.robot.CatzSubsystems.CatzAlgaeEffector.CatzAlgaePivot;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.CatzConstants;
 import frc.robot.Utilities.LoggedTunableNumber;
+
+import static frc.robot.CatzSubsystems.CatzAlgaeEffector.CatzAlgaePivot.AlgaePivotConstants.*;
+
 import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
 
@@ -37,12 +41,6 @@ public class CatzAlgaePivot extends SubsystemBase {
   static LoggedTunableNumber kA = new LoggedTunableNumber("AlgaePivot/kA", 0);
 
   /** Creates a new PositionSubsystem. */
-  public CatzAlgaePivot() {
-    // io = new PositionIOKraken() {};
-    io = new AlgaePivotIOReal() {};
-
-    io.setPID(kP.getAsDouble(), kI.getAsDouble(), kD.getAsDouble());
-  }
 
   // ==========================================================//
   // ^^ Hallo make sure you set this to the correct motor ^^  //
@@ -59,6 +57,28 @@ public class CatzAlgaePivot extends SubsystemBase {
 
     private double getTargetMotionPosition() {
       return motionType.getAsDouble();
+    }
+  }
+
+  public CatzAlgaePivot() {
+    if(isAlgaePivotDisabled) { //Comes from Algae Pivot Constants
+      io = new AlgaePivotIONull();
+      System.out.println("Algae Pivot Unconfigured");
+    } else {
+      switch (CatzConstants.hardwareMode) {
+        case REAL:
+          io = new AlgaePivotIOReal();
+          System.out.println("Algae Pivot Configured for Real");
+        break;
+        case REPLAY:
+          io = new AlgaePivotIOReal() {};
+          System.out.println("Algae Pivot Configured for Replayed simulation");
+        break;
+        default:
+          io = new AlgaePivotIONull();
+          System.out.println("Algae Pivot Unconfigured");
+        break;
+      }
     }
   }
 

@@ -19,17 +19,27 @@ public class CatzAlgaeRemover extends SubsystemBase {
   private final AlgaeRemoverIO io;
   private final AlgaeEffectorIOInputsAutoLogged inputs = new AlgaeEffectorIOInputsAutoLogged();
 
+  
+
   public CatzAlgaeRemover() {
-    switch (CatzConstants.hardwareMode) {
-      case REAL:
-        io = new AlgaeRemoverIOReal();
+    if(isAlgaeRemoverDisabled) { //Comes from Algae Remover Constants
+      io = new AlgaeRemoverIONull();
+      System.out.println("Algae Remover Unconfigured");
+    } else {
+      switch (CatzConstants.hardwareMode) {
+        case REAL:
+          io = new AlgaeRemoverIOReal();
+          System.out.println("Algae Remover Configured for Real");
         break;
-      case REPLAY:
-        io = new AlgaeRemoverIOReal() {};
+        case REPLAY:
+          io = new AlgaeRemoverIOReal() {};
+          System.out.println("Algae Remover Configured for Replayed simulation");
         break;
-      default:
-        io = new AlgaeRemoverIONull();
+        default:
+          io = new AlgaeRemoverIONull();
+          System.out.println("Algae Remover Unconfigured");
         break;
+      }
     }
   }
 
