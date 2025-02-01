@@ -433,6 +433,22 @@ public class LocalADStar implements Pathfinder {
     if (path.isEmpty()) {
       return new ArrayList<>();
     }
+    
+    // Visualize path
+    // for (int row = nodesY - 1; row >= 0; row--) {
+    //   for (int col = 0; col < nodesX; col++) {
+    //     if (obstacles.contains(new GridPosition(col, row))){
+    //       System.out.print("#");
+    //     }
+    //     else if (path.contains(new GridPosition(col, row))){
+    //       System.out.print("+");
+    //     }
+    //     else {
+    //       System.out.print("_");
+    //     }
+    //   }
+    //   System.out.println();
+    // }
 
     List<Translation2d> fieldPosPath = new ArrayList<>();
     fieldPosPath.add(realStartPos);
@@ -465,22 +481,6 @@ public class LocalADStar implements Pathfinder {
         new Pose2d(
             fieldPosPath.get(fieldPosPath.size() - 1),
             fieldPosPath.get(fieldPosPath.size() - 1).minus(fieldPosPath.get(fieldPosPath.size() - 2)).getAngle()));
-
-    // Visualize path
-    for (int row = nodesY - 1; row >= 0; row--) {
-      for (int col = 0; col < nodesX; col++) {
-        if (obstacles.contains(new GridPosition(col, row))){
-          System.out.print("#");
-        }
-        else if (path.contains(new GridPosition(col, row))){
-          System.out.print("+");
-        }
-        else {
-          System.out.print("_");
-        }
-      }
-      System.out.println();
-    }
 
     return PathPlannerPath.waypointsFromPoses(pathPoses);
   }
