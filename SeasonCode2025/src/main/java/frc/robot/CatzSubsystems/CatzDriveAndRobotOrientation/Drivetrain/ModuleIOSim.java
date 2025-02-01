@@ -102,8 +102,7 @@ public class ModuleIOSim implements ModuleIO {
   @Override
   public void runDriveVelocityRPSIO(double velocityRPS) {
     double velocityRadsPerSec = Units.rotationsToRadians(velocityRPS);
-    runDriveVolts(
-        driveFeedback.calculate(driveSim.getAngularVelocityRadPerSec(), velocityRadsPerSec));
+    driveSim.setAngularVelocity(velocityRadsPerSec);
   }
 
   @Override

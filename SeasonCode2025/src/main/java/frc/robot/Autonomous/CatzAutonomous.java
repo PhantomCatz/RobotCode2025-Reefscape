@@ -29,6 +29,7 @@ import frc.robot.Autonomous.CatzAutonomous.AutoQuestion;
 import frc.robot.Autonomous.CatzAutonomous.AutoQuestionResponse;
 import frc.robot.Autonomous.CatzAutonomous.AutoScoringOptions;
 import frc.robot.CatzSubsystems.CatzSuperstructure.LeftRight;
+import frc.robot.CatzSubsystems.CatzStateCommands;
 import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.*;
 import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.Drivetrain.DriveConstants;
 import frc.robot.Commands.CharacterizationCmds.WheelRadiusCharacterization;
@@ -129,11 +130,26 @@ public class CatzAutonomous extends VirtualSubsystem {
       NamedCommands.registerCommand(question, dashboardCmds.get(question));
     }
 
+    NamedCommands.registerCommand("Stow", CatzStateCommands.stow(container));
+    NamedCommands.registerCommand("IntakeCoralGround", CatzStateCommands.intakeCoralGround(container));
+    NamedCommands.registerCommand("IntakeCoralStation", CatzStateCommands.intakeCoralStation(container));
+    NamedCommands.registerCommand("IntakeAlgae", CatzStateCommands.intakeAlgae(container));
+    NamedCommands.registerCommand("L1Coral", CatzStateCommands.L1Coral(container));
+    NamedCommands.registerCommand("L2Coral", CatzStateCommands.L2Coral(container));
+    NamedCommands.registerCommand("L3Coral", CatzStateCommands.L3Coral(container));
+    NamedCommands.registerCommand("L4Coral", CatzStateCommands.L4Coral(container));
+    NamedCommands.registerCommand("Processor", CatzStateCommands.processor(container));
+    NamedCommands.registerCommand("BotAlgae", CatzStateCommands.intakeCoralGround(container));
+    NamedCommands.registerCommand("TopAlgae", CatzStateCommands.topAlgae(container));
+    NamedCommands.registerCommand("Climb", CatzStateCommands.climb(container));
+
+
     for (File autoFile : autosDirectory.listFiles()) {
       String autoName = autoFile.getName().replaceFirst("[.][^.]+$", "");
       autoProgramChooser.addDefaultOption(autoName, new PathPlannerAuto(autoName));
     }
   }
+
 
   @Override
   public void periodic() {
@@ -237,6 +253,8 @@ public class CatzAutonomous extends VirtualSubsystem {
                 DriveConstants.PATHFINDING_CONSTRAINTS, new GoalEndState(0, goal.getRotation())),
             m_container.getCatzDrivetrain()));
   }
+
+
 
   /** Getter for final autonomous Program */
   public Command getCommand() {

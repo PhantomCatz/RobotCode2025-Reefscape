@@ -104,8 +104,6 @@ public class LocalADStar implements Pathfinder {
         nodeSize = ((Number) json.get("nodeSizeMeters")).doubleValue();
         JSONArray grid = (JSONArray) json.get("grid");
 
-        System.out.println(grid.size());
-
         nodesY = grid.size();
         for (int row = 0; row < grid.size(); row++) {
           JSONArray rowArray = (JSONArray) grid.get(row);
@@ -115,13 +113,10 @@ public class LocalADStar implements Pathfinder {
           for (int col = 0; col < rowArray.size(); col++) {
             boolean isObstacle = (boolean) rowArray.get(col);
             if (isObstacle) {
-              System.out.print("#");
               staticObstacles.add(new GridPosition(col, row));
             } else {
-              System.out.print("_");
             }
           }
-          System.out.println();
         }
 
         JSONObject fieldSize = (JSONObject) json.get("field_size");

@@ -13,7 +13,25 @@
         {
           "type": "named",
           "data": {
+            "name": "TopAlgae"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "L4Coral"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
             "name": "Bottom L4 FDC 2"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "IntakeCoralStation"
           }
         },
         {
@@ -25,13 +43,43 @@
         {
           "type": "named",
           "data": {
+            "name": "TopAlgae"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "L3Coral"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
             "name": "Bottom L4 FDC 4"
           }
         },
         {
           "type": "named",
           "data": {
+            "name": "IntakeCoralStation"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
             "name": "Bottom L4 FDC 5"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "BotAlgae"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "L2Coral"
           }
         }
       ]
