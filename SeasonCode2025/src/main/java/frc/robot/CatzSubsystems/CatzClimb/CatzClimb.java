@@ -10,7 +10,11 @@ package frc.robot.CatzSubsystems.CatzClimb;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.CatzConstants;
 import frc.robot.Utilities.LoggedTunableNumber;
+
+import static frc.robot.CatzSubsystems.CatzClimb.ClimbConstants.*;
+
 import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
 
@@ -37,12 +41,6 @@ public class CatzClimb extends SubsystemBase {
   static LoggedTunableNumber kA = new LoggedTunableNumber("Climb/kA", 0);
 
   /** Creates a new PositionSubsystem. */
-  public CatzClimb() {
-    // io = new PositionIOKraken() {};
-    io = new ClimbIOReal() {};
-
-    io.setPID(kP.getAsDouble(), kI.getAsDouble(), kD.getAsDouble());
-  }
 
   // ==========================================================//
   // ^^ Hallo make sure you set this to the correct motor ^^  //
@@ -60,6 +58,28 @@ public class CatzClimb extends SubsystemBase {
 
     private double getTargetMotionPosition() {
       return motionType.getAsDouble();
+    }
+  }
+
+  public CatzClimb() {
+    if(isClimbDisabled) { //Comes from Climb Constants
+      io = new ClimbIONull();
+      System.out.println("Climb Unconfigured");
+    } else {
+      switch (CatzConstants.hardwareMode) {
+        case REAL:
+          io = new ClimbIOReal();
+          System.out.println("Climb Configured for Real");
+        break;
+        case REPLAY:
+          io = new ClimbIOReal() {};
+          System.out.println("Climb Configured for Replayed simulation");
+        break;
+        default:
+          io = new ClimbIONull();
+          System.out.println("Climb Unconfigured");
+        break;
+      }
     }
   }
 

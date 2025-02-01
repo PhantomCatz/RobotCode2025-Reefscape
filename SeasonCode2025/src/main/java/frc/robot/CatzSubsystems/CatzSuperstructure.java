@@ -36,7 +36,7 @@ public class CatzSuperstructure extends VirtualSubsystem {
         STOW,
         INTAKE_CORAL_GROUND,
         INTAKE_CORAL_STATION,
-        INTAKE_ALGAE,
+        INTAKE_ALGAE_GROUND,
         L1_CORAL,
         L2_CORAL,
         L3_CORAL,
@@ -128,7 +128,7 @@ public class CatzSuperstructure extends VirtualSubsystem {
                         System.out.println("Intake coral ground");
 
                 } else {
-                    currentRobotState = RobotState.INTAKE_ALGAE;
+                    currentRobotState = RobotState.INTAKE_ALGAE_GROUND;
                     System.out.println("Intake algae");
 
                 }
@@ -156,7 +156,7 @@ public class CatzSuperstructure extends VirtualSubsystem {
         getCurrentRobotState();
         getCurrentRobotAction();
 
-
-        
     }
+
+
 }

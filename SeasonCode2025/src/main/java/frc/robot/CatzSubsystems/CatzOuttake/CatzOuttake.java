@@ -127,4 +127,7 @@ public class CatzOuttake extends SubsystemBase {
     return runOnce(() -> currentState = outtakeStates.SCORE);
   }
 
+  public Command stopOuttake() {
+    return runOnce(() -> io.runMotor(0,0));
+  }
 }

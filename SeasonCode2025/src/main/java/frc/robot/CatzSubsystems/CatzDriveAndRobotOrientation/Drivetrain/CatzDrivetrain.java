@@ -242,7 +242,7 @@ public class CatzDrivetrain extends SubsystemBase {
       optimizedDesiredStates[i] = m_swerveModules[i].optimizeWheelAngles(unoptimizedModuleStates[i]);
 
       // Set module states to each of the swerve modules
-      m_swerveModules[i].setModuleAngleAndVelocity(advModuleStates[i]);
+      m_swerveModules[i].setModuleAngleAndVelocity(optimizedDesiredStates[i]);
     }
 
     // --------------------------------------------------------

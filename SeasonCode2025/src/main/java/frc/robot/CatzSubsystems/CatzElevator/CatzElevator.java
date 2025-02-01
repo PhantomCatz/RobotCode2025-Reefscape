@@ -11,6 +11,7 @@ import static frc.robot.CatzSubsystems.CatzElevator.ElevatorConstants.*;
 
 import java.util.function.DoubleSupplier;
 
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.CatzConstants;
 import frc.robot.Utilities.LoggedTunableNumber;
@@ -144,6 +145,10 @@ public class CatzElevator extends SubsystemBase {
 
   public void setTargetPosition(ElevatorPosition targetPosition) {
     this.targetPosition = targetPosition;
+  }
+
+  public Command setTargetPositionCommand (ElevatorPosition targetPosition) {
+    return runOnce(() -> setTargetPosition(targetPosition));
   }
 
 
