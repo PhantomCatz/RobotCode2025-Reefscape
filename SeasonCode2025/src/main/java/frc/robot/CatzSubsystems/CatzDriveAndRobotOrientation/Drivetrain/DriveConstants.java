@@ -120,7 +120,7 @@ public class DriveConstants {
                 0.0,
                 0.1,
                 0.0,
-                10.0,
+                1.0,
                 0.0,
                 Mk4iReductions.L2_PLUS.reduction,
                 Mk4iReductions.steer.reduction);
