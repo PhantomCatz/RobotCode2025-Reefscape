@@ -20,8 +20,10 @@ import edu.wpi.first.math.controller.HolonomicDriveController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.trajectory.Trajectory;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
+import frc.robot.Robot;
 import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.CatzRobotTracker;
 import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.Drivetrain.CatzDrivetrain;
 import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.Drivetrain.DriveConstants;
@@ -48,7 +50,7 @@ import org.littletonrobotics.junction.Logger;
 public class TrajectoryDriveCmd extends Command {
   // Trajectory constants
   public static final double ALLOWABLE_POSE_ERROR = 0.05;
-  public static final double ALLOWABLE_ROTATION_ERROR = 5;
+  public static final double ALLOWABLE_ROTATION_ERROR = 2.0;
   public static final double ALLOWABLE_VEL_ERROR = 0.2;
   private static final double TIMEOUT_SCALAR = 5;
 
@@ -106,10 +108,15 @@ public class TrajectoryDriveCmd extends Command {
       usePath = path.flipPath();
     }
 
-    try {
-      tracker.resetPose(usePath.getStartingHolonomicPose().get());
-    } catch (NoSuchElementException e) {
+    if(Robot.isFirstPath && DriverStation.isAutonomous()){
+      try {
+        tracker.resetPose(usePath.getStartingHolonomicPose().get());
+        Robot.isFirstPath = false;
+      } catch (NoSuchElementException e) {
+        e.printStackTrace();
+      }
     }
+
 
     ChassisSpeeds currentSpeeds =
         DriveConstants.SWERVE_KINEMATICS.toChassisSpeeds(tracker.getCurrentModuleStates());
