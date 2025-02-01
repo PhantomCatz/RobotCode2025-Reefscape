@@ -26,7 +26,6 @@ public class CatzClimb extends SubsystemBase {
   private final ClimbIO io;
   private final ClimbIOInputsAutoLogged inputs = new ClimbIOInputsAutoLogged();
 
-  private Position PositionType;
   static double manualPow = 0;
   static boolean isManual;
   static final double MANUAL_SCALE = 5;
@@ -40,11 +39,6 @@ public class CatzClimb extends SubsystemBase {
   static LoggedTunableNumber kV = new LoggedTunableNumber("Climb/kV", 0);
   static LoggedTunableNumber kA = new LoggedTunableNumber("Climb/kA", 0);
 
-  /** Creates a new PositionSubsystem. */
-
-  // ==========================================================//
-  // ^^ Hallo make sure you set this to the correct motor ^^  //
-  // ==========================================================//
   @RequiredArgsConstructor
   public enum Position { //In degrees
     RETRACT(() -> -46),
@@ -126,8 +120,6 @@ public class CatzClimb extends SubsystemBase {
   }
 
   public void climbManual(Supplier<Double> manualSupplier) {
-    // manualPow = manualSupplier.get();
-    // isManual = true;
     position += manualSupplier.get() * MANUAL_SCALE;
     System.out.println(position);
   }

@@ -55,14 +55,12 @@ import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 public class CatzAutonomous extends VirtualSubsystem {
   private final int MAX_QUESTIONS = 5;
   private static final String AUTO_STRING = "Auto";
-  private final LoggedDashboardChooser<PathPlannerAuto> autoProgramChooser =
-      new LoggedDashboardChooser<>(AUTO_STRING + "/Program");
+  private final LoggedDashboardChooser<PathPlannerAuto> autoProgramChooser = new LoggedDashboardChooser<>(AUTO_STRING + "/Program");
 
   private HashMap<String, DashboardCmd> dashboardCmds = new HashMap<>();
-  private File autosDirectory = new File(Filesystem.getDeployDirectory(), "pathplanner/autos");
-  private File choreoPathsDirectory = new File(Filesystem.getDeployDirectory(), "choreo");
-  private File pathplannerPathsDirectory =
-      new File(Filesystem.getDeployDirectory(), "pathplanner/paths");
+  private File autosDirectory            = new File(Filesystem.getDeployDirectory(), "pathplanner/autos");
+  private File choreoPathsDirectory      = new File(Filesystem.getDeployDirectory(), "choreo");
+  private File pathplannerPathsDirectory = new File(Filesystem.getDeployDirectory(), "pathplanner/paths");
 
   private PathPlannerAuto lastProgram;
   private JSONParser parser = new JSONParser();
@@ -97,10 +95,13 @@ public class CatzAutonomous extends VirtualSubsystem {
 
     // ------------------------------------------------------------------------------------------------------------
     // Path Configuration
-    // ------------------------------------------------------------------------------------------------------------
+    // // ------------------------------------------------------------------------------------------------------------
     // for (File pathFile : choreoPathsDirectory.listFiles()) {
     //   // to get rid of the extensions trailing the path names
     //   String pathName = pathFile.getName().replaceFirst("[.][^.]+$", "");
+    //   if(pathName == "Choreo Path Project")
+    //     continue;
+    //   System.out.println(pathName);
     //   try {
     //     NamedCommands.registerCommand(
     //         pathName,

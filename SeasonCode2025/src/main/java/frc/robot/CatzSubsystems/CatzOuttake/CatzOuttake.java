@@ -30,7 +30,7 @@ public class CatzOuttake extends SubsystemBase {
   private outtakeStates currentState = outtakeStates.STOP;
 
   public CatzOuttake() {
-    if(isOuttakeDisabled) { //Comes from elevator Constants
+    if(isOuttakeDisabled) {
       io = new OuttakeIONull();
       System.out.println("Outtake Unconfigured");
     } else {

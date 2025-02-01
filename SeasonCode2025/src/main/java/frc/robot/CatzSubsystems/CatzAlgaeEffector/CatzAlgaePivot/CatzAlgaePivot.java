@@ -26,7 +26,6 @@ public class CatzAlgaePivot extends SubsystemBase {
   private final AlgaePivotIO io;
   private final AlgaePivotIOInputsAutoLogged inputs = new AlgaePivotIOInputsAutoLogged();
 
-  private Position PositionType;
   static double manualPow = 0;
   static boolean isManual;
   static final double MANUAL_SCALE = 5;
