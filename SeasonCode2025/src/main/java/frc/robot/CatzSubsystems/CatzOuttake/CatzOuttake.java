@@ -30,7 +30,7 @@ public class CatzOuttake extends SubsystemBase {
   private outtakeStates currentState = outtakeStates.STOP;
 
   public CatzOuttake() {
-    if(isOuttakeDisabled) { //Comes from elevator Constants
+    if(isOuttakeDisabled) {
       io = new OuttakeIONull();
       System.out.println("Outtake Unconfigured");
     } else {
@@ -80,7 +80,6 @@ public class CatzOuttake extends SubsystemBase {
   // ============================================
 
   private void case_adjustInit() {
-    System.out.println("using case_adjustInit");
 
     io.runMotor(INTAKE_SPD, INTAKE_SPD);
 
@@ -90,7 +89,6 @@ public class CatzOuttake extends SubsystemBase {
   }
 
   private void case_adjustBack() {
-    System.out.println("using adjus");
 
     io.runMotor(ADJ_SPD, ADJ_SPD);
     if (!inputs.bbreakBackTriggered) {
@@ -99,7 +97,6 @@ public class CatzOuttake extends SubsystemBase {
   }
 
   private void case_shoot() {
-    System.out.println("using case_shoot");
 
     io.runMotor(OUTTAKE_LT, OUTTAKE_RT);
     if(!inputs.bbreakFrntTriggered) {

@@ -102,6 +102,12 @@ public class ModuleIOSim implements ModuleIO {
   @Override
   public void runDriveVelocityRPSIO(double velocityRPS) {
     double velocityRadsPerSec = Units.rotationsToRadians(velocityRPS);
+    // runDriveVolts has no internal PID so autonomous paths will drift after ending
+    // (driveFeedback won't immediately return 0 - it needs to be continuously called to converge to 0 like any other PID,
+    //  but trajectoryDriveCommand end() only calls stopDriving once)
+    // TLDR ignore autonomous paths drifting in sim because it won't happen in real life since setControl has an internal PID running in a separate thread
+
+    // driveSim.setAngularVelocity(velocityRadsPerSec);
     runDriveVolts(
         driveFeedback.calculate(driveSim.getAngularVelocityRadPerSec(), velocityRadsPerSec));
   }

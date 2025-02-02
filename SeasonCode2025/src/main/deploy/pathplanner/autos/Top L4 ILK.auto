@@ -13,7 +13,19 @@
         {
           "type": "named",
           "data": {
+            "name": "L4Coral"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
             "name": "Top L4 ILK 2"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "IntakeCoralStation"
           }
         },
         {
@@ -25,13 +37,31 @@
         {
           "type": "named",
           "data": {
+            "name": "L3Coral"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
             "name": "Top L4 ILK 4"
           }
         },
         {
           "type": "named",
           "data": {
+            "name": "IntakeCoralStation"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
             "name": "Top L4 ILK 5"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "L2Coral"
           }
         }
       ]
