@@ -13,7 +13,7 @@ public class AlgaeRemoverConstants {
 
     static final double ALGAE_REMOVER_POWER = -0.5;
 
-    static final int ALGAE_REMOVER_MOTOR_ID = 24;
+    static final int ALGAE_REMOVER_MOTOR_ID = 11;
 
-    static final int STALL_CURRENT_LIMIT = 80;
+    static final int STALL_CURRENT_LIMIT = 30;
 }

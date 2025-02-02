@@ -25,8 +25,8 @@ import edu.wpi.first.units.measure.Voltage;
 
 public class ElevatorIOReal implements ElevatorIO {
 
-  TalonFX leaderTalon = new TalonFX(leaderID);
-  TalonFX followerTalon = new TalonFX(followerID);
+  TalonFX leaderTalon = new TalonFX(LEFT_LEADER_ID);
+  TalonFX followerTalon = new TalonFX(RIGHT_LEADER_ID);
 
   // private final TalonFX leaderTalon;
   // private final TalonFX followerTalon;

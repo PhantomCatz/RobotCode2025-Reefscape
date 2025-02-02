@@ -14,6 +14,12 @@ public class OuttakeConstants {
     public static final boolean isOuttakeDisabled = true;
 
     public static final int OUTTAKE_CURRENT_LIMIT = 30;
+
+    public static final int LEFT_OUTTAKE_ID = 21;
+    public static final int RIGHT_OUTTAKE_ID = 20; 
+    public static final int FRONT_BEAM_BREAK_ID = 1;
+    public static final int BACK_BEAM_BREAK_ID = 0;
+
     static double OUTTAKE_RT = 0.3;
     static double OUTTAKE_LT = 0.3;
     static double INTAKE_SPD = 0.3;

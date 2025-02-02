@@ -63,7 +63,7 @@ public class AlgaePivotIOReal implements AlgaePivotIO {
     config.Slot0.kI = 0;
     config.Slot0.kD = 0;
 
-    config.CurrentLimits.SupplyCurrentLimit = 30.0;
+    config.CurrentLimits.SupplyCurrentLimit = 80.0;
     config.CurrentLimits.SupplyCurrentLimitEnable = true;
 
     config.MotorOutput.NeutralMode = NeutralModeValue.Brake;

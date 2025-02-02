@@ -14,19 +14,26 @@ import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkBase.ResetMode;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 
+import static frc.robot.CatzSubsystems.CatzOuttake.OuttakeConstants.BACK_BEAM_BREAK_ID;
+import static frc.robot.CatzSubsystems.CatzOuttake.OuttakeConstants.FRONT_BEAM_BREAK_ID;
+import static frc.robot.CatzSubsystems.CatzOuttake.OuttakeConstants.LEFT_OUTTAKE_ID;
 import static frc.robot.CatzSubsystems.CatzOuttake.OuttakeConstants.OUTTAKE_CURRENT_LIMIT;
+import static frc.robot.CatzSubsystems.CatzOuttake.OuttakeConstants.RIGHT_OUTTAKE_ID;
 
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkMaxConfig;
+
+import edu.wpi.first.wpilibj.DigitalInput;
+
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkMaxConfig;
 
 
 public class OuttakeIOReal implements OuttakeIO {
 
-  // private final DigitalInput beamBreakBck;
-  // private final DigitalInput beamBreakFrnt;
+  private final DigitalInput beamBreakBck;
+  private final DigitalInput beamBreakFrnt;
 
   private final SparkMax OuttakeLeftMtr;
   private final SparkMax OuttakeRightMtr;
@@ -37,16 +44,16 @@ public class OuttakeIOReal implements OuttakeIO {
 
   public OuttakeIOReal() {
 
-    OuttakeLeftMtr = new SparkMax(2, MotorType.kBrushless);
-    OuttakeRightMtr = new SparkMax(1, MotorType.kBrushless);
+    OuttakeLeftMtr = new SparkMax(LEFT_OUTTAKE_ID, MotorType.kBrushless);
+    OuttakeRightMtr = new SparkMax(RIGHT_OUTTAKE_ID, MotorType.kBrushless);
 
     globalConfig.smartCurrentLimit(OUTTAKE_CURRENT_LIMIT);
     globalConfig.idleMode(IdleMode.kBrake);
     globalConfig.voltageCompensation(12);
     updateConfig();
 
-    // beamBreakBck = new DigitalInput(3);
-    // beamBreakFrnt = new DigitalInput(6);
+    beamBreakBck = new DigitalInput(BACK_BEAM_BREAK_ID);
+    beamBreakFrnt = new DigitalInput(FRONT_BEAM_BREAK_ID);
   }
 
   private void updateConfig(){
@@ -56,8 +63,8 @@ public class OuttakeIOReal implements OuttakeIO {
 
   @Override
   public void updateInputs(OuttakeIOInputs inputs) {
-    // inputs.bbreakFrntTriggered = !beamBreakFrnt.get();
-    // inputs.bbreakBackTriggered = !beamBreakBck.get();
+    inputs.bbreakFrntTriggered = !beamBreakFrnt.get();
+    inputs.bbreakBackTriggered = !beamBreakBck.get();
   }
 
   @Override
