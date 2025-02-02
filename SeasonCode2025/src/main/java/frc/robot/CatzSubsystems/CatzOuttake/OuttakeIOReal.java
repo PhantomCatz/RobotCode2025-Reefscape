@@ -13,6 +13,9 @@ import com.revrobotics.spark.SparkBase.ResetMode;
 import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkBase.ResetMode;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
+
+import static frc.robot.CatzSubsystems.CatzOuttake.OuttakeConstants.OUTTAKE_CURRENT_LIMIT;
+
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkMaxConfig;
@@ -37,7 +40,7 @@ public class OuttakeIOReal implements OuttakeIO {
     OuttakeLeftMtr = new SparkMax(2, MotorType.kBrushless);
     OuttakeRightMtr = new SparkMax(1, MotorType.kBrushless);
 
-    globalConfig.smartCurrentLimit(50);
+    globalConfig.smartCurrentLimit(OUTTAKE_CURRENT_LIMIT);
     globalConfig.idleMode(IdleMode.kBrake);
     globalConfig.voltageCompensation(12);
     updateConfig();

@@ -16,6 +16,7 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Autonomous.CatzAutonomous;
 import frc.robot.CatzSubsystems.CatzSuperstructure;
+import frc.robot.CatzSubsystems.CatzAlgaeEffector.CatzAlgaePivot.CatzAlgaePivot;
 import frc.robot.CatzSubsystems.CatzAlgaeEffector.CatzAlgaeRemover.CatzAlgaeRemover;
 import frc.robot.CatzSubsystems.CatzSuperstructure.Gamepiece;
 import frc.robot.CatzSubsystems.CatzSuperstructure.LeftRight;
@@ -51,12 +52,14 @@ public class RobotContainer {
   private static CatzSuperstructure superstructure = new CatzSuperstructure();
   private static CatzClimb climb = new CatzClimb();
   private static CatzAlgaeRemover algaeRemover = new CatzAlgaeRemover();
+  private static CatzAlgaePivot algaePivot = new CatzAlgaePivot();
 
   // ------------------------------------------------------------------------------------------------------------------
   // Drive Controller Declaration
   // -----------------------------------------------------------------------------------------------------------------
   private CommandXboxController xboxDrv = new CommandXboxController(0);
   private CommandXboxController xboxAux = new CommandXboxController(1);
+  private CommandXboxController xboxTest = new CommandXboxController(2);
 
   // -------------------------------------------------------------------------------------------------------------------
   // Alert Declaration
@@ -153,7 +156,14 @@ public class RobotContainer {
     xboxDrv.x().toggleOnTrue(climb.Climb_Home().alongWith(Commands.print("pressed x")));
     xboxDrv.b().toggleOnTrue(climb.Climb_Full().alongWith(Commands.print("pressed b")));
 
+    xboxTest.rightBumper().toggleOnTrue(algaePivot.AlgaePivot_Stow().alongWith(Commands.print("stow")));
+    xboxTest.leftBumper().toggleOnTrue(algaePivot.AlgaePivot_Horizontal().alongWith(Commands.print("stow")));
 
+
+    xboxTest.a().toggleOnTrue(elevator.Elevator_L1().alongWith(Commands.print("L1")));
+    xboxTest.b().toggleOnTrue(elevator.Elevator_L2().alongWith(Commands.print("L2")));
+    xboxTest.x().toggleOnTrue(elevator.Elevator_L3().alongWith(Commands.print("L3")));
+    xboxTest.y().toggleOnTrue(elevator.Elevator_L4().alongWith(Commands.print("L4")));
 
     //---------------------------------------------------------------------------------------------------------------------
     // XBOX AUX

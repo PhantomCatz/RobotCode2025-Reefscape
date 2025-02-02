@@ -119,6 +119,7 @@ public class CatzOuttake extends SubsystemBase {
     return runOnce(() -> currentState = outtakeStates.ADJ_INIT);
   }
 
+
   public Command tempIntake() {
     return runOnce(() -> currentState = outtakeStates.TEMP_RUN);
   }

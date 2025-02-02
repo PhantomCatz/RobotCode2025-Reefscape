@@ -11,8 +11,9 @@ package frc.robot.CatzSubsystems.CatzOuttake;
 public class OuttakeConstants {
 
     // Subsystem safety disable
-    public static final boolean isOuttakeDisabled = false;
+    public static final boolean isOuttakeDisabled = true;
 
+    public static final int OUTTAKE_CURRENT_LIMIT = 30;
     static double OUTTAKE_RT = 0.3;
     static double OUTTAKE_LT = 0.3;
     static double INTAKE_SPD = 0.3;

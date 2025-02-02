@@ -26,6 +26,7 @@ public class ElevatorConstants {
     public static final double ELEVATOR_RATIO_STAGE_ONE  = ELEVATOR_DRIVING_PULLEY/ELEVATOR_DRIVEN_PULLEY;
     public static final double FINAL_REDUCATION          = MAXPLANETARY_GEAR_RATIO * ELEVATOR_RATIO_STAGE_ONE;
 
+    public double leadMotorID;
     // Motor ID
     public static final int leaderID =
         switch (CatzConstants.getRobotType()) { //TBD

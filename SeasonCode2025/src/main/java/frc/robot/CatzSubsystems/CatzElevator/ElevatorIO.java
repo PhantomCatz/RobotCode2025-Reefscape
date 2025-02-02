@@ -44,6 +44,8 @@ public interface ElevatorIO {
 
   public default void runSetpoint(double setpointRotations, double feedforward) {}
 
+  public default void setPosition(double pos) {}
+
   public default void setBrakeMode(boolean enabled) {}
 
   public default void setMotionMagicParameters(double cruiseVelocity, double acceleration, double jerk) {}
