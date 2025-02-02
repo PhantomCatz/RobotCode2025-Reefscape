@@ -43,14 +43,14 @@ public class RobotContainer {
   private static CatzDrivetrain drive = new CatzDrivetrain();
 
   // Assistance Subsystem declaration
-  private static CatzLED led = CatzLED.getInstance();
-  private static CatzRobotTracker robotTracker = CatzRobotTracker.getInstance();
-  private static CatzVision vision = new CatzVision(new VisionIOLimelight("limelight-soba"));
-  private static CatzOuttake outtake = new CatzOuttake();
-  private static CatzElevator elevator = new CatzElevator();
-  private static CatzSuperstructure superstructure = new CatzSuperstructure();
-  private static CatzClimb climb = new CatzClimb();
-  private static CatzAlgaeRemover algaeRemover = new CatzAlgaeRemover();
+  private static final CatzLED led = CatzLED.getInstance();
+  private static final CatzRobotTracker robotTracker = CatzRobotTracker.getInstance();
+  private static final CatzVision vision = new CatzVision(new VisionIOLimelight("limelight-soba"));
+  private static final CatzOuttake outtake = new CatzOuttake();
+  private static final CatzElevator elevator = new CatzElevator();
+  private static final CatzSuperstructure superstructure = new CatzSuperstructure();
+  private static final CatzClimb climb = new CatzClimb();
+  private static final CatzAlgaeRemover algaeRemover = new CatzAlgaeRemover();
 
   // ------------------------------------------------------------------------------------------------------------------
   // Drive Controller Declaration

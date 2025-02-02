@@ -307,8 +307,11 @@ public class Robot extends LoggedRobot {
   //        Autonomous
   //
   // --------------------------------------------------------------------------------------------------------
+  public static boolean isFirstPath = true;
+
   @Override
   public void autonomousInit() {
+    isFirstPath = true;
     // deployment benchmark
     LAST_DEPLOYMENT_WARNING.set(true);
     autoStart = Timer.getFPGATimestamp();

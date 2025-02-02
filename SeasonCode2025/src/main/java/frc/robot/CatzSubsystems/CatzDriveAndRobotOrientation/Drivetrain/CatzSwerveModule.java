@@ -142,7 +142,6 @@ public class CatzSwerveModule {
     // Run closed loop drive control
     // --------------------------------------------------------
     io.runDriveVelocityRPSIO(Conversions.MPSToRPS(state.speedMetersPerSecond));
-
     // --------------------------------------------------------
     // Run closed loop steer control
     // --------------------------------------------------------
@@ -163,7 +162,7 @@ public class CatzSwerveModule {
   }
 
   public void stopDriving() {
-    io.runDrivePwrPercentIO(0.0);
+    io.runDriveVelocityRPSIO(0.0);
   }
 
   // --------------------------------------------------------------------------------------------------------------------
