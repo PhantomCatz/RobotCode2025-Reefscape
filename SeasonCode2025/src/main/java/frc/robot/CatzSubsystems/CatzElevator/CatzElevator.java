@@ -28,24 +28,33 @@ public class CatzElevator extends SubsystemBase {
   private final ElevatorIO io;
   private final ElevatorIOInputsAutoLogged inputs = new ElevatorIOInputsAutoLogged();
 
-  private static LoggedTunableNumber tunableNumber =
-      new LoggedTunableNumber("Elevator/MotorPower", 0.1);
+  static LoggedTunableNumber tunableNumber = new LoggedTunableNumber("Elevator/MotorPower", 0.1);
+  static LoggedTunableNumber kP = new LoggedTunableNumber("Elevator/kP", 0.17);
+  static LoggedTunableNumber kI = new LoggedTunableNumber("Elevator/kI", 0.0);
+  static LoggedTunableNumber kD = new LoggedTunableNumber("Elevator/kD", 0.0006);
 
+  static LoggedTunableNumber kS = new LoggedTunableNumber("Elevator/kS", 0);
+  static LoggedTunableNumber kV = new LoggedTunableNumber("Elevator/kV", 0);
+  static LoggedTunableNumber kA = new LoggedTunableNumber("Elevator/kA", 0);
+
+  static double position;
   private double elevatorSpeed = 0.0;
   private boolean breakModeEnabled = true;
   private boolean isCharacterizing = false;
 
+  double targetPosition;
 
-  private ElevatorPosition targetPosition = ElevatorPosition.PosL1Home;
+
+  // private ElevatorPosition targetPosition = ElevatorPosition.PosL1Home;
 
   private ElevatorFeedforward ff;
 
   @RequiredArgsConstructor
   public static enum ElevatorPosition {
-      PosL1Home(() -> 25.0), //TBD
-      PosL2(() -> 50.0),
-      PosL3(() -> 75.0),
-      PosL4(() -> 100.0),
+      PosL1Home(() -> -25.0), //TBD
+      PosL2(() -> 0.0),
+      PosL3(() -> 50.0),
+      PosL4(() -> 75.0),
       PosManual(new LoggedTunableNumber("Elevator/ScoreSourceSetpoint",0.0));
 
     private final DoubleSupplier elevatorSetpointSupplier;
@@ -98,17 +107,39 @@ public class CatzElevator extends SubsystemBase {
         mmAcceleration,
         mmJerk);
 
-    if(DriverStation.isDisabled() || targetPosition == null) {
-      io.stop();
+    if(DriverStation.isDisabled()) { // || targetPosition == null) {
+      // io.stop();
     } else {
-      io.runSetpoint(targetPosition.getTargetPositionRotations(), ff.calculate(inputs.velocityRpm));
+      // System.out.println("spinning");
+      io.runSetpoint(position, ff.calculate(inputs.velocityRpm));
     }
 
     Logger.recordOutput("Elevator/CurrentRotations", getElevatorPositionRotations());
     Logger.recordOutput("Elevator/isElevatorInPos", isElevatorInPosition());
+    Logger.recordOutput("Elevator/targetPosition", position);
 
   }
 
+  public Command Elevator_L1() {
+    return runOnce(() -> setElevatorPos(ElevatorPosition.PosL1Home));
+  }
+
+  public Command Elevator_L2() {
+    return runOnce(() -> setElevatorPos(ElevatorPosition.PosL2));
+  }
+
+  public Command Elevator_L3() {
+    return runOnce(() -> setElevatorPos(ElevatorPosition.PosL3));
+  }
+
+  public Command Elevator_L4() {
+    return runOnce(() -> setElevatorPos(ElevatorPosition.PosL4));
+  }
+
+  public void setElevatorPos(ElevatorPosition target) {
+    targetPosition = target.getTargetPositionRotations();
+    position = target.getTargetPositionRotations();
+  }
 
   //--------------------------------------------------------------------------
   //
@@ -121,7 +152,7 @@ public class CatzElevator extends SubsystemBase {
   }
 
   public boolean isElevatorInPosition() {
-    return (Math.abs((getElevatorPositionRotations() - targetPosition.getTargetPositionRotations())) < 5.0);
+    return (Math.abs((getElevatorPositionRotations() - targetPosition)) < 5.0);
   }
 
   public void setBrakeMode(boolean enabled) {
@@ -136,20 +167,12 @@ public class CatzElevator extends SubsystemBase {
   }
 
   public double getCharacterizationVelocity() {
+    System.out.println(inputs.velocityRpm);
     return inputs.velocityRpm;
   }
 
   public void endCharacterization() {
     isCharacterizing = false;
   }
-
-  public void setTargetPosition(ElevatorPosition targetPosition) {
-    this.targetPosition = targetPosition;
-  }
-
-  public Command setTargetPositionCommand (ElevatorPosition targetPosition) {
-    return runOnce(() -> setTargetPosition(targetPosition));
-  }
-
 
 }

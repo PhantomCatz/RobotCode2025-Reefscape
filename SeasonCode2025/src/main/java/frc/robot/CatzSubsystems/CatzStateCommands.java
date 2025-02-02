@@ -15,7 +15,6 @@ import frc.robot.RobotContainer;
 import frc.robot.CatzSubsystems.CatzAlgaeEffector.CatzAlgaeRemover.CatzAlgaeRemover;
 import frc.robot.CatzSubsystems.CatzClimb.CatzClimb;
 import frc.robot.CatzSubsystems.CatzElevator.CatzElevator;
-import frc.robot.CatzSubsystems.CatzElevator.CatzElevator.ElevatorPosition;
 import frc.robot.CatzSubsystems.CatzOuttake.CatzOuttake;
 
 public class CatzStateCommands {
@@ -32,7 +31,7 @@ public class CatzStateCommands {
             climb.Climb_Stow(),
             algae.stopAlgae(),
             outtake.stopOuttake(),
-            elevator.setTargetPositionCommand(ElevatorPosition.PosL1Home)
+            elevator.Elevator_L1()
         );
 
     }
@@ -56,7 +55,7 @@ public class CatzStateCommands {
             climb.Climb_Stow(),
             algae.stopAlgae(),
             outtake.startIntaking(),
-            elevator.setTargetPositionCommand(ElevatorPosition.PosL1Home)
+            elevator.Elevator_L1()
         );
     }
 
@@ -70,7 +69,7 @@ public class CatzStateCommands {
             climb.Climb_Stow(),
             algae.eatAlgae(),
             outtake.stopOuttake(),
-            elevator.setTargetPositionCommand(ElevatorPosition.PosL1Home)
+            elevator.Elevator_L1()
         );
     }
 
@@ -85,7 +84,7 @@ public class CatzStateCommands {
             algae.stopAlgae(),
 
             new SequentialCommandGroup(
-                elevator.setTargetPositionCommand(ElevatorPosition.PosL1Home),
+                elevator.Elevator_L1(),
                 outtake.startOuttake()
             )
         );
@@ -102,7 +101,7 @@ public class CatzStateCommands {
             algae.stopAlgae(),
 
             new SequentialCommandGroup(
-                elevator.setTargetPositionCommand(ElevatorPosition.PosL2),
+                elevator.Elevator_L2(),
                 outtake.startOuttake()
             )
         );
@@ -119,7 +118,7 @@ public class CatzStateCommands {
             algae.stopAlgae(),
 
             new SequentialCommandGroup(
-                elevator.setTargetPositionCommand(ElevatorPosition.PosL3),
+                elevator.Elevator_L3(),
                 outtake.startOuttake()
             )
         );
@@ -136,7 +135,7 @@ public class CatzStateCommands {
             algae.stopAlgae(),
 
             new SequentialCommandGroup(
-                elevator.setTargetPositionCommand(ElevatorPosition.PosL4),
+                elevator.Elevator_L4(),
                 outtake.startOuttake()
             )
         );
@@ -153,7 +152,7 @@ public class CatzStateCommands {
             outtake.stopOuttake(),
 
             new SequentialCommandGroup(
-                elevator.setTargetPositionCommand(ElevatorPosition.PosL1Home),
+                elevator.Elevator_L1(),
                 algae.vomitAlgae()
 
             )
@@ -171,7 +170,7 @@ public class CatzStateCommands {
             outtake.stopOuttake(),
 
             new SequentialCommandGroup(
-                elevator.setTargetPositionCommand(ElevatorPosition.PosL2), //TODO real height
+                elevator.Elevator_L2(), //TODO real height
                 algae.eatAlgae()
             )
         );
@@ -188,7 +187,7 @@ public class CatzStateCommands {
             outtake.stopOuttake(),
 
             new SequentialCommandGroup(
-                elevator.setTargetPositionCommand(ElevatorPosition.PosL3), //TODO real height
+                elevator.Elevator_L3(), //TODO real height
                 algae.eatAlgae()
             )
         );
@@ -204,7 +203,7 @@ public class CatzStateCommands {
             new ParallelCommandGroup(
                 outtake.stopOuttake(),
                 algae.stopAlgae(),
-                elevator.setTargetPositionCommand(ElevatorPosition.PosL1Home)
+                elevator.Elevator_L1()
             ),
             climb.Climb_Full()
         );

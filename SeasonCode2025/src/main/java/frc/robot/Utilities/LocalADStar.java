@@ -433,7 +433,7 @@ public class LocalADStar implements Pathfinder {
     if (path.isEmpty()) {
       return new ArrayList<>();
     }
-    
+
     // Visualize path
     // for (int row = nodesY - 1; row >= 0; row--) {
     //   for (int col = 0; col < nodesX; col++) {

@@ -63,7 +63,7 @@ public class AlgaePivotIOReal implements AlgaePivotIO {
     config.Slot0.kI = 0;
     config.Slot0.kD = 0;
 
-    config.CurrentLimits.SupplyCurrentLimit = 60.0;
+    config.CurrentLimits.SupplyCurrentLimit = 80.0;
     config.CurrentLimits.SupplyCurrentLimitEnable = true;
 
     config.MotorOutput.NeutralMode = NeutralModeValue.Brake;
@@ -89,12 +89,12 @@ public class AlgaePivotIOReal implements AlgaePivotIO {
                 algaePivotTorqueCurrent,
                 algaePivotTempCelsius)
             .isOK();
-    inputs.positionMechs = algaePivotPosition.getValueAsDouble();
-    inputs.velocityRpm = algaePivotVelocity.getValueAsDouble() * 60.0;
-    inputs.appliedVolts = algaePivotAppliedVolts.getValueAsDouble();
+    inputs.positionMechs     = algaePivotPosition.getValueAsDouble();
+    inputs.velocityRpm       = algaePivotVelocity.getValueAsDouble() * 60.0;
+    inputs.appliedVolts      = algaePivotAppliedVolts.getValueAsDouble();
     inputs.supplyCurrentAmps = algaePivotSupplyCurrent.getValueAsDouble();
     inputs.torqueCurrentAmps = algaePivotTorqueCurrent.getValueAsDouble();
-    inputs.tempCelsius = algaePivotTempCelsius.getValueAsDouble();
+    inputs.tempCelsius       = algaePivotTempCelsius.getValueAsDouble();
   }
 
   @Override
@@ -102,7 +102,6 @@ public class AlgaePivotIOReal implements AlgaePivotIO {
       {
     CatzAlgaePivot.position = pos;
     algaePivotMotor.setControl(positionControl.withPosition(pos));
-    // System.out.println(pos);
   }
 
   @Override

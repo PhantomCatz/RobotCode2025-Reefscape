@@ -31,7 +31,7 @@ public class DriveConstants {
   // ---------------------------------------------------------------------------------------------------------------
   // Disabled flag for testing
   // ---------------------------------------------------------------------------------------------------------------
-  public static final boolean IS_DRIVE_DISABLED = false;
+  public static final boolean IS_DRIVE_DISABLED = true;
 
   // ---------------------------------------------------------------------------------------------------------------
   // Module organizations
@@ -47,7 +47,7 @@ public class DriveConstants {
   public static final int TRAJ_INDEX_BL = 2;
   public static final int TRAJ_INDEX_BR = 3;
 
-  public static final int GYRO_ID = 0;
+  public static final int GYRO_ID = 10;
 
   // ---------------------------------------------------------------------------------------------------------------
   // Drive Subsytem Config info

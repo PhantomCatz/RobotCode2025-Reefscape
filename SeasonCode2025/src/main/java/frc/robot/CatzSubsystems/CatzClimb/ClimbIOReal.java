@@ -7,6 +7,8 @@
 
 package frc.robot.CatzSubsystems.CatzClimb;
 
+import static frc.robot.CatzSubsystems.CatzClimb.ClimbConstants.CLIMB_MOTOR_ID;
+
 import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
@@ -24,7 +26,7 @@ import edu.wpi.first.units.measure.Voltage;
 /** Add your docs here. */
 public class ClimbIOReal implements ClimbIO {
 
-  TalonFX climbMotor = new TalonFX(4);
+  TalonFX climbMotor = new TalonFX(CLIMB_MOTOR_ID);
 
 
   private final PositionVoltage positionControl = new PositionVoltage(0).withUpdateFreqHz(0.0);
@@ -60,7 +62,7 @@ public class ClimbIOReal implements ClimbIO {
     config.Slot0.kI = 0;
     config.Slot0.kD = 0;
 
-    config.CurrentLimits.SupplyCurrentLimit = 60.0;
+    config.CurrentLimits.SupplyCurrentLimit = 80.0;
     config.CurrentLimits.SupplyCurrentLimitEnable = true;
 
     config.MotorOutput.NeutralMode = NeutralModeValue.Brake;
