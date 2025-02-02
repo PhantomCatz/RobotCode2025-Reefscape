@@ -31,14 +31,14 @@ import org.json.simple.parser.JSONParser;
  * translated it from was much worse.
  */
 public class LocalADStar implements Pathfinder {
-  private static final double SMOOTHING_ANCHOR_PCT = 0.8;
+  private static final double SMOOTHING_ANCHOR_PCT = 0.75; // higher values set anchors closer to waypoints
   private static final double EPS = 2.5;
   private static final GridPosition[] ADJACENT =
       new GridPosition[] {
-        new GridPosition(-1, 0),
         new GridPosition(1, 0),
-        new GridPosition(0, -1),
-        new GridPosition(0, 1)
+        new GridPosition(0, 1),
+        new GridPosition(-1, 0),
+        new GridPosition(0, -1)
       };
 
   private double fieldLength = 16.54;
@@ -54,6 +54,7 @@ public class LocalADStar implements Pathfinder {
   private final HashMap<GridPosition, Pair<Double, Double>> open = new HashMap<>();
   private final HashMap<GridPosition, Pair<Double, Double>> incons = new HashMap<>();
   private final Set<GridPosition> closed = new HashSet<>();
+  private final Set<GridPosition> corners = new HashSet<>();
   private final Set<GridPosition> staticObstacles = new HashSet<>();
   private final Set<GridPosition> dynamicObstacles = new HashSet<>();
   private final Set<GridPosition> requestObstacles = new HashSet<>();
@@ -104,8 +105,6 @@ public class LocalADStar implements Pathfinder {
         nodeSize = ((Number) json.get("nodeSizeMeters")).doubleValue();
         JSONArray grid = (JSONArray) json.get("grid");
 
-        System.out.println(grid.size());
-
         nodesY = grid.size();
         for (int row = 0; row < grid.size(); row++) {
           JSONArray rowArray = (JSONArray) grid.get(row);
@@ -115,13 +114,10 @@ public class LocalADStar implements Pathfinder {
           for (int col = 0; col < rowArray.size(); col++) {
             boolean isObstacle = (boolean) rowArray.get(col);
             if (isObstacle) {
-              System.out.print("#");
               staticObstacles.add(new GridPosition(col, row));
             } else {
-              System.out.print("_");
             }
           }
-          System.out.println();
         }
 
         JSONObject fieldSize = (JSONObject) json.get("field_size");
@@ -129,6 +125,21 @@ public class LocalADStar implements Pathfinder {
         fieldWidth = ((Number) fieldSize.get("y")).doubleValue();
       } catch (Exception e) {
         // Do nothing, use defaults
+      }
+    }
+
+    for(GridPosition pos: staticObstacles){
+      for(int i=0; i<4; i++){
+        GridPosition direction1 = ADJACENT[i];
+        GridPosition direction2 = ADJACENT[(i+1)%4];
+
+        if(
+          !staticObstacles.contains(pos.add(direction1)) &&
+          !staticObstacles.contains(pos.add(direction2)) &&
+          !staticObstacles.contains(pos.add(direction1).add(direction2))
+        ){
+          corners.add(pos.add(direction1).add(direction2));
+        }
       }
     }
 
@@ -350,43 +361,68 @@ public class LocalADStar implements Pathfinder {
     }
   }
 
-  private List<GridPosition> findReversePath(
-      GridPosition sStart, GridPosition sGoal, Set<GridPosition> obstacles) {
-    if (sGoal.equals(sStart)) {
+  public class CompareDistances implements Comparator<PathfindingPosition>{
+    @Override
+    public int compare(PathfindingPosition o1, PathfindingPosition o2) {
+      return (int) Math.signum(
+        (o1.position.getDistance(o1.corner) + o1.cornerDistance) -
+        (o2.position.getDistance(o2.corner) + o2.cornerDistance)
+      );
+    }
+  }
+
+  private List<GridPosition> findReversePath(GridPosition start, GridPosition goal, Set<GridPosition> obstacles) {
+    if (goal.equals(start)) {
       return new ArrayList<>();
     }
 
-    int iterations = 0;
-    Queue<GridPosition> frontier = new LinkedList<>();
-    HashMap<GridPosition, GridPosition> parent = new HashMap<>();
-    frontier.add(sStart);
-    parent.put(sStart, sStart);
+    PriorityQueue<PathfindingPosition> frontier = new PriorityQueue<>(new CompareDistances());
+    HashMap<GridPosition, GridPosition> lastCorner = new HashMap<>();
+    HashMap<GridPosition, Set<GridPosition>> imaginaryObstacles = new HashMap<>();
 
-    while (frontier.size() > 0) {
-      iterations += 1;
-      GridPosition currentPos = frontier.remove();
-      if (currentPos.compareTo(sGoal) == 0 || iterations > 1e4) {
+    frontier.add(new PathfindingPosition(start, start, 0.0));
+    lastCorner.put(start, start);
+    imaginaryObstacles.put(start, new HashSet<>());
+
+    while(frontier.size() > 0){
+      PathfindingPosition currentPathfindingPos = frontier.poll();
+      GridPosition currentPos = currentPathfindingPos.position;
+      GridPosition currentCorner = currentPathfindingPos.corner;
+      double currentCornerDistance = currentPathfindingPos.cornerDistance;
+      if(currentPos.compareTo(goal) == 0){
         break;
       }
 
-      for (GridPosition dr : ADJACENT) {
-        GridPosition newPos = currentPos.add(dr);
-        if (parent.get(newPos) == null && !obstacles.contains(newPos)) {
-          frontier.add(newPos);
-          parent.put(newPos, currentPos);
+      if(corners.contains(currentPos)){
+        Translation2d slope = new Translation2d(currentPos.y - currentCorner.y, currentPos.x - currentCorner.x);
+        imaginaryObstacles.get(currentCorner).addAll(getCellsOnLine(currentPos, slope, obstacles));
+        imaginaryObstacles.put(currentPos, new HashSet<>());
+
+        currentCornerDistance += currentPos.getDistance(currentCorner);
+        currentCorner = currentPos;
+      }
+
+      for(GridPosition dxy: ADJACENT){
+        GridPosition newPos = currentPos.add(dxy);
+
+        if(
+          !imaginaryObstacles.get(currentCorner).contains(newPos) &&
+          !obstacles.contains(newPos) &&
+          !lastCorner.containsKey(newPos)
+        ){
+          frontier.add(new PathfindingPosition(newPos, currentCorner, currentCornerDistance));
+          lastCorner.put(newPos, currentCorner);
         }
       }
     }
 
-    List<GridPosition> retrace = new ArrayList<>();
-    GridPosition currentPos = sGoal;
-    while (currentPos != sStart && currentPos != null) {
-      retrace.add(currentPos);
-      currentPos = parent.get(currentPos);
+    List<GridPosition> path = new ArrayList<>();
+    while(goal.compareTo(start) != 0 && goal != null){
+      path.add(goal);
+      goal = lastCorner.get(goal);
     }
-    retrace.add(sStart);
 
-    return retrace;
+    return path;
   }
 
   private List<Waypoint> createWaypoints(
@@ -397,32 +433,36 @@ public class LocalADStar implements Pathfinder {
     if (path.isEmpty()) {
       return new ArrayList<>();
     }
-
-    List<GridPosition> simplifiedPath = new ArrayList<>();
-    simplifiedPath.add(path.get(path.size() - 1));
-    for (int i = path.size() - 1; i > 0; i--) { //this cuts off too much for some reason, so the robot sometimes clips into the reef
-      for (int j = i - 1; j > 0; j--) {
-        if (!walkable(path.get(i), path.get(j), obstacles)) {
-          i = j + 1;
-          simplifiedPath.add(path.get(j));
-          break;
-        }
-      }
-    }
-    simplifiedPath.add(path.get(0));
+    
+    // Visualize path
+    // for (int row = nodesY - 1; row >= 0; row--) {
+    //   for (int col = 0; col < nodesX; col++) {
+    //     if (obstacles.contains(new GridPosition(col, row))){
+    //       System.out.print("#");
+    //     }
+    //     else if (path.contains(new GridPosition(col, row))){
+    //       System.out.print("+");
+    //     }
+    //     else {
+    //       System.out.print("_");
+    //     }
+    //   }
+    //   System.out.println();
+    // }
 
     List<Translation2d> fieldPosPath = new ArrayList<>();
-    for (GridPosition pos : simplifiedPath) {
-      fieldPosPath.add(gridPosToTranslation2d(pos));
+    fieldPosPath.add(realStartPos);
+    for (int i = path.size() - 1; i > 0; i--) { //this cuts off too much for some reason, so the robot sometimes clips into the reef
+      fieldPosPath.add(gridPosToTranslation2d(path.get(i)));
     }
-
-    // Replace start and end positions with their real positions
-    fieldPosPath.set(0, realStartPos);
-    fieldPosPath.set(fieldPosPath.size() - 1, realGoalPos);
+    fieldPosPath.add(realGoalPos);
 
     List<Pose2d> pathPoses = new ArrayList<>();
     pathPoses.add(
-        new Pose2d(fieldPosPath.get(0), fieldPosPath.get(1).minus(fieldPosPath.get(0)).getAngle()));
+      new Pose2d(
+        fieldPosPath.get(0),
+        fieldPosPath.get(1).minus(fieldPosPath.get(0)).getAngle()));
+
     for (int i = 1; i < fieldPosPath.size() - 1; i++) {
       Translation2d last = fieldPosPath.get(i - 1);
       Translation2d current = fieldPosPath.get(i);
@@ -436,13 +476,11 @@ public class LocalADStar implements Pathfinder {
       pathPoses.add(new Pose2d(anchor1, heading1));
       pathPoses.add(new Pose2d(anchor2, heading2));
     }
+
     pathPoses.add(
         new Pose2d(
             fieldPosPath.get(fieldPosPath.size() - 1),
-            fieldPosPath
-                .get(fieldPosPath.size() - 1)
-                .minus(fieldPosPath.get(fieldPosPath.size() - 2))
-                .getAngle()));
+            fieldPosPath.get(fieldPosPath.size() - 1).minus(fieldPosPath.get(fieldPosPath.size() - 2)).getAngle()));
 
     return PathPlannerPath.waypointsFromPoses(pathPoses);
   }
@@ -472,9 +510,9 @@ public class LocalADStar implements Pathfinder {
     return null;
   }
 
-  private boolean walkable(GridPosition s1, GridPosition s2, Set<GridPosition> obstacles) {
-    Translation2d slope = new Translation2d(s2.x - s1.x, s2.y - s1.y);
-    double n = 1 + Math.max(Math.abs(slope.getX()), Math.abs(slope.getY()));
+  // wont include start cell
+  private List<GridPosition> getCellsOnLine(GridPosition start, Translation2d slope, Set<GridPosition> obstacles) {
+    double n = Math.max(nodesX, nodesY);
 
     if (slope.getX() == 0 || slope.getY() == 0) {
       slope = slope.div(slope.getNorm());
@@ -482,8 +520,9 @@ public class LocalADStar implements Pathfinder {
       slope = slope.div(Math.max(slope.getX(), slope.getY()));
     }
 
-    double x = s1.x;
-    double y = s1.y;
+    double x = start.x;
+    double y = start.y;
+    List<GridPosition> onLine = new ArrayList<>();
 
     while (n >= 0) {
       x += slope.getX();
@@ -491,17 +530,15 @@ public class LocalADStar implements Pathfinder {
 
       int gx = (int) Math.round(x);
       int gy = (int) Math.round(y);
-
       if (obstacles.contains(new GridPosition(gx, gy))) {
-        return false;
+        return onLine;
       }
-      if (gx == s2.x && gy == s2.y) {
-        break;
-      }
+
+      onLine.add(new GridPosition(gx, gy));
       n--;
     }
 
-    return true;
+    return onLine;
   }
 
   private void reset(GridPosition sStart, GridPosition sGoal) {
@@ -583,9 +620,15 @@ public class LocalADStar implements Pathfinder {
       return new GridPosition(o.x + x, o.y + y);
     }
 
+    public double getDistance(GridPosition o){
+      return Math.hypot(o.x - x, o.y - y);
+    }
+
     @Override
     public String toString() {
       return "(" + x + "," + y + ")";
     }
   }
+
+  public record PathfindingPosition(GridPosition position, GridPosition corner, double cornerDistance){};
 }

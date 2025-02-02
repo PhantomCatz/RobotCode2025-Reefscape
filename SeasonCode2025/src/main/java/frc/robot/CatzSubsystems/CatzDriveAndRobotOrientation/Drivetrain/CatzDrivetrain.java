@@ -217,15 +217,6 @@ public class CatzDrivetrain extends SubsystemBase {
   // --------------------------------------------------------------------------------------------------------------------------
   public void drive(ChassisSpeeds chassisSpeeds) {
     ChassisSpeeds descreteSpeeds = ChassisSpeeds.discretize(chassisSpeeds, CatzConstants.LOOP_TIME);
-    // 254 Setpoint Generator
-    advModuleSetpoint = swerveSetpointGenerator.generateSetpoint(
-                        DriveConstants.moduleLimitsFree,
-                        advModuleSetpoint,
-                        descreteSpeeds,
-                        CatzConstants.LOOP_TIME
-                      );
-    SwerveModuleState[] advModuleStates = advModuleSetpoint.moduleStates();
-
     // --------------------------------------------------------
     // Convert chassis speeds to individual module states and set module states
     // --------------------------------------------------------
@@ -251,7 +242,6 @@ public class CatzDrivetrain extends SubsystemBase {
 
     Logger.recordOutput("Drive/chassispeeds", descreteSpeeds);
     Logger.recordOutput("Drive/modulestates", optimizedDesiredStates);
-    Logger.recordOutput("Drive/SetpointGeneratorModuleStates", advModuleStates);
   }
 
   public void simpleDrive(ChassisSpeeds speeds) {

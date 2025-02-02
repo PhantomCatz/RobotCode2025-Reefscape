@@ -65,7 +65,7 @@ public class CatzElevator extends SubsystemBase {
   }
 
   public CatzElevator() {
-    if(isElevatorDisabled) { //Comes from elevator Constants
+    if(isElevatorDisabled) {
       io = new ElevatorIONull();
       System.out.println("Elevator Unconfigured");
     } else {

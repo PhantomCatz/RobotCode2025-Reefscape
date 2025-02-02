@@ -26,7 +26,6 @@ public class CatzAlgaePivot extends SubsystemBase {
   private final AlgaePivotIO io;
   private final AlgaePivotIOInputsAutoLogged inputs = new AlgaePivotIOInputsAutoLogged();
 
-  private Position PositionType;
   static double manualPow = 0;
   static boolean isManual;
   static final double MANUAL_SCALE = 5;
@@ -125,7 +124,7 @@ public class CatzAlgaePivot extends SubsystemBase {
     // manualPow = manualSupplier.get();
     // isManual = true;
     position += manualSupplier.get() * MANUAL_SCALE;
-    System.out.println(position);
+    System.out.println("algae:" +position);
   }
 
   public Command AlgaePivotManualMode(Supplier<Double> manualSupplier) {
