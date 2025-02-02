@@ -33,8 +33,6 @@ public class AlgaeRemoverIOReal implements AlgaeRemoverIO {
     globalConfig.voltageCompensation(12);
 
     algaeRemoverMotor.configure(globalConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
-
-
   }
 
   @Override
