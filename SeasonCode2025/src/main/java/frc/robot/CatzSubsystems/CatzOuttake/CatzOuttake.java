@@ -9,6 +9,7 @@ package frc.robot.CatzSubsystems.CatzOuttake;
 import static frc.robot.CatzSubsystems.CatzOuttake.OuttakeConstants.*;
 
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.CatzConstants;
 
@@ -23,6 +24,7 @@ public class CatzOuttake extends SubsystemBase {
     ADJ_INIT,
     ADJ_BACK,
     SCORE,
+    SCORE_L1,
     STOP,
     TEMP_RUN
   }
@@ -66,6 +68,9 @@ public class CatzOuttake extends SubsystemBase {
       case SCORE:
         case_shoot();
         break;
+      case SCORE_L1:
+        case_shootL1();
+        break;
       case STOP: io.runMotor(0,0);
         break;
       case TEMP_RUN: io.runMotor(OUTTAKE_LT, OUTTAKE_RT);
@@ -103,6 +108,13 @@ public class CatzOuttake extends SubsystemBase {
         currentState = outtakeStates.STOP;
     }
   }
+  private void case_shootL1() {
+
+    io.runMotor(0.8, 0.05);
+    if(!inputs.bbreakFrntTriggered) {
+        currentState = outtakeStates.STOP;
+    }
+  }
 
 
   //=========================================================
@@ -113,7 +125,7 @@ public class CatzOuttake extends SubsystemBase {
 
 
   public Command startIntaking() {
-    return runOnce(() -> currentState = outtakeStates.ADJ_INIT);
+    return runOnce(() -> currentState = outtakeStates.ADJ_INIT).alongWith(Commands.print("hello"));
   }
 
 
@@ -123,6 +135,10 @@ public class CatzOuttake extends SubsystemBase {
 
   public Command startOuttake() {
     return runOnce(() -> currentState = outtakeStates.SCORE);
+  }
+
+  public Command outtakeL1() {
+    return runOnce(() -> currentState = outtakeStates.SCORE_L1);
   }
 
   public Command stopOuttake() {

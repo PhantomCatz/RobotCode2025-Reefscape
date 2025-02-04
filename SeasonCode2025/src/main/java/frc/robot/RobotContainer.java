@@ -44,15 +44,15 @@ public class RobotContainer {
   private static CatzDrivetrain drive = new CatzDrivetrain();
 
   // Assistance Subsystem declaration
-  private static CatzLED led = CatzLED.getInstance();
-  private static CatzRobotTracker robotTracker = CatzRobotTracker.getInstance();
-  private static CatzVision vision = new CatzVision(new VisionIOLimelight("limelight-soba"));
-  private static CatzOuttake outtake = new CatzOuttake();
-  private static CatzElevator elevator = new CatzElevator();
-  private static CatzSuperstructure superstructure = new CatzSuperstructure();
-  private static CatzClimb climb = new CatzClimb();
-  private static CatzAlgaeRemover algaeRemover = new CatzAlgaeRemover();
-  private static CatzAlgaePivot algaePivot = new CatzAlgaePivot();
+  private CatzLED led = CatzLED.getInstance();
+  private CatzRobotTracker robotTracker = CatzRobotTracker.getInstance();
+  private CatzVision vision = new CatzVision(new VisionIOLimelight("limelight-soba"));
+  private CatzOuttake outtake = new CatzOuttake();
+  private CatzElevator elevator = new CatzElevator();
+  private CatzClimb climb = new CatzClimb();
+  private CatzAlgaeRemover algaeRemover = new CatzAlgaeRemover();
+  private CatzAlgaePivot algaePivot = new CatzAlgaePivot();
+  private CatzSuperstructure superstructure = new CatzSuperstructure(this);
 
   // ------------------------------------------------------------------------------------------------------------------
   // Drive Controller Declaration
@@ -146,10 +146,10 @@ public class RobotContainer {
 
 
     // Manual Climb Control
-    Trigger LeftJoystickTrigger = new Trigger(
+    Trigger rightJoystickTrigger = new Trigger(
       () -> Math.abs(xboxDrv.getRightY()) > 0.1);
-    LeftJoystickTrigger.onTrue(climb.ClimbManualMode(() -> xboxDrv.getRightY()).alongWith(Commands.print("Using manual climb")));
-    LeftJoystickTrigger.onFalse(climb.ClimbManualMode(() -> 0.0));
+    rightJoystickTrigger.onTrue(climb.ClimbManualMode(() -> xboxDrv.getRightY()).alongWith(Commands.print("Using manual climb")));
+    rightJoystickTrigger.onFalse(climb.ClimbManualMode(() -> 0.0));
 
     // Climb SetPosition Control
     xboxDrv.y().toggleOnTrue(climb.Climb_Retract().alongWith(Commands.print("pressed y")));
