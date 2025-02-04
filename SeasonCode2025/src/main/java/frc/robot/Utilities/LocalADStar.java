@@ -128,6 +128,8 @@ public class LocalADStar implements Pathfinder {
       }
     }
 
+    //if three squares put together in an L shape can be put around a node in the map, then the middle square of the L shape is defined as the corner
+
     for(GridPosition pos: staticObstacles){
       for(int i=0; i<4; i++){
         GridPosition direction1 = ADJACENT[i];
@@ -361,12 +363,17 @@ public class LocalADStar implements Pathfinder {
     }
   }
 
+  /**
+   * Comparator used in the PriorityQueue during pathfinding. 
+   * The queue is ordered based on the distance from the corners traveled so far and the distance from the position's associated corner.
+   * This ensures that the shortest path is checked first and that the floodfilling is circular. 
+   */
   public class CompareDistances implements Comparator<PathfindingPosition>{
     @Override
     public int compare(PathfindingPosition o1, PathfindingPosition o2) {
       return (int) Math.signum(
-        (o1.position.getDistance(o1.corner) + o1.cornerDistance) -
-        (o2.position.getDistance(o2.corner) + o2.cornerDistance)
+        (o1.position.getDistance(o1.corner) + o1.cornerDistancesTraveled) -
+        (o2.position.getDistance(o2.corner) + o2.cornerDistancesTraveled)
       );
     }
   }
@@ -388,7 +395,7 @@ public class LocalADStar implements Pathfinder {
       PathfindingPosition currentPathfindingPos = frontier.poll();
       GridPosition currentPos = currentPathfindingPos.position;
       GridPosition currentCorner = currentPathfindingPos.corner;
-      double currentCornerDistance = currentPathfindingPos.cornerDistance;
+      double currentCornerDistance = currentPathfindingPos.cornerDistancesTraveled;
       if(currentPos.compareTo(goal) == 0){
         break;
       }
@@ -630,5 +637,10 @@ public class LocalADStar implements Pathfinder {
     }
   }
 
-  public record PathfindingPosition(GridPosition position, GridPosition corner, double cornerDistance){};
+  /**
+   * @param position The current position during pathfinding.
+   * @param corner   The corner that the position is associated with.
+   * @param cornerDistancesTraveled The sum of distances from each corners that the position traveled through. 
+   */
+  public record PathfindingPosition(GridPosition position, GridPosition corner, double cornerDistancesTraveled){};
 }
