@@ -366,7 +366,7 @@ public class LocalADStar implements Pathfinder {
   /**
    * Comparator used in the PriorityQueue during pathfinding. 
    * The queue is ordered based on the distance from the corners traveled so far and the distance from the position's associated corner.
-   * This ensures that the shortest path is checked first and that the floodfilling is circular. 
+   * This ensures that the shortest path is checked first and that the floodfilling is circular (which gurantees the shortest path and ensures that corners that were visited later doesn't flow into corners that were visited earlier). 
    */
   public class CompareDistances implements Comparator<PathfindingPosition>{
     @Override
@@ -382,12 +382,19 @@ public class LocalADStar implements Pathfinder {
     if (goal.equals(start)) {
       return new ArrayList<>();
     }
-
+    //Queue to store the nodes to explore, prioritizing the shortest paths.
     PriorityQueue<PathfindingPosition> frontier = new PriorityQueue<>(new CompareDistances());
+    
+    //Maps a position in the node to the corner that it is associated with.
+    //Used to construct the path by retracing the corners that it traveled
     HashMap<GridPosition, GridPosition> lastCorner = new HashMap<>();
+
+    //Invisible lines that draws a line-of-sight from corners to corners, ensuring that areas with different "lastCorners" don't spill over eachother
     HashMap<GridPosition, Set<GridPosition>> imaginaryObstacles = new HashMap<>();
 
     frontier.add(new PathfindingPosition(start, start, 0.0));
+    
+    //the start counts as a corner
     lastCorner.put(start, start);
     imaginaryObstacles.put(start, new HashSet<>());
 
@@ -400,11 +407,14 @@ public class LocalADStar implements Pathfinder {
         break;
       }
 
+      //if a corner is found, draw an imaginary line from the previous corner to this corner
+      //now all cells propagating from this corner identifies as this corner (if that makes sense)
       if(corners.contains(currentPos)){
         Translation2d slope = new Translation2d(currentPos.y - currentCorner.y, currentPos.x - currentCorner.x);
         imaginaryObstacles.get(currentCorner).addAll(getCellsOnLine(currentPos, slope, obstacles));
         imaginaryObstacles.put(currentPos, new HashSet<>());
 
+        //add the euclidean distance from the previous corner to this corner
         currentCornerDistance += currentPos.getDistance(currentCorner);
         currentCorner = currentPos;
       }
@@ -412,6 +422,8 @@ public class LocalADStar implements Pathfinder {
       for(GridPosition dxy: ADJACENT){
         GridPosition newPos = currentPos.add(dxy);
 
+        //floodfill from the current node. 
+        //if the next node is not an imaginary obstacle and it's not an actual obstacle and if it hasn't been traveled before, add it to the frontier.
         if(
           !imaginaryObstacles.get(currentCorner).contains(newPos) &&
           !obstacles.contains(newPos) &&
@@ -423,6 +435,8 @@ public class LocalADStar implements Pathfinder {
       }
     }
 
+    //either a path was found (or wasn't found)
+    //retrace the path backwards by going through the corners that this path visited.
     List<GridPosition> path = new ArrayList<>();
     while(goal.compareTo(start) != 0 && goal != null){
       path.add(goal);
@@ -459,7 +473,7 @@ public class LocalADStar implements Pathfinder {
 
     List<Translation2d> fieldPosPath = new ArrayList<>();
     fieldPosPath.add(realStartPos);
-    for (int i = path.size() - 1; i > 0; i--) { //this cuts off too much for some reason, so the robot sometimes clips into the reef
+    for (int i = path.size() - 1; i > 0; i--) { 
       fieldPosPath.add(gridPosToTranslation2d(path.get(i)));
     }
     fieldPosPath.add(realGoalPos);
@@ -470,6 +484,7 @@ public class LocalADStar implements Pathfinder {
         fieldPosPath.get(0),
         fieldPosPath.get(1).minus(fieldPosPath.get(0)).getAngle()));
 
+    //smoothens the path by splitting a path into smaller sections at some midpoint. 
     for (int i = 1; i < fieldPosPath.size() - 1; i++) {
       Translation2d last = fieldPosPath.get(i - 1);
       Translation2d current = fieldPosPath.get(i);
