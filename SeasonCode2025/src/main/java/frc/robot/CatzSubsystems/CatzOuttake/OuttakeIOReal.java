@@ -14,20 +14,13 @@ import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkBase.ResetMode;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 
-import static frc.robot.CatzSubsystems.CatzOuttake.OuttakeConstants.BACK_BEAM_BREAK_ID;
-import static frc.robot.CatzSubsystems.CatzOuttake.OuttakeConstants.FRONT_BEAM_BREAK_ID;
-import static frc.robot.CatzSubsystems.CatzOuttake.OuttakeConstants.LEFT_OUTTAKE_ID;
-import static frc.robot.CatzSubsystems.CatzOuttake.OuttakeConstants.OUTTAKE_CURRENT_LIMIT;
-import static frc.robot.CatzSubsystems.CatzOuttake.OuttakeConstants.RIGHT_OUTTAKE_ID;
+import static frc.robot.CatzSubsystems.CatzOuttake.OuttakeConstants.*;
 
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkMaxConfig;
 
 import edu.wpi.first.wpilibj.DigitalInput;
-
-import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
-import com.revrobotics.spark.config.SparkMaxConfig;
 
 
 public class OuttakeIOReal implements OuttakeIO {
@@ -37,8 +30,6 @@ public class OuttakeIOReal implements OuttakeIO {
 
   private final SparkMax OuttakeLeftMtr;
   private final SparkMax OuttakeRightMtr;
-
-  // private SparkBaseConfig globalConfig;
 
   private SparkMaxConfig globalConfig = new SparkMaxConfig();
 

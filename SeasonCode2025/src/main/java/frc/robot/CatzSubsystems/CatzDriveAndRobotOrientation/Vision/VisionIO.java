@@ -8,7 +8,6 @@
 package frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.Vision;
 
 import edu.wpi.first.math.geometry.Pose3d;
-import edu.wpi.first.math.geometry.Rotation2d;
 import org.littletonrobotics.junction.AutoLog;
 
 public interface VisionIO {
@@ -16,14 +15,13 @@ public interface VisionIO {
   @AutoLog
   public static class VisionIOInputs {
     public boolean connected = false;
-    public TargetObservation latestTargetObservation =
-        new TargetObservation(0.0, new Rotation2d(), new Rotation2d(), 0);
+    public TargetObservation[] latestTargetObservations = new TargetObservation[0];
     public PoseObservation[] poseObservations = new PoseObservation[0];
     public int[] tagIds = new int[0];
   }
 
   /** Represents the angle to a simple target, not used for pose estimation. */
-  public static record TargetObservation(double timestampe, Rotation2d tx, Rotation2d ty, int tagID) {}
+  public static record TargetObservation(double timestamp, double tx, double ty, double tz, int tagID, double distance) {}
 
   /** Represents a robot pose sample used for pose estimation. */
   public static record PoseObservation(

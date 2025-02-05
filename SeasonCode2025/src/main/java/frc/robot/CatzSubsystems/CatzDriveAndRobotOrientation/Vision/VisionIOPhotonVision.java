@@ -8,7 +8,6 @@
 package frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.Vision;
 
 import edu.wpi.first.math.geometry.Pose3d;
-import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.wpilibj.Timer;
 
@@ -44,14 +43,36 @@ public class VisionIOPhotonVision implements VisionIO {
     List<PoseObservation> poseObservations = new LinkedList<>();
     for (var result : camera.getAllUnreadResults()) {
       // Update latest target observation
+      List<TargetObservation> targetObservations = new LinkedList<>();
       if (result.hasTargets()) {
-        inputs.latestTargetObservation =
+
+        // distance from the center of the Limelight lens to the floor
+        double limelightLensHeightInches = 20.0;
+
+        // distance from the target to the floor
+        double goalHeightInches = 8.75;
+
+        double angleToGoalDegrees = result.getBestTarget().getPitch();
+        double angleToGoalRadians = angleToGoalDegrees * (Math.PI / 180.0);
+
+        //calculate distance
+        double distanceToTargetMeters = Math.abs((goalHeightInches - limelightLensHeightInches) / Math.tan(angleToGoalRadians));
+
+        targetObservations.add(
             new TargetObservation(
                 timestamp,
-                Rotation2d.fromDegrees(result.getBestTarget().getYaw()),
-                Rotation2d.fromDegrees(result.getBestTarget().getPitch()), 0);
+                result.getBestTarget().getYaw(),
+                result.getBestTarget().getPitch(),
+                0.0, result.getBestTarget().fiducialId, distanceToTargetMeters)
+        );
       } else {
-        inputs.latestTargetObservation = new TargetObservation(timestamp, new Rotation2d(), new Rotation2d(), 0);
+        targetObservations.add(
+          new TargetObservation(0.0, 0.0, 0.0,0.0, 0, 0.0)
+        );
+      }
+      inputs.latestTargetObservations = new TargetObservation[targetObservations.size()];
+      for (int i = 0; i < targetObservations.size(); i++) {
+        inputs.latestTargetObservations[i] = targetObservations.get(i);
       }
 
       // Add pose observation

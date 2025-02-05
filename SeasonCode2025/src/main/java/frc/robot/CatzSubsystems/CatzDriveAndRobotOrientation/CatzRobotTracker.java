@@ -72,6 +72,10 @@ public class CatzRobotTracker {
   @AutoLogOutput(key = "CatzRobotTracker/EstimatedPose")
   private Pose2d estimatedPose = new Pose2d();
 
+  @Getter
+  @AutoLogOutput(key = "CatzRobotTracker/TxTyPose")
+  private Pose2d txTyPose = new Pose2d();
+
   private final TimeInterpolatableBuffer<Pose2d> POSE_BUFFER =
       TimeInterpolatableBuffer.createBuffer(POSE_BUFFER_SIZE_SEC);
   private final Matrix<N3, N1> TRACKER_STD_DEVS = new Matrix<>(Nat.N3(), Nat.N1());
@@ -212,6 +216,9 @@ public class CatzRobotTracker {
     estimatedPose = estimateAtTime.plus(scaledTransform).plus(sampleToOdometryTransform);
   } // end of addVisionObservation(OdometryObservation observation)
 
+  //-----------------------------------------------------------------------------------------------
+  //  TX TY Observation adder
+  //-----------------------------------------------------------------------------------------------
   public void addTxTyObservation(TxTyObservation observation) {
     // Skip if current data for tag is newer
     if (txTyPoses.containsKey(observation.tagId())
@@ -219,43 +226,50 @@ public class CatzRobotTracker {
       return;
     }
 
-    // Get odometry based pose at timestamp
+    // Get rotation at timestamp
     var sample = POSE_BUFFER.getSample(observation.timestamp());
     if (sample.isEmpty()) {
       // exit if not there
       return;
     }
+    Rotation2d robotRotation =
+        estimatedPose.transformBy(new Transform2d(odometryPose, sample.get())).getRotation();
 
-    // Average tx's and ty's
     double tx = observation.tx();
     double ty = observation.ty();
 
+    Transform3d transformPose = VisionConstants.robotToCamera0;
+    Pose3d cameraPose = new Pose3d(transformPose.getX(), transformPose.getY(), transformPose.getZ(),
+                                    transformPose.getRotation());
 
-    Pose3d cameraPose = VisionConstants.cameraPoses[observation.camera()];
-    // Use 2d distance and tag angle + tx to find robot pose
-    double distance2d = observation.distance() * Math.cos(-cameraPose.getRotation().getY() - ty);
+    // Use 3D distance and tag angles to find robot pose
+    Translation2d camToTagTranslation =
+        new Pose3d(Translation3d.kZero, new Rotation3d(0, ty, -tx))
+            .transformBy(
+                new Transform3d(new Translation3d(observation.distance(), 0, 0), Rotation3d.kZero))
+            .getTranslation()
+            .rotateBy(new Rotation3d(0, cameraPose.getRotation().getY(), 0))
+            .toTranslation2d();
     Rotation2d camToTagRotation =
-        sample
-            .get()
-            .getRotation()
-            .plus(cameraPose.toPose2d().getRotation().plus(Rotation2d.fromRadians(-tx)));
+        robotRotation.plus(
+            cameraPose.toPose2d().getRotation().plus(camToTagTranslation.getAngle()));
     var tagPose2d = tagPoses2d.get(observation.tagId());
     if (tagPose2d == null) return;
     Translation2d fieldToCameraTranslation =
         new Pose2d(tagPose2d.getTranslation(), camToTagRotation.plus(Rotation2d.kPi))
-            .transformBy(GeomUtil.toTransform2d(distance2d, 0.0))
+            .transformBy(GeomUtil.toTransform2d(camToTagTranslation.getNorm(), 0.0))
             .getTranslation();
-    Pose2d robotPose =
+    txTyPose =
         new Pose2d(
-                fieldToCameraTranslation,
-                sample.get().getRotation().plus(cameraPose.toPose2d().getRotation()))
+                fieldToCameraTranslation, robotRotation.plus(cameraPose.toPose2d().getRotation()))
             .transformBy(new Transform2d(cameraPose.toPose2d(), Pose2d.kZero));
     // Use gyro angle at time for robot rotation
-    robotPose = new Pose2d(robotPose.getTranslation(), sample.get().getRotation());
+    txTyPose = new Pose2d(txTyPose.getTranslation(), robotRotation);
 
     // Add transform to current odometry based pose for latency correction
     txTyPoses.put(
-        observation.tagId(), new TxTyPoseRecord(robotPose, distance2d, observation.timestamp()));
+        observation.tagId(),
+        new TxTyPoseRecord(txTyPose, camToTagTranslation.getNorm(), observation.timestamp()));
   }
 
 

@@ -10,6 +10,7 @@ package frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.Vision;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.networktables.DoubleArrayPublisher;
 import edu.wpi.first.networktables.DoubleArraySubscriber;
@@ -33,6 +34,7 @@ public class VisionIOLimelight implements VisionIO {
   private final DoubleSubscriber txSubscriber;
   private final DoubleSubscriber tySubscriber;
   private final DoubleSubscriber tagIDSubscriber;
+  private final DoubleArraySubscriber cameraSpaceSubscriber;
   private final DoubleArraySubscriber megatag1Subscriber;
   private final DoubleArraySubscriber megatag2Subscriber;
 
@@ -49,6 +51,7 @@ public class VisionIOLimelight implements VisionIO {
     txSubscriber         = table.getDoubleTopic("tx").subscribe(0.0);
     tySubscriber         = table.getDoubleTopic("ty").subscribe(0.0);
     tagIDSubscriber      = table.getDoubleTopic("tid").subscribe(0.0);
+    cameraSpaceSubscriber= table.getDoubleArrayTopic("targetpose_cameraspace").subscribe(new double[] {});
     megatag1Subscriber   = table.getDoubleArrayTopic("botpose_wpiblue").subscribe(new double[] {});
     megatag2Subscriber   = table.getDoubleArrayTopic("botpose_orb_wpiblue").subscribe(new double[] {});
   }
@@ -59,10 +62,6 @@ public class VisionIOLimelight implements VisionIO {
     // Update connection status based on whether an update has been seen in the last 250ms
     inputs.connected = (usedTimestamp - latencySubscriber.getLastChange()) < 250;
 
-    // Update target observation
-    inputs.latestTargetObservation =
-        new TargetObservation(
-            usedTimestamp, Rotation2d.fromDegrees(txSubscriber.get()), Rotation2d.fromDegrees(tySubscriber.get()), (int) tagIDSubscriber.get());
 
     // Update orientation for MegaTag 2
     orientationPublisher.accept(
@@ -70,12 +69,31 @@ public class VisionIOLimelight implements VisionIO {
     // System.out.println(rotationSupplier.get().getDegrees());
     NetworkTableInstance.getDefault().flush(); // Increases network traffic but recommended by Limelight
 
-    //----------------------------------------------------------------------------------------------
-    // Megatag 1 estimation
-    //----------------------------------------------------------------------------------------------
     // Read new pose observations from NetworkTables
     Set<Integer> tagIds = new HashSet<>();
     List<PoseObservation> poseObservations = new LinkedList<>();
+    List<TargetObservation> targetObservations = new LinkedList<>();
+
+    //----------------------------------------------------------------------------------------------
+    // Single tag Pose estimation
+    //----------------------------------------------------------------------------------------------
+    for (var rawSample : cameraSpaceSubscriber.readQueue()) {
+      if (rawSample.value.length == 0) continue;
+      Translation3d cameraSpaceTranslation = new Translation3d(
+        rawSample.value[0],
+        rawSample.value[1],
+        rawSample.value[2]
+      );
+      targetObservations.add(
+        new TargetObservation(
+          usedTimestamp,
+          rawSample.value[0],
+          rawSample.value[1],
+          rawSample.value[2],
+          (int) tagIDSubscriber.get(),
+          cameraSpaceTranslation.getNorm())
+      );
+    }
 
     //----------------------------------------------------------------------------------------------
     // Megatag 2 estimation
@@ -109,6 +127,12 @@ public class VisionIOLimelight implements VisionIO {
     inputs.poseObservations = new PoseObservation[poseObservations.size()];
     for (int i = 0; i < poseObservations.size(); i++) {
       inputs.poseObservations[i] = poseObservations.get(i);
+    }
+
+    // Save Tx Ty observation to inputs object
+    inputs.latestTargetObservations = new TargetObservation[targetObservations.size()];
+    for (int i = 0; i < targetObservations.size(); i++) {
+      inputs.latestTargetObservations[i] = targetObservations.get(i);
     }
 
     // Save tag IDs to inputs objects
