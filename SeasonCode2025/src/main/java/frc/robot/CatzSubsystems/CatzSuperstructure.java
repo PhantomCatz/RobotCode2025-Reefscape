@@ -9,11 +9,16 @@ package frc.robot.CatzSubsystems;
 
 import org.littletonrobotics.junction.AutoLogOutput;
 
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
+import frc.robot.RobotContainer;
 import frc.robot.Utilities.VirtualSubsystem;
 import lombok.Getter;
 import lombok.Setter;
 
 public class CatzSuperstructure extends VirtualSubsystem {
+
+    private RobotContainer container;
 
     @Getter @Setter @AutoLogOutput(key = "CatzSuperstructure/ChosenGamepiece")
     private Gamepiece chosenGamepiece = Gamepiece.CORAL;
@@ -66,7 +71,12 @@ public class CatzSuperstructure extends VirtualSubsystem {
         }
       }
 
-    public void setCurrentRobotAction(RobotAction action) {
+    public CatzSuperstructure(RobotContainer container) {
+        this.container = container;
+    }
+
+    public Command setCurrentRobotAction(RobotAction action) {
+        Command robotActionCommand = Commands.print("No robot Action Selected");
         this.currentRobotAction = action;
         switch(currentRobotAction) {
 
@@ -75,23 +85,28 @@ public class CatzSuperstructure extends VirtualSubsystem {
                 if(chosenGamepiece == Gamepiece.CORAL) {
                     switch (level) {
                         case 1:
-                            currentRobotState = RobotState.L1_CORAL;
+                        currentRobotState = RobotState.L1_CORAL;
+                        robotActionCommand = CatzStateCommands.L1Coral(container);
                         break;
 
                         case 2:
                         currentRobotState = RobotState.L2_CORAL;
+                        robotActionCommand =  CatzStateCommands.L2Coral(container);
                         break;
 
                         case 3:
                         currentRobotState = RobotState.L3_CORAL;
+                        robotActionCommand = CatzStateCommands.L3Coral(container);
                         break;
 
                         case 4:
                         currentRobotState = RobotState.L4_CORAL;
+                        robotActionCommand = CatzStateCommands.L4Coral(container);
                         break;
                     }
                 } else {
                     currentRobotState = RobotState.PROCESSOR;
+                    robotActionCommand = CatzStateCommands.processor(container);
                     System.out.println("Processor");
 
                 }
@@ -102,18 +117,18 @@ public class CatzSuperstructure extends VirtualSubsystem {
                 if(chosenGamepiece == Gamepiece.CORAL) {
                         currentRobotState = RobotState.INTAKE_CORAL_STATION;
                         System.out.println("Intake coral station");
-
+                        robotActionCommand = CatzStateCommands.intakeCoralStation(container);
                 } else {
                     switch (level) {
                         case 2:
                             currentRobotState = RobotState.TOP_ALGAE;
                             System.out.println("TOP algae");
-
+                            robotActionCommand = CatzStateCommands.topAlgae(container);
                             break;
                         case 4:
                             currentRobotState = RobotState.BOT_ALGAE;
                             System.out.println("BOT algae");
-
+                            robotActionCommand = CatzStateCommands.botAlgae(container);
                             break;
                         default:
                             break;
@@ -126,23 +141,27 @@ public class CatzSuperstructure extends VirtualSubsystem {
                 if(chosenGamepiece == Gamepiece.CORAL) {
                         currentRobotState = RobotState.INTAKE_CORAL_GROUND;
                         System.out.println("Intake coral ground");
+                        robotActionCommand = CatzStateCommands.intakeCoralGround(container);
+
 
                 } else {
                     currentRobotState = RobotState.INTAKE_ALGAE_GROUND;
                     System.out.println("Intake algae");
+                    robotActionCommand = CatzStateCommands.intakeAlgae(container);
 
                 }
                 break;
 
             // Sets All Mechanisms to Base Positions
-            // default:
+            default:
             case STOW:
                 currentRobotState = RobotState.STOW;
-                // System.out.println("STOW");
-
+                robotActionCommand = CatzStateCommands.stow(container);
                 break;
 
         }
+
+        return robotActionCommand;
     }
 
 

@@ -8,6 +8,7 @@
 package frc.robot.CatzSubsystems;
 
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
@@ -28,7 +29,7 @@ public class CatzStateCommands {
         CatzElevator elevator = robotContainer.getCatzElevator();
 
         return new ParallelCommandGroup(
-            climb.Climb_Stow(),
+            climb.Climb_Retract(),
             algae.stopAlgae(),
             outtake.stopOuttake(),
             elevator.Elevator_L1()
@@ -52,11 +53,11 @@ public class CatzStateCommands {
         CatzElevator elevator = robotContainer.getCatzElevator();
 
         return new ParallelCommandGroup(
-            climb.Climb_Stow(),
+            // climb.Climb_Retract(),
             algae.stopAlgae(),
             outtake.startIntaking(),
             elevator.Elevator_L1()
-        );
+        ).alongWith(Commands.print("hello"));
     }
 
     public static Command intakeAlgae(RobotContainer robotContainer) {
@@ -66,7 +67,7 @@ public class CatzStateCommands {
         CatzElevator elevator = robotContainer.getCatzElevator();
 
         return new ParallelCommandGroup(
-            climb.Climb_Stow(),
+            climb.Climb_Retract(),
             algae.eatAlgae(),
             outtake.stopOuttake(),
             elevator.Elevator_L1()
@@ -80,12 +81,12 @@ public class CatzStateCommands {
         CatzElevator elevator = robotContainer.getCatzElevator();
 
         return new ParallelCommandGroup(
-            climb.Climb_Stow(),
+            climb.Climb_Home(),
             algae.stopAlgae(),
 
             new SequentialCommandGroup(
                 elevator.Elevator_L1(),
-                outtake.startOuttake()
+                outtake.outtakeL1()
             )
         );
     }
@@ -97,7 +98,7 @@ public class CatzStateCommands {
         CatzElevator elevator = robotContainer.getCatzElevator();
 
         return new ParallelCommandGroup(
-            climb.Climb_Stow(),
+            climb.Climb_Retract(),
             algae.stopAlgae(),
 
             new SequentialCommandGroup(
@@ -114,7 +115,7 @@ public class CatzStateCommands {
         CatzElevator elevator = robotContainer.getCatzElevator();
 
         return new ParallelCommandGroup(
-            climb.Climb_Stow(),
+            climb.Climb_Retract(),
             algae.stopAlgae(),
 
             new SequentialCommandGroup(
@@ -131,7 +132,7 @@ public class CatzStateCommands {
         CatzElevator elevator = robotContainer.getCatzElevator();
 
         return new ParallelCommandGroup(
-            climb.Climb_Stow(),
+            climb.Climb_Retract(),
             algae.stopAlgae(),
 
             new SequentialCommandGroup(
@@ -148,7 +149,7 @@ public class CatzStateCommands {
         CatzElevator elevator = robotContainer.getCatzElevator();
 
         return new ParallelCommandGroup(
-            climb.Climb_Stow(),
+            climb.Climb_Retract(),
             outtake.stopOuttake(),
 
             new SequentialCommandGroup(
@@ -166,7 +167,7 @@ public class CatzStateCommands {
         CatzElevator elevator = robotContainer.getCatzElevator();
 
         return new ParallelCommandGroup(
-            climb.Climb_Stow(),
+            climb.Climb_Retract(),
             outtake.stopOuttake(),
 
             new SequentialCommandGroup(
@@ -183,7 +184,7 @@ public class CatzStateCommands {
         CatzElevator elevator = robotContainer.getCatzElevator();
 
         return new ParallelCommandGroup(
-            climb.Climb_Stow(),
+            climb.Climb_Retract(),
             outtake.stopOuttake(),
 
             new SequentialCommandGroup(
