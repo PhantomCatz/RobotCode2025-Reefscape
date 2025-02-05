@@ -25,13 +25,16 @@ import frc.robot.CatzSubsystems.CatzClimb.CatzClimb;
 import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.CatzRobotTracker;
 import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.Drivetrain.CatzDrivetrain;
 import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.Vision.CatzVision;
-import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.Vision.VisionIOLimelight;
+import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.Vision.VisionConstants;
+import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.Vision.VisionIOPhotonVisionSim;
 import frc.robot.CatzSubsystems.CatzElevator.*;
 import frc.robot.CatzSubsystems.CatzLEDs.CatzLED;
 import frc.robot.CatzSubsystems.CatzOuttake.CatzOuttake;
 import frc.robot.Commands.DriveAndRobotOrientationCmds.TeleopDriveCmd;
 import frc.robot.Utilities.Alert;
 import frc.robot.Utilities.Alert.AlertType;
+
+import static frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.Vision.VisionConstants.camera0Name;
 
 import org.littletonrobotics.junction.networktables.LoggedNetworkNumber;
 
@@ -46,7 +49,7 @@ public class RobotContainer {
   // Assistance Subsystem declaration
   private static CatzLED led = CatzLED.getInstance();
   private static CatzRobotTracker robotTracker = CatzRobotTracker.getInstance();
-  private static CatzVision vision = new CatzVision(new VisionIOLimelight("limelight-soba"));
+  private static CatzVision vision = new CatzVision(new VisionIOPhotonVisionSim(camera0Name, VisionConstants.robotToCamera0));//new VisionIOLimelight("limelight-soba"));
   private static CatzOuttake outtake = new CatzOuttake();
   private static CatzElevator elevator = new CatzElevator();
   private static CatzSuperstructure superstructure = new CatzSuperstructure();

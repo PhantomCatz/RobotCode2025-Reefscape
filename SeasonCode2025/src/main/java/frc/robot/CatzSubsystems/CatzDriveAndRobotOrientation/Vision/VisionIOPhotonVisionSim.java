@@ -11,6 +11,8 @@ import static frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.Vision.Visio
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Transform3d;
+import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.CatzRobotTracker;
+
 import java.util.function.Supplier;
 import org.photonvision.simulation.PhotonCameraSim;
 import org.photonvision.simulation.SimCameraProperties;
@@ -20,7 +22,7 @@ import org.photonvision.simulation.VisionSystemSim;
 public class VisionIOPhotonVisionSim extends VisionIOPhotonVision {
   private static VisionSystemSim visionSim;
 
-  private final Supplier<Pose2d> poseSupplier;
+  private final Supplier<Pose2d> poseSupplier = ()->CatzRobotTracker.getInstance().getEstimatedPose();
   private final PhotonCameraSim cameraSim;
 
   /**
@@ -29,10 +31,8 @@ public class VisionIOPhotonVisionSim extends VisionIOPhotonVision {
    * @param name The name of the camera.
    * @param poseSupplier Supplier for the robot pose to use in simulation.
    */
-  public VisionIOPhotonVisionSim(
-      String name, Transform3d robotToCamera, Supplier<Pose2d> poseSupplier) {
+  public VisionIOPhotonVisionSim(String name, Transform3d robotToCamera) {
     super(name, robotToCamera);
-    this.poseSupplier = poseSupplier;
 
     // Initialize vision sim
     if (visionSim == null) {

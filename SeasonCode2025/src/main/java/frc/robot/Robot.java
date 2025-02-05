@@ -8,6 +8,7 @@
 package frc.robot;
 
 import com.pathplanner.lib.pathfinding.Pathfinding;
+
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.RobotController;
@@ -185,7 +186,8 @@ public class Robot extends LoggedRobot {
     CANIVORE_ERROR_TIMER.restart();
     DISABLED_TIMER.restart();
 
-    RobotController.setBrownoutVoltage(6.0);
+    // Set Brownout Voltatage to WPILIB recommendations
+    RobotController.setBrownoutVoltage(6.3);
 
     // Print out Catz Constant enums
     System.out.println("Enviroment: " + CatzConstants.robotSenario.toString());
@@ -223,10 +225,15 @@ public class Robot extends LoggedRobot {
 
   @Override
   public void robotPeriodic() {
+    //------------------------------------------------------------------------------------------------
+    // Run Subsystem Periodics
+    //------------------------------------------------------------------------------------------------
     VirtualSubsystem.periodicAll();
     CommandScheduler.getInstance().run();
 
+    //-------------------------------------------------------------------------------------------------
     // Print auto duration
+    //-------------------------------------------------------------------------------------------------
     if (m_autonomousCommand != null) {
       if (!m_autonomousCommand.isScheduled() && !autoMessagePrinted) {
         if (DriverStation.isAutonomousEnabled()) {
@@ -242,26 +249,35 @@ public class Robot extends LoggedRobot {
       }
     }
 
+    //-------------------------------------------------------------------------------------------------
     // Robot container periodic methods
+    //-------------------------------------------------------------------------------------------------
     m_robotContainer.checkControllers();
     m_robotContainer.updateDashboardOutputs();
     m_robotContainer.updateAlerts();
 
+    //-------------------------------------------------------------------------------------------------
     // Check CAN status
-    var canStatus =
-        RobotController
-            .getCANStatus(); // TODO find benifits of getCANStatus and evaluate whether it
+    // For Transimit Errors, recieve errors, busOffCounts, percent util, txfullcount
+    //-------------------------------------------------------------------------------------------------
+    var canStatus = RobotController.getCANStatus();
     if (canStatus.transmitErrorCount > 0 || canStatus.receiveErrorCount > 0) {
       CAN_ERROR_TIMER.restart();
     }
-    CAN_ERROR_ALERT.set(
-        !CAN_ERROR_TIMER.hasElapsed(CAN_ERROR_TIME_THRESHOLD)
-            && !CAN_INITIAL_ERROR_TIMER.hasElapsed(CAN_ERROR_TIME_THRESHOLD));
+    CAN_ERROR_ALERT.set(!CAN_ERROR_TIMER.hasElapsed(CAN_ERROR_TIME_THRESHOLD) && !CAN_INITIAL_ERROR_TIMER.hasElapsed(CAN_ERROR_TIME_THRESHOLD));
+    Logger.recordOutput("CANErrors/Transmit Errors", canStatus.transmitErrorCount);
+    Logger.recordOutput("CANErrors/Recieve Errors count", canStatus.receiveErrorCount);
+    Logger.recordOutput("CANErrors/Bus Off Count", canStatus.busOffCount);
+    Logger.recordOutput("CANErrors/Percent Utilization", canStatus.percentBusUtilization);
+    Logger.recordOutput("CANErrors/TxFullCount", canStatus.txFullCount);
 
-    // Low battery alert
+    //------------------------------------------------------------------------------------------------
+    // Low battery alert to determine whether necessary to put in new battery
+    //------------------------------------------------------------------------------------------------
     if (DriverStation.isEnabled()) {
       DISABLED_TIMER.reset();
     }
+
     if (RobotController.getBatteryVoltage() <= LOW_BATTERY_VOLTAGE
         && DISABLED_TIMER.hasElapsed(LOW_BATTERY_DISABLED_TIME)) {
       LOW_BATTERY_ALERT.set(true);
@@ -335,8 +351,6 @@ public class Robot extends LoggedRobot {
   //        teleop
   //
   // --------------------------------------------------------------------------------------------------------
-
-
   @Override
   public void teleopInit() {
     // deployment benchmark
