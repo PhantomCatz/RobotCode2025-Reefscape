@@ -25,8 +25,7 @@ import frc.robot.CatzSubsystems.CatzClimb.CatzClimb;
 import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.CatzRobotTracker;
 import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.Drivetrain.CatzDrivetrain;
 import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.Vision.CatzVision;
-import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.Vision.VisionConstants;
-import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.Vision.VisionIOPhotonVisionSim;
+import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.Vision.VisionIOLimelight;
 import frc.robot.CatzSubsystems.CatzElevator.*;
 import frc.robot.CatzSubsystems.CatzLEDs.CatzLED;
 import frc.robot.CatzSubsystems.CatzOuttake.CatzOuttake;
@@ -34,7 +33,6 @@ import frc.robot.Commands.DriveAndRobotOrientationCmds.TeleopDriveCmd;
 import frc.robot.Utilities.Alert;
 import frc.robot.Utilities.Alert.AlertType;
 
-import static frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.Vision.VisionConstants.camera0Name;
 
 import org.littletonrobotics.junction.networktables.LoggedNetworkNumber;
 

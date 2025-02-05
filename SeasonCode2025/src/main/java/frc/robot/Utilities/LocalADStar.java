@@ -364,9 +364,9 @@ public class LocalADStar implements Pathfinder {
   }
 
   /**
-   * Comparator used in the PriorityQueue during pathfinding. 
+   * Comparator used in the PriorityQueue during pathfinding.
    * The queue is ordered based on the distance from the corners traveled so far and the distance from the position's associated corner.
-   * This ensures that the shortest path is checked first and that the floodfilling is circular (which gurantees the shortest path and ensures that corners that were visited later doesn't flow into corners that were visited earlier). 
+   * This ensures that the shortest path is checked first and that the floodfilling is circular (which gurantees the shortest path and ensures that corners that were visited later doesn't flow into corners that were visited earlier).
    */
   public class CompareDistances implements Comparator<PathfindingPosition>{
     @Override
@@ -384,7 +384,7 @@ public class LocalADStar implements Pathfinder {
     }
     //Queue to store the nodes to explore, prioritizing the shortest paths.
     PriorityQueue<PathfindingPosition> frontier = new PriorityQueue<>(new CompareDistances());
-    
+
     //Maps a position in the node to the corner that it is associated with.
     //Used to construct the path by retracing the corners that it traveled
     HashMap<GridPosition, GridPosition> lastCorner = new HashMap<>();
@@ -393,7 +393,7 @@ public class LocalADStar implements Pathfinder {
     HashMap<GridPosition, Set<GridPosition>> imaginaryObstacles = new HashMap<>();
 
     frontier.add(new PathfindingPosition(start, start, 0.0));
-    
+
     //the start counts as a corner
     lastCorner.put(start, start);
     imaginaryObstacles.put(start, new HashSet<>());
@@ -422,7 +422,7 @@ public class LocalADStar implements Pathfinder {
       for(GridPosition dxy: ADJACENT){
         GridPosition newPos = currentPos.add(dxy);
 
-        //floodfill from the current node. 
+        //floodfill from the current node.
         //if the next node is not an imaginary obstacle and it's not an actual obstacle and if it hasn't been traveled before, add it to the frontier.
         if(
           !imaginaryObstacles.get(currentCorner).contains(newPos) &&
@@ -473,7 +473,7 @@ public class LocalADStar implements Pathfinder {
 
     List<Translation2d> fieldPosPath = new ArrayList<>();
     fieldPosPath.add(realStartPos);
-    for (int i = path.size() - 1; i > 0; i--) { 
+    for (int i = path.size() - 1; i > 0; i--) {
       fieldPosPath.add(gridPosToTranslation2d(path.get(i)));
     }
     fieldPosPath.add(realGoalPos);
@@ -484,7 +484,7 @@ public class LocalADStar implements Pathfinder {
         fieldPosPath.get(0),
         fieldPosPath.get(1).minus(fieldPosPath.get(0)).getAngle()));
 
-    //smoothens the path by splitting a path into smaller sections at some midpoint. 
+    //smoothens the path by splitting a path into smaller sections at some midpoint.
     for (int i = 1; i < fieldPosPath.size() - 1; i++) {
       Translation2d last = fieldPosPath.get(i - 1);
       Translation2d current = fieldPosPath.get(i);
@@ -655,7 +655,7 @@ public class LocalADStar implements Pathfinder {
   /**
    * @param position The current position during pathfinding.
    * @param corner   The corner that the position is associated with.
-   * @param cornerDistancesTraveled The sum of distances from each corners that the position traveled through. 
+   * @param cornerDistancesTraveled The sum of distances from each corners that the position traveled through.
    */
   public record PathfindingPosition(GridPosition position, GridPosition corner, double cornerDistancesTraveled){};
 }
