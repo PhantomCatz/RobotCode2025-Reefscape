@@ -9,6 +9,7 @@ package frc.robot.CatzSubsystems.CatzClimb;
 
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.CatzConstants;
 import frc.robot.Utilities.LoggedTunableNumber;
@@ -43,7 +44,6 @@ public class CatzClimb extends SubsystemBase {
   public enum Position { //In degrees
     RETRACT(() -> -46),
     HOME(() -> 0.0),
-    STOW(() -> 40.0),
     FULLTURN(() -> 90),
     MANUAL(() -> manualPow),
     TUNNABLE(tunnablePos);
@@ -94,10 +94,6 @@ public class CatzClimb extends SubsystemBase {
     Logger.recordOutput("Position/targetPosition", position);
   }
 
-  public Command Climb_Stow() {
-    return runOnce(() -> setClimbPos(Position.STOW));
-  }
-
   public Command Climb_Home() {
     return runOnce(() -> setClimbPos(Position.HOME));
   }
@@ -125,6 +121,6 @@ public class CatzClimb extends SubsystemBase {
   }
 
   public Command ClimbManualMode(Supplier<Double> manualSupplier) {
-    return run(() -> climbManual(manualSupplier));
+    return run(() -> climbManual(manualSupplier)).alongWith(Commands.print("hi"));
   }
 }
