@@ -31,6 +31,7 @@ import frc.robot.CatzSubsystems.CatzLEDs.CatzLED;
 import frc.robot.CatzSubsystems.CatzOuttake.CatzOuttake;
 import frc.robot.Commands.DriveAndRobotOrientationCmds.TeleopDriveCmd;
 import frc.robot.Utilities.Alert;
+import frc.robot.Utilities.SprayWheelSelector;
 import frc.robot.Utilities.Alert.AlertType;
 
 
@@ -61,6 +62,8 @@ public class RobotContainer {
   private CommandXboxController xboxDrv = new CommandXboxController(0);
   private CommandXboxController xboxAux = new CommandXboxController(1);
   private CommandXboxController xboxTest = new CommandXboxController(2);
+
+  private SprayWheelSelector selector = new SprayWheelSelector(xboxAux);
 
   // -------------------------------------------------------------------------------------------------------------------
   // Alert Declaration
@@ -254,6 +257,10 @@ public class RobotContainer {
 
   public CatzAutonomous getAutonomous(){
     return auto;
+  }
+
+  public SprayWheelSelector getSelector(){
+    return selector;
   }
 
 }

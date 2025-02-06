@@ -371,6 +371,7 @@ public class Robot extends LoggedRobot {
   public void teleopPeriodic() {
 
     teleElapsedTime = Timer.getFPGATimestamp() - teleStart;
+    m_robotContainer.getSelector().updateSelected();
 
   }
 
