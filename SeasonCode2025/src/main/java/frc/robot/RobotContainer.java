@@ -7,6 +7,7 @@
 
 package frc.robot;
 
+import edu.wpi.first.math.Pair;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -31,7 +32,7 @@ import frc.robot.CatzSubsystems.CatzLEDs.CatzLED;
 import frc.robot.CatzSubsystems.CatzOuttake.CatzOuttake;
 import frc.robot.Commands.DriveAndRobotOrientationCmds.TeleopDriveCmd;
 import frc.robot.Utilities.Alert;
-import frc.robot.Utilities.SprayWheelSelector;
+import frc.robot.Utilities.TeleopPosSelector;
 import frc.robot.Utilities.Alert.AlertType;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
@@ -66,7 +67,7 @@ public class RobotContainer {
   private CommandXboxController xboxAux = new CommandXboxController(1);
   private CommandXboxController xboxTest = new CommandXboxController(2);
 
-  private SprayWheelSelector selector = new SprayWheelSelector(xboxAux);
+  private TeleopPosSelector selector = new TeleopPosSelector(xboxAux, this);
 
   // -------------------------------------------------------------------------------------------------------------------
   // Alert Declaration
@@ -135,49 +136,19 @@ public class RobotContainer {
   //
   // ---------------------------------------------------------------------------
 
-  Command currentPathfindingCommand = Commands.runOnce(() -> {});
-  int POVReefAngle = 0; // 0 = none, x = x/6 revolutions
-  LeftRight leftRightReef = LeftRight.LEFT;
-
   private void configureBindings() {
-    //SPRAY WHEEL SELECTION
-    xboxAux.b().onTrue(Commands.runOnce(() -> {
-      POVReefAngle = selector.getCurrentlySelected();
-      if(POVReefAngle != -1){
-        Pose2d targetPose = auto.calculateReefPos(POVReefAngle, leftRightReef);
-        currentPathfindingCommand = auto.getPathfindingCommand(targetPose);
-        currentPathfindingCommand.schedule();
-      }
-    }));
+    // Reef autopathfind
+    Pair<Integer, LeftRight> closestReefPos = selector.getClosestReefPos();
+    Pair<Integer, LeftRight> xboxReefPos = selector.getXBoxReefPos();
 
-    xboxAux.b().onFalse(Commands.runOnce(() -> currentPathfindingCommand.cancel()));
+    xboxAux.a().onTrue(selector.runPathfindingCommand(() -> selector.calculateReefPose(xboxReefPos.getFirst(), xboxReefPos.getSecond())));
+    xboxAux.a().onFalse(selector.stopPathfindingCommand());
 
-    //---------------------------------------------------------------------------------------------------------------------
-    // XBOX DRIVE
-    //---------------------------------------------------------------------------------------------------------------------
-    // Autodrive to Reef
-    // Autodriving Reef Position 0-5 CCW; 0 Facing Driver Stations
+    xboxDrv.a().onTrue(selector.runPathfindingCommand(() -> selector.calculateReefPose(closestReefPos.getFirst(), closestReefPos.getSecond())));
+    xboxDrv.a().onFalse(selector.stopPathfindingCommand());
 
-    xboxDrv.povUp().onTrue(Commands.runOnce(() -> POVReefAngle = 0));
-    xboxDrv.povUpLeft().onTrue(Commands.runOnce(() -> POVReefAngle = 1));
-    xboxDrv.povDownLeft().onTrue(Commands.runOnce(() -> POVReefAngle = 2));
-    xboxDrv.povDown().onTrue(Commands.runOnce(() -> POVReefAngle = 3));
-    xboxDrv.povDownRight().onTrue(Commands.runOnce(() -> POVReefAngle = 4));
-    xboxDrv.povUpRight().onTrue(Commands.runOnce(() -> POVReefAngle = 5));
-
-    xboxDrv.leftBumper().onTrue(Commands.runOnce(() -> leftRightReef = LeftRight.LEFT));
-    xboxDrv.rightBumper().onTrue(Commands.runOnce(() -> leftRightReef = LeftRight.RIGHT));
-
-    xboxDrv.a().onTrue(auto.runPathfindingCommand(() -> auto.getReefPos(POVReefAngle, leftRightReef)));
-    xboxDrv.a().onFalse(auto.stopPathfindingCommand());
-
-    xboxDrv.b().onTrue(auto.runPathfindingCommand(() -> auto.getClosestReefPos()));
-    xboxDrv.b().onFalse(auto.stopPathfindingCommand());
-
-    drive.setDefaultCommand(
-      new TeleopDriveCmd(
-          () -> xboxDrv.getLeftX(), () -> xboxDrv.getLeftY(), () -> xboxDrv.getRightX(), drive));
-
+    // Default driving
+    drive.setDefaultCommand(new TeleopDriveCmd(() -> xboxDrv.getLeftX(), () -> xboxDrv.getLeftY(), () -> xboxDrv.getRightX(), drive));
 
     // Manual Climb Control
     Trigger rightJoystickTrigger = new Trigger(
@@ -287,7 +258,7 @@ public class RobotContainer {
     return auto;
   }
 
-  public SprayWheelSelector getSelector(){
+  public TeleopPosSelector getSelector(){
     return selector;
   }
 

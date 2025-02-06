@@ -10,32 +10,23 @@ package frc.robot.Autonomous;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
 import com.pathplanner.lib.commands.PathPlannerAuto;
-import com.pathplanner.lib.path.GoalEndState;
 import com.pathplanner.lib.path.PathPlannerPath;
-import com.pathplanner.lib.pathfinding.Pathfinding;
 import com.pathplanner.lib.util.FileVersionException;
 
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.Autonomous.CatzAutonomous.AutoQuestion;
 import frc.robot.Autonomous.CatzAutonomous.AutoQuestionResponse;
 import frc.robot.Autonomous.CatzAutonomous.AutoScoringOptions;
-import frc.robot.CatzSubsystems.CatzSuperstructure.LeftRight;
 import frc.robot.CatzSubsystems.CatzStateCommands;
 import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.*;
 import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.Drivetrain.DriveConstants;
 import frc.robot.Commands.CharacterizationCmds.WheelRadiusCharacterization;
 import frc.robot.Commands.CharacterizationCmds.WheelRadiusCharacterization.Direction;
 import frc.robot.Commands.DriveAndRobotOrientationCmds.TrajectoryDriveCmd;
-import frc.robot.FieldConstants.Reef;
 import frc.robot.RobotContainer;
 import frc.robot.Utilities.AllianceFlipUtil;
 import frc.robot.Utilities.JSONUtil;
@@ -48,7 +39,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.function.BooleanSupplier;
-import java.util.function.Supplier;
 
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -57,12 +47,6 @@ import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
 public class CatzAutonomous extends VirtualSubsystem {
   private RobotContainer m_container;
-
-  // ------------------------------------------------------------------------------------------------------------
-  // Auto Pathfinding
-  // ------------------------------------------------------------------------------------------------------------
-  CatzRobotTracker tracker = CatzRobotTracker.getInstance();
-  Command currentPathfindingCommand = new InstantCommand();
 
   // ------------------------------------------------------------------------------------------------------------
   // Questionairre
@@ -78,6 +62,8 @@ public class CatzAutonomous extends VirtualSubsystem {
   private JSONParser parser = new JSONParser();
   private HashMap<String, DashboardCmd> dashboardCmds = new HashMap<>();
   private PathPlannerAuto lastProgram;
+
+  CatzRobotTracker tracker = CatzRobotTracker.getInstance();
 
   public CatzAutonomous(RobotContainer container) {
     this.m_container = container;
@@ -209,80 +195,6 @@ public class CatzAutonomous extends VirtualSubsystem {
   //
   // ---------------------------------------------------------------------------------------------------------
 
-  public Command getPathfindingCommand(Pose2d goal) {
-    Translation2d robotPos = tracker.getEstimatedPose().getTranslation();
-
-    Pathfinding.setStartPosition(robotPos);
-    Pathfinding.setGoalPosition(goal.getTranslation());
-    PathPlannerPath path =
-        Pathfinding.getCurrentPath(
-            DriveConstants.PATHFINDING_CONSTRAINTS, new GoalEndState(0, goal.getRotation()));
-
-    if (path == null) {
-      return new InstantCommand();
-    } else {
-      if(AllianceFlipUtil.shouldFlipToRed()) {
-        path = path.flipPath();
-      }
-      return new TrajectoryDriveCmd(path, m_container.getCatzDrivetrain(), true);
-    }
-  }
-
-  public Command runPathfindingCommand(Supplier<Pose2d> goal){
-    return new InstantCommand(() -> {
-      currentPathfindingCommand.cancel();
-      currentPathfindingCommand = getPathfindingCommand(goal.get());
-      currentPathfindingCommand.schedule();
-    });
-  }
-
-  public Command stopPathfindingCommand(){
-    return new InstantCommand(() -> {
-      currentPathfindingCommand.cancel();
-    });
-  }
-
-  public Pose2d getReefPos(int reefAngle, LeftRight leftRightPos){
-    Rotation2d selectedAngle = Rotation2d.fromRotations(reefAngle / 6.0);
-
-    Translation2d unitRadius = new Translation2d(selectedAngle.getCos(), selectedAngle.getSin());
-    Translation2d unitLeftRight = unitRadius.rotateBy(Rotation2d.fromDegrees(90));
-
-    Translation2d radius = unitRadius.times(Reef.reefOrthogonalRadius + Reef.scoringDistance);
-    Translation2d leftRight = unitLeftRight.times(leftRightPos.NUM * Reef.leftRightDistance);
-    if (unitLeftRight.getY() < 0) {
-      leftRight = leftRight.times(-1);
-    }
-
-    Translation2d scoringPos = radius.plus(leftRight).plus(Reef.center);
-    return AllianceFlipUtil.apply(new Pose2d(scoringPos, selectedAngle));
-  }
-
-  public Pose2d getClosestReefPos(){
-    Pose2d closest = getReefPos(0, LeftRight.LEFT);
-    Translation2d robotPos = tracker.getEstimatedPose().getTranslation();
-
-    for(int reefAngle = 0; reefAngle < 6; reefAngle++){
-      for(LeftRight leftRightPos: LeftRight.values()){
-        Pose2d reefPos = getReefPos(reefAngle, leftRightPos);
-        if(reefPos.getTranslation().getDistance(robotPos) < closest.getTranslation().getDistance(robotPos)){
-          closest = reefPos;
-        }
-      }
-    }
-
-    return closest;
-  }
-
-  public Command pathfindThenFollowPath(AutoScoringOptions option) {
-    Pose2d goal = new Pose2d(0, 0, new Rotation2d());
-    return new SequentialCommandGroup(
-        getPathfindingCommand(goal),
-        new TrajectoryDriveCmd(
-            Pathfinding.getCurrentPath(
-                DriveConstants.PATHFINDING_CONSTRAINTS, new GoalEndState(0, goal.getRotation())),
-            m_container.getCatzDrivetrain(), false));
-  }
 
   /** Getter for final autonomous Program */
   public Command getCommand() {
