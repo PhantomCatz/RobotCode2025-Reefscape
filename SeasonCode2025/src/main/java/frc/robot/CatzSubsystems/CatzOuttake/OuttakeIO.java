@@ -33,7 +33,7 @@ public interface OuttakeIO {
 
   public default void runMotorRight(double speed) {}
 
-  public default void runMotor(double Speed, double speed2) {}
+  public default void runVolts(double Speed, double speed2) {}
 
   public default void setPIDF(double kP, double kI, double kD, double kF) {}
 

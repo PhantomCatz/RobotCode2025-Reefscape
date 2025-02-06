@@ -71,9 +71,9 @@ public class CatzOuttake extends SubsystemBase {
       case SCORE_L1:
         case_shootL1();
         break;
-      case STOP: io.runMotor(0,0);
+      case STOP: io.runVolts(0,0);
         break;
-      case TEMP_RUN: io.runMotor(OUTTAKE_LT, OUTTAKE_RT);
+      case TEMP_RUN: io.runVolts(OUTTAKE_LT, OUTTAKE_RT);
     }
     // previousState = currentState;
   }
@@ -86,7 +86,7 @@ public class CatzOuttake extends SubsystemBase {
 
   private void case_adjustInit() {
 
-    io.runMotor(INTAKE_SPD, INTAKE_SPD);
+    io.runVolts(INTAKE_SPD, INTAKE_SPD);
 
     if (inputs.bbreakFrntTriggered) {
       currentState = outtakeStates.ADJ_BACK;
@@ -95,7 +95,7 @@ public class CatzOuttake extends SubsystemBase {
 
   private void case_adjustBack() {
 
-    io.runMotor(ADJ_SPD, ADJ_SPD);
+    io.runVolts(ADJ_SPD, ADJ_SPD);
     if (!inputs.bbreakBackTriggered) {
       currentState = outtakeStates.STOP;
     }
@@ -103,14 +103,14 @@ public class CatzOuttake extends SubsystemBase {
 
   private void case_shoot() {
 
-    io.runMotor(OUTTAKE_LT, OUTTAKE_RT);
+    io.runVolts(OUTTAKE_LT, OUTTAKE_RT);
     if(!inputs.bbreakFrntTriggered) {
         currentState = outtakeStates.STOP;
     }
   }
   private void case_shootL1() {
 
-    io.runMotor(0.8, 0.05);
+    io.runVolts(0.8, 0.05);
     if(!inputs.bbreakFrntTriggered) {
         currentState = outtakeStates.STOP;
     }
@@ -142,6 +142,6 @@ public class CatzOuttake extends SubsystemBase {
   }
 
   public Command stopOuttake() {
-    return runOnce(() -> io.runMotor(0,0));
+    return runOnce(() -> io.runVolts(0,0));
   }
 }

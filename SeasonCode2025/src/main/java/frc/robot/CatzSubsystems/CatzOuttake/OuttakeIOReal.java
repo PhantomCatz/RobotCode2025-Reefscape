@@ -59,9 +59,9 @@ public class OuttakeIOReal implements OuttakeIO {
   }
 
   @Override
-  public void runMotor(double speed, double speed2) {
-    OuttakeLeftMtr.set(speed);
-    OuttakeRightMtr.set(-speed2);
+  public void runVolts(double speed, double speed2) {
+    OuttakeLeftMtr.setVoltage(speed);
+    OuttakeRightMtr.setVoltage(-speed2);
   }
 
   @Override
