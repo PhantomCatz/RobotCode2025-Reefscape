@@ -17,6 +17,7 @@ public class SprayWheelSelector {
 
     private int previousSelected = 0;
     private int currentSelected = 0;
+    private boolean isSelecting = false;
 
     public SprayWheelSelector(CommandXboxController aux){
         this.xboxAux = aux;
@@ -29,8 +30,9 @@ public class SprayWheelSelector {
     public void updateSelected(){
         final double x = -xboxAux.getLeftY();
         final double y = -xboxAux.getLeftX();
+        isSelecting = Math.hypot(x, y) > SELECTION_THRESHOLD;
 
-        if(Math.hypot(x, y) > SELECTION_THRESHOLD){
+        if(isSelecting){
             double angle = (Math.atan2(y, x) + 2*Math.PI) % (2 * Math.PI); //ensures angle is between 0-2pi (Dr. Eric Yuchen Lu (MD)'s idea)
 
             currentSelected = (int) Math.round(angle * 3.0 / Math.PI) % 6; //if angle is too close to 2pi, then it will return 6, but we want selected to be between 0-5
@@ -48,6 +50,9 @@ public class SprayWheelSelector {
     }
 
     public int getCurrentlySelected(){
+        if(!isSelecting){
+            return -1;
+        }
         return currentSelected;
     }
 

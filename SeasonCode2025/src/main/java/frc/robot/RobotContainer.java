@@ -119,6 +119,18 @@ public class RobotContainer {
   LeftRight leftRightReef = LeftRight.LEFT;
 
   private void configureBindings() {
+    //SPRAY WHEEL SELECTION
+    xboxAux.b().onTrue(Commands.runOnce(() -> {
+      POVReefAngle = selector.getCurrentlySelected();
+      if(POVReefAngle != -1){
+        Pose2d targetPose = auto.calculateReefPos(POVReefAngle, leftRightReef);
+        currentPathfindingCommand = auto.getPathfindingCommand(targetPose);
+        currentPathfindingCommand.schedule();
+      }
+    }));
+
+    xboxAux.b().onFalse(Commands.runOnce(() -> currentPathfindingCommand.cancel()));
+
     //---------------------------------------------------------------------------------------------------------------------
     // XBOX DRIVE
     //---------------------------------------------------------------------------------------------------------------------
