@@ -11,11 +11,9 @@ import static frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.Vision.Visio
 
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.geometry.Pose3d;
-import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Alert.AlertType;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.Robot;
 import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.CatzRobotTracker;
 import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.CatzRobotTracker.TxTyObservation;
 import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.CatzRobotTracker.VisionObservation;
@@ -55,8 +53,8 @@ public class CatzVision extends SubsystemBase {
    *
    * @param cameraIndex The index of the camera to use.
    */
-  public Rotation2d getTargetX(int cameraIndex) {
-    return inputs[cameraIndex].latestTargetObservation.tx();
+  public double getTargetX(int cameraIndex) {
+    return inputs[cameraIndex].latestTargetObservations[0].tx();
   }
 
   @Override
@@ -148,7 +146,6 @@ public class CatzVision extends SubsystemBase {
                     observation.pose().toPose2d(),
                     observation.timestamp(),
                     VecBuilder.fill(linearStdDev, linearStdDev, angularStdDev)));
-        // System.out.println("===");
 
         // Log camera datadata
         Logger.recordOutput("Vision/Camera" + cameraIndex + "/TagPoses", tagPoses.toArray(new Pose3d[tagPoses.size()]));
@@ -164,19 +161,25 @@ public class CatzVision extends SubsystemBase {
       //------------------------------------------------------------------------------------------------------------------------------------
       // Get tag tx ty observation data
       //------------------------------------------------------------------------------------------------------------------------------------
-      if(Robot.isSimulation()) {
-        continue;
-      }
-      var targetObservation = inputs[cameraIndex].latestTargetObservation;
+      // Get tag tx ty observation data
+      for (int frameIndex = 0; frameIndex < inputs[cameraIndex].latestTargetObservations.length;
+          frameIndex++) {
+        var timestamp = inputs[cameraIndex].latestTargetObservations[frameIndex].timestamp();
+        var values = inputs[cameraIndex].latestTargetObservations[frameIndex];
 
-      double distance = 0.1;
-      txTyObservations.put(
-            targetObservation.tagID(), new TxTyObservation(targetObservation.tagID(),
-                                                           cameraIndex,
-                                                           targetObservation.tx().getDegrees(),
-                                                           targetObservation.ty().getDegrees(),
-                                                           distance,
-                                                           targetObservation.timestampe()));
+        double tx = values.tx();
+        double ty = values.ty();
+        int tagId = (int) values.tagID();
+        double distance = values.distance();
+
+        txTyObservations.put(
+            tagId, new TxTyObservation(tagId, cameraIndex, tx, ty, distance, timestamp));
+
+        Logger.recordOutput("Vision/Camera" + cameraIndex + "/TxTyObservation tx" + frameIndex, tx);
+        Logger.recordOutput("Vision/Camera" + cameraIndex + "/TxTyObservation ty" + frameIndex, ty);
+        Logger.recordOutput("Vision/Camera" + cameraIndex + "/TxTyObservation tagID" + frameIndex, tagId);
+        Logger.recordOutput("Vision/Camera" + cameraIndex + "/TxTyObservation distance" + frameIndex, distance);
+      }
 
       // Save tx ty observation data
       for (var observation : txTyObservations.values()) {
@@ -185,7 +188,6 @@ public class CatzVision extends SubsystemBase {
           allTxTyObservations.put(observation.tagId(), observation);
         }
       }
-
       allTxTyObservations.values().stream().forEach(CatzRobotTracker.getInstance()::addTxTyObservation);
 
 

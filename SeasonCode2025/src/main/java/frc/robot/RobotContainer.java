@@ -31,10 +31,12 @@ import frc.robot.CatzSubsystems.CatzLEDs.CatzLED;
 import frc.robot.CatzSubsystems.CatzOuttake.CatzOuttake;
 import frc.robot.Commands.DriveAndRobotOrientationCmds.TeleopDriveCmd;
 import frc.robot.Utilities.Alert;
+import frc.robot.Utilities.SprayWheelSelector;
 import frc.robot.Utilities.Alert.AlertType;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
+
 
 import org.littletonrobotics.junction.networktables.LoggedNetworkNumber;
 
@@ -63,6 +65,8 @@ public class RobotContainer {
   private CommandXboxController xboxDrv = new CommandXboxController(0);
   private CommandXboxController xboxAux = new CommandXboxController(1);
   private CommandXboxController xboxTest = new CommandXboxController(2);
+
+  private SprayWheelSelector selector = new SprayWheelSelector(xboxAux);
 
   // -------------------------------------------------------------------------------------------------------------------
   // Alert Declaration
@@ -136,6 +140,18 @@ public class RobotContainer {
   LeftRight leftRightReef = LeftRight.LEFT;
 
   private void configureBindings() {
+    //SPRAY WHEEL SELECTION
+    xboxAux.b().onTrue(Commands.runOnce(() -> {
+      POVReefAngle = selector.getCurrentlySelected();
+      if(POVReefAngle != -1){
+        Pose2d targetPose = auto.calculateReefPos(POVReefAngle, leftRightReef);
+        currentPathfindingCommand = auto.getPathfindingCommand(targetPose);
+        currentPathfindingCommand.schedule();
+      }
+    }));
+
+    xboxAux.b().onFalse(Commands.runOnce(() -> currentPathfindingCommand.cancel()));
+
     //---------------------------------------------------------------------------------------------------------------------
     // XBOX DRIVE
     //---------------------------------------------------------------------------------------------------------------------
@@ -269,6 +285,10 @@ public class RobotContainer {
 
   public CatzAutonomous getAutonomous(){
     return auto;
+  }
+
+  public SprayWheelSelector getSelector(){
+    return selector;
   }
 
 }
