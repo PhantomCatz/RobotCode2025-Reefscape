@@ -75,7 +75,7 @@ public class CatzSuperstructure extends VirtualSubsystem {
         this.container = container;
     }
 
-    public Command setCurrentRobotAction(RobotAction action) {
+    public void setCurrentRobotAction(RobotAction action) {
         Command robotActionCommand = Commands.print("No robot Action Selected");
         this.currentRobotAction = action;
         switch(currentRobotAction) {
@@ -86,6 +86,7 @@ public class CatzSuperstructure extends VirtualSubsystem {
                     switch (level) {
                         case 1:
                         currentRobotState = RobotState.L1_CORAL;
+                        CatzStateCommands.L1Coral(container).schedule();
                         robotActionCommand = CatzStateCommands.L1Coral(container);
                         break;
 
@@ -116,6 +117,7 @@ public class CatzSuperstructure extends VirtualSubsystem {
             case INTAKE:
                 if(chosenGamepiece == Gamepiece.CORAL) {
                         currentRobotState = RobotState.INTAKE_CORAL_STATION;
+                        CatzStateCommands.intakeCoralStation(container).schedule();
                         System.out.println("Intake coral station");
                         robotActionCommand = CatzStateCommands.intakeCoralStation(container);
                 } else {
@@ -161,7 +163,7 @@ public class CatzSuperstructure extends VirtualSubsystem {
 
         }
 
-        return robotActionCommand;
+       // return robotActionCommand;
     }
 
 
