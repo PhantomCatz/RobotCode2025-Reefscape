@@ -112,9 +112,7 @@ public class RobotContainer {
                     && DriverStation.getMatchTime() <= Math.round(endgameAlert1.get()))
         .onTrue(
             controllerRumbleCommand()
-                .withTimeout(0.5)
-                .beforeStarting(() -> CatzLED.getInstance().endgameAlert = true)
-                .finallyDo(() -> CatzLED.getInstance().endgameAlert = false));
+                .withTimeout(0.5));
     new Trigger(
             () ->
                 DriverStation.isTeleopEnabled()
@@ -126,8 +124,7 @@ public class RobotContainer {
                 .andThen(Commands.waitSeconds(0.1))
                 .repeatedly()
                 .withTimeout(0.9) // Rumble three times
-                .beforeStarting(() -> CatzLED.getInstance().endgameAlert = true)
-                .finallyDo(() -> CatzLED.getInstance().endgameAlert = false));
+);
   }
 
   // ---------------------------------------------------------------------------

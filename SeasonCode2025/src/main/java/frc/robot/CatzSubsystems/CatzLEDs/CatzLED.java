@@ -15,11 +15,15 @@ import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.Notifier;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.util.Color;
-import frc.robot.CatzConstants.CatzColorConstants;
+import frc.robot.CatzConstants;
 import frc.robot.Utilities.VirtualSubsystem;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.util.List;
 import java.util.Optional;
+
+import org.littletonrobotics.junction.AutoLogOutput;
 
 public class CatzLED extends VirtualSubsystem {
   private static CatzLED instance = null;
@@ -34,30 +38,30 @@ public class CatzLED extends VirtualSubsystem {
   // ----------------------------------------------------------------------------------------------
   // Robot state LED tracking
   // ----------------------------------------------------------------------------------------------
+  @Getter @Setter @AutoLogOutput (key = "CatzLED/ledState")
+  public LEDState ledState;
+
+
+  public enum LEDState {
+    LEDmanual_none,
+    LEDmanual_one,
+    LEDaqua_empty,
+    LEDaqua_full,
+    NBA_empty,
+    NBA_full,
+    BALLS,
+    TO_BALLS,
+    climb,
+    endgameAlert,
+    sameBattery,
+    autoFinished,
+    lowBatteryAlert
+  }
+
+  public double autoFinishedTime = 0.0;
   // MISC
+
   public int loopCycleCount = 0;
-  public boolean boost = false;
-  public boolean intaking = false;
-  public boolean hasCoral = false;
-  public boolean hasAlgae = false;
-
-  // Main Driver LED States
-  public boolean isCoral = false;
-  public boolean isAlgae = false;
-  public boolean isHoarding = false;
-  public boolean isClimbing = false;
-
-  // Extra Driver LED States
-  public boolean trapping = false;
-  public boolean autoDrive = false;
-
-  // MISC LED states
-  public boolean endgameAlert = false;
-  public boolean sameBattery = false;
-  public boolean autoFinished = false;
-  public double  autoFinishedTime = 0.0;
-  public boolean lowBatteryAlert = false;
-  public boolean demoMode = false;
 
   private Optional<Alliance> alliance = Optional.empty();
   private Color allianceColor = Color.kPurple;
@@ -91,6 +95,8 @@ public class CatzLED extends VirtualSubsystem {
   private static final double autoFadeTime = 2.5; // 3s nominal
   private static final double autoFadeMaxTime = 5.0; // Return to normal
 
+
+
   private CatzLED() {
     ledStrip = new AddressableLED(LEADER_LED_PWM_PORT);
     buffer =
@@ -112,6 +118,9 @@ public class CatzLED extends VirtualSubsystem {
 
   @Override
   public void periodic() {
+
+
+
     // Update alliance color
     if (DriverStation.isDSAttached()) {
       alliance = DriverStation.getAlliance();
@@ -124,7 +133,7 @@ public class CatzLED extends VirtualSubsystem {
 
     // Update auto state
     if (DriverStation.isDisabled()) {
-      autoFinished = false;
+      // autoFinished = false;
     } else {
       lastEnabledAuto = DriverStation.isAutonomous();
       lastEnabledTime = Timer.getFPGATimestamp();
@@ -155,48 +164,53 @@ public class CatzLED extends VirtualSubsystem {
       if (lastEnabledAuto && Timer.getFPGATimestamp() - lastEnabledTime < autoFadeMaxTime) {
         // Auto fade
         solid(1.0 - ((Timer.getFPGATimestamp() - lastEnabledTime) / autoFadeTime), Color.kGreen);
-      } else if (lowBatteryAlert) {
-        // Low battery
-        solid(Color.kOrangeRed);
-      } else if (paradeLeds) {
-        // TODO add parade led pattern
-      } else {
-        // Default pattern
-        wave(allianceColor, secondaryDisabledColor, waveAllianceCycleLength, waveAllianceDuration);
-      }
-
-      // Same battery alert //TODO add battery alert
-      if (sameBattery) {
-        breath(Color.kRed, Color.kBlack);
       }
 
       // MODE AUTON
     } else if (DriverStation.isAutonomous()) {
       wave(Color.kGold, Color.kDarkBlue, waveFastCycleLength, waveFastDuration);
-      if (autoFinished) {
-        double fullTime = (double) length / waveFastCycleLength * waveFastDuration;
-        solid((Timer.getFPGATimestamp() - autoFinishedTime) / fullTime, Color.kGreen);
-      }
       // MODE ENABLED
     } else {
-      wave(
-          CatzColorConstants.PHANTOM_SAPPHIRE,
-          Color.kWhite,
-          waveAllianceCycleLength,
-          waveAllianceDuration);
 
-      if (trapping || isClimbing || autoDrive || isCoral) {
-        rainbow(rainbowCycleLength, rainbowDuration);
-      } else if (isHoarding) {
-        wave(Color.kBlack, Color.kPurple, waveAllianceCycleLength, waveAllianceDuration);
-      } else if (hasCoral) {
-        solid(Color.kGreen);
-      } else if (hasAlgae) {
-        solid(Color.kOrange);
-      }
-
-      if (endgameAlert) {
-        strobe(Color.kRed, Color.kGold, strobeDuration);
+      switch(ledState) {
+        case LEDmanual_none:
+          strobe(Color.kRed, breathDuration);
+        break;
+        case LEDmanual_one:
+          solid(Color.kRed);
+        break;
+        case LEDaqua_empty:
+          strobe(Color.kBlue, breathDuration);
+        break;
+        case LEDaqua_full:
+          solid(Color.kBlue);
+        break;
+        case NBA_empty:
+          strobe(Color.kYellow, breathDuration);
+        break;
+        case NBA_full:
+          solid(Color.kYellow);
+        break;
+        case BALLS:
+          strobe(Color.kWhite, breathDuration);
+        break;
+        case TO_BALLS:
+          solid(Color.kWhite);
+        break;
+        case climb:
+          rainbow(rainbowCycleLength, rainbowDuration);
+        break;
+        case sameBattery:
+          solid(Color.kDarkOrange);
+        break;
+        case autoFinished:
+          solid(CatzConstants.CatzColorConstants.PHANTOM_SAPPHIRE);
+        break;
+        case lowBatteryAlert:
+          solid(Color.kOrange);
+        break;
+        default:
+          break;
       }
     }
 
