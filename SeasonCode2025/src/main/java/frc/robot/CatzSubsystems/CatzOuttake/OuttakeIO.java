@@ -29,14 +29,10 @@ public interface OuttakeIO {
   }
 
   public default void updateInputs(OuttakeIOInputs inputs) {}
+  
+  public default void runIntakesIntakeMotor(double speed) {}
 
-  public default void runMotorLeft(double speed) {}
-
-  public default void runMotorRight(double speed) {}
-
-  public default void runVolts(double Speed, double speed2) {}
+  public default void runMotor(double Speed, double speed2) {}
 
   public default void setPIDF(double kP, double kI, double kD, double kF) {}
-
-  public default void runCharacterizationMotor(double input) {}
 }

@@ -30,6 +30,7 @@ public class OuttakeIOReal implements OuttakeIO {
 
   private final SparkMax OuttakeLeftMtr;
   private final SparkMax OuttakeRightMtr;
+  private final SparkMax IntakeCoralMtr;
 
   private SparkMaxConfig globalConfig = new SparkMaxConfig();
 
@@ -37,8 +38,10 @@ public class OuttakeIOReal implements OuttakeIO {
 
     OuttakeLeftMtr = new SparkMax(LEFT_OUTTAKE_ID, MotorType.kBrushless);
     OuttakeRightMtr = new SparkMax(RIGHT_OUTTAKE_ID, MotorType.kBrushless);
+    IntakeCoralMtr = new SparkMax(50, MotorType.kBrushless);
 
-    globalConfig.smartCurrentLimit(OUTTAKE_CURRENT_LIMIT);
+    // globalConfig.smartCurrentLimit(OUTTAKE_CURRENT_LIMIT);
+    globalConfig.smartCurrentLimit(20);
     globalConfig.idleMode(IdleMode.kBrake);
     globalConfig.voltageCompensation(12);
     updateConfig();
@@ -58,24 +61,17 @@ public class OuttakeIOReal implements OuttakeIO {
     inputs.bbreakBackTriggered = !beamBreakBck.get();
     inputs.appliedVolts        = OuttakeLeftMtr.getBusVoltage();
     inputs.rightAppliedVolts   = OuttakeRightMtr.getBusVoltage();
-
-
   }
 
   @Override
-  public void runVolts(double speed, double speed2) {
-    OuttakeLeftMtr.setVoltage(speed);
-    OuttakeRightMtr.setVoltage(-speed2);
+  public void runMotor(double speed, double speed2) {
+    OuttakeLeftMtr.set(speed);
+    OuttakeRightMtr.set(-speed2);
   }
 
   @Override
-  public void runMotorLeft(double speed) {
-    OuttakeLeftMtr.set(-speed);
-  }
-
-  @Override
-  public void runMotorRight(double speed) {
-    OuttakeRightMtr.set(speed);
+  public void runIntakesIntakeMotor(double speed) {
+    IntakeCoralMtr.set(speed);
   }
 
   @Override

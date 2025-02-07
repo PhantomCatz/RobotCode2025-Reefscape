@@ -20,8 +20,8 @@ public class OuttakeConstants {
     public static final int FRONT_BEAM_BREAK_ID = 1;
     public static final int BACK_BEAM_BREAK_ID = 0;
 
-    static double OUTTAKE_RT = 3.6;
-    static double OUTTAKE_LT = 3.6;
-    static double INTAKE_SPD = 3.6;
-    static double ADJ_SPD = 1.2;
+    static double OUTTAKE_RT = 0.5;
+    static double OUTTAKE_LT = 0.5;
+    static double INTAKE_SPD = 0.3;
+    static double ADJ_SPD = 0.8;
 }
