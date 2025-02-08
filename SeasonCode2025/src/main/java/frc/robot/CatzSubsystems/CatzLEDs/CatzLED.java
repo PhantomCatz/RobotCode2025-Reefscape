@@ -39,7 +39,7 @@ public class CatzLED extends VirtualSubsystem {
   // Robot state LED tracking
   // ----------------------------------------------------------------------------------------------
   @Getter @Setter @AutoLogOutput (key = "CatzLED/ledState")
-  public LEDState ledState;
+  public LEDState ledState = LEDState.BALLS;
 
 
   public enum LEDState {
