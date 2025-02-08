@@ -133,11 +133,13 @@ public class RobotContainer {
     xboxDrv.a().onTrue(
       Commands.runOnce(
           () -> {
+            currentPathfindingCommand.cancel();
             Pose2d targetPose = auto.calculateReefPos(POVReefAngle, leftRightReef);
             currentPathfindingCommand = auto.getPathfindingCommand(targetPose);
             currentPathfindingCommand.schedule();
+            System.out.println("Command path scheduled");
           }
-      )
+      , drive)
     );
     xboxDrv.a().onFalse(Commands.runOnce(() -> currentPathfindingCommand.cancel()));
 

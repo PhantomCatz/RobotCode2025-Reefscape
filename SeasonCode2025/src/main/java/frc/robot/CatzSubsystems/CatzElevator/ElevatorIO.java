@@ -14,27 +14,29 @@ public interface ElevatorIO {
   @AutoLog
   public static class ElevatorIOInputs {
 
-    public boolean isElevatorIOMotorConnected = true;
-    public boolean isLeaderMotorConnected = true;
-    public boolean isFollowerMotorConnected = true;
+    public boolean isLeaderMotorConnected = false;
+    public boolean isFollowerMotorConnected = false;
+    public boolean isTopLimitSwitched = false;
+    public boolean isBotLimitSwitched = false;
 
-    public double motorState;
-    public double leaderPositionRotations = 0.0;
-    public double positionRotations = 0.0;
-    public double velocityRpm = 0.0;
-    public double appliedVolts = 0.0;
-    public double supplyCurrentAmps = 0.0;
-    public double torqueCurrentAmps = 0.0;
-    public double tempCelsius = 0.0;
+    public double positionRads = 0.0;
+    public double absoluteEncoderPositionRads = 0.0;
+    public double relativeEncoderPositionRads = 0.0;
+    public double velocityRadsPerSec = 0.0;
+    public double[] appliedVolts = new double[] {};
+    public double[] supplyCurrentAmps = new double[] {};
+    public double[] torqueCurrentAmps = new double[] {};
+    public double[] tempCelcius = new double[] {};
+
   }
+
+  public default void updateInputs(ElevatorIOInputs inputs) {}
 
   public default void runMotor(double Speed) {}
 
   public default void runMotorBck(double Speed) {}
 
   public default void runCurrent(double amps) {}
-
-  public default void updateInputs(ElevatorIOInputsAutoLogged inputs) {}
 
   public default void setPID(double kP, double kI, double kD) {}
 

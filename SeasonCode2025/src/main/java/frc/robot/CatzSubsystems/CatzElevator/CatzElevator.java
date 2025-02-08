@@ -42,10 +42,7 @@ public class CatzElevator extends SubsystemBase {
   private boolean breakModeEnabled = true;
   private boolean isCharacterizing = false;
 
-  double targetPosition;
-
-
-  // private ElevatorPosition targetPosition = ElevatorPosition.PosL1Home;
+  private double targetPosition;
 
   private ElevatorFeedforward ff;
 
@@ -89,7 +86,7 @@ public class CatzElevator extends SubsystemBase {
   @Override
   public void periodic() {
     io.updateInputs(inputs);
-    Logger.processInputs("Elevator/inputs", inputs);
+    Logger.processInputs("inputs/Elevator", inputs);
 
     // Update controllers when user specifies
     LoggedTunableNumber.ifChanged(
@@ -111,7 +108,7 @@ public class CatzElevator extends SubsystemBase {
       // io.stop();
     } else {
       // System.out.println("spinning");
-      io.runSetpoint(position, ff.calculate(inputs.velocityRpm));
+      io.runSetpoint(position, ff.calculate(inputs.velocityRadsPerSec));
     }
 
     Logger.recordOutput("Elevator/CurrentRotations", getElevatorPositionRotations());
@@ -148,7 +145,7 @@ public class CatzElevator extends SubsystemBase {
   //--------------------------------------------------------------------------
 
   public double getElevatorPositionRotations() {
-    return inputs.positionRotations;
+    return inputs.positionRads;
   }
 
   public boolean isElevatorInPosition() {
@@ -167,8 +164,8 @@ public class CatzElevator extends SubsystemBase {
   }
 
   public double getCharacterizationVelocity() {
-    System.out.println(inputs.velocityRpm);
-    return inputs.velocityRpm;
+    System.out.println(inputs.velocityRadsPerSec);
+    return inputs.velocityRadsPerSec;
   }
 
   public void endCharacterization() {

@@ -135,7 +135,7 @@ public class DriveConstants {
                 Mk4iReductions.L2_PLUS.reduction,
                 Mk4iReductions.steer.reduction);
       };
-      
+
   // -------------------------------------------------------------------------------
   // Odometry Constants
   // -------------------------------------------------------------------------------

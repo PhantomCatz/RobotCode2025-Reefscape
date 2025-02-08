@@ -75,10 +75,10 @@ public class CatzOuttake extends SubsystemBase {
       case SCORE_L1:
         case_shootL1();
         break;
-      case STOP: 
+      case STOP:
         io.runMotor(0,0);
         break;
-      case TEMP_RUN: 
+      case TEMP_RUN:
         io.runMotor(OUTTAKE_LT, OUTTAKE_RT);
         break;
     }
@@ -94,7 +94,7 @@ public class CatzOuttake extends SubsystemBase {
 
     io.runMotor(INTAKE_SPD, INTAKE_SPD);
 
-    if ((inputs.bbreakFrntTriggered && inputs.bbreakBackTriggered) || 
+    if ((inputs.bbreakFrntTriggered && inputs.bbreakBackTriggered) ||
         (!inputs.bbreakFrntTriggered && inputs.bbreakBackTriggered)) {
       currentState = outtakeStates.ADJ_FWD;
 
