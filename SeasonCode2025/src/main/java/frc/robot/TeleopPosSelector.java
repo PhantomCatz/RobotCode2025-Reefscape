@@ -7,16 +7,13 @@
 
 package frc.robot;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedList;
-import java.util.List;
 import java.util.Queue;
 import java.util.function.Supplier;
 
 import com.pathplanner.lib.path.GoalEndState;
 import com.pathplanner.lib.path.PathPlannerPath;
-import com.pathplanner.lib.path.PathPoint;
 import com.pathplanner.lib.path.Waypoint;
 import com.pathplanner.lib.pathfinding.Pathfinding;
 
@@ -170,22 +167,29 @@ public class TeleopPosSelector {
   public Command runLeftRightCommand(LeftRight leftRight){
     return new InstantCommand(() -> {
       Pose2d goal = calculateReefPose(new Pair<Integer, LeftRight>(currentPathfindingPair.getFirst(), leftRight));
-      Pose2d currentPose = calculateReefPose(currentPathfindingPair);
-      if(currentPose.getTranslation().getDistance(goal.getTranslation()) > Reef.leftRightDistance * 3){
+      Pose2d currentPose = tracker.getEstimatedPose();
+
+      Translation2d goalPos = goal.getTranslation();
+      Translation2d currentPos = currentPose.getTranslation();
+      Translation2d direction = goalPos.minus(currentPos).div(2.0);
+
+      System.out.println(direction.getNorm());
+      if(currentPose.getTranslation().getDistance(goal.getTranslation()) > Reef.leftRightDistance * 3 || direction.getNorm() <= 1e-3){
         return;
       }
 
-      
-    });
-
-    currentPathfindingCommand.cancel();
+      currentPathfindingCommand.cancel();
       currentPathfindingCommand = new TrajectoryDriveCmd(new PathPlannerPath(
-        Arrays.asList(new Waypoint[] {new Waypoint(goal), new Waypoint(goal)}),
+        Arrays.asList(new Waypoint[] {
+          new Waypoint(currentPos.minus(direction), currentPos, currentPos.plus(direction)),
+          new Waypoint(goalPos.minus(direction), goalPos, goalPos.plus(direction))
+        }),
         DriveConstants.PATHFINDING_CONSTRAINTS,
         null,
         new GoalEndState(0, goal.getRotation())
       ), m_container.getCatzDrivetrain(), true);
       currentPathfindingCommand.schedule();
+    });
   }
 
   private Command runPathfindingCommand(Supplier<Pose2d> goal){

@@ -41,6 +41,14 @@ public class LocalADStar implements Pathfinder {
         new GridPosition(0, -1)
       };
 
+  private static final Translation2d[] DIAGONAL =
+    new Translation2d[] {
+      new Translation2d(1, 1),
+      new Translation2d(-1, 1),
+      new Translation2d(-1, -1),
+      new Translation2d(1, -1)
+    };
+
   private double fieldLength = 16.54;
   private double fieldWidth = 8.02;
 
@@ -54,10 +62,10 @@ public class LocalADStar implements Pathfinder {
   private final HashMap<GridPosition, Pair<Double, Double>> open = new HashMap<>();
   private final HashMap<GridPosition, Pair<Double, Double>> incons = new HashMap<>();
   private final Set<GridPosition> closed = new HashSet<>();
-  private final Set<GridPosition> corners = new HashSet<>();
   private final Set<GridPosition> staticObstacles = new HashSet<>();
   private final Set<GridPosition> dynamicObstacles = new HashSet<>();
   private final Set<GridPosition> requestObstacles = new HashSet<>();
+  private final HashMap<GridPosition, Integer> corners = new HashMap<>();
 
   private GridPosition requestStart;
   private Translation2d requestRealStartPos;
@@ -140,7 +148,12 @@ public class LocalADStar implements Pathfinder {
           !staticObstacles.contains(pos.add(direction2)) &&
           !staticObstacles.contains(pos.add(direction1).add(direction2))
         ){
-          corners.add(pos.add(direction1).add(direction2));
+          GridPosition corner = pos.add(direction1).add(direction2);
+          if (corners.get(corner) == null){
+            corners.put(corner, i);
+          } else {
+            corners.put(corner, -1);
+          }
         }
       }
     }
@@ -409,14 +422,20 @@ public class LocalADStar implements Pathfinder {
 
       //if a corner is found, draw an imaginary line from the previous corner to this corner
       //now all cells propagating from this corner identifies as this corner (if that makes sense)
-      if(corners.contains(currentPos)){
+      if(corners.keySet().contains(currentPos)){
         Translation2d slope = new Translation2d(currentPos.y - currentCorner.y, currentPos.x - currentCorner.x);
-        imaginaryObstacles.get(currentCorner).addAll(getCellsOnLine(currentPos, slope, obstacles));
-        imaginaryObstacles.put(currentPos, new HashSet<>());
+        int diagonalIndex = corners.get(currentPos);
 
-        //add the euclidean distance from the previous corner to this corner
-        currentCornerDistance += currentPos.getDistance(currentCorner);
-        currentCorner = currentPos;
+        //If the angle between the imaginary slope and a vector extruding diagonally from the corner (length sqrt2) is greater than 135 degrees, ignore the corner
+        //The angle is measured using dot products
+        if (diagonalIndex != -1 && DIAGONAL[diagonalIndex].getX() * slope.getX() + DIAGONAL[diagonalIndex].getY() * slope.getY() > - slope.getNorm()){
+          imaginaryObstacles.get(currentCorner).addAll(getCellsOnLine(currentPos, slope, obstacles));
+          imaginaryObstacles.put(currentPos, new HashSet<>());
+
+          //add the euclidean distance from the previous corner to this corner
+          currentCornerDistance += currentPos.getDistance(currentCorner);
+          currentCorner = currentPos;
+        }
       }
 
       for(GridPosition dxy: ADJACENT){
