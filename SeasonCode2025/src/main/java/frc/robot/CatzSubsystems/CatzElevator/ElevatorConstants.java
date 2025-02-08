@@ -31,16 +31,32 @@ public class ElevatorConstants {
     public static final int LEFT_LEADER_ID =
         switch (CatzConstants.getRobotType()) {
             case SN2 -> 50;
-            case SN1 -> 31;
+            case SN1 -> 40;
             default -> 11;
         };
 
-        public static final int RIGHT_LEADER_ID =
-        switch (CatzConstants.getRobotType()) {
-            case SN2 -> 51;
-            case SN1 -> 30;
-            default -> 12;
-        };
+    //TBD
+    public static final int TOPLIMITSWITCH =
+    switch (CatzConstants.getRobotType()) {
+        case SN2 -> 8;
+        case SN1 -> 8;
+        default -> 8;
+    };
+
+    //TBD
+    public static final int BOTLIMITSWITCH =
+    switch (CatzConstants.getRobotType()) {
+        case SN2 -> 9;
+        case SN1 -> 9;
+        default -> 9;
+    };
+
+    public static final int RIGHT_LEADER_ID =
+    switch (CatzConstants.getRobotType()) {
+        case SN2 -> 51;
+        case SN1 -> 51;
+        default -> 12;
+    };
 
     public static final double elevatorLength =
         switch (CatzConstants.getRobotType()) {

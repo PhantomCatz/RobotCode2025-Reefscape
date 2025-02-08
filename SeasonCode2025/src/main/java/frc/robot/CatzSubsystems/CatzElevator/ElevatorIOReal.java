@@ -21,9 +21,12 @@ import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.Temperature;
 import edu.wpi.first.units.measure.Voltage;
+import edu.wpi.first.wpilibj.DigitalInput;
+
 
 
 public class ElevatorIOReal implements ElevatorIO {
+
 
   TalonFX leaderTalon = new TalonFX(LEFT_LEADER_ID);
   TalonFX followerTalon = new TalonFX(RIGHT_LEADER_ID);
@@ -44,7 +47,8 @@ public class ElevatorIOReal implements ElevatorIO {
   private final StatusSignal<Current> leaderElevatorTorqueCurrent;
   private final StatusSignal<Temperature> leaderElevatorTempCelsius;
 
-
+  final DigitalInput m_elevatorLimitTop = new DigitalInput(TOPLIMITSWITCH);
+  final DigitalInput m_elevatorLimitBot = new DigitalInput(BOTLIMITSWITCH);
 
   public ElevatorIOReal() {
 
@@ -113,7 +117,10 @@ public class ElevatorIOReal implements ElevatorIO {
   @Override
   public void runSetpoint(double setpointRotations, double feedforward) {
     System.out.println(setpointRotations);
-    leaderTalon.setControl(positionControl.withPosition(setpointRotations).withFeedForward(feedforward));
+    leaderTalon.setControl(positionControl.withPosition(setpointRotations)
+                                          .withFeedForward(feedforward)
+                                          .withLimitForwardMotion(m_elevatorLimitBot.get())
+                                          .withLimitReverseMotion(m_elevatorLimitTop.get()));
   }
 
   @Override
