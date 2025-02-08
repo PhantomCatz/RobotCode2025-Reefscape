@@ -10,32 +10,23 @@ package frc.robot.Autonomous;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
 import com.pathplanner.lib.commands.PathPlannerAuto;
-import com.pathplanner.lib.path.GoalEndState;
 import com.pathplanner.lib.path.PathPlannerPath;
-import com.pathplanner.lib.pathfinding.Pathfinding;
 import com.pathplanner.lib.util.FileVersionException;
 
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.Autonomous.CatzAutonomous.AutoQuestion;
 import frc.robot.Autonomous.CatzAutonomous.AutoQuestionResponse;
 import frc.robot.Autonomous.CatzAutonomous.AutoScoringOptions;
-import frc.robot.CatzSubsystems.CatzSuperstructure.LeftRight;
 import frc.robot.CatzSubsystems.CatzStateCommands;
 import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.*;
 import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.Drivetrain.DriveConstants;
 import frc.robot.Commands.CharacterizationCmds.WheelRadiusCharacterization;
 import frc.robot.Commands.CharacterizationCmds.WheelRadiusCharacterization.Direction;
 import frc.robot.Commands.DriveAndRobotOrientationCmds.TrajectoryDriveCmd;
-import frc.robot.FieldConstants.Reef;
 import frc.robot.RobotContainer;
 import frc.robot.Utilities.AllianceFlipUtil;
 import frc.robot.Utilities.JSONUtil;
@@ -48,34 +39,34 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.function.BooleanSupplier;
+
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
 public class CatzAutonomous extends VirtualSubsystem {
-  private final int MAX_QUESTIONS = 5;
+  private RobotContainer m_container;
+
+  // ------------------------------------------------------------------------------------------------------------
+  // Questionairre
+  // ------------------------------------------------------------------------------------------------------------
+  private static final int MAX_QUESTIONS = 5;
   private static final String AUTO_STRING = "Auto";
   private final LoggedDashboardChooser<PathPlannerAuto> autoProgramChooser = new LoggedDashboardChooser<>(AUTO_STRING + "/Program");
 
-  private HashMap<String, DashboardCmd> dashboardCmds = new HashMap<>();
   private File autosDirectory            = new File(Filesystem.getDeployDirectory(), "pathplanner/autos");
   private File choreoPathsDirectory      = new File(Filesystem.getDeployDirectory(), "choreo");
   private File pathplannerPathsDirectory = new File(Filesystem.getDeployDirectory(), "pathplanner/paths");
 
-  private PathPlannerAuto lastProgram;
   private JSONParser parser = new JSONParser();
+  private HashMap<String, DashboardCmd> dashboardCmds = new HashMap<>();
+  private PathPlannerAuto lastProgram;
 
-  // ---------------------------------------------------------------------------------------------------
-  //  Auto Questions
-  // -----------------------------------------------------------------------------------------------------
-  private RobotContainer m_container;
+  CatzRobotTracker tracker = CatzRobotTracker.getInstance();
 
   public CatzAutonomous(RobotContainer container) {
     this.m_container = container;
-
-    // Path follwing setup
-    CatzRobotTracker tracker = CatzRobotTracker.getInstance();
 
     // ------------------------------------------------------------------------------------------------------------
     // Autonmous questionaire gui configurations
@@ -100,12 +91,11 @@ public class CatzAutonomous extends VirtualSubsystem {
     for (File pathFile : choreoPathsDirectory.listFiles()) {
       // to get rid of the extensions trailing the path names
       String pathName = pathFile.getName().replaceFirst("[.][^.]+$", "");
-      System.out.println(pathName);
       try {
         NamedCommands.registerCommand(
             pathName,
             new TrajectoryDriveCmd(
-                PathPlannerPath.fromChoreoTrajectory(pathName), m_container.getCatzDrivetrain()));
+                PathPlannerPath.fromChoreoTrajectory(pathName), m_container.getCatzDrivetrain(), false));
       } catch (FileVersionException | IOException | ParseException e) {
         e.printStackTrace();
       }
@@ -118,7 +108,7 @@ public class CatzAutonomous extends VirtualSubsystem {
         NamedCommands.registerCommand(
             pathName,
             new TrajectoryDriveCmd(
-                PathPlannerPath.fromPathFile(pathName), m_container.getCatzDrivetrain()));
+                PathPlannerPath.fromPathFile(pathName), m_container.getCatzDrivetrain(), false));
       } catch (FileVersionException | IOException | ParseException e) {
         e.printStackTrace();
       }
@@ -204,54 +194,6 @@ public class CatzAutonomous extends VirtualSubsystem {
   //          Pathfinding
   //
   // ---------------------------------------------------------------------------------------------------------
-
-  public Command getPathfindingCommand(Pose2d goal) {
-    Translation2d robotPos = CatzRobotTracker.getInstance().getEstimatedPose().getTranslation();
-
-    Pathfinding.setStartPosition(robotPos);
-    Pathfinding.setGoalPosition(goal.getTranslation());
-    PathPlannerPath path =
-        Pathfinding.getCurrentPath(
-            DriveConstants.PATHFINDING_CONSTRAINTS, new GoalEndState(0, goal.getRotation()));
-
-    if (path == null) {
-      return new InstantCommand();
-    } else {
-      if(AllianceFlipUtil.shouldFlipToRed()) {
-        path = path.flipPath();
-      }
-      return new TrajectoryDriveCmd(path, m_container.getCatzDrivetrain());
-    }
-  }
-
-  public Pose2d calculateReefPos(int reefAngle, LeftRight leftRightPos){
-    Rotation2d selectedAngle = Rotation2d.fromRotations(reefAngle / 6.0);
-    Translation2d unitRadius =
-        new Translation2d(selectedAngle.getCos(), selectedAngle.getSin());
-    Translation2d unitLeftRight = unitRadius.rotateBy(Rotation2d.fromDegrees(90));
-    Translation2d radius =
-        unitRadius.times(Reef.reefOrthogonalRadius + Reef.scoringDistance);
-    Translation2d leftRight =
-        unitLeftRight.times(leftRightPos.NUM * Reef.leftRightDistance);
-    if (unitLeftRight.getY() < 0) {
-      leftRight = leftRight.times(-1);
-    }
-    Translation2d scoringPos = radius.plus(leftRight).plus(Reef.center);
-
-    return AllianceFlipUtil.apply(new Pose2d(scoringPos, selectedAngle));
-  }
-
-
-  public Command pathfindThenFollowPath(AutoScoringOptions option) {
-    Pose2d goal = new Pose2d(0, 0, new Rotation2d());
-    return new SequentialCommandGroup(
-        getPathfindingCommand(goal),
-        new TrajectoryDriveCmd(
-            Pathfinding.getCurrentPath(
-                DriveConstants.PATHFINDING_CONSTRAINTS, new GoalEndState(0, goal.getRotation())),
-            m_container.getCatzDrivetrain()));
-  }
-
 
 
   /** Getter for final autonomous Program */
