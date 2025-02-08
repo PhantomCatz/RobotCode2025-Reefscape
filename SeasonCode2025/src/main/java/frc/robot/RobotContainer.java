@@ -7,11 +7,11 @@
 
 package frc.robot;
 
-import edu.wpi.first.math.Pair;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
@@ -134,14 +134,20 @@ public class RobotContainer {
 
   private void configureBindings() {
     // Reef autopathfind
-    Pair<Integer, LeftRight> closestReefPos = selector.getClosestReefPos();
-    Pair<Integer, LeftRight> xboxReefPos = selector.getXBoxReefPos();
+    xboxAux.a().onTrue(Commands.runOnce(() -> selector.pathQueueAdd(selector.getXBoxReefPos())));
+    xboxAux.y().onTrue(Commands.runOnce(() -> selector.pathQueueClear()));
 
-    xboxAux.a().onTrue(selector.runPathfindingCommand(() -> selector.calculateReefPose(xboxReefPos.getFirst(), xboxReefPos.getSecond())));
-    xboxAux.a().onFalse(selector.stopPathfindingCommand());
-
-    xboxDrv.a().onTrue(selector.runPathfindingCommand(() -> selector.calculateReefPose(closestReefPos.getFirst(), closestReefPos.getSecond())));
+    xboxDrv.a().onTrue(selector.runReefPathfindingCommand(() -> selector.getClosestReefPos()));
     xboxDrv.a().onFalse(selector.stopPathfindingCommand());
+
+    xboxDrv.b().onTrue(selector.runReefPathfindingCommand(() -> selector.pathQueuePeek()).alongWith(new InstantCommand(() -> selector.pathQueuePop())));
+    xboxDrv.b().onFalse(selector.stopPathfindingCommand());
+
+    xboxDrv.leftBumper().onTrue(selector.runLeftRightCommand(LeftRight.LEFT));
+    xboxDrv.leftBumper().onFalse(selector.stopPathfindingCommand());
+
+    xboxDrv.rightBumper().onTrue(selector.runLeftRightCommand(LeftRight.RIGHT));
+    xboxDrv.rightBumper().onFalse(selector.stopPathfindingCommand());
 
     // Default driving
     drive.setDefaultCommand(new TeleopDriveCmd(() -> xboxDrv.getLeftX(), () -> xboxDrv.getLeftY(), () -> xboxDrv.getRightX(), drive));
