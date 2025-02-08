@@ -23,26 +23,20 @@ import lombok.Getter;
  */
 public class FieldConstants {
   public static final double FIELD_LENGTH_MTRS = Units.inchesToMeters(690.876);
-  public static final double FIELD_WIDTH = Units.inchesToMeters(317);
-  public static final double STARTING_LINE_X =
-      Units.inchesToMeters(299.438); // Measured from the inside of starting line
+  public static final double FIELD_WIDTH       = Units.inchesToMeters(317);
+  public static final double STARTING_LINE_X   = Units.inchesToMeters(299.438); // Measured from the inside of starting line
 
   public static class Processor {
-    public static final Pose2d centerFace =
-        new Pose2d(Units.inchesToMeters(235.726), 0, Rotation2d.fromDegrees(90));
+    public static final Pose2d CENTER_FACE        = new Pose2d(Units.inchesToMeters(235.726), 0, Rotation2d.fromDegrees(90));
   }
-
   public static class Barge {
-    public static final Translation2d farCage =
-        new Translation2d(Units.inchesToMeters(345.428), Units.inchesToMeters(286.779));
-    public static final Translation2d middleCage =
-        new Translation2d(Units.inchesToMeters(345.428), Units.inchesToMeters(242.855));
-    public static final Translation2d closeCage =
-        new Translation2d(Units.inchesToMeters(345.428), Units.inchesToMeters(199.947));
+    public static final Translation2d FAR_CAGE    = new Translation2d(Units.inchesToMeters(345.428), Units.inchesToMeters(286.779));
+    public static final Translation2d MIDDLE_CAGE = new Translation2d(Units.inchesToMeters(345.428), Units.inchesToMeters(242.855));
+    public static final Translation2d CLOSE_CAGE  = new Translation2d(Units.inchesToMeters(345.428), Units.inchesToMeters(199.947));
 
     // Measured from floor to bottom of cage
-    public static final double deepHeight = Units.inchesToMeters(3.125);
-    public static final double shallowHeight = Units.inchesToMeters(30.125);
+    public static final double DEEP_HEIGHT    = Units.inchesToMeters(3.125);
+    public static final double SHALLOW_HEIGHT = Units.inchesToMeters(30.125);
   }
 
   public static class CoralStation {
@@ -59,26 +53,18 @@ public class FieldConstants {
   }
 
   public static class Reef {
-    public static final Translation2d center =
-        new Translation2d(Units.inchesToMeters(176.746), Units.inchesToMeters(158.501));
-    public static final double faceToZoneLine =
-        Units.inchesToMeters(12); // Side of the reef to the inside of the reef zone line
-    public static final double scoringDistance =
-        Units.inchesToMeters(24); // Scoring distance from the side of the reef
-    public static final double reefOrthogonalRadius =
-        Units.inchesToMeters(32.743); // Distance from the center to the side of the reef
-    public static final double leftRightDistance =
-        Units.inchesToMeters(12); // Center of each face to the left and right sides of each face
+    public static final Translation2d center        = new Translation2d(Units.inchesToMeters(176.746), Units.inchesToMeters(158.501));
+    public static final double faceToZoneLine       = Units.inchesToMeters(12); // Side of the reef to the inside of the reef zone line
+    public static final double scoringDistance      = Units.inchesToMeters(24); // Scoring distance from the side of the reef
+    public static final double reefOrthogonalRadius = Units.inchesToMeters(32.743); // Distance from the center to the side of the reef
+    public static final double leftRightDistance    = Units.inchesToMeters(12); // Center of each face to the left and right sides of each face
   }
 
   public static class StagingPositions {
     // Measured from the center of the ice cream
-    public static final Pose2d leftIceCream =
-        new Pose2d(Units.inchesToMeters(48), Units.inchesToMeters(230.5), new Rotation2d());
-    public static final Pose2d middleIceCream =
-        new Pose2d(Units.inchesToMeters(48), Units.inchesToMeters(158.5), new Rotation2d());
-    public static final Pose2d rightIceCream =
-        new Pose2d(Units.inchesToMeters(48), Units.inchesToMeters(86.5), new Rotation2d());
+    public static final Pose2d leftIceCream =   new Pose2d(Units.inchesToMeters(48), Units.inchesToMeters(230.5), new Rotation2d());
+    public static final Pose2d middleIceCream = new Pose2d(Units.inchesToMeters(48), Units.inchesToMeters(158.5), new Rotation2d());
+    public static final Pose2d rightIceCream =  new Pose2d(Units.inchesToMeters(48), Units.inchesToMeters(86.5), new Rotation2d());
   }
 
   public enum ReefHeight {

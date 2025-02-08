@@ -75,7 +75,7 @@ public class CatzSuperstructure extends VirtualSubsystem {
         this.container = container;
     }
 
-    public Command setCurrentRobotAction(RobotAction action) {
+    public void setCurrentRobotAction(RobotAction action) {
         Command robotActionCommand = Commands.print("No robot Action Selected");
         this.currentRobotAction = action;
         switch(currentRobotAction) {
@@ -161,7 +161,9 @@ public class CatzSuperstructure extends VirtualSubsystem {
 
         }
 
-        return robotActionCommand;
+        robotActionCommand.schedule();
+
+
     }
 
 

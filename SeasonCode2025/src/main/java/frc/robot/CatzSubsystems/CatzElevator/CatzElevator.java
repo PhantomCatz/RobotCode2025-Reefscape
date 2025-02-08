@@ -51,8 +51,8 @@ public class CatzElevator extends SubsystemBase {
 
   @RequiredArgsConstructor
   public static enum ElevatorPosition {
-      PosL1Home(() -> -25.0), //TBD
-      PosL2(() -> 0.0),
+      PosL1Home(() -> 0.0), //TBD
+      PosL2(() -> 25.0),
       PosL3(() -> 50.0),
       PosL4(() -> 75.0),
       PosManual(new LoggedTunableNumber("Elevator/ScoreSourceSetpoint",0.0));
