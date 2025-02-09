@@ -84,6 +84,7 @@ public class ElevatorIOReal implements ElevatorIO {
     config.MotionMagic.MotionMagicCruiseVelocity = motionMagicParameters.mmCruiseVelocity();
     config.MotionMagic.MotionMagicAcceleration = motionMagicParameters.mmAcceleration();
     config.MotionMagic.MotionMagicJerk = motionMagicParameters.mmJerk();
+    config.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
 
     leaderTalon.getConfigurator().apply(config, 1.0);
     followerTalon.getConfigurator().apply(config, 1.0);
@@ -93,7 +94,7 @@ public class ElevatorIOReal implements ElevatorIO {
 
     leaderTalon.setPosition(0);
     followerTalon.setPosition(0);
-
+    System.out.println("Motor instat");
 
   }
 
@@ -164,8 +165,8 @@ public class ElevatorIOReal implements ElevatorIO {
 
   @Override
   public void runMotor(double speed) {
-    leaderTalon.set(speed);
-    followerTalon.set(-speed);
+    System.out.println(speed);
+    leaderTalon.setControl(new DutyCycleOut(speed));
   }
 
   @Override

@@ -153,10 +153,10 @@ public class RobotContainer {
     // rightJoystickTrigger.onFalse(climb.ClimbManualMode(() -> 0.0));
 
     // Manual Elevator Control
-    Trigger rightJoystickTrigger = new Trigger(
-      () -> Math.abs(xboxTest.getRightY()) > 0.1);
-    rightJoystickTrigger.onTrue(elevator.elevatorManualMode(() -> xboxTest.getRightY()).alongWith(Commands.print("Using manual elevator")));
-    rightJoystickTrigger.onFalse(elevator.elevatorManualMode(() -> 0.0));
+    // Trigger rightJoystickTrigger = new Trigger(
+    //   () -> Math.abs(xboxTest.getRightY()) > 0.1);
+    // rightJoystickTrigger.onTrue(elevator.elevatorManualMode(() -> xboxTest.getRightY()).alongWith(Commands.print("Using manual elevator")));
+    // rightJoystickTrigger.onFalse(elevator.elevatorManualMode(() -> 0.0));
 
     // Climb SetPosition Control
     xboxDrv.y().toggleOnTrue(climb.Climb_Retract().alongWith(Commands.print("pressed y")));
@@ -171,6 +171,8 @@ public class RobotContainer {
     xboxTest.b().toggleOnTrue(algaePivot.AlgaePivot_Stow().alongWith(Commands.print("stow")));
     xboxTest.x().toggleOnTrue(algaePivot.AlgaePivot_Undisclosed().alongWith(Commands.print("??????")));
     xboxTest.y().toggleOnTrue(elevator.Elevator_L4().alongWith(Commands.print("L4")));
+
+    xboxTest.rightStick().onTrue(elevator.elevatorFullManual(()->xboxTest.getRightY()));
 
     //---------------------------------------------------------------------------------------------------------------------
     // XBOX AUX

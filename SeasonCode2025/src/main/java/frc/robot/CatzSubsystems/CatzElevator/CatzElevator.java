@@ -189,4 +189,8 @@ public class CatzElevator extends SubsystemBase {
   public Command elevatorManualMode(Supplier<Double> manualSupplier) {
     return run(() -> elevatorManual(manualSupplier)).alongWith(Commands.print("hi"));
   }
+
+  public Command elevatorFullManual(Supplier<Double> manuaSupplier) {
+    return run(()->io.runMotor(manuaSupplier.get())).alongWith(Commands.print("full manual"));
+  }
 }
