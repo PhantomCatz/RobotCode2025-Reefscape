@@ -38,6 +38,6 @@ public interface AlgaePivotIO {
 
   //   public default void updateInputs(AlgaePivotIOInputs inputs) {}
 
-  public default void setPower(double power) {}
+  public default void runSetpoint(double setpointRotations, double feedforward) {}
 
 }

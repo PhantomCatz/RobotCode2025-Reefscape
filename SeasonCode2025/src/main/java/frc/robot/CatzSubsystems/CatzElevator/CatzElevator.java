@@ -10,8 +10,10 @@ package frc.robot.CatzSubsystems.CatzElevator;
 import static frc.robot.CatzSubsystems.CatzElevator.ElevatorConstants.*;
 
 import java.util.function.DoubleSupplier;
+import java.util.function.Supplier;
 
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.CatzConstants;
 import frc.robot.Utilities.LoggedTunableNumber;
@@ -44,7 +46,7 @@ public class CatzElevator extends SubsystemBase {
 
   private double targetPosition;
 
-  private ElevatorFeedforward ff;
+  private ElevatorFeedforward ff = new ElevatorFeedforward(gains.kS(), gains.kG(), gains.kV(), gains.kA());
 
   @RequiredArgsConstructor
   public static enum ElevatorPosition {
@@ -104,6 +106,12 @@ public class CatzElevator extends SubsystemBase {
         mmAcceleration,
         mmJerk);
 
+        if(inputs.isBotLimitSwitched) {
+          io.setPosition(ElevatorPosition.PosL4.getTargetPositionRotations());
+        } else if (inputs.isTopLimitSwitched) {
+          io.setPosition(ElevatorPosition.PosL1Home.getTargetPositionRotations());
+        }
+
     if(DriverStation.isDisabled()) { // || targetPosition == null) {
       // io.stop();
     } else {
@@ -140,7 +148,7 @@ public class CatzElevator extends SubsystemBase {
 
   //--------------------------------------------------------------------------
   //
-  //
+  //        Elevator Motor methods
   //
   //--------------------------------------------------------------------------
 
@@ -164,7 +172,7 @@ public class CatzElevator extends SubsystemBase {
   }
 
   public double getCharacterizationVelocity() {
-    System.out.println(inputs.velocityRadsPerSec);
+    // System.out.println(inputs.velocityRadsPerSec);
     return inputs.velocityRadsPerSec;
   }
 
@@ -172,4 +180,13 @@ public class CatzElevator extends SubsystemBase {
     isCharacterizing = false;
   }
 
+
+  public void elevatorManual(Supplier<Double> manualSupplier) {
+    position += manualSupplier.get() * MANUAL_SCALE;
+    // System.out.println(position);
+  }
+
+  public Command elevatorManualMode(Supplier<Double> manualSupplier) {
+    return run(() -> elevatorManual(manualSupplier)).alongWith(Commands.print("hi"));
+  }
 }

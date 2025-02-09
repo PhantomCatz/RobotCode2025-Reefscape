@@ -32,14 +32,10 @@ public class ElevatorIOReal implements ElevatorIO {
 
 
   TalonFX leaderTalon = new TalonFX(LEFT_LEADER_ID);
-  TalonFX followerTalon = new TalonFX(RIGHT_LEADER_ID);
+  TalonFX followerTalon = new TalonFX(RIGHT_FOLLOWER_ID);
 
-  // private final TalonFX leaderTalon;
-  // private final TalonFX followerTalon;
   private final TalonFXConfiguration config = new TalonFXConfiguration();
-  private final MotionMagicVoltage positionControl =
-      // new MotionMagicVoltage(0.0).withUpdateFreqHz(0.0);
-      new MotionMagicVoltage(0.0).withUpdateFreqHz(0.0);
+  private final MotionMagicVoltage positionControl = new MotionMagicVoltage(0.0).withUpdateFreqHz(0.0);
 
   // Status Signals
   private final StatusSignal<Angle> internalPositionRotations;
@@ -49,8 +45,8 @@ public class ElevatorIOReal implements ElevatorIO {
   private final List<StatusSignal<Current>> torqueCurrent;
   private final List<StatusSignal<Temperature>> tempCelsius;
 
-  final DigitalInput m_elevatorLimitTop = new DigitalInput(TOPLIMITSWITCH);
-  final DigitalInput m_elevatorLimitBot = new DigitalInput(BOTLIMITSWITCH);
+  final DigitalInput m_elevatorLimitTop = new DigitalInput(TOP_LIMIT_SWITCH);
+  final DigitalInput m_elevatorLimitBot = new DigitalInput(BOT_LIMIT_SWITCH);
 
   public ElevatorIOReal() {
 
@@ -74,27 +70,31 @@ public class ElevatorIOReal implements ElevatorIO {
         tempCelsius.get(0),
         tempCelsius.get(1));
 
-    config.Slot0.kP = 12.0;
-    config.Slot0.kI = 0;
-    config.Slot0.kD = 0;
+    config.Slot0.kS = gains.kS();
+    config.Slot0.kV = gains.kV();
+    config.Slot0.kA = gains.kA();
+    config.Slot0.kP = gains.kP();
+    config.Slot0.kI = gains.kI();
+    config.Slot0.kD = gains.kD();
 
-    config.CurrentLimits.SupplyCurrentLimit = 80.0;
-    config.CurrentLimits.SupplyCurrentLimitEnable = true;
-    // config.TorqueCurrent.PeakForwardTorqueCurrent =  80.0;
-    // config.TorqueCurrent.PeakReverseTorqueCurrent = -80.0;
+    config.TorqueCurrent.PeakForwardTorqueCurrent =  80.0;
+    config.TorqueCurrent.PeakReverseTorqueCurrent = -80.0;
     config.MotorOutput.NeutralMode = NeutralModeValue.Brake;
 
-    config.MotionMagic.MotionMagicCruiseVelocity = 80;
-    config.MotionMagic.MotionMagicAcceleration = 400;
-    config.MotionMagic.MotionMagicJerk = 1600;
+    config.MotionMagic.MotionMagicCruiseVelocity = motionMagicParameters.mmCruiseVelocity();
+    config.MotionMagic.MotionMagicAcceleration = motionMagicParameters.mmAcceleration();
+    config.MotionMagic.MotionMagicJerk = motionMagicParameters.mmJerk();
 
     leaderTalon.getConfigurator().apply(config, 1.0);
     followerTalon.getConfigurator().apply(config, 1.0);
 
     followerTalon.setControl(new Follower(leaderTalon.getDeviceID(), true));
+    positionControl.EnableFOC = true;
 
     leaderTalon.setPosition(0);
     followerTalon.setPosition(0);
+
+
   }
 
     public void updateInputs(ElevatorIOInputs inputs) {
@@ -134,7 +134,7 @@ public class ElevatorIOReal implements ElevatorIO {
 
   @Override
   public void runSetpoint(double setpointRotations, double feedforward) {
-    System.out.println(setpointRotations);
+    // System.out.println(setpointRotations);
     leaderTalon.setControl(positionControl.withPosition(setpointRotations)
                                           .withFeedForward(feedforward)
                                           .withLimitForwardMotion(m_elevatorLimitTop.get())
@@ -144,7 +144,7 @@ public class ElevatorIOReal implements ElevatorIO {
   @Override
   public void setPosition(double pos) {
     CatzElevator.position = pos;
-    leaderTalon.setControl(positionControl.withPosition(pos));
+    leaderTalon.setPosition(pos);
   }
 
   @Override

@@ -29,7 +29,7 @@ public class CatzAlgaePivot extends SubsystemBase {
   static double manualPow = 0;
   static boolean isManual;
   static final double MANUAL_SCALE = 5;
-  static double position;
+  static double position = 0.0;
   static LoggedTunableNumber tunnablePos = new LoggedTunableNumber("AlgaePivot/TunnablePosition", 1);
   static LoggedTunableNumber kP = new LoggedTunableNumber("AlgaePivot/kP", 0.17);
   static LoggedTunableNumber kI = new LoggedTunableNumber("AlgaePivot/kI", 0.0);
@@ -92,10 +92,11 @@ public class CatzAlgaePivot extends SubsystemBase {
       // if(isManual) {
       //   io.setPower(manualPow);
       // } else {
-        io.setPosition(position);
+        io.runSetpoint(position, 0.0);
       // }
     }
-    Logger.recordOutput("Position/targetPosition", position);
+    Logger.recordOutput("AlgaePivot/targetPosition", position);
+
   }
 
   public Command AlgaePivot_Stow() {

@@ -17,7 +17,7 @@ import frc.robot.Utilities.MotorUtil.MotionMagicParameters;
 /** Add your docs here. */
 public class ElevatorConstants {
 
-    public static final boolean isElevatorDisabled = false;
+    public static final boolean isElevatorDisabled = true;
 
     // Gearbox definitions
     public static final double MAXPLANETARY_GEAR_RATIO   = 4.0 * 4.0;
@@ -26,37 +26,13 @@ public class ElevatorConstants {
     public static final double ELEVATOR_RATIO_STAGE_ONE  = ELEVATOR_DRIVING_PULLEY/ELEVATOR_DRIVEN_PULLEY;
     public static final double FINAL_REDUCATION          = MAXPLANETARY_GEAR_RATIO * ELEVATOR_RATIO_STAGE_ONE;
 
-    public double leadMotorID;
     // Motor ID
-    public static final int LEFT_LEADER_ID =
-        switch (CatzConstants.getRobotType()) {
-            case SN2 -> 50;
-            case SN1 -> 40;
-            default -> 11;
-        };
+    public static final int LEFT_LEADER_ID  = 30;
+    public static final int RIGHT_FOLLOWER_ID = 31;
 
-    //TBD
-    public static final int TOPLIMITSWITCH =
-    switch (CatzConstants.getRobotType()) {
-        case SN2 -> 8;
-        case SN1 -> 8;
-        default -> 8;
-    };
+    public static final int TOP_LIMIT_SWITCH = 2;
+    public static final int BOT_LIMIT_SWITCH = 3;
 
-    //TBD
-    public static final int BOTLIMITSWITCH =
-    switch (CatzConstants.getRobotType()) {
-        case SN2 -> 9;
-        case SN1 -> 9;
-        default -> 9;
-    };
-
-    public static final int RIGHT_LEADER_ID =
-    switch (CatzConstants.getRobotType()) {
-        case SN2 -> 51;
-        case SN1 -> 51;
-        default -> 12;
-    };
 
     public static final double elevatorLength =
         switch (CatzConstants.getRobotType()) {
@@ -69,12 +45,12 @@ public class ElevatorConstants {
     public static final double  MIN_ROTATIONS = 0.0;
     public static final double  MAX_ROTATIONS = 117.0;
     public static final Translation2d elevatorOrigin = new Translation2d(-0.238, 0.298);
-
+    public static final double MANUAL_SCALE = 0.5;
     // Initial PIDF and motion magic assignment
     public static final Gains gains =
         switch (CatzConstants.getRobotType()) {
             case SN2 -> new Gains(7.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0); //TODO fix gains
-            case SN1 -> new Gains(75.0, 0.0, 2.5, 0.0, 0.0, 0.0, 0.0);
+            case SN1 -> new Gains(100.0, 0.0, 0.0, 0.25, 0.12, 0.01, 0.0);
             case SN_TEST, SN1_2024 -> new Gains(7000.0, 0.0, 250.0, 8.4, 0.2, 0.2, 22.9);
         };
     public static final MotionMagicParameters motionMagicParameters =

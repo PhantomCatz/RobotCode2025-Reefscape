@@ -19,6 +19,8 @@ public class CatzOuttake extends SubsystemBase {
 
   private final OuttakeIO io;
   private final OuttakeIOInputsAutoLogged inputs = new OuttakeIOInputsAutoLogged();
+  private int interationCounter = 0;
+  private int intakeIterationCoutner = 0;
 
   public enum outtakeStates {
     ADJ_INIT,
@@ -31,6 +33,7 @@ public class CatzOuttake extends SubsystemBase {
   }
 
   private outtakeStates currentState = outtakeStates.STOP;
+  private outtakeStates previousState = outtakeStates.STOP;
 
   public CatzOuttake() {
     if(isOuttakeDisabled) {
@@ -59,6 +62,11 @@ public class CatzOuttake extends SubsystemBase {
     io.updateInputs(inputs);
     Logger.processInputs("inputs/Outtake", inputs);
 
+    if(currentState != previousState) {
+      interationCounter = 0;
+      intakeIterationCoutner = 0;
+    }
+
     switch (currentState) {
       case ADJ_INIT:
         case_adjustInit();
@@ -82,6 +90,9 @@ public class CatzOuttake extends SubsystemBase {
         io.runMotor(OUTTAKE_LT, OUTTAKE_RT);
         break;
     }
+
+    previousState = currentState;
+
   }
 
   // ============================================
@@ -93,42 +104,56 @@ public class CatzOuttake extends SubsystemBase {
   private void case_adjustInit() {
 
     io.runMotor(INTAKE_SPD, INTAKE_SPD);
-
-    if ((inputs.bbreakFrntTriggered && inputs.bbreakBackTriggered) ||
-        (!inputs.bbreakFrntTriggered && inputs.bbreakBackTriggered)) {
-      currentState = outtakeStates.ADJ_FWD;
-
-    } else if (inputs.bbreakFrntTriggered && !inputs.bbreakBackTriggered) {
-      currentState = outtakeStates.ADJ_BACK;
+    System.out.println("uhygfdsdertyuiopiuytrdsfgyhujioiuygthfg");
+    if(inputs.bbreakFrntTriggered) {
+      io.runMotor(0.0, 0.0);
+      intakeIterationCoutner++;
+      if(intakeIterationCoutner >= 5) {
+        if(inputs.bbreakBackTriggered) {
+          intakeIterationCoutner = 0;
+          System.out.println("going to adj_fwd");
+          currentState = outtakeStates.ADJ_FWD;
+        } else {
+          intakeIterationCoutner = 0;
+          System.out.println("going to adj_bck");
+          currentState = outtakeStates.ADJ_BACK;
+        }
+      }
     }
   }
 
   private void case_adjustBack() {
     io.runMotor(-ADJ_SPD, -ADJ_SPD);
-    if (inputs.bbreakFrntTriggered && inputs.bbreakBackTriggered) {
+    if (inputs.bbreakBackTriggered) {
       currentState = outtakeStates.STOP;
+      System.out.println("stopping adjbck");
 
     }
   }
 
   private void case_adjustFwd() {
     io.runMotor(ADJ_SPD, ADJ_SPD);
-    if (inputs.bbreakFrntTriggered && !inputs.bbreakBackTriggered) {
+    if (!inputs.bbreakBackTriggered) {
       currentState = outtakeStates.STOP;
+      System.out.println("stopping adjfwd");
     }
   }
 
+
   private void case_shoot() {
     io.runMotor(OUTTAKE_LT, OUTTAKE_RT);
-    if(!inputs.bbreakFrntTriggered) {
+    interationCounter++;
+    if(!inputs.bbreakFrntTriggered && interationCounter >= 25) {
+        interationCounter = 0;
         currentState = outtakeStates.STOP;
     }
   }
   private void case_shootL1() {
-
-    io.runMotor(0.8, 0.05);
-    if(!inputs.bbreakFrntTriggered) {
-        currentState = outtakeStates.STOP;
+    io.runMotor(OUTTAKE_L1_LT, OUTTAKE_L1_RT);
+    interationCounter++;
+    if(!inputs.bbreakFrntTriggered&& interationCounter >= 25) {
+      interationCounter = 0;
+      currentState = outtakeStates.STOP;
     }
   }
 
