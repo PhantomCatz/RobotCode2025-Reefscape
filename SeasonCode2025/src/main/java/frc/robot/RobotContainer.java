@@ -147,16 +147,14 @@ public class RobotContainer {
 
 
     // Manual Climb Control
-    // Trigger rightJoystickTrigger = new Trigger(
-    //   () -> Math.abs(xboxDrv.getRightY()) > 0.1);
-    // rightJoystickTrigger.onTrue(climb.ClimbManualMode(() -> xboxDrv.getRightY()).alongWith(Commands.print("Using manual climb")));
-    // rightJoystickTrigger.onFalse(climb.ClimbManualMode(() -> 0.0));
+    Trigger rightJoystickTrigger = new Trigger(
+      () -> Math.abs(xboxDrv.getRightY()) > 0.1);
+    rightJoystickTrigger.onTrue(climb.ClimbManualMode(() -> xboxDrv.getRightY()).alongWith(Commands.print("Using manual climb")));
 
     // Manual Elevator Control
-    // Trigger rightJoystickTrigger = new Trigger(
-    //   () -> Math.abs(xboxTest.getRightY()) > 0.1);
-    // rightJoystickTrigger.onTrue(elevator.elevatorManualMode(() -> xboxTest.getRightY()).alongWith(Commands.print("Using manual elevator")));
-    // rightJoystickTrigger.onFalse(elevator.elevatorManualMode(() -> 0.0));
+    Trigger leftJoystickTrigger = new Trigger(
+      () -> Math.abs(xboxTest.getLeftY()) > 0.1);
+    leftJoystickTrigger.onTrue(elevator.elevatorManualMode(() -> xboxTest.getLeftY()).alongWith(Commands.print("Using manual elevator")));
 
     // Climb SetPosition Control
     xboxDrv.y().toggleOnTrue(climb.Climb_Retract().alongWith(Commands.print("pressed y")));

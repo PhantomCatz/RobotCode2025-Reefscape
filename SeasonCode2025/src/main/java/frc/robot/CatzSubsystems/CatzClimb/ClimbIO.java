@@ -7,6 +7,8 @@
 
 package frc.robot.CatzSubsystems.CatzClimb;
 
+import java.util.function.Supplier;
+
 import org.littletonrobotics.junction.AutoLog;
 
 public interface ClimbIO {
@@ -38,6 +40,6 @@ public interface ClimbIO {
 
   //   public default void updateInputs(ClimbIOInputs inputs) {}
 
-  public default void setPower(double power) {}
+  public default void setPower(double joystickPower) {}
 
 }

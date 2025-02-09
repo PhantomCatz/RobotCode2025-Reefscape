@@ -84,7 +84,7 @@ public class ElevatorIOReal implements ElevatorIO {
     config.MotionMagic.MotionMagicCruiseVelocity = motionMagicParameters.mmCruiseVelocity();
     config.MotionMagic.MotionMagicAcceleration = motionMagicParameters.mmAcceleration();
     config.MotionMagic.MotionMagicJerk = motionMagicParameters.mmJerk();
-    config.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
+    config.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
 
     leaderTalon.getConfigurator().apply(config, 1.0);
     followerTalon.getConfigurator().apply(config, 1.0);

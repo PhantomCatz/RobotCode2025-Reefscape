@@ -81,15 +81,14 @@ public class CatzClimb extends SubsystemBase {
   public void periodic() {
     io.updateInputs(inputs);
     Logger.processInputs("Climb/inputs", inputs);
-    // System.out.println(position);
     if (DriverStation.isDisabled()) {
 
     } else {
-      // if(isManual) {
-      //   io.setPower(manualPow);
-      // } else {
+      if(isManual == false) {
         io.setPosition(position);
-      // }
+      } else {
+
+      }
     }
     Logger.recordOutput("Position/targetPosition", position);
   }
@@ -115,12 +114,18 @@ public class CatzClimb extends SubsystemBase {
     isManual = false;
   }
 
-  public void climbManual(Supplier<Double> manualSupplier) {
+  public void climbSemiManual(Supplier<Double> manualSupplier) {
     position += manualSupplier.get() * MANUAL_SCALE;
-    System.out.println(position);
+    // System.out.println(position);
+    isManual = false;
+  }
+
+  public void climbFullManual(double joystickPower) {
+    io.setPower(joystickPower);
+    isManual = true;
   }
 
   public Command ClimbManualMode(Supplier<Double> manualSupplier) {
-    return run(() -> climbManual(manualSupplier)).alongWith(Commands.print("hi"));
+    return run(() -> climbSemiManual(manualSupplier)).alongWith(Commands.print("hi"));
   }
 }

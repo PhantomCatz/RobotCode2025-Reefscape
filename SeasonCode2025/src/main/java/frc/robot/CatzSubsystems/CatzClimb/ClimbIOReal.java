@@ -7,7 +7,9 @@
 
 package frc.robot.CatzSubsystems.CatzClimb;
 
-import static frc.robot.CatzSubsystems.CatzClimb.ClimbConstants.CLIMB_MOTOR_ID;
+import static frc.robot.CatzSubsystems.CatzClimb.ClimbConstants.*;
+
+import java.util.function.Supplier;
 
 import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.StatusSignal;
@@ -58,9 +60,9 @@ public class ClimbIOReal implements ClimbIO {
         climbTorqueCurrent,
         climbTempCelsius);
 
-    config.Slot0.kP = 12.0;
-    config.Slot0.kI = 0;
-    config.Slot0.kD = 0;
+    config.Slot0.kP = gains.kP();
+    config.Slot0.kI = gains.kI();
+    config.Slot0.kD = gains.kD();
 
     config.CurrentLimits.SupplyCurrentLimit = 80.0;
     config.CurrentLimits.SupplyCurrentLimitEnable = true;
