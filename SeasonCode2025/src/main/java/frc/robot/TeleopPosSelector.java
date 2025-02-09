@@ -24,6 +24,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.FieldConstants.Reef;
 import frc.robot.Utilities.AllianceFlipUtil;
@@ -33,7 +34,7 @@ import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.CatzRobotTracker;
 import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.Drivetrain.DriveConstants;
 import frc.robot.Commands.DriveAndRobotOrientationCmds.TrajectoryDriveCmd;
 
-public class TeleopPosSelector {
+public class TeleopPosSelector extends SubsystemBase {
   private final RobotContainer m_container;
 
   private final CommandXboxController xboxAux;
@@ -51,6 +52,7 @@ public class TeleopPosSelector {
   public TeleopPosSelector(CommandXboxController aux, RobotContainer container){
       this.xboxAux = aux;
       this.m_container = container;
+      this.currentPathfindingCommand.addRequirements(container.getCatzDrivetrain());
   }
 
   public void pathQueueAddFront(Pair<Integer, LeftRight> pose){
@@ -170,7 +172,7 @@ public class TeleopPosSelector {
   }
 
   public Command runLeftRightCommand(LeftRight leftRight){
-    return new InstantCommand(() -> {
+    return runOnce(() -> {
       Pose2d goal = calculateReefPose(new Pair<Integer, LeftRight>(currentPathfindingPair.getFirst(), leftRight));
       Pose2d currentPose = tracker.getEstimatedPose();
 
@@ -201,7 +203,6 @@ public class TeleopPosSelector {
       currentPathfindingCommand.cancel();
       currentPathfindingCommand = getPathfindingCommand(goal.get());
       currentPathfindingCommand.schedule();
-
     });
   }
 

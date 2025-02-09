@@ -146,6 +146,8 @@ public class RobotContainer {
     xboxDrv.leftBumper().onTrue(selector.runLeftRightCommand(LeftRight.LEFT));
     xboxDrv.leftBumper().onFalse(selector.stopPathfindingCommand());
 
+    xboxDrv.leftBumper().and(xboxDrv.rightBumper()).onTrue(selector.stopPathfindingCommand());
+
     xboxDrv.rightBumper().onTrue(selector.runLeftRightCommand(LeftRight.RIGHT));
     xboxDrv.rightBumper().onFalse(selector.stopPathfindingCommand());
 
