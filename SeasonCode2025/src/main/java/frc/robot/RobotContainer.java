@@ -134,14 +134,14 @@ public class RobotContainer {
 
   private void configureBindings() {
     // Reef autopathfind
-    xboxAux.a().onTrue(Commands.runOnce(() -> selector.pathQueueAdd(selector.getXBoxReefPos())));
-    xboxAux.y().onTrue(Commands.runOnce(() -> selector.pathQueueClear()));
+    xboxAux.a().onTrue(Commands.runOnce(() -> selector.pathQueueAddFront(selector.getXBoxReefPos())));
+    xboxAux.y().onTrue(Commands.runOnce(() -> selector.pathQueuePopBack()));
 
-    xboxDrv.a().onTrue(selector.runReefPathfindingCommand(() -> selector.getClosestReefPos()));
-    xboxDrv.a().onFalse(selector.stopPathfindingCommand());
-
-    xboxDrv.b().onTrue(selector.runReefPathfindingCommand(() -> selector.pathQueuePeek()).alongWith(new InstantCommand(() -> selector.pathQueuePop())));
+    xboxDrv.b().onTrue(selector.runReefPathfindingCommand(() -> selector.getClosestReefPos()));
     xboxDrv.b().onFalse(selector.stopPathfindingCommand());
+
+    xboxDrv.a().onTrue(selector.runReefPathfindingCommand(() -> selector.pathQueuePeekFront()).alongWith(new InstantCommand(() -> selector.pathQueuePopFront())));
+    xboxDrv.a().onFalse(selector.stopPathfindingCommand());
 
     xboxDrv.leftBumper().onTrue(selector.runLeftRightCommand(LeftRight.LEFT));
     xboxDrv.leftBumper().onFalse(selector.stopPathfindingCommand());
@@ -189,7 +189,7 @@ public class RobotContainer {
     xboxAux.b().onTrue(Commands.runOnce(() -> superstructure.setCurrentRobotAction(RobotAction.INTAKE_GROUND)).alongWith(Commands.print("INTAKEGROUND")));
     xboxAux.a().onTrue(Commands.runOnce(() -> superstructure.setCurrentRobotAction(RobotAction.STOW)).alongWith(Commands.print("STOWWW")));
 
-    xboxAux.a().onTrue(Commands.runOnce(()-> System.out.println("L:"+superstructure.getLevel()+", "+superstructure.getChosenGamepiece())));
+    xboxAux.a().onTrue(Commands.runOnce(() -> System.out.println("L:"+superstructure.getLevel()+", "+superstructure.getChosenGamepiece())));
   }
 
   // ---------------------------------------------------------------------------

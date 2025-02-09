@@ -8,8 +8,8 @@
 package frc.robot;
 
 import java.util.Arrays;
+import java.util.Deque;
 import java.util.LinkedList;
-import java.util.Queue;
 import java.util.function.Supplier;
 
 import com.pathplanner.lib.path.GoalEndState;
@@ -37,34 +37,32 @@ public class TeleopPosSelector {
   private final RobotContainer m_container;
 
   private final CommandXboxController xboxAux;
-  private final String REEFSIDE = "Reefside";
+  private final String REEFSIDE = "Reefside ";
+  private final String QUEUE = "PathQueue ";
+  private final int NUM_QUEUE_DISPLAY = 4;
   private final double SELECTION_THRESHOLD = 0.3;
 
   private CatzRobotTracker tracker = CatzRobotTracker.getInstance();
   private Command currentPathfindingCommand = new InstantCommand();
   private Pair<Integer, LeftRight> currentPathfindingPair = new Pair<Integer, LeftRight>(0, LeftRight.LEFT);
-  private Queue<Pair<Integer, LeftRight>> queuedPaths = new LinkedList<>();
+  private Deque<Pair<Integer, LeftRight>> queuedPaths = new LinkedList<>();
 
   public TeleopPosSelector(CommandXboxController aux, RobotContainer container){
       this.xboxAux = aux;
       this.m_container = container;
-
-      for(int i = 0; i < 6; i++){
-          SmartDashboard.putBoolean(REEFSIDE + i, false);
-      }
   }
 
-  public void pathQueueAdd(Pair<Integer, LeftRight> pose){
-    queuedPaths.add(pose);
+  public void pathQueueAddFront(Pair<Integer, LeftRight> pose){
+    queuedPaths.addFirst(pose);
   }
-  public Pair<Integer, LeftRight> pathQueuePeek(){
-    return queuedPaths.peek();
+  public Pair<Integer, LeftRight> pathQueuePeekFront(){
+    return queuedPaths.peekFirst();
   }
-  public Pair<Integer, LeftRight> pathQueuePop(){
-    return queuedPaths.poll();
+  public void pathQueuePopFront(){
+    queuedPaths.pollFirst();
   }
-  public void pathQueueClear(){
-    queuedPaths.clear();
+  public void pathQueuePopBack(){
+    queuedPaths.pollLast();
   }
 
   public void updateCurrentlySelected(){
@@ -75,6 +73,16 @@ public class TeleopPosSelector {
 
     for(int side = 0; side < 6; side++){
       SmartDashboard.putBoolean(REEFSIDE + side, side == currentlySelected.getFirst());
+    }
+
+    for(int i = 0; i < NUM_QUEUE_DISPLAY; i++){
+      SmartDashboard.putString(QUEUE + i, "");
+    }
+
+    int i = 0;
+    for(Pair<Integer, LeftRight> pair : queuedPaths){
+      SmartDashboard.putString(QUEUE + i, pair.getFirst() + " " + pair.getSecond());
+      i++;
     }
   }
 
@@ -173,7 +181,6 @@ public class TeleopPosSelector {
       Translation2d currentPos = currentPose.getTranslation();
       Translation2d direction = goalPos.minus(currentPos).div(2.0);
 
-      System.out.println(direction.getNorm());
       if(currentPose.getTranslation().getDistance(goal.getTranslation()) > Reef.leftRightDistance * 3 || direction.getNorm() <= 1e-3){
         return;
       }
@@ -197,6 +204,7 @@ public class TeleopPosSelector {
       currentPathfindingCommand.cancel();
       currentPathfindingCommand = getPathfindingCommand(goal.get());
       currentPathfindingCommand.schedule();
+
     });
   }
 

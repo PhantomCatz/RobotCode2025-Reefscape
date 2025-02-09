@@ -8,7 +8,7 @@
 package frc.robot.CatzSubsystems.CatzClimb;
 
 public class ClimbConstants {
-    public static final boolean isClimbDisabled = false;
+    public static final boolean isClimbDisabled = true;
 
     public static final int CLIMB_MOTOR_ID = 50;
 

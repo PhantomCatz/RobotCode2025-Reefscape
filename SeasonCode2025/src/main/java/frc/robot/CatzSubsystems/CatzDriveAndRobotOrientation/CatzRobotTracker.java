@@ -288,7 +288,7 @@ public class CatzRobotTracker {
    * Clear pose buffer
    */
   public void resetPose(Pose2d initialPose) {
-    System.out.println(initialPose.getRotation().getDegrees());
+    // System.out.println(initialPose.getRotation().getDegrees());
     estimatedPose = initialPose;
     odometryPose = initialPose;
     POSE_BUFFER.clear();

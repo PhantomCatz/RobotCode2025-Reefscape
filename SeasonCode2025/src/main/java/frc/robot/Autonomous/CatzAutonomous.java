@@ -18,6 +18,7 @@ import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Autonomous.CatzAutonomous.AutoQuestion;
 import frc.robot.Autonomous.CatzAutonomous.AutoQuestionResponse;
 import frc.robot.Autonomous.CatzAutonomous.AutoScoringOptions;
@@ -30,7 +31,6 @@ import frc.robot.Commands.DriveAndRobotOrientationCmds.TrajectoryDriveCmd;
 import frc.robot.RobotContainer;
 import frc.robot.Utilities.AllianceFlipUtil;
 import frc.robot.Utilities.JSONUtil;
-import frc.robot.Utilities.VirtualSubsystem;
 
 import java.io.File;
 import java.io.FileReader;
@@ -45,7 +45,7 @@ import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
-public class CatzAutonomous extends VirtualSubsystem {
+public class CatzAutonomous extends SubsystemBase {
   private RobotContainer m_container;
 
   // ------------------------------------------------------------------------------------------------------------
@@ -141,6 +141,7 @@ public class CatzAutonomous extends VirtualSubsystem {
 
   @Override
   public void periodic() {
+
     // Update the list of questions
     PathPlannerAuto selectedProgram = autoProgramChooser.get();
     if (selectedProgram == null
@@ -198,6 +199,7 @@ public class CatzAutonomous extends VirtualSubsystem {
 
   /** Getter for final autonomous Program */
   public Command getCommand() {
+    System.out.println("e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e " + lastProgram.getName());
     return lastProgram;
   }
 

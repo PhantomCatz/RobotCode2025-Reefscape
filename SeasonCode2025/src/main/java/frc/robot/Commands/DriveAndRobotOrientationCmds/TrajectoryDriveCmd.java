@@ -139,7 +139,14 @@ public class TrajectoryDriveCmd extends Command {
 
     hocontroller = DriveConstants.getNewHolController();
     ppHoController = DriveConstants.getNewPathFollowingController();
-    pathTimeOut = trajectory.getTotalTimeSeconds() * TIMEOUT_SCALAR; // TODO do we still need this
+    pathTimeOut = trajectory.getTotalTimeSeconds() * TIMEOUT_SCALAR; // TODO do we still need this (we don't)
+
+    for(double i = 0; i<1; i += 0.05){
+      PathPlannerTrajectoryState state = trajectory.sample(i * trajectory.getTotalTimeSeconds());
+      System.out.println("Pose: "+ state.pose);
+      System.out.println("Speeds: "+ state.fieldSpeeds);
+      System.out.println();
+    }
 
     // Reset
     PathPlannerLogging.logActivePath(usePath);
@@ -178,7 +185,7 @@ public class TrajectoryDriveCmd extends Command {
     Trajectory.State state =
         new Trajectory.State(
             currentTime,
-            goal.linearVelocity, // made the
+            goal.linearVelocity * DriveConstants.TRAJECTORY_FF_SCALAR,
             0.0, // TODO verify if this does what we want it to do
             new Pose2d(goal.pose.getTranslation(), goal.heading),
             0.0);
@@ -232,6 +239,10 @@ public class TrajectoryDriveCmd extends Command {
 
   @Override
   public void end(boolean interrupted) {
+    if(interrupted){
+      System.out.println("trajectory following was interrupted");
+    }
+
     timer.stop(); // Stop timer
     m_driveTrain.stopDriving();
     System.out.println("trajectory done");
@@ -247,9 +258,9 @@ public class TrajectoryDriveCmd extends Command {
   @Override
   public boolean isFinished() {
     // Command not intended to end
-    if (autoalign){
-      return false;
-    }
+    // if (autoalign){
+    //   return false;
+    // }
 
     // Finish command if the total time the path takes is over
     if (timer.hasElapsed(pathTimeOut) && !isEventCommandRunning){

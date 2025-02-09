@@ -84,19 +84,19 @@ public class DriveConstants {
                 Units.inchesToMeters(37),
                 Units.inchesToMeters(33),
                 Units.feetToMeters(12.16),
-                Units.feetToMeters(120.32),
-                7.93,
-                29.89);
+                Units.feetToMeters(50.32),
+                6.28,
+                12.56);
       };
 
   public static final ModuleGainsAndRatios MODULE_GAINS_AND_RATIOS =
       switch (CatzConstants.getRobotType()) {
         case SN1 ->
             new ModuleGainsAndRatios(
-                5.0,
-                0.0,
+                0.175,
+                0.125,
                 1.0 / DCMotor.getKrakenX60Foc(1).KtNMPerAmp, // A/(N*m)
-                0.2,
+                0.1,
                 0.0,
                 0.50,
                 0.005,
@@ -228,15 +228,17 @@ public class DriveConstants {
   // -----------------------------------------------------------------------------------------------------------------------------
   public static HolonomicDriveController getNewHolController() {
     return new HolonomicDriveController(
-        new PIDController(10.0, 0.0, 0.1),
-        new PIDController(10.0, 0.0, 0.1),
+        new PIDController(8.0, 0.0, 0.0),
+        new PIDController(8.0, 0.0, 0.0),
         new ProfiledPIDController(
-            5,
+            4,
             0,
             0,
             new TrapezoidProfile.Constraints(
                 DRIVE_CONFIG.maxAngularVelocity, DRIVE_CONFIG.maxAngularAcceleration)));
   }
+
+  public static final double TRAJECTORY_FF_SCALAR = 0.9;
 
   public static PathFollowingController getNewPathFollowingController() {
     return new PPHolonomicDriveController(

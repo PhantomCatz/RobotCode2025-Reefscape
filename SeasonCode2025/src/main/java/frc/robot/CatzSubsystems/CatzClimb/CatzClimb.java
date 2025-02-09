@@ -117,7 +117,7 @@ public class CatzClimb extends SubsystemBase {
 
   public void climbManual(Supplier<Double> manualSupplier) {
     position += manualSupplier.get() * MANUAL_SCALE;
-    System.out.println(position);
+    // System.out.println(position);
   }
 
   public Command ClimbManualMode(Supplier<Double> manualSupplier) {

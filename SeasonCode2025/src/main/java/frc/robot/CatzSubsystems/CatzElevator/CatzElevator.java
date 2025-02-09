@@ -167,7 +167,7 @@ public class CatzElevator extends SubsystemBase {
   }
 
   public double getCharacterizationVelocity() {
-    System.out.println(inputs.velocityRpm);
+    // System.out.println(inputs.velocityRpm);
     return inputs.velocityRpm;
   }
 

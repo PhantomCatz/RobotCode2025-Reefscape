@@ -112,7 +112,7 @@ public class ElevatorIOReal implements ElevatorIO {
 
   @Override
   public void runSetpoint(double setpointRotations, double feedforward) {
-    System.out.println(setpointRotations);
+    // System.out.println(setpointRotations);
     leaderTalon.setControl(positionControl.withPosition(setpointRotations).withFeedForward(feedforward));
   }
 
