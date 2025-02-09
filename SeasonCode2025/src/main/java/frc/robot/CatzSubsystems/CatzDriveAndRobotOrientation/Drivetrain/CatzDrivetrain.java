@@ -10,7 +10,6 @@ package frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.Drivetrain;
 import static frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.Drivetrain.DriveConstants.*;
 
 import com.ctre.phoenix6.signals.NeutralModeValue;
-import com.pathplanner.lib.pathfinding.Pathfinding;
 import com.pathplanner.lib.util.PathPlannerLogging;
 
 import edu.wpi.first.math.geometry.Pose2d;
@@ -32,7 +31,6 @@ import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.CatzRobotTracker.Od
 import frc.robot.Robot;
 import frc.robot.Utilities.Alert;
 import frc.robot.Utilities.EqualsUtil;
-import frc.robot.Utilities.LocalADStarAK;
 import frc.robot.Utilities.Swerve.AdvantageSwerveSetpoint;
 import frc.robot.Utilities.Swerve.AdvantageSwerveSetpointGenerator;
 
@@ -113,13 +111,6 @@ public class CatzDrivetrain extends SubsystemBase {
     // Swerve Setpoint Generator
     swerveSetpointGenerator = new AdvantageSwerveSetpointGenerator(DriveConstants.SWERVE_KINEMATICS, DriveConstants.MODULE_TRANSLATIONS);
 
-    // ---------------------------------------------------------------------------------
-    // Pathplanner Logging
-    // ---------------------------------------------------------------------------------
-    // Configure logging trajectories to advantage kit
-    Pathfinding.setPathfinder(new LocalADStarAK());
-
-    // PathPlanner Debug
     field = new Field2d();
     SmartDashboard.putData("Field", field);
 

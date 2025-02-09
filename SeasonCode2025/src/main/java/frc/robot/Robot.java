@@ -7,7 +7,6 @@
 
 package frc.robot;
 
-import com.pathplanner.lib.pathfinding.Pathfinding;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -25,7 +24,6 @@ import frc.robot.CatzSubsystems.CatzLEDs.CatzLED;
 import frc.robot.CatzSubsystems.CatzLEDs.CatzLED.LEDState;
 import frc.robot.Utilities.Alert;
 import frc.robot.Utilities.Alert.AlertType;
-import frc.robot.Utilities.LocalADStarAK;
 import frc.robot.Utilities.VirtualSubsystem;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -106,7 +104,6 @@ public class Robot extends LoggedRobot {
   // --------------------------------------------------------------------------------------------------------
   @Override
   public void robotInit() {
-    Pathfinding.setPathfinder(new LocalADStarAK());
     System.gc();
 
     // Record metadata

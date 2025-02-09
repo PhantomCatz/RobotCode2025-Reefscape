@@ -15,7 +15,6 @@ import java.util.function.Supplier;
 import com.pathplanner.lib.path.GoalEndState;
 import com.pathplanner.lib.path.PathPlannerPath;
 import com.pathplanner.lib.path.Waypoint;
-import com.pathplanner.lib.pathfinding.Pathfinding;
 
 import edu.wpi.first.math.Pair;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -28,6 +27,7 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.FieldConstants.Reef;
 import frc.robot.Utilities.AllianceFlipUtil;
+import frc.robot.Utilities.CornerTrackingPathfinder;
 import frc.robot.CatzSubsystems.CatzSuperstructure.LeftRight;
 import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.CatzRobotTracker;
 import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.Drivetrain.DriveConstants;
@@ -42,6 +42,7 @@ public class TeleopPosSelector {
   private final int NUM_QUEUE_DISPLAY = 4;
   private final double SELECTION_THRESHOLD = 0.3;
 
+  private CornerTrackingPathfinder pathfinder = new CornerTrackingPathfinder();
   private CatzRobotTracker tracker = CatzRobotTracker.getInstance();
   private Command currentPathfindingCommand = new InstantCommand();
   private Pair<Integer, LeftRight> currentPathfindingPair = new Pair<Integer, LeftRight>(0, LeftRight.LEFT);
@@ -156,11 +157,7 @@ public class TeleopPosSelector {
     }
 
     Translation2d robotPos = tracker.getEstimatedPose().getTranslation();
-    Pathfinding.setStartPosition(robotPos);
-    Pathfinding.setGoalPosition(goal.getTranslation());
-    PathPlannerPath path =
-        Pathfinding.getCurrentPath(
-            DriveConstants.PATHFINDING_CONSTRAINTS, new GoalEndState(0, goal.getRotation()));
+    PathPlannerPath path = pathfinder.getPath(robotPos, goal.getTranslation(), new GoalEndState(0.0, goal.getRotation()));
 
     if (path == null) {
       return new InstantCommand();
