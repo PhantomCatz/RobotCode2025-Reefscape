@@ -86,14 +86,15 @@ public class ElevatorIOReal implements ElevatorIO {
     config.MotionMagic.MotionMagicJerk = motionMagicParameters.mmJerk();
     config.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
 
+    leaderTalon.setPosition(0);
+    followerTalon.setPosition(0);
+
     leaderTalon.getConfigurator().apply(config, 1.0);
     followerTalon.getConfigurator().apply(config, 1.0);
 
     followerTalon.setControl(new Follower(leaderTalon.getDeviceID(), true));
     positionControl.EnableFOC = true;
 
-    leaderTalon.setPosition(0);
-    followerTalon.setPosition(0);
     System.out.println("Motor instat");
 
   }
@@ -134,17 +135,17 @@ public class ElevatorIOReal implements ElevatorIO {
 
 
   @Override
-  public void runSetpoint(double setpointRotations, double feedforward) {
-    // System.out.println(setpointRotations);
+  public void runSetpoint(double setpointRads, double feedforward) {
+    double setpointRotations = Units.radiansToRotations(setpointRads);
+    System.out.println(setpointRotations);
     leaderTalon.setControl(positionControl.withPosition(setpointRotations)
-                                          .withFeedForward(feedforward)
-                                          .withLimitForwardMotion(m_elevatorLimitTop.get())
-                                          .withLimitReverseMotion(m_elevatorLimitBot.get()));
+                                          .withFeedForward(feedforward));
+                                          // .withLimitForwardMotion(m_elevatorLimitTop.get())
+                                          // .withLimitReverseMotion(m_elevatorLimitBot.get()));
   }
 
   @Override
   public void setPosition(double pos) {
-    CatzElevator.position = pos;
     leaderTalon.setPosition(pos);
   }
 

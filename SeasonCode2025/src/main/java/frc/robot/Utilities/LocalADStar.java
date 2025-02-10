@@ -653,7 +653,7 @@ public class LocalADStar implements Pathfinder {
   }
 
   /**
-   * @param position The current position during pathfinding.
+   * @param targetPosition The current position during pathfinding.
    * @param corner   The corner that the position is associated with.
    * @param cornerDistancesTraveled The sum of distances from each corners that the position traveled through.
    */

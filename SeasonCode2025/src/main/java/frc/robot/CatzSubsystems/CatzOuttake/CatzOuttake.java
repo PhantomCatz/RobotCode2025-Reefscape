@@ -28,6 +28,7 @@ public class CatzOuttake extends SubsystemBase {
     ADJ_FWD,
     SCORE,
     SCORE_L1,
+    SCORE_L4,
     STOP,
     TEMP_RUN
   }
@@ -83,6 +84,9 @@ public class CatzOuttake extends SubsystemBase {
       case SCORE_L1:
         case_shootL1();
         break;
+      case SCORE_L4:
+        case_shootL4();
+        break;
       case STOP:
         io.runMotor(0,0);
         break;
@@ -104,7 +108,6 @@ public class CatzOuttake extends SubsystemBase {
   private void case_adjustInit() {
 
     io.runMotor(INTAKE_SPD, INTAKE_SPD);
-    System.out.println("uhygfdsdertyuiopiuytrdsfgyhujioiuygthfg");
     if(inputs.bbreakFrntTriggered) {
       io.runMotor(0.0, 0.0);
       intakeIterationCoutner++;
@@ -151,9 +154,18 @@ public class CatzOuttake extends SubsystemBase {
   private void case_shootL1() {
     io.runMotor(OUTTAKE_L1_LT, OUTTAKE_L1_RT);
     interationCounter++;
-    if(!inputs.bbreakFrntTriggered&& interationCounter >= 25) {
+    if(!inputs.bbreakFrntTriggered&& interationCounter >= 100) {
       interationCounter = 0;
       currentState = outtakeStates.STOP;
+    }
+  }
+
+  private void case_shootL4() {
+    io.runMotor(OUTTAKE_L4, OUTTAKE_L4);
+    interationCounter++;
+    if(!inputs.bbreakFrntTriggered && interationCounter >= 25) {
+        interationCounter = 0;
+        currentState = outtakeStates.STOP;
     }
   }
 
@@ -180,6 +192,10 @@ public class CatzOuttake extends SubsystemBase {
 
   public Command outtakeL1() {
     return runOnce(() -> currentState = outtakeStates.SCORE_L1);
+  }
+
+  public Command outtakeL4() {
+    return runOnce(() -> currentState = outtakeStates.SCORE_L4);
   }
 
   public Command stopOuttake() {

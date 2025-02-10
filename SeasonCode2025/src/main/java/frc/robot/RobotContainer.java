@@ -148,13 +148,13 @@ public class RobotContainer {
 
     // Manual Climb Control
     Trigger rightJoystickTrigger = new Trigger(
-      () -> Math.abs(xboxDrv.getRightY()) > 0.1);
-    rightJoystickTrigger.onTrue(climb.ClimbManualMode(() -> xboxDrv.getRightY()).alongWith(Commands.print("Using manual climb")));
+      () -> Math.abs(xboxTest.getRightY()) > 0.1);
+    rightJoystickTrigger.onTrue(climb.ClimbManualMode(() -> xboxTest.getRightY()).alongWith(Commands.print("Using manual climb")));
 
     // Manual Elevator Control
     Trigger leftJoystickTrigger = new Trigger(
       () -> Math.abs(xboxTest.getLeftY()) > 0.1);
-    leftJoystickTrigger.onTrue(elevator.elevatorManualMode(() -> xboxTest.getLeftY()).alongWith(Commands.print("Using manual elevator")));
+    leftJoystickTrigger.onTrue(elevator.elevatorFullManual(() -> xboxTest.getLeftY()).alongWith(Commands.print("Using manual elevator")));
 
     // Climb SetPosition Control
     xboxDrv.y().toggleOnTrue(climb.Climb_Retract().alongWith(Commands.print("pressed y")));
@@ -165,10 +165,14 @@ public class RobotContainer {
     xboxTest.leftBumper().toggleOnTrue(algaePivot.AlgaePivot_Horizontal().alongWith(Commands.print("stow")));
 
 
-    xboxTest.a().toggleOnTrue(algaePivot.AlgaePivot_Horizontal().alongWith(Commands.print("horizontal")));
-    xboxTest.b().toggleOnTrue(algaePivot.AlgaePivot_Stow().alongWith(Commands.print("stow")));
-    xboxTest.x().toggleOnTrue(algaePivot.AlgaePivot_Undisclosed().alongWith(Commands.print("??????")));
+    xboxTest.a().toggleOnTrue(elevator.Elevator_L1().alongWith(Commands.print("L1")));
+    xboxTest.b().toggleOnTrue(elevator.Elevator_L2().alongWith(Commands.print("L2")));
+    xboxTest.x().toggleOnTrue(elevator.Elevator_L3().alongWith(Commands.print("L3")));
     xboxTest.y().toggleOnTrue(elevator.Elevator_L4().alongWith(Commands.print("L4")));
+
+    xboxTest.leftTrigger().onTrue(outtake.startIntaking().alongWith(Commands.print("intake")));
+    xboxTest.rightTrigger().onTrue(outtake.startOuttake().alongWith(Commands.print("Outtaking")));
+    xboxTest.leftBumper().onTrue(outtake.outtakeL4().alongWith(Commands.print("Outtaking L4")));
 
     xboxTest.rightStick().onTrue(elevator.elevatorFullManual(()->xboxTest.getRightY()));
 

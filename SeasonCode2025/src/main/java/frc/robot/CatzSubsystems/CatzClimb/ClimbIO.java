@@ -7,7 +7,6 @@
 
 package frc.robot.CatzSubsystems.CatzClimb;
 
-import java.util.function.Supplier;
 
 import org.littletonrobotics.junction.AutoLog;
 

@@ -126,6 +126,6 @@ public class CatzClimb extends SubsystemBase {
   }
 
   public Command ClimbManualMode(Supplier<Double> manualSupplier) {
-    return run(() -> climbSemiManual(manualSupplier)).alongWith(Commands.print("hi"));
+    return run(() -> climbFullManual(manualSupplier.get())).alongWith(Commands.print("hi"));
   }
 }

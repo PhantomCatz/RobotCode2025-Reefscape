@@ -45,7 +45,7 @@ public class OuttakeIOReal implements OuttakeIO {
     globalConfig.idleMode(IdleMode.kBrake);
     globalConfig.voltageCompensation(12);
     updateConfig();
-
+    System.out.println("HELLLLO");
     beamBreakBck = new DigitalInput(BACK_BEAM_BREAK_ID);
     beamBreakFrnt = new DigitalInput(FRONT_BEAM_BREAK_ID);
   }
@@ -65,6 +65,7 @@ public class OuttakeIOReal implements OuttakeIO {
 
   @Override
   public void runMotor(double speed, double speed2) {
+    // System.out.println(speed);
     OuttakeLeftMtr.set(speed);
     OuttakeRightMtr.set(-speed2);
   }

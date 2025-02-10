@@ -9,7 +9,6 @@ package frc.robot.CatzSubsystems.CatzClimb;
 
 import static frc.robot.CatzSubsystems.CatzClimb.ClimbConstants.*;
 
-import java.util.function.Supplier;
 
 import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.StatusSignal;
