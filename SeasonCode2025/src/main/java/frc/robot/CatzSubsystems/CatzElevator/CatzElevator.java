@@ -130,7 +130,6 @@ public class CatzElevator extends SubsystemBase {
     if(DriverStation.isDisabled()) {
       io.stop();
     } else if(targetPosition != ElevatorPosition.PosManual){
-        System.out.println("setpos");
         io.runSetpoint(targetPosition.getTargetPositionRads(), elevatorFeedForward);
     } else {
       io.runSetpoint(targetManualPosition, elevatorFeedForward);

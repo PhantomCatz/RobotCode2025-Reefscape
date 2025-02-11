@@ -94,9 +94,6 @@ public class ElevatorIOReal implements ElevatorIO {
 
     followerTalon.setControl(new Follower(leaderTalon.getDeviceID(), true));
     positionControl.EnableFOC = true;
-
-    System.out.println("Motor instat");
-
   }
 
     public void updateInputs(ElevatorIOInputs inputs) {
@@ -119,15 +116,20 @@ public class ElevatorIOReal implements ElevatorIO {
                   tempCelsius.get(1))
               .isOK();
 
-      inputs.positionRads = Units.rotationsToRadians(internalPositionRotations.getValueAsDouble());
+      inputs.positionRads =       Units.rotationsToRadians(internalPositionRotations.getValueAsDouble());
       inputs.velocityRadsPerSec = Units.rotationsToRadians(velocityRps.getValueAsDouble());
-      inputs.appliedVolts =
-          appliedVoltage.stream().mapToDouble(StatusSignal::getValueAsDouble).toArray();
-      inputs.supplyCurrentAmps =
-          supplyCurrent.stream().mapToDouble(StatusSignal::getValueAsDouble).toArray();
-      inputs.torqueCurrentAmps =
-          torqueCurrent.stream().mapToDouble(StatusSignal::getValueAsDouble).toArray();
-      inputs.tempCelcius = tempCelsius.stream().mapToDouble(StatusSignal::getValueAsDouble).toArray();
+      inputs.appliedVolts =       appliedVoltage.stream()
+                                                .mapToDouble(StatusSignal::getValueAsDouble)
+                                                .toArray();
+      inputs.supplyCurrentAmps =  supplyCurrent.stream()
+                                                .mapToDouble(StatusSignal::getValueAsDouble)
+                                                .toArray();
+      inputs.torqueCurrentAmps =  torqueCurrent.stream()
+                                              .mapToDouble(StatusSignal::getValueAsDouble)
+                                              .toArray();
+      inputs.tempCelcius =        tempCelsius.stream()
+                                            .mapToDouble(StatusSignal::getValueAsDouble)
+                                            .toArray();
 
       inputs.isTopLimitSwitched = m_elevatorLimitTop.get();
       inputs.isBotLimitSwitched = m_elevatorLimitBot.get();
@@ -137,7 +139,6 @@ public class ElevatorIOReal implements ElevatorIO {
   @Override
   public void runSetpoint(double setpointRads, double feedforward) {
     double setpointRotations = Units.radiansToRotations(setpointRads);
-    System.out.println(setpointRotations);
     leaderTalon.setControl(positionControl.withPosition(setpointRotations)
                                           .withFeedForward(feedforward));
                                           // .withLimitForwardMotion(m_elevatorLimitTop.get())
