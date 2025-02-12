@@ -41,13 +41,13 @@ public class AlgaeRemoverIOReal implements AlgaeRemoverIO {
   public void updateInputs(AlgaeEffectorIOInputs inputs) {  }
 
   @Override
-  public void runMotor(double speed) {
+  public void runVolts(double speed) {
     System.out.println(speed + " ");
-    algaeRemoverMotor.set(-speed);
+    algaeRemoverMotor.setVoltage(-speed);
   }
 
   @Override
-  public void runMotorBck(double speed) {
-    algaeRemoverMotor.set(speed);
+  public void runVoltsBck(double speed) {
+    algaeRemoverMotor.setVoltage(speed);
   }
 }

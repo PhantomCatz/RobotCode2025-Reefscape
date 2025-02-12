@@ -12,6 +12,7 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import frc.robot.Robot;
 import frc.robot.RobotContainer;
 import frc.robot.CatzSubsystems.CatzAlgaeEffector.CatzAlgaeRemover.CatzAlgaeRemover;
 import frc.robot.CatzSubsystems.CatzClimb.CatzClimb;
@@ -33,7 +34,7 @@ public class CatzStateCommands {
             algae.stopAlgae(),
             outtake.stopOuttake(),
             elevator.Elevator_L1()
-        );
+        ).unless(()-> Robot.isSimulation()).alongWith(Commands.print("Stow"));
 
     }
 
@@ -57,7 +58,7 @@ public class CatzStateCommands {
             algae.stopAlgae(),
             outtake.startIntaking(),
             elevator.Elevator_L1()
-        ).alongWith(Commands.print("hello"));
+        ).unless(()-> Robot.isSimulation()).alongWith(Commands.print("Intake Coral Station"));
     }
 
     public static Command intakeAlgae(RobotContainer robotContainer) {
@@ -71,7 +72,7 @@ public class CatzStateCommands {
             algae.eatAlgae(),
             outtake.stopOuttake(),
             elevator.Elevator_L1()
-        );
+        ).unless(()-> Robot.isSimulation()).alongWith(Commands.print("intakeAlgae"));
     }
 
     public static Command L1Coral(RobotContainer robotContainer) {
@@ -85,10 +86,10 @@ public class CatzStateCommands {
             algae.stopAlgae(),
 
             new SequentialCommandGroup(
-                elevator.Elevator_L1(),
+               // elevator.Elevator_L1(),
                 outtake.outtakeL1()
             )
-        );
+        ).unless(()-> Robot.isSimulation()).alongWith(Commands.print("L1 Scoring State"));
     }
 
     public static Command L2Coral(RobotContainer robotContainer) {
@@ -103,9 +104,10 @@ public class CatzStateCommands {
 
             new SequentialCommandGroup(
                 elevator.Elevator_L2(),
+                Commands.waitUntil(() -> elevator.isElevatorInPosition()),
                 outtake.startOuttake()
             )
-        );
+        ).unless(()-> Robot.isSimulation()).alongWith(Commands.print("L2 Scoring State")).unless(()-> Robot.isSimulation());
     }
 
     public static Command L3Coral(RobotContainer robotContainer) {
@@ -120,9 +122,10 @@ public class CatzStateCommands {
 
             new SequentialCommandGroup(
                 elevator.Elevator_L3(),
+                Commands.waitUntil(() -> elevator.isElevatorInPosition()),
                 outtake.startOuttake()
             )
-        );
+        ).unless(()-> Robot.isSimulation()).alongWith(Commands.print("L3 scoring state"));
     }
 
     public static Command L4Coral(RobotContainer robotContainer) {
@@ -137,9 +140,10 @@ public class CatzStateCommands {
 
             new SequentialCommandGroup(
                 elevator.Elevator_L4(),
-                outtake.startOuttake()
+                Commands.waitUntil(() -> elevator.isElevatorInPosition()),
+                outtake.outtakeL4()
             )
-        );
+        ).unless(()-> Robot.isSimulation()).alongWith(Commands.print("L4 Scoring State"));
     }
 
     public static Command processor(RobotContainer robotContainer) {
@@ -157,7 +161,7 @@ public class CatzStateCommands {
                 algae.vomitAlgae()
 
             )
-        );
+        ).unless(()-> Robot.isSimulation()).alongWith(Commands.print("processor"));
     }
 
     public static Command botAlgae(RobotContainer robotContainer) {
@@ -172,9 +176,10 @@ public class CatzStateCommands {
 
             new SequentialCommandGroup(
                 elevator.Elevator_L2(), //TODO real height
+                Commands.waitUntil(() -> elevator.isElevatorInPosition()),
                 algae.eatAlgae()
             )
-        );
+        ).unless(()-> Robot.isSimulation()).alongWith(Commands.print("Bot Algae"));
     }
 
     public static Command topAlgae(RobotContainer robotContainer) {
@@ -189,9 +194,10 @@ public class CatzStateCommands {
 
             new SequentialCommandGroup(
                 elevator.Elevator_L3(), //TODO real height
+                Commands.waitUntil(() -> elevator.isElevatorInPosition()),
                 algae.eatAlgae()
             )
-        );
+        ).unless(()-> Robot.isSimulation()).alongWith(Commands.print("Top Algae"));
     }
 
     public static Command climb(RobotContainer robotContainer) {
@@ -207,6 +213,6 @@ public class CatzStateCommands {
                 elevator.Elevator_L1()
             ),
             climb.Climb_Full()
-        );
+        ).unless(()-> Robot.isSimulation()).alongWith(Commands.print("Climb"));
     }
 }

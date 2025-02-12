@@ -229,7 +229,15 @@ public class TrajectoryDriveCmd extends Command {
   @Override
   public void end(boolean interrupted) {
     timer.stop(); // Stop timer
-    m_driveTrain.stopDriving();
+    if(interrupted)
+    {
+      System.out.println("OH NO I GOT INTERUPTED HOW RUDE");
+    }
+    {
+      System.out.println("trajectory done");
+      m_driveTrain.stopDriving();
+    }
+
     System.out.println("trajectory done");
 
     timer.stop();

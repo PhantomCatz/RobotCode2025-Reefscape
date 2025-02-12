@@ -7,7 +7,6 @@
 
 package frc.robot;
 
-import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -133,11 +132,12 @@ public class RobotContainer {
     xboxDrv.a().onTrue(
       Commands.runOnce(
           () -> {
-            Pose2d targetPose = auto.calculateReefPos(POVReefAngle, leftRightReef);
-            currentPathfindingCommand = auto.getPathfindingCommand(targetPose);
+            currentPathfindingCommand.cancel();
+            currentPathfindingCommand = auto.getPathfindingCommand(auto.calculateReefPos(POVReefAngle, leftRightReef));
             currentPathfindingCommand.schedule();
+            System.out.println("Command path scheduled");
           }
-      )
+      , drive)
     );
     xboxDrv.a().onFalse(Commands.runOnce(() -> currentPathfindingCommand.cancel()));
 
@@ -148,9 +148,13 @@ public class RobotContainer {
 
     // Manual Climb Control
     Trigger rightJoystickTrigger = new Trigger(
-      () -> Math.abs(xboxDrv.getRightY()) > 0.1);
-    rightJoystickTrigger.onTrue(climb.ClimbManualMode(() -> xboxDrv.getRightY()).alongWith(Commands.print("Using manual climb")));
-    rightJoystickTrigger.onFalse(climb.ClimbManualMode(() -> 0.0));
+      () -> Math.abs(xboxTest.getRightY()) > 0.1);
+    rightJoystickTrigger.onTrue(climb.ClimbManualMode(() -> xboxTest.getRightY()).alongWith(Commands.print("Using manual climb")));
+
+    // Manual Elevator Control
+    Trigger leftJoystickTrigger = new Trigger(
+      () -> Math.abs(xboxTest.getLeftY()) > 0.1);
+    leftJoystickTrigger.onTrue(elevator.elevatorFullManual(() -> xboxTest.getLeftY()).alongWith(Commands.print("Using manual elevator")));
 
     // Climb SetPosition Control
     xboxDrv.y().toggleOnTrue(climb.Climb_Retract().alongWith(Commands.print("pressed y")));
@@ -166,6 +170,12 @@ public class RobotContainer {
     xboxTest.x().toggleOnTrue(elevator.Elevator_L3().alongWith(Commands.print("L3")));
     xboxTest.y().toggleOnTrue(elevator.Elevator_L4().alongWith(Commands.print("L4")));
 
+    xboxTest.leftTrigger().onTrue(outtake.startIntaking().alongWith(Commands.print("intake")));
+    xboxTest.rightTrigger().onTrue(outtake.startOuttake().alongWith(Commands.print("Outtaking")));
+    xboxTest.leftBumper().onTrue(outtake.outtakeL4().alongWith(Commands.print("Outtaking L4")));
+
+    xboxTest.rightStick().onTrue(elevator.elevatorFullManual(()->xboxTest.getRightY()));
+
     //---------------------------------------------------------------------------------------------------------------------
     // XBOX AUX
     //---------------------------------------------------------------------------------------------------------------------
@@ -179,7 +189,7 @@ public class RobotContainer {
     xboxAux.leftBumper().onTrue(Commands.runOnce(() -> superstructure.setChosenGamepiece(Gamepiece.CORAL)));
     xboxAux.rightBumper().onTrue(Commands.runOnce(() -> superstructure.setChosenGamepiece(Gamepiece.ALGAE)));
 
-    xboxAux.y().onTrue(Commands.runOnce(() -> superstructure.setCurrentRobotAction(RobotAction.OUTTAKE)).alongWith(Commands.print("OUTTAKE")));
+    xboxAux.y().onTrue(Commands.runOnce(() -> superstructure.setCurrentRobotAction(RobotAction.OUTTAKE)).alongWith(Commands.print("OUTTAKE L" + superstructure.getLevel())));
     xboxAux.x().onTrue(Commands.runOnce(() -> superstructure.setCurrentRobotAction(RobotAction.INTAKE)).alongWith(Commands.print("INTAKE")));
     xboxAux.b().onTrue(Commands.runOnce(() -> superstructure.setCurrentRobotAction(RobotAction.INTAKE_GROUND)).alongWith(Commands.print("INTAKEGROUND")));
     xboxAux.a().onTrue(Commands.runOnce(() -> superstructure.setCurrentRobotAction(RobotAction.STOW)).alongWith(Commands.print("STOWWW")));

@@ -27,7 +27,7 @@ import static frc.robot.CatzSubsystems.CatzAlgaeEffector.CatzAlgaePivot.AlgaePiv
 /** Add your docs here. */
 public class AlgaePivotIOReal implements AlgaePivotIO {
 
-  TalonFX algaePivotMotor = new TalonFX(ALGAE_PIVOT_MOTOR_ID);
+  private TalonFX algaePivotMotor = new TalonFX(ALGAE_PIVOT_MOTOR_ID);
 
 
   private final PositionVoltage positionControl = new PositionVoltage(0).withUpdateFreqHz(0.0);
@@ -59,9 +59,12 @@ public class AlgaePivotIOReal implements AlgaePivotIO {
         algaePivotTorqueCurrent,
         algaePivotTempCelsius);
 
-    config.Slot0.kP = 12.0;
-    config.Slot0.kI = 0;
-    config.Slot0.kD = 0;
+    config.Slot0.kP = gains.kP();
+    config.Slot0.kI = gains.kI();
+    config.Slot0.kD = gains.kD();
+    config.Slot0.kS = gains.kS();
+    config.Slot0.kV = gains.kV();
+    config.Slot0.kA = gains.kA();
 
     config.CurrentLimits.SupplyCurrentLimit = 80.0;
     config.CurrentLimits.SupplyCurrentLimitEnable = true;
@@ -69,9 +72,9 @@ public class AlgaePivotIOReal implements AlgaePivotIO {
     config.MotorOutput.NeutralMode = NeutralModeValue.Brake;
 
 
-    config.MotionMagic.MotionMagicCruiseVelocity = 80;
-    config.MotionMagic.MotionMagicAcceleration = 400;
-    config.MotionMagic.MotionMagicJerk = 1600;
+    config.MotionMagic.MotionMagicCruiseVelocity = motionMagicParameters.mmCruiseVelocity();
+    config.MotionMagic.MotionMagicAcceleration = motionMagicParameters.mmAcceleration();
+    config.MotionMagic.MotionMagicJerk = motionMagicParameters.mmJerk();
 
     algaePivotMotor.getConfigurator().apply(config, 1.0);
 
@@ -98,15 +101,16 @@ public class AlgaePivotIOReal implements AlgaePivotIO {
   }
 
   @Override
-  public void setPosition(double pos) // Set the motor position in mechanism rotations
-      {
+  public void setPosition(double pos) {// Set the motor position in mechanism rotations
     CatzAlgaePivot.position = pos;
-    algaePivotMotor.setControl(positionControl.withPosition(pos));
+    algaePivotMotor.setPosition(pos);
   }
 
   @Override
-  public void setPower(double power) {
-    algaePivotMotor.set(power);
+  public void runSetpoint(double setpointRotations, double feedforward) {
+    algaePivotMotor.setControl(positionControl.withPosition(setpointRotations)
+                                              .withFeedForward(feedforward));
+    System.out.println(setpointRotations);
   }
 
   @Override

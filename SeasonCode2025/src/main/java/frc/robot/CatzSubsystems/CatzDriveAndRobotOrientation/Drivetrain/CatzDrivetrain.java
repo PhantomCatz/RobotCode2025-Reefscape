@@ -33,9 +33,6 @@ import frc.robot.Robot;
 import frc.robot.Utilities.Alert;
 import frc.robot.Utilities.EqualsUtil;
 import frc.robot.Utilities.LocalADStarAK;
-import frc.robot.Utilities.Swerve.AdvantageSwerveSetpoint;
-import frc.robot.Utilities.Swerve.AdvantageSwerveSetpointGenerator;
-
 import java.util.Arrays;
 import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
@@ -62,22 +59,6 @@ public class CatzDrivetrain extends SubsystemBase {
   public final CatzSwerveModule RT_BACK_MODULE;
   public final CatzSwerveModule LT_BACK_MODULE;
   public final CatzSwerveModule LT_FRNT_MODULE;
-
-  //---------------------------------------------------------------------------------
-  //   Swerve Setpoint Generator
-  //---------------------------------------------------------------------------------
-  private AdvantageSwerveSetpoint advModuleSetpoint =
-      new AdvantageSwerveSetpoint(
-          new ChassisSpeeds(),
-          new SwerveModuleState[] {
-            new SwerveModuleState(),
-            new SwerveModuleState(),
-            new SwerveModuleState(),
-            new SwerveModuleState()
-          });
-  private final AdvantageSwerveSetpointGenerator swerveSetpointGenerator;
-
-
 
   private final Field2d field;
 
@@ -109,9 +90,6 @@ public class CatzDrivetrain extends SubsystemBase {
     m_swerveModules[INDEX_BR] = RT_BACK_MODULE;
     m_swerveModules[INDEX_BL] = LT_BACK_MODULE;
     m_swerveModules[INDEX_FL] = LT_FRNT_MODULE;
-
-    // Swerve Setpoint Generator
-    swerveSetpointGenerator = new AdvantageSwerveSetpointGenerator(DriveConstants.SWERVE_KINEMATICS, DriveConstants.MODULE_TRANSLATIONS);
 
     // ---------------------------------------------------------------------------------
     // Pathplanner Logging
@@ -157,7 +135,7 @@ public class CatzDrivetrain extends SubsystemBase {
     }
 
     pose = pose.interpolate(tracker.getEstimatedPose(), 0.05);
-    Logger.recordOutput("CatzRobotTracker/pose", pose);
+    Logger.recordOutput("CatzRobotTracker/interlated pose", pose);
 
     // -----------------------------------------------------------------------------------------------------
     // Attempt to update gyro inputs and log
