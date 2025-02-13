@@ -37,6 +37,8 @@ import frc.robot.Commands.DriveAndRobotOrientationCmds.TrajectoryDriveCmd;
 public class TeleopPosSelector extends SubsystemBase {
   private final RobotContainer m_container;
 
+  private final boolean IS_6_SIDED = false;
+
   private final CommandXboxController xboxAux;
   private final String REEFSIDE = "Reefside ";
   private final String QUEUE = "PathQueue ";
@@ -75,7 +77,8 @@ public class TeleopPosSelector extends SubsystemBase {
     }
 
     for(int side = 0; side < 6; side++){
-      SmartDashboard.putBoolean(REEFSIDE + side, side == currentlySelected.getFirst());
+      SmartDashboard.putBoolean(REEFSIDE + side + " L", side == currentlySelected.getFirst() && currentlySelected.getSecond().equals(LeftRight.LEFT));
+      SmartDashboard.putBoolean(REEFSIDE + side + " R", side == currentlySelected.getFirst() && currentlySelected.getSecond().equals(LeftRight.RIGHT));
     }
 
     for(int i = 0; i < NUM_QUEUE_DISPLAY; i++){
@@ -99,10 +102,21 @@ public class TeleopPosSelector extends SubsystemBase {
 
         //if angle is too close to 2pi, then it will return 6, but we want selected to be between 0-5 (Dr. Eric Yuchen Lu (MD)'s idea)
         int side = (int) Math.round(angle * 3.0 / Math.PI) % 6;
+        LeftRight leftRight = null;
 
-        LeftRight leftRight = LeftRight.LEFT;
-        if (xboxAux.rightBumper().getAsBoolean()){
-          leftRight = LeftRight.RIGHT;
+        if(IS_6_SIDED){
+          leftRight = LeftRight.LEFT;
+          if (xboxAux.rightBumper().getAsBoolean()){
+            leftRight = LeftRight.RIGHT;
+          }
+        }else{
+          int leftOrRight = (int) Math.ceil(angle * 6.0 / Math.PI) % 12;
+          System.out.println("side: " + leftOrRight);
+          if(x > 0){
+            leftRight = leftOrRight % 2 == 0 ? LeftRight.RIGHT : LeftRight.LEFT;
+          }else{
+            leftRight = leftOrRight % 2 == 0 ? LeftRight.LEFT : LeftRight.RIGHT;
+          }
         }
 
         return new Pair<Integer, LeftRight>(side, leftRight);
