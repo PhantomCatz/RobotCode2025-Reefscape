@@ -123,10 +123,19 @@ public class CornerTrackingPathfinder{
     List<Waypoint> waypoints = createWaypoints(findReversePath(translation2dToGridPos(start), translation2dToGridPos(end), walls), start, end, walls);
 
     if(waypoints.size() >= 2){
-      return new PathPlannerPath(waypoints, DriveConstants.PATHFINDING_CONSTRAINTS, null, goal);
+      PathPlannerPath path = new PathPlannerPath(waypoints, DriveConstants.PATHFINDING_CONSTRAINTS, null, goal);
+      return path;
     } else {
       return null;
     }
+
+    // slow
+    //[Waypoint[prevControl=null, anchor=Translation2d(X: 2.13, Y: 3.34), nextControl=Translation2d(X: 2.50, Y: 3.49)],
+    //Waypoint[prevControl=Translation2d(X: 2.68, Y: 3.57), anchor=Translation2d(X: 3.05, Y: 3.72), nextControl=null]]
+
+    // fast
+    //[Waypoint[prevControl=null, anchor=Translation2d(X: 1.84, Y: 3.25), nextControl=Translation2d(X: 2.32, Y: 3.44)],
+    //Waypoint[prevControl=Translation2d(X: 2.56, Y: 3.53), anchor=Translation2d(X: 3.05, Y: 3.72), nextControl=null]]
   }
 
   /**
@@ -138,8 +147,8 @@ public class CornerTrackingPathfinder{
     @Override
     public int compare(PathfindingPosition o1, PathfindingPosition o2) {
       return (int) Math.signum(
-        (o1.position.getDistance(o1.corner) + o1.cornerDistancesTraveled) -
-        (o2.position.getDistance(o2.corner) + o2.cornerDistancesTraveled)
+        (o1.position.getDistance(o1.corner) + o1.position.getDistance(o1.goal) + o1.cornerDistancesTraveled) -
+        (o2.position.getDistance(o2.corner) + o2.position.getDistance(o2.goal) + o2.cornerDistancesTraveled)
       );
     }
   }
@@ -158,7 +167,7 @@ public class CornerTrackingPathfinder{
     //Invisible lines that draws a line-of-sight from corners to corners, ensuring that areas with different "lastCorners" don't spill over eachother
     HashMap<GridPosition, Set<GridPosition>> ghostWalls = new HashMap<>();
 
-    frontier.add(new PathfindingPosition(start, start, 0.0));
+    frontier.add(new PathfindingPosition(start, start, goal, 0.0));
 
     //the start counts as a corner
     lastCorner.put(start, start);
@@ -201,7 +210,7 @@ public class CornerTrackingPathfinder{
           !obstacles.contains(newPos) &&
           !lastCorner.containsKey(newPos)
         ){
-          frontier.add(new PathfindingPosition(newPos, currentCorner, currentCornerDistance));
+          frontier.add(new PathfindingPosition(newPos, currentCorner, goal, currentCornerDistance));
           lastCorner.put(newPos, currentCorner);
         }
       }
@@ -226,8 +235,6 @@ public class CornerTrackingPathfinder{
     if (path.isEmpty()) {
       return new ArrayList<>();
     }
-
-    System.out.println("Path " + path);
 
     // Visualize path
     // for (int row = nodesY - 1; row >= 0; row--) {
@@ -358,5 +365,5 @@ public class CornerTrackingPathfinder{
    * @param corner   The corner that the position is associated with.
    * @param cornerDistancesTraveled The sum of distances from each corners that the position traveled through.
    */
-  public record PathfindingPosition(GridPosition position, GridPosition corner, double cornerDistancesTraveled){};
+  public record PathfindingPosition(GridPosition position, GridPosition corner, GridPosition goal, double cornerDistancesTraveled){};
 }

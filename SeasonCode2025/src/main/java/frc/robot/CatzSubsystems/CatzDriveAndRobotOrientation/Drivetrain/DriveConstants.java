@@ -74,19 +74,19 @@ public class DriveConstants {
                 .maxLinearVelocity(Units.feetToMeters(17))
                 .maxLinearAcceleration(Units.feetToMeters(120.0)) // TODO emperically calculate
                 .maxAngularVelocity(12.0) // Radians
-                .maxAngularAcceleration(6.0) // Radians // TODO verify angle constraints
+                .maxAngularAcceleration(30) // Radians // TODO verify angle constraints
                 .build();
         case SN1, SN1_2024 ->
             new DriveConfig( //TODO make the builder the same way for these configurations
                 Units.inchesToMeters(2.0),
                 Units.inchesToMeters(29.0),
                 Units.inchesToMeters(29.0),
-                Units.inchesToMeters(37),
-                Units.inchesToMeters(33),
-                Units.feetToMeters(12.16),
-                Units.feetToMeters(50.32),
-                6.28,
-                12.56);
+                Units.inchesToMeters(32),
+                Units.inchesToMeters(32),
+                Units.feetToMeters(17),
+                Units.feetToMeters(120),
+                12,
+                30);
       };
 
   public static final ModuleGainsAndRatios MODULE_GAINS_AND_RATIOS =

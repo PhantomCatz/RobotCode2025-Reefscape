@@ -201,8 +201,8 @@ public class TeleopPosSelector extends SubsystemBase {
       currentPathfindingCommand.cancel();
       currentPathfindingCommand = new TrajectoryDriveCmd(new PathPlannerPath(
         Arrays.asList(new Waypoint[] {
-          new Waypoint(currentPos.minus(direction), currentPos, currentPos.plus(direction)),
-          new Waypoint(goalPos.minus(direction), goalPos, goalPos.plus(direction))
+          new Waypoint(null, currentPos, currentPos.plus(direction)),
+          new Waypoint(goalPos.minus(direction), goalPos, null)
         }),
         DriveConstants.PATHFINDING_CONSTRAINTS,
         null,

@@ -139,14 +139,7 @@ public class TrajectoryDriveCmd extends Command {
 
     hocontroller = DriveConstants.getNewHolController();
     ppHoController = DriveConstants.getNewPathFollowingController();
-    pathTimeOut = trajectory.getTotalTimeSeconds() * TIMEOUT_SCALAR; // TODO do we still need this (we don't)
-
-    for(double i = 0; i<1; i += 0.05){
-      PathPlannerTrajectoryState state = trajectory.sample(i * trajectory.getTotalTimeSeconds());
-      System.out.println("Pose: "+ state.pose);
-      System.out.println("Speeds: "+ state.fieldSpeeds);
-      System.out.println();
-    }
+    pathTimeOut = trajectory.getTotalTimeSeconds() * TIMEOUT_SCALAR;
 
     // Reset
     PathPlannerLogging.logActivePath(usePath);
