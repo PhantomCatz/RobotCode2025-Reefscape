@@ -34,9 +34,7 @@ import frc.robot.Commands.DriveAndRobotOrientationCmds.TeleopDriveCmd;
 import frc.robot.Utilities.Alert;
 import frc.robot.Utilities.Alert.AlertType;
 import edu.wpi.first.wpilibj.Joystick;
-import edu.wpi.first.wpilibj2.command.button.Trigger;
-import edu.wpi.first.wpilibj2.command.button.JoystickButton;
-
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 import org.littletonrobotics.junction.networktables.LoggedNetworkNumber;
 
@@ -64,9 +62,10 @@ public class RobotContainer {
   // -----------------------------------------------------------------------------------------------------------------
   private CommandXboxController xboxDrv = new CommandXboxController(0);
   private CommandXboxController xboxAux = new CommandXboxController(1);
-  private CommandXboxController xboxTest = new CommandXboxController(2);
+  private CommandXboxController haute   = new CommandXboxController(2);
+  private CommandXboxController xboxTest = new CommandXboxController(3);
 
-  private TeleopPosSelector selector = new TeleopPosSelector(xboxAux, this);
+  private TeleopPosSelector selector = new TeleopPosSelector(xboxAux, haute, this);
 
   // -------------------------------------------------------------------------------------------------------------------
   // Alert Declaration
@@ -132,10 +131,10 @@ public class RobotContainer {
   //
   // ---------------------------------------------------------------------------
 
+  private int POVReefAngle = 0;
+
   private void configureBindings() {
     // Reef autopathfind
-    xboxAux.a().onTrue(Commands.runOnce(() -> selector.pathQueueAddFront(selector.getXBoxReefPos())));
-    xboxAux.y().onTrue(Commands.runOnce(() -> selector.pathQueuePopBack()));
 
     xboxDrv.b().onTrue(selector.runReefPathfindingCommand(() -> selector.getClosestReefPos()));
     xboxDrv.b().onFalse(selector.stopPathfindingCommand());
@@ -177,6 +176,9 @@ public class RobotContainer {
     // XBOX AUX
     //---------------------------------------------------------------------------------------------------------------------
     // Scoring Level Determination
+    xboxAux.a().onTrue(Commands.runOnce(() -> selector.pathQueueAddFront(selector.getXBoxReefPos())));
+    xboxAux.y().onTrue(Commands.runOnce(() -> selector.pathQueuePopBack()));
+
     xboxAux.povRight().onTrue(Commands.runOnce(()->superstructure.setLevel(1)));
     xboxAux.povUp().onTrue(Commands.runOnce(() -> superstructure.setLevel(2)));
     xboxAux.povLeft().onTrue(Commands.runOnce(() -> superstructure.setLevel(3)));
@@ -192,6 +194,24 @@ public class RobotContainer {
     xboxAux.a().onTrue(Commands.runOnce(() -> superstructure.setCurrentRobotAction(RobotAction.STOW)).alongWith(Commands.print("STOWWW")));
 
     xboxAux.a().onTrue(Commands.runOnce(() -> System.out.println("L:"+superstructure.getLevel()+", "+superstructure.getChosenGamepiece())));
+
+
+    //CUSTOM CONTROLLER
+    haute.x().onTrue(Commands.runOnce(() -> selector.pathQueueAddFront(selector.getXBoxReefPos())));
+    haute.y().onTrue(Commands.runOnce(() -> selector.pathQueuePopBack()));
+
+    haute.povUp().onTrue(Commands.runOnce(() -> POVReefAngle = 0));
+    haute.povUpLeft().onTrue(Commands.runOnce(() -> POVReefAngle = 1));
+    haute.povDownLeft().onTrue(Commands.runOnce(() -> POVReefAngle = 2));
+    haute.povDown().onTrue(Commands.runOnce(() -> POVReefAngle = 3));
+    haute.povDownRight().onTrue(Commands.runOnce(() -> POVReefAngle = 4));
+    haute.povUpRight().onTrue(Commands.runOnce(() -> POVReefAngle = 5));
+
+    haute.a().onTrue(Commands.runOnce(()->{superstructure.setLevel(1); SmartDashboard.putNumber("Reef Level", 1);}));
+    haute.b().onTrue(Commands.runOnce(() -> {superstructure.setLevel(2); SmartDashboard.putNumber("Reef Level", 2);}));
+    haute.rightTrigger().onTrue(Commands.runOnce(() -> {superstructure.setLevel(3); SmartDashboard.putNumber("Reef Level", 3);}));
+    haute.leftTrigger().onTrue(Commands.runOnce(() -> {superstructure.setLevel(4); SmartDashboard.putNumber("Reef Level", 4);}));
+
   }
 
   // ---------------------------------------------------------------------------
@@ -264,6 +284,10 @@ public class RobotContainer {
 
   public TeleopPosSelector getSelector(){
     return selector;
+  }
+
+  public int getReefAngle(){
+    return POVReefAngle;
   }
 
 }

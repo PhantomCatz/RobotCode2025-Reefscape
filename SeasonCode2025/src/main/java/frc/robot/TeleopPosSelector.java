@@ -9,6 +9,7 @@ package frc.robot;
 
 import java.util.Arrays;
 import java.util.Deque;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.function.Supplier;
 
@@ -38,8 +39,11 @@ public class TeleopPosSelector extends SubsystemBase {
   private final RobotContainer m_container;
 
   private final boolean IS_6_SIDED = false;
+  private final boolean USING_HAUTE = false;
 
   private final CommandXboxController xboxAux;
+  private final CommandXboxController haute;
+
   private final String REEFSIDE = "Reefside ";
   private final String QUEUE = "PathQueue ";
   private final int NUM_QUEUE_DISPLAY = 4;
@@ -51,14 +55,30 @@ public class TeleopPosSelector extends SubsystemBase {
   private Pair<Integer, LeftRight> currentPathfindingPair = new Pair<Integer, LeftRight>(0, LeftRight.LEFT);
   private Deque<Pair<Integer, LeftRight>> queuedPaths = new LinkedList<>();
 
-  public TeleopPosSelector(CommandXboxController aux, RobotContainer container){
+  private HashMap<String, String> poseToLetter = new HashMap<>();
+
+  public TeleopPosSelector(CommandXboxController aux, CommandXboxController haute, RobotContainer container){
       this.xboxAux = aux;
+      this.haute = haute;
       this.m_container = container;
       this.currentPathfindingCommand.addRequirements(container.getCatzDrivetrain());
+
+      poseToLetter.put("0 RIGHT", "G");
+      poseToLetter.put("0 LEFT", "H");
+      poseToLetter.put("1 RIGHT", "I");
+      poseToLetter.put("1 LEFT", "J");
+      poseToLetter.put("2 RIGHT", "L");
+      poseToLetter.put("2 LEFT", "K");
+      poseToLetter.put("3 RIGHT", "B");
+      poseToLetter.put("3 LEFT", "A");
+      poseToLetter.put("4 RIGHT", "D");
+      poseToLetter.put("4 LEFT", "C");
+      poseToLetter.put("5 RIGHT", "E");
+      poseToLetter.put("5 LEFT", "F");
   }
 
   public void pathQueueAddFront(Pair<Integer, LeftRight> pose){
-    queuedPaths.addFirst(pose);
+    queuedPaths.addLast(pose);
   }
   public Pair<Integer, LeftRight> pathQueuePeekFront(){
     return queuedPaths.peekFirst();
@@ -87,43 +107,50 @@ public class TeleopPosSelector extends SubsystemBase {
 
     int i = 0;
     for(Pair<Integer, LeftRight> pair : queuedPaths){
-      SmartDashboard.putString(QUEUE + i, pair.getFirst() + " " + pair.getSecond());
+      SmartDashboard.putString(QUEUE + i, poseToLetter.get(pair.getFirst() + " " + pair.getSecond()));
       i++;
     }
   }
 
   public Pair<Integer, LeftRight> getXBoxReefPos(){
-    final double x = -xboxAux.getLeftY();
-    final double y = -xboxAux.getLeftX();
+    int side = 0;
+    LeftRight leftRight = LeftRight.LEFT;
 
-    if(Math.hypot(x, y) > SELECTION_THRESHOLD){
-        //ensures angle is between 0-2pi (Dr. Eric Yuchen Lu (MD)'s idea)
-        double angle = (Math.atan2(y, x) + 2*Math.PI) % (2 * Math.PI);
+    if(USING_HAUTE){
+      side = m_container.getReefAngle();
 
-        //if angle is too close to 2pi, then it will return 6, but we want selected to be between 0-5 (Dr. Eric Yuchen Lu (MD)'s idea)
-        int side = (int) Math.round(angle * 3.0 / Math.PI) % 6;
-        LeftRight leftRight = null;
+      if(haute.leftBumper().getAsBoolean()){
+        leftRight = LeftRight.RIGHT;
+      }
+    }else{
+      final double x = -xboxAux.getLeftY();
+      final double y = -xboxAux.getLeftX();
 
-        if(IS_6_SIDED){
-          leftRight = LeftRight.LEFT;
-          if (xboxAux.rightBumper().getAsBoolean()){
-            leftRight = LeftRight.RIGHT;
+      if(Math.hypot(x, y) > SELECTION_THRESHOLD){
+          //ensures angle is between 0-2pi (Dr. Eric Yuchen Lu (MD)'s idea)
+          double angle = (Math.atan2(y, x) + 2*Math.PI) % (2 * Math.PI);
+
+          //if angle is too close to 2pi, then it will return 6, but we want selected to be between 0-5 (Dr. Eric Yuchen Lu (MD)'s idea)
+          side = (int) Math.round(angle * 3.0 / Math.PI) % 6;
+
+          if(IS_6_SIDED){
+            if (xboxAux.rightBumper().getAsBoolean()){
+              leftRight = LeftRight.RIGHT;
+            }
+          }else{
+            int leftOrRight = (int) Math.ceil(angle * 6.0 / Math.PI) % 12;
+            if(x > 0){
+              leftRight = leftOrRight % 2 == 0 ? LeftRight.RIGHT : LeftRight.LEFT;
+            }else{
+              leftRight = leftOrRight % 2 == 0 ? LeftRight.LEFT : LeftRight.RIGHT;
+            }
           }
         }else{
-          int leftOrRight = (int) Math.ceil(angle * 6.0 / Math.PI) % 12;
-          System.out.println("side: " + leftOrRight);
-          if(x > 0){
-            leftRight = leftOrRight % 2 == 0 ? LeftRight.RIGHT : LeftRight.LEFT;
-          }else{
-            leftRight = leftOrRight % 2 == 0 ? LeftRight.LEFT : LeftRight.RIGHT;
-          }
+          return new Pair<Integer, LeftRight>(-1, LeftRight.LEFT);
         }
-
-        return new Pair<Integer, LeftRight>(side, leftRight);
-    }else{
-        return new Pair<Integer, LeftRight>(-1, LeftRight.LEFT);
+      }
+      return new Pair<Integer, LeftRight>(side, leftRight);
     }
-  }
 
   public Pair<Integer, LeftRight> getClosestReefPos(){
     int closestSide = 0;
