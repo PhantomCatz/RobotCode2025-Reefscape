@@ -32,9 +32,19 @@ public class CatzSuperstructure extends VirtualSubsystem {
     @Getter @AutoLogOutput(key = "CatzSuperstructure/CurrentRobotAction")
     private RobotAction currentRobotAction = RobotAction.STOW;
 
+    @Getter @AutoLogOutput(key = "CatzSuperstructure/CurrentCoralState")
+    public static CoralState currentCoralState = CoralState.NOT_IN_OUTTAKE;
+
     public enum Gamepiece{
         CORAL,
         ALGAE
+    }
+
+
+    public enum CoralState{
+        IN_OUTTAKE,
+        NOT_IN_OUTTAKE,
+        CORAL_ADJUSTING
     }
 
     public enum RobotState {
@@ -176,6 +186,7 @@ public class CatzSuperstructure extends VirtualSubsystem {
         getLevel();
         getCurrentRobotState();
         getCurrentRobotAction();
+        getCurrentCoralState();
 
     }
 

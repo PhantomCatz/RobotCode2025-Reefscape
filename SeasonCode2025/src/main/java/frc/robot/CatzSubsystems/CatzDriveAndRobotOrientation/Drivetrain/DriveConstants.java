@@ -95,7 +95,7 @@ public class DriveConstants {
                 5.0,
                 0.0,
                 1.0 / DCMotor.getKrakenX60Foc(1).KtNMPerAmp, // A/(N*m)
-                0.2,
+                1.2,
                 0.0,
                 0.50,
                 0.005,
