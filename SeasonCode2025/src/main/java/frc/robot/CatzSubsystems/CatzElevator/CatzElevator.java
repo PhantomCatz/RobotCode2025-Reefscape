@@ -140,7 +140,7 @@ public class CatzElevator extends SubsystemBase {
     //----------------------------------------------------------------------------------------------------------------------------
     Logger.recordOutput("Elevator/CurrentRotations", getElevatorPositionRads());
     Logger.recordOutput("Elevator/isElevatorInPos", isElevatorInPosition());
-    Logger.recordOutput("Elevator/targetPosition", targetPosition);
+    Logger.recordOutput("Elevator/targetPosition", targetPosition.getTargetPositionRads());
 
   }
   //--------------------------------------------------------------------------------------------------------------------------

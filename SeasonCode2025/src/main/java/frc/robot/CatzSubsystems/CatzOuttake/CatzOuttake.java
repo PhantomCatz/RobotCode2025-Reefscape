@@ -12,6 +12,8 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.CatzConstants;
+import frc.robot.CatzSubsystems.CatzSuperstructure;
+import frc.robot.CatzSubsystems.CatzSuperstructure.CoralState;
 
 import org.littletonrobotics.junction.Logger;
 
@@ -108,6 +110,10 @@ public class CatzOuttake extends SubsystemBase {
   private void case_adjustInit() {
 
     io.runMotor(INTAKE_SPD, INTAKE_SPD);
+    io.runIntakesIntakeMotor(INTAKE_INTAKE_SPEED);
+
+    CatzSuperstructure.currentCoralState = CoralState.CORAL_ADJUSTING;
+
     if(inputs.bbreakFrntTriggered) {
       io.runMotor(0.0, 0.0);
       intakeIterationCoutner++;
@@ -126,36 +132,47 @@ public class CatzOuttake extends SubsystemBase {
   }
 
   private void case_adjustBack() {
+    io.runIntakesIntakeMotor(0.0);
     io.runMotor(-ADJ_SPD, -ADJ_SPD);
+
+    CatzSuperstructure.currentCoralState = CoralState.NOT_IN_OUTTAKE;
+
     if (inputs.bbreakBackTriggered) {
       currentState = outtakeStates.STOP;
+      CatzSuperstructure.currentCoralState = CoralState.IN_OUTTAKE;
       System.out.println("stopping adjbck");
 
     }
   }
 
   private void case_adjustFwd() {
+    io.runIntakesIntakeMotor(0.0);
     io.runMotor(ADJ_SPD, ADJ_SPD);
     if (!inputs.bbreakBackTriggered) {
       currentState = outtakeStates.STOP;
+      CatzSuperstructure.currentCoralState = CoralState.IN_OUTTAKE;
       System.out.println("stopping adjfwd");
     }
   }
 
 
   private void case_shoot() {
+    io.runIntakesIntakeMotor(0.0);
     io.runMotor(OUTTAKE_LT, OUTTAKE_RT);
     interationCounter++;
-    if(!inputs.bbreakFrntTriggered && interationCounter >= 25) {
+    if(!inputs.bbreakFrntTriggered && interationCounter >= 25) { //0.02s per iteration
         interationCounter = 0;
+        CatzSuperstructure.currentCoralState = CoralState.NOT_IN_OUTTAKE;
         currentState = outtakeStates.STOP;
     }
   }
   private void case_shootL1() {
+    io.runIntakesIntakeMotor(0.0);
     io.runMotor(OUTTAKE_L1_LT, OUTTAKE_L1_RT);
     interationCounter++;
     if(!inputs.bbreakFrntTriggered&& interationCounter >= 100) {
       interationCounter = 0;
+      CatzSuperstructure.currentCoralState = CoralState.NOT_IN_OUTTAKE;
       currentState = outtakeStates.STOP;
     }
   }
@@ -165,6 +182,7 @@ public class CatzOuttake extends SubsystemBase {
     interationCounter++;
     if(!inputs.bbreakFrntTriggered && interationCounter >= 25) {
         interationCounter = 0;
+        CatzSuperstructure.currentCoralState = CoralState.NOT_IN_OUTTAKE;
         currentState = outtakeStates.STOP;
     }
   }
@@ -199,6 +217,6 @@ public class CatzOuttake extends SubsystemBase {
   }
 
   public Command stopOuttake() {
-    return runOnce(() -> io.runMotor(0,0));
+    return runOnce(() -> currentState = outtakeStates.STOP);
   }
 }

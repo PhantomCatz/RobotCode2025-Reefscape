@@ -271,8 +271,8 @@ public class RobotContainer {
     return selector;
   }
 
-  public int getReefAngle(){
-    return POVReefAngle;
+  public CatzAlgaePivot getAlgaePivot(){
+    return algaePivot;
   }
 
 }
