@@ -34,7 +34,6 @@ import frc.robot.Utilities.Alert;
 import frc.robot.Utilities.Alert.AlertType;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 
-import java.lang.reflect.Field;
 
 import org.littletonrobotics.junction.networktables.LoggedNetworkNumber;
 

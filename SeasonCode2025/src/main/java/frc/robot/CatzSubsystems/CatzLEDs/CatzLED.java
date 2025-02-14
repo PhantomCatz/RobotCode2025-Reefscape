@@ -39,10 +39,10 @@ public class CatzLED extends VirtualSubsystem {
   // Robot state LED tracking
   // ----------------------------------------------------------------------------------------------
   @Getter @Setter @AutoLogOutput (key = "CatzLED/ledState")
-  public LEDState ledState = LEDState.BALLS;
+  public ControllerLEDState ledState = ControllerLEDState.BALLS;
 
 
-  public enum LEDState {
+  public enum ControllerLEDState {
     LEDmanual_none,
     LEDmanual_one,
     LEDaqua_empty,
@@ -77,7 +77,6 @@ public class CatzLED extends VirtualSubsystem {
 
   // LED PWM IDs
   private final int LEADER_LED_PWM_PORT = 2;
-  private final int LED_COUNT_HALF = 5; // TODO what does this mean
 
   // Constants
   private static final boolean paradeLeds = false;
@@ -156,9 +155,9 @@ public class CatzLED extends VirtualSubsystem {
     // -----------------------------------------------------------
     // Set LED mode
     // ----------------------------------------------------------
-    solid(Color.kBlack); // Default to off
+    setSolidElevatorColor(Color.kBlack); // Default to off
     if (estopped) {
-      solid(Color.kRed);
+      setSolidElevatorColor(Color.kRed);
       // MODE DISABLED
     } else if (DriverStation.isDisabled()) {
       if (lastEnabledAuto && Timer.getFPGATimestamp() - lastEnabledTime < autoFadeMaxTime) {
@@ -177,37 +176,37 @@ public class CatzLED extends VirtualSubsystem {
           strobe(Color.kRed, breathDuration);
         break;
         case LEDmanual_one:
-          solid(Color.kRed);
+          setSolidElevatorColor(Color.kRed);
         break;
         case LEDaqua_empty:
           strobe(Color.kBlue, breathDuration);
         break;
         case LEDaqua_full:
-          solid(Color.kBlue);
+          setSolidElevatorColor(Color.kBlue);
         break;
         case NBA_empty:
           strobe(Color.kYellow, breathDuration);
         break;
         case NBA_full:
-          solid(Color.kYellow);
+          setSolidElevatorColor(Color.kYellow);
         break;
         case BALLS:
           strobe(Color.kWhite, breathDuration);
         break;
         case TO_BALLS:
-          solid(Color.kWhite);
+          setSolidElevatorColor(Color.kWhite);
         break;
         case climb:
           rainbow(rainbowCycleLength, rainbowDuration);
         break;
         case sameBattery:
-          solid(Color.kDarkOrange);
+          setSolidElevatorColor(Color.kDarkOrange);
         break;
         case autoFinished:
-          solid(CatzConstants.CatzColorConstants.PHANTOM_SAPPHIRE);
+          setSolidElevatorColor(CatzConstants.CatzColorConstants.PHANTOM_SAPPHIRE);
         break;
         case lowBatteryAlert:
-          solid(Color.kOrange);
+          setSolidElevatorColor(Color.kOrange);
         break;
         default:
           break;
@@ -218,9 +217,17 @@ public class CatzLED extends VirtualSubsystem {
     ledStrip.setData(buffer);
   } // end of periodic()
 
-  private void solid(Color color) {
+  private void setSolidElevatorColor(Color color) {
     if (color != null) {
-      for (int i = 0; i < length; i++) {
+      for (int i = 0; i < length/2; i++) {
+        buffer.setLED(i, color);
+      }
+    }
+  }
+
+  private void setSolidCrossbarColor(Color color) {
+    if (color != null) {
+      for (int i = length/2; i < length; i++) {
         buffer.setLED(i, color);
       }
     }
@@ -234,7 +241,7 @@ public class CatzLED extends VirtualSubsystem {
 
   private void strobe(Color c1, Color c2, double duration) {
     boolean c1On = ((Timer.getFPGATimestamp() % duration) / duration) > 0.5;
-    solid(c1On ? c1 : c2);
+    setSolidElevatorColor(c1On ? c1 : c2);
   }
 
   private void strobe(Color color, double duration) {
@@ -251,7 +258,7 @@ public class CatzLED extends VirtualSubsystem {
     double red = (c1.red * (1 - ratio)) + (c2.red * ratio);
     double green = (c1.green * (1 - ratio)) + (c2.green * ratio);
     double blue = (c1.blue * (1 - ratio)) + (c2.blue * ratio);
-    solid(new Color(red, green, blue));
+    setSolidElevatorColor(new Color(red, green, blue));
   }
 
   private void rainbow(double cycleLength, double duration) {
