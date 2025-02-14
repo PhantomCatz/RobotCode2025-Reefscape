@@ -35,6 +35,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Set;
+
+
 import org.littletonrobotics.junction.Logger;
 
 /**************************************************************************************************
@@ -67,6 +69,7 @@ public class TrajectoryDriveCmd extends Command {
   private boolean atTarget = false;
   private double pathTimeOut = -999.0;
   private Timer timer = new Timer();
+  private boolean autoalign;
 
   // Event Command variables
   private final EventScheduler eventScheduler;
@@ -79,9 +82,10 @@ public class TrajectoryDriveCmd extends Command {
   // Trajectory Drive Command Constructor
   //
   // ---------------------------------------------------------------------------------------------
-  public TrajectoryDriveCmd(PathPlannerPath newPath, CatzDrivetrain drivetrain) {
+  public TrajectoryDriveCmd(PathPlannerPath newPath, CatzDrivetrain drivetrain, boolean autoalign) {
     this.path = newPath;
     this.m_driveTrain = drivetrain;
+    this.autoalign = autoalign;
     this.eventScheduler = new EventScheduler();
     addRequirements(m_driveTrain);
 
@@ -135,7 +139,7 @@ public class TrajectoryDriveCmd extends Command {
 
     hocontroller = DriveConstants.getNewHolController();
     ppHoController = DriveConstants.getNewPathFollowingController();
-    pathTimeOut = trajectory.getTotalTimeSeconds() * TIMEOUT_SCALAR; // TODO do we still need this
+    pathTimeOut = trajectory.getTotalTimeSeconds() * TIMEOUT_SCALAR;
 
     // Reset
     PathPlannerLogging.logActivePath(usePath);
@@ -174,7 +178,7 @@ public class TrajectoryDriveCmd extends Command {
     Trajectory.State state =
         new Trajectory.State(
             currentTime,
-            goal.linearVelocity, // made the
+            goal.linearVelocity * DriveConstants.TRAJECTORY_FF_SCALAR,
             0.0, // TODO verify if this does what we want it to do
             new Pose2d(goal.pose.getTranslation(), goal.heading),
             0.0);
@@ -228,6 +232,10 @@ public class TrajectoryDriveCmd extends Command {
 
   @Override
   public void end(boolean interrupted) {
+    if(interrupted){
+      System.out.println("trajectory following was interrupted");
+    }
+
     timer.stop(); // Stop timer
     if(interrupted)
     {
@@ -250,7 +258,17 @@ public class TrajectoryDriveCmd extends Command {
 
   @Override
   public boolean isFinished() {
+    // Command not intended to end
+    // if (autoalign){
+    //   return false;
+    // }
+
     // Finish command if the total time the path takes is over
+    if (timer.hasElapsed(pathTimeOut) && !isEventCommandRunning){
+      return true;
+    }
+
+    // Finish command if the robot is near goal (and if robot velocity is zero if goal velocity is zero)
     PathPlannerTrajectoryState endState = trajectory.getEndState();
 
     double currentPosX = tracker.getEstimatedPose().getX();
@@ -261,8 +279,6 @@ public class TrajectoryDriveCmd extends Command {
     double desiredPosY = endState.pose.getY();
     double desiredRotation = endState.pose.getRotation().getDegrees();
 
-    // Another condition to end trajectory. If end target velocity is zero, then only stop if the
-    // robot velocity is also near zero so it doesn't run over its target.
     double desiredMPS = trajectory.getEndState().linearVelocity;
     ChassisSpeeds currentChassisSpeeds = tracker.getRobotChassisSpeeds();
     double currentMPS =
@@ -278,12 +294,10 @@ public class TrajectoryDriveCmd extends Command {
       rotationError = 360 - rotationError;
     }
 
-    atTarget =
-        (xError < ALLOWABLE_POSE_ERROR
-            && yError < ALLOWABLE_POSE_ERROR
-            && rotationError < ALLOWABLE_ROTATION_ERROR
-            && (desiredMPS == 0 || currentMPS < ALLOWABLE_VEL_ERROR));
-
-    return atTarget || timer.hasElapsed(pathTimeOut) && !isEventCommandRunning;
+    return
+      xError < ALLOWABLE_POSE_ERROR &&
+      yError < ALLOWABLE_POSE_ERROR &&
+      rotationError < ALLOWABLE_ROTATION_ERROR &&
+      (desiredMPS == 0 || currentMPS < ALLOWABLE_VEL_ERROR);
   }
 }

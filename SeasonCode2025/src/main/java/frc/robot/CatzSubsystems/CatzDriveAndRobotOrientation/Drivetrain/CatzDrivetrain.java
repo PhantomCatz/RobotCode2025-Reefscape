@@ -10,7 +10,6 @@ package frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.Drivetrain;
 import static frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.Drivetrain.DriveConstants.*;
 
 import com.ctre.phoenix6.signals.NeutralModeValue;
-import com.pathplanner.lib.pathfinding.Pathfinding;
 import com.pathplanner.lib.util.PathPlannerLogging;
 
 import edu.wpi.first.math.geometry.Pose2d;
@@ -32,7 +31,7 @@ import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.CatzRobotTracker.Od
 import frc.robot.Robot;
 import frc.robot.Utilities.Alert;
 import frc.robot.Utilities.EqualsUtil;
-import frc.robot.Utilities.LocalADStarAK;
+
 import java.util.Arrays;
 import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
@@ -91,13 +90,7 @@ public class CatzDrivetrain extends SubsystemBase {
     m_swerveModules[INDEX_BL] = LT_BACK_MODULE;
     m_swerveModules[INDEX_FL] = LT_FRNT_MODULE;
 
-    // ---------------------------------------------------------------------------------
-    // Pathplanner Logging
-    // ---------------------------------------------------------------------------------
-    // Configure logging trajectories to advantage kit
-    Pathfinding.setPathfinder(new LocalADStarAK());
 
-    // PathPlanner Debug
     field = new Field2d();
     SmartDashboard.putData("Field", field);
 

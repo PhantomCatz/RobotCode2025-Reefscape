@@ -73,29 +73,29 @@ public class DriveConstants {
                 .maxLinearVelocity(Units.feetToMeters(17))
                 .maxLinearAcceleration(Units.feetToMeters(120.0)) // TODO emperically calculate
                 .maxAngularVelocity(12.0) // Radians
-                .maxAngularAcceleration(6.0) // Radians // TODO verify angle constraints
+                .maxAngularAcceleration(30) // Radians // TODO verify angle constraints
                 .build();
         case SN1, SN1_2024 ->
             new DriveConfig( //TODO make the builder the same way for these configurations
                 Units.inchesToMeters(2.0),
                 Units.inchesToMeters(29.0),
                 Units.inchesToMeters(29.0),
-                Units.inchesToMeters(37),
-                Units.inchesToMeters(33),
-                Units.feetToMeters(12.16),
-                Units.feetToMeters(120.32),
-                7.93,
-                29.89);
+                Units.inchesToMeters(32),
+                Units.inchesToMeters(32),
+                Units.feetToMeters(17),
+                Units.feetToMeters(120),
+                12,
+                30);
       };
 
   public static final ModuleGainsAndRatios MODULE_GAINS_AND_RATIOS =
       switch (CatzConstants.getRobotType()) {
         case SN1 ->
             new ModuleGainsAndRatios(
-                5.0,
-                0.0,
+                0.175,
+                0.125,
                 1.0 / DCMotor.getKrakenX60Foc(1).KtNMPerAmp, // A/(N*m)
-                0.2,
+                0.1,
                 0.0,
                 0.50,
                 0.005,
@@ -223,15 +223,17 @@ public class DriveConstants {
   // -----------------------------------------------------------------------------------------------------------------------------
   public static HolonomicDriveController getNewHolController() {
     return new HolonomicDriveController(
-        new PIDController(10.0, 0.0, 0.1),
-        new PIDController(10.0, 0.0, 0.1),
+        new PIDController(8.0, 0.0, 0.0),
+        new PIDController(8.0, 0.0, 0.0),
         new ProfiledPIDController(
-            5,
+            4,
             0,
             0,
             new TrapezoidProfile.Constraints(
                 DRIVE_CONFIG.maxAngularVelocity, DRIVE_CONFIG.maxAngularAcceleration)));
   }
+
+  public static final double TRAJECTORY_FF_SCALAR = 0.9;
 
   public static PathFollowingController getNewPathFollowingController() {
     return new PPHolonomicDriveController(

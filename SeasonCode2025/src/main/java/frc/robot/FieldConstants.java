@@ -53,11 +53,16 @@ public class FieldConstants {
   }
 
   public static class Reef {
-    public static final Translation2d center        = new Translation2d(Units.inchesToMeters(176.746), Units.inchesToMeters(158.501));
-    public static final double faceToZoneLine       = Units.inchesToMeters(12); // Side of the reef to the inside of the reef zone line
-    public static final double scoringDistance      = Units.inchesToMeters(24); // Scoring distance from the side of the reef
-    public static final double reefOrthogonalRadius = Units.inchesToMeters(32.743); // Distance from the center to the side of the reef
-    public static final double leftRightDistance    = Units.inchesToMeters(12); // Center of each face to the left and right sides of each face
+    public static final Translation2d center =
+        new Translation2d(Units.inchesToMeters(176.746), Units.inchesToMeters(158.501));
+    public static final double faceToZoneLine =
+        Units.inchesToMeters(12); // Side of the reef to the inside of the reef zone line
+    public static final double scoringDistance =
+        Units.inchesToMeters(24); // Scoring distance from the side of the reef
+    public static final double reefOrthogonalRadius =
+        Units.inchesToMeters(32.743); // Distance from the center to the side of the reef
+    public static final double leftRightDistance =
+        Units.inchesToMeters(12); // Center of each face to the left and right scoring positions of each face
   }
 
   public static class StagingPositions {

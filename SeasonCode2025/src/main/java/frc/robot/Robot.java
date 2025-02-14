@@ -7,8 +7,9 @@
 
 package frc.robot;
 
-import com.pathplanner.lib.pathfinding.Pathfinding;
 
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.RobotController;
@@ -17,10 +18,12 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import frc.robot.CatzConstants.RobotHardwareMode;
 import frc.robot.CatzConstants.RobotID;
+import frc.robot.FieldConstants.Reef;
+import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.CatzRobotTracker;
 import frc.robot.CatzSubsystems.CatzLEDs.CatzLED;
+import frc.robot.CatzSubsystems.CatzLEDs.CatzLED.ControllerLEDState;
 import frc.robot.Utilities.Alert;
 import frc.robot.Utilities.Alert.AlertType;
-import frc.robot.Utilities.LocalADStarAK;
 import frc.robot.Utilities.VirtualSubsystem;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -101,7 +104,6 @@ public class Robot extends LoggedRobot {
   // --------------------------------------------------------------------------------------------------------
   @Override
   public void robotInit() {
-    Pathfinding.setPathfinder(new LocalADStarAK());
     System.gc();
 
     // Record metadata
@@ -244,7 +246,7 @@ public class Robot extends LoggedRobot {
               "*** Auto cancelled in %.2f secs ***%n", Timer.getFPGATimestamp() - autoStart);
         }
         autoMessagePrinted = true;
-        CatzLED.getInstance().autoFinished = true;
+        CatzLED.getInstance().ledState = ControllerLEDState.autoFinished;
         CatzLED.getInstance().autoFinishedTime = Timer.getFPGATimestamp();
       }
     }
@@ -281,7 +283,7 @@ public class Robot extends LoggedRobot {
     if (RobotController.getBatteryVoltage() <= LOW_BATTERY_VOLTAGE
         && DISABLED_TIMER.hasElapsed(LOW_BATTERY_DISABLED_TIME)) {
       LOW_BATTERY_ALERT.set(true);
-      CatzLED.getInstance().lowBatteryAlert = true;
+      CatzLED.getInstance().ledState = ControllerLEDState.lowBatteryAlert;
     }
   }
 
@@ -363,7 +365,8 @@ public class Robot extends LoggedRobot {
     teleStart = Timer.getFPGATimestamp();
     //CatzRobotTracker.getInstance().resetPose(m_robotContainer.getAutonomous().calculateReefPos(2, LeftRight.LEFT));
 
-    //CatzRobotTracker.getInstance().resetPose(new Pose2d(Reef.center, Rotation2d.kZero));
+    System.out.println("resetstsetserweset");
+    CatzRobotTracker.getInstance().resetPose(new Pose2d(Reef.center, Rotation2d.kZero));
 
   }
 
@@ -371,6 +374,7 @@ public class Robot extends LoggedRobot {
   public void teleopPeriodic() {
 
     teleElapsedTime = Timer.getFPGATimestamp() - teleStart;
+    m_robotContainer.getSelector().updateCurrentlySelected();
 
   }
 

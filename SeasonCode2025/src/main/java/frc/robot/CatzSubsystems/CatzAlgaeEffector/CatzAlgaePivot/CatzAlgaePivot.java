@@ -117,7 +117,7 @@ public class CatzAlgaePivot extends SubsystemBase {
 
   public void setAlgaePivotPos(Position target) {
     position = target.getTargetMotionPosition();
-    System.out.println(position);
+    // System.out.println(position);
     isManual = false;
   }
 

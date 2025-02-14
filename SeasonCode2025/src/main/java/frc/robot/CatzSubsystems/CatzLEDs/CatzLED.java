@@ -15,11 +15,15 @@ import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.Notifier;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.util.Color;
-import frc.robot.CatzConstants.CatzColorConstants;
+import frc.robot.CatzConstants;
 import frc.robot.Utilities.VirtualSubsystem;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.util.List;
 import java.util.Optional;
+
+import org.littletonrobotics.junction.AutoLogOutput;
 
 public class CatzLED extends VirtualSubsystem {
   private static CatzLED instance = null;
@@ -34,30 +38,30 @@ public class CatzLED extends VirtualSubsystem {
   // ----------------------------------------------------------------------------------------------
   // Robot state LED tracking
   // ----------------------------------------------------------------------------------------------
+  @Getter @Setter @AutoLogOutput (key = "CatzLED/ledState")
+  public ControllerLEDState ledState = ControllerLEDState.BALLS;
+
+
+  public enum ControllerLEDState {
+    LEDmanual_none,
+    LEDmanual_one,
+    LEDaqua_empty,
+    LEDaqua_full,
+    NBA_empty,
+    NBA_full,
+    BALLS,
+    TO_BALLS,
+    climb,
+    endgameAlert,
+    sameBattery,
+    autoFinished,
+    lowBatteryAlert
+  }
+
+  public double autoFinishedTime = 0.0;
   // MISC
+
   public int loopCycleCount = 0;
-  public boolean boost = false;
-  public boolean intaking = false;
-  public boolean hasCoral = false;
-  public boolean hasAlgae = false;
-
-  // Main Driver LED States
-  public boolean isCoral = false;
-  public boolean isAlgae = false;
-  public boolean isHoarding = false;
-  public boolean isClimbing = false;
-
-  // Extra Driver LED States
-  public boolean trapping = false;
-  public boolean autoDrive = false;
-
-  // MISC LED states
-  public boolean endgameAlert = false;
-  public boolean sameBattery = false;
-  public boolean autoFinished = false;
-  public double  autoFinishedTime = 0.0;
-  public boolean lowBatteryAlert = false;
-  public boolean demoMode = false;
 
   private Optional<Alliance> alliance = Optional.empty();
   private Color allianceColor = Color.kPurple;
@@ -73,7 +77,6 @@ public class CatzLED extends VirtualSubsystem {
 
   // LED PWM IDs
   private final int LEADER_LED_PWM_PORT = 2;
-  private final int LED_COUNT_HALF = 5; // TODO what does this mean
 
   // Constants
   private static final boolean paradeLeds = false;
@@ -90,6 +93,8 @@ public class CatzLED extends VirtualSubsystem {
   private static final double waveAllianceDuration = 2.0;
   private static final double autoFadeTime = 2.5; // 3s nominal
   private static final double autoFadeMaxTime = 5.0; // Return to normal
+
+
 
   private CatzLED() {
     ledStrip = new AddressableLED(LEADER_LED_PWM_PORT);
@@ -112,6 +117,9 @@ public class CatzLED extends VirtualSubsystem {
 
   @Override
   public void periodic() {
+
+
+
     // Update alliance color
     if (DriverStation.isDSAttached()) {
       alliance = DriverStation.getAlliance();
@@ -124,7 +132,7 @@ public class CatzLED extends VirtualSubsystem {
 
     // Update auto state
     if (DriverStation.isDisabled()) {
-      autoFinished = false;
+      // autoFinished = false;
     } else {
       lastEnabledAuto = DriverStation.isAutonomous();
       lastEnabledTime = Timer.getFPGATimestamp();
@@ -147,56 +155,61 @@ public class CatzLED extends VirtualSubsystem {
     // -----------------------------------------------------------
     // Set LED mode
     // ----------------------------------------------------------
-    solid(Color.kBlack); // Default to off
+    setSolidElevatorColor(Color.kBlack); // Default to off
     if (estopped) {
-      solid(Color.kRed);
+      setSolidElevatorColor(Color.kRed);
       // MODE DISABLED
     } else if (DriverStation.isDisabled()) {
       if (lastEnabledAuto && Timer.getFPGATimestamp() - lastEnabledTime < autoFadeMaxTime) {
         // Auto fade
         solid(1.0 - ((Timer.getFPGATimestamp() - lastEnabledTime) / autoFadeTime), Color.kGreen);
-      } else if (lowBatteryAlert) {
-        // Low battery
-        solid(Color.kOrangeRed);
-      } else if (paradeLeds) {
-        // TODO add parade led pattern
-      } else {
-        // Default pattern
-        wave(allianceColor, secondaryDisabledColor, waveAllianceCycleLength, waveAllianceDuration);
-      }
-
-      // Same battery alert //TODO add battery alert
-      if (sameBattery) {
-        breath(Color.kRed, Color.kBlack);
       }
 
       // MODE AUTON
     } else if (DriverStation.isAutonomous()) {
       wave(Color.kGold, Color.kDarkBlue, waveFastCycleLength, waveFastDuration);
-      if (autoFinished) {
-        double fullTime = (double) length / waveFastCycleLength * waveFastDuration;
-        solid((Timer.getFPGATimestamp() - autoFinishedTime) / fullTime, Color.kGreen);
-      }
       // MODE ENABLED
     } else {
-      wave(
-          CatzColorConstants.PHANTOM_SAPPHIRE,
-          Color.kWhite,
-          waveAllianceCycleLength,
-          waveAllianceDuration);
 
-      if (trapping || isClimbing || autoDrive || isCoral) {
-        rainbow(rainbowCycleLength, rainbowDuration);
-      } else if (isHoarding) {
-        wave(Color.kBlack, Color.kPurple, waveAllianceCycleLength, waveAllianceDuration);
-      } else if (hasCoral) {
-        solid(Color.kGreen);
-      } else if (hasAlgae) {
-        solid(Color.kOrange);
-      }
-
-      if (endgameAlert) {
-        strobe(Color.kRed, Color.kGold, strobeDuration);
+      switch(ledState) {
+        case LEDmanual_none:
+          strobe(Color.kRed, breathDuration);
+        break;
+        case LEDmanual_one:
+          setSolidElevatorColor(Color.kRed);
+        break;
+        case LEDaqua_empty:
+          strobe(Color.kBlue, breathDuration);
+        break;
+        case LEDaqua_full:
+          setSolidElevatorColor(Color.kBlue);
+        break;
+        case NBA_empty:
+          strobe(Color.kYellow, breathDuration);
+        break;
+        case NBA_full:
+          setSolidElevatorColor(Color.kYellow);
+        break;
+        case BALLS:
+          strobe(Color.kWhite, breathDuration);
+        break;
+        case TO_BALLS:
+          setSolidElevatorColor(Color.kWhite);
+        break;
+        case climb:
+          rainbow(rainbowCycleLength, rainbowDuration);
+        break;
+        case sameBattery:
+          setSolidElevatorColor(Color.kDarkOrange);
+        break;
+        case autoFinished:
+          setSolidElevatorColor(CatzConstants.CatzColorConstants.PHANTOM_SAPPHIRE);
+        break;
+        case lowBatteryAlert:
+          setSolidElevatorColor(Color.kOrange);
+        break;
+        default:
+          break;
       }
     }
 
@@ -204,9 +217,17 @@ public class CatzLED extends VirtualSubsystem {
     ledStrip.setData(buffer);
   } // end of periodic()
 
-  private void solid(Color color) {
+  private void setSolidElevatorColor(Color color) {
     if (color != null) {
-      for (int i = 0; i < length; i++) {
+      for (int i = 0; i < length/2; i++) {
+        buffer.setLED(i, color);
+      }
+    }
+  }
+
+  private void setSolidCrossbarColor(Color color) {
+    if (color != null) {
+      for (int i = length/2; i < length; i++) {
         buffer.setLED(i, color);
       }
     }
@@ -220,7 +241,7 @@ public class CatzLED extends VirtualSubsystem {
 
   private void strobe(Color c1, Color c2, double duration) {
     boolean c1On = ((Timer.getFPGATimestamp() % duration) / duration) > 0.5;
-    solid(c1On ? c1 : c2);
+    setSolidElevatorColor(c1On ? c1 : c2);
   }
 
   private void strobe(Color color, double duration) {
@@ -237,7 +258,7 @@ public class CatzLED extends VirtualSubsystem {
     double red = (c1.red * (1 - ratio)) + (c2.red * ratio);
     double green = (c1.green * (1 - ratio)) + (c2.green * ratio);
     double blue = (c1.blue * (1 - ratio)) + (c2.blue * ratio);
-    solid(new Color(red, green, blue));
+    setSolidElevatorColor(new Color(red, green, blue));
   }
 
   private void rainbow(double cycleLength, double duration) {
