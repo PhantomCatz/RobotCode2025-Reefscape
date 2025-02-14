@@ -165,8 +165,6 @@ public class RobotContainer {
     // XBOX AUX
     //---------------------------------------------------------------------------------------------------------------------
     // Reef autopathfind
-    xboxAux.a().onTrue(Commands.runOnce(() -> selector.pathQueueAddFront(selector.getXBoxReefPos(), superstructure.getLevel())));
-    xboxAux.y().onTrue(Commands.runOnce(() -> selector.pathQueuePopBack()));
 
     // Scoring Level Determination
     xboxAux.rightTrigger().onTrue(Commands.runOnce(() -> selector.pathQueueAddBack(selector.getXBoxReefPos(), superstructure.getLevel())));

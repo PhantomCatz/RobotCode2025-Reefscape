@@ -90,7 +90,11 @@ public class TeleopPosSelector extends SubsystemBase {
   }
 
   public Pair<Pair<Integer, LeftRight>,Integer> pathQueuePeekFront() {
-    return queuedPaths.peekFirst();
+    if(queuedPaths.peekFirst() != null){
+      return queuedPaths.peekFirst();
+    }else{
+      return new Pair(new Pair(null,null), 0);
+    }
   }
 
   public void pathQueuePopFront() {

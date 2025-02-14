@@ -120,7 +120,13 @@ public class CornerTrackingPathfinder{
   }
 
   public PathPlannerPath getPath(Translation2d start, Translation2d end, GoalEndState goal){
-    List<Waypoint> waypoints = createWaypoints(findReversePath(translation2dToGridPos(start), translation2dToGridPos(end), walls), start, end, walls);
+    List<Waypoint> waypoints = createWaypoints(
+      findReversePath(
+        findClosestNonObstacle(translation2dToGridPos(start), walls),
+        findClosestNonObstacle(translation2dToGridPos(end), walls),
+        walls
+      ),
+    start, end, walls);
 
     if(waypoints.size() >= 2){
       PathPlannerPath path = new PathPlannerPath(waypoints, DriveConstants.PATHFINDING_CONSTRAINTS, null, goal);
@@ -153,6 +159,7 @@ public class CornerTrackingPathfinder{
     }
   }
 
+
   private List<GridPosition> findReversePath(GridPosition start, GridPosition goal, Set<GridPosition> obstacles) {
     if (goal.equals(start)) {
       return new ArrayList<>();
@@ -179,6 +186,7 @@ public class CornerTrackingPathfinder{
       GridPosition currentCorner = currentPathfindingPos.corner;
       double currentCornerDistance = currentPathfindingPos.cornerDistancesTraveled;
       if(currentPos.compareTo(goal) == 0){
+        System.out.println("GOALLLL!" + lastCorner.size());
         break;
       }
 
@@ -190,7 +198,7 @@ public class CornerTrackingPathfinder{
 
         //If the angle between the imaginary slope and a vector extruding diagonally from the corner (length sqrt2) is greater than 135 degrees, ignore the corner
         //The angle is measured using dot products
-        if (diagonalIndex != -1 && DIAGONAL[diagonalIndex].getX() * slope.getX() + DIAGONAL[diagonalIndex].getY() * slope.getY() > - slope.getNorm()){
+        if (diagonalIndex != -1 && DIAGONAL[diagonalIndex].getX() * slope.getX() + DIAGONAL[diagonalIndex].getY() * slope.getY() >= - slope.getNorm()){
           ghostWalls.get(currentCorner).addAll(getCellsOnLine(currentPos, slope, obstacles));
           ghostWalls.put(currentPos, new HashSet<>());
 
@@ -216,6 +224,22 @@ public class CornerTrackingPathfinder{
       }
     }
 
+    // Visualize path
+    // for (int row = nodesY - 1; row >= 0; row--) {
+    //   for (int col = 0; col < nodesX; col++) {
+    //     if (obstacles.contains(new GridPosition(col, row))){
+    //       System.out.print("#");
+    //     }
+    //     else if (lastCorner.keySet().contains(new GridPosition(col, row))){
+    //       System.out.print("+");
+    //     }
+    //     else {
+    //       System.out.print("_");
+    //     }
+    //   }
+    //   System.out.println();
+    // }
+
     //either a path was found (or wasn't found)
     //retrace the path backwards by going through the corners that this path visited.
     List<GridPosition> path = new ArrayList<>();
@@ -235,22 +259,6 @@ public class CornerTrackingPathfinder{
     if (path.isEmpty()) {
       return new ArrayList<>();
     }
-
-    // Visualize path
-    // for (int row = nodesY - 1; row >= 0; row--) {
-    //   for (int col = 0; col < nodesX; col++) {
-    //     if (obstacles.contains(new GridPosition(col, row))){
-    //       System.out.print("#");
-    //     }
-    //     else if (path.contains(new GridPosition(col, row))){
-    //       System.out.print("+");
-    //     }
-    //     else {
-    //       System.out.print("_");
-    //     }
-    //   }
-    //   System.out.println();
-    // }
 
     List<Translation2d> fieldPosPath = new ArrayList<>();
     fieldPosPath.add(realStartPos);
@@ -319,6 +327,32 @@ public class CornerTrackingPathfinder{
     return onLine;
   }
 
+  private GridPosition findClosestNonObstacle(GridPosition pos, Set<GridPosition> obstacles) {
+    if (!obstacles.contains(pos)) {
+      return pos;
+    }
+
+    Set<GridPosition> visited = new HashSet<>();
+    Queue<GridPosition> frontier = new LinkedList<>();
+    frontier.add(pos);
+
+    while (!frontier.isEmpty()) {
+      GridPosition currentPos = frontier.poll();
+      if (!obstacles.contains(currentPos)) {
+        return currentPos;
+      }
+      visited.add(currentPos);
+
+      for(GridPosition dxy: ADJACENT){
+        GridPosition newPos = currentPos.add(dxy);
+        if (!visited.contains(newPos)) {
+          frontier.add(newPos);
+        }
+      }
+    }
+    return null;
+  }
+
   private Translation2d gridPosToTranslation2d(GridPosition pos) {
     return new Translation2d(pos.x * nodeSize, pos.y * nodeSize);
   }
@@ -363,6 +397,7 @@ public class CornerTrackingPathfinder{
   /**
    * @param position The current position during pathfinding.
    * @param corner   The corner that the position is associated with.
+   * @param goal goal
    * @param cornerDistancesTraveled The sum of distances from each corners that the position traveled through.
    */
   public record PathfindingPosition(GridPosition position, GridPosition corner, GridPosition goal, double cornerDistancesTraveled){};
