@@ -13,7 +13,6 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
-import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Autonomous.CatzAutonomous;
 import frc.robot.CatzSubsystems.CatzSuperstructure;
@@ -33,10 +32,9 @@ import frc.robot.CatzSubsystems.CatzOuttake.CatzOuttake;
 import frc.robot.Commands.DriveAndRobotOrientationCmds.TeleopDriveCmd;
 import frc.robot.Utilities.Alert;
 import frc.robot.Utilities.Alert.AlertType;
-import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
-import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 
+import java.lang.reflect.Field;
 
 import org.littletonrobotics.junction.networktables.LoggedNetworkNumber;
 
@@ -81,24 +79,6 @@ public class RobotContainer {
   // ---------------------------------------------------------------------------------------------------------------------
   private CatzAutonomous auto = new CatzAutonomous(this);
 
-  // -------------------------------------------------------------------------------------------------------------------
-  // ReefJoystickButton
-  // ---------------------------------------------------------------------------------------------------------------------
-  private final Joystick reefTargetingSystem = new Joystick(2);
-
-  private final JoystickButton alphaButton = new JoystickButton(reefTargetingSystem, 1);
-  private final JoystickButton bravoButton = new JoystickButton(reefTargetingSystem, 2);
-  private final JoystickButton charlieButton = new JoystickButton(reefTargetingSystem, 3);
-  private final JoystickButton deltaButton = new JoystickButton(reefTargetingSystem, 4);
-  private final JoystickButton echoButton = new JoystickButton(reefTargetingSystem, 5);
-  private final JoystickButton foxtrotButton = new JoystickButton(reefTargetingSystem, 6);
-  private final JoystickButton golfButton = new JoystickButton(reefTargetingSystem, 7);
-  private final JoystickButton hotelButton = new JoystickButton(reefTargetingSystem, 8);
-  private final JoystickButton indiaButton = new JoystickButton(reefTargetingSystem, 9);
-  private final JoystickButton julietButton = new JoystickButton(reefTargetingSystem, 10);
-  private final JoystickButton kiloButton = new JoystickButton(reefTargetingSystem, 11);
-  private final JoystickButton limaButton = new JoystickButton(reefTargetingSystem, 12);
-
   public RobotContainer() {
     // Drive And Aux Command Mapping
     configureBindings();
@@ -133,10 +113,10 @@ public class RobotContainer {
   // ---------------------------------------------------------------------------
 
   private void configureBindings() {
+    //---------------------------------------------------------------------------------------------------------------------
+    // XBOX Drive
+    //---------------------------------------------------------------------------------------------------------------------
     // Reef autopathfind
-    xboxAux.a().onTrue(Commands.runOnce(() -> selector.pathQueueAddFront(selector.getXBoxReefPos())));
-    xboxAux.y().onTrue(Commands.runOnce(() -> selector.pathQueuePopBack()));
-
     xboxDrv.b().onTrue(selector.runReefPathfindingCommand(() -> selector.getClosestReefPos()));
     xboxDrv.b().onFalse(selector.stopPathfindingCommand());
 
@@ -150,6 +130,14 @@ public class RobotContainer {
 
     xboxDrv.rightBumper().onTrue(selector.runLeftRightCommand(LeftRight.RIGHT));
     xboxDrv.rightBumper().onFalse(selector.stopPathfindingCommand());
+
+    xboxDrv.rightTrigger().onTrue(selector.runCoralStationPathFindingCommand(()-> FieldConstants.CoralStation.rightCenterFace));
+    xboxDrv.rightTrigger().onFalse(selector.stopPathfindingCommand());
+
+    xboxDrv.leftTrigger().onTrue(selector.runCoralStationPathFindingCommand(()-> FieldConstants.CoralStation.leftCenterFace));
+    xboxDrv.leftTrigger().onFalse(selector.stopPathfindingCommand());
+
+    xboxDrv.rightTrigger().and(xboxDrv.leftTrigger()).onTrue(selector.stopPathfindingCommand());
 
     // Default driving
     drive.setDefaultCommand(new TeleopDriveCmd(() -> xboxDrv.getLeftX(), () -> xboxDrv.getLeftY(), () -> xboxDrv.getRightX(), drive));
@@ -176,6 +164,10 @@ public class RobotContainer {
     //---------------------------------------------------------------------------------------------------------------------
     // XBOX AUX
     //---------------------------------------------------------------------------------------------------------------------
+    // Reef autopathfind
+    xboxAux.a().onTrue(Commands.runOnce(() -> selector.pathQueueAddFront(selector.getXBoxReefPos())));
+    xboxAux.y().onTrue(Commands.runOnce(() -> selector.pathQueuePopBack()));
+
     // Scoring Level Determination
     xboxAux.povRight().onTrue(Commands.runOnce(()->superstructure.setLevel(1)));
     xboxAux.povUp().onTrue(Commands.runOnce(() -> superstructure.setLevel(2)));

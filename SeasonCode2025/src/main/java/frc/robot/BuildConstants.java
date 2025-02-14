@@ -7,12 +7,12 @@ public final class BuildConstants {
   public static final String MAVEN_GROUP = "";
   public static final String MAVEN_NAME = "SeasonCode2025";
   public static final String VERSION = "unspecified";
-  public static final int GIT_REVISION = 174;
-  public static final String GIT_SHA = "ddae531cd46dbed04410c1036f57e1e0b4b54537";
-  public static final String GIT_DATE = "2025-02-12 19:45:26 EST";
-  public static final String GIT_BRANCH = "Feature/KanAcademyButtonMap";
-  public static final String BUILD_DATE = "2025-02-12 21:15:05 EST";
-  public static final long BUILD_UNIX_TIME = 1739412905880L;
+  public static final int GIT_REVISION = 175;
+  public static final String GIT_SHA = "cf3b6e06246d82419a995ff8a424995f2551815f";
+  public static final String GIT_DATE = "2025-02-12 21:24:24 EST";
+  public static final String GIT_BRANCH = "fixdoubletap";
+  public static final String BUILD_DATE = "2025-02-14 02:14:49 EST";
+  public static final long BUILD_UNIX_TIME = 1739517289664L;
   public static final int DIRTY = 1;
 
   private BuildConstants(){}

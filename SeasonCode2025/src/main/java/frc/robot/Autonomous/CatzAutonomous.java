@@ -13,15 +13,15 @@ import com.pathplanner.lib.commands.PathPlannerAuto;
 import com.pathplanner.lib.path.PathPlannerPath;
 import com.pathplanner.lib.util.FileVersionException;
 
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.PrintCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.Autonomous.CatzAutonomous.AutoQuestion;
-import frc.robot.Autonomous.CatzAutonomous.AutoQuestionResponse;
-import frc.robot.Autonomous.CatzAutonomous.AutoScoringOptions;
 import frc.robot.CatzSubsystems.CatzStateCommands;
 import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.*;
 import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.Drivetrain.DriveConstants;
@@ -37,7 +37,6 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.function.BooleanSupplier;
 
 import org.json.simple.JSONObject;
@@ -87,7 +86,7 @@ public class CatzAutonomous extends SubsystemBase {
 
     // ------------------------------------------------------------------------------------------------------------
     // Path Configuration
-    // // ------------------------------------------------------------------------------------------------------------
+    // ------------------------------------------------------------------------------------------------------------
     for (File pathFile : choreoPathsDirectory.listFiles()) {
       // to get rid of the extensions trailing the path names
       String pathName = pathFile.getName().replaceFirst("[.][^.]+$", "");
@@ -114,10 +113,6 @@ public class CatzAutonomous extends SubsystemBase {
       }
     }
 
-    for (String question : dashboardCmds.keySet()) {
-      NamedCommands.registerCommand(question, dashboardCmds.get(question));
-    }
-
     NamedCommands.registerCommand("Stow", CatzStateCommands.stow(container));
     NamedCommands.registerCommand("IntakeCoralGround", CatzStateCommands.intakeCoralGround(container));
     NamedCommands.registerCommand("IntakeCoralStation", CatzStateCommands.intakeCoralStation(container));
@@ -130,7 +125,35 @@ public class CatzAutonomous extends SubsystemBase {
     NamedCommands.registerCommand("BotAlgae", CatzStateCommands.intakeCoralGround(container));
     NamedCommands.registerCommand("TopAlgae", CatzStateCommands.topAlgae(container));
     NamedCommands.registerCommand("Climb", CatzStateCommands.climb(container));
+    NamedCommands.registerCommand("RestPose", Commands.runOnce(()->tracker.resetPose(new Pose2d())));
 
+    //----------------------------------------------------------------------------------------------------
+    //
+    //----------------------------------------------------------------------------------------------------
+    HashMap<String, Command> chooseYourOwnScoringBOT = new HashMap<>();
+    chooseYourOwnScoringBOT.put("Score A", NamedCommands.getCommand("Score L"));
+    chooseYourOwnScoringBOT.put("Score B", NamedCommands.getCommand("CollectGP1"));
+    chooseYourOwnScoringBOT.put("Score C", NamedCommands.getCommand("CollectGP1"));
+    chooseYourOwnScoringBOT.put("Score D", NamedCommands.getCommand("CollectGP1"));
+    chooseYourOwnScoringBOT.put("Score E", NamedCommands.getCommand("CollectGP1"));
+    chooseYourOwnScoringBOT.put("Score F", NamedCommands.getCommand("CollectGP1"));
+    chooseYourOwnScoringBOT.put("Do Nothing", new PrintCommand("Skipped"));
+    dashboardCmds.put("BotScoringChooser", new DashboardCmd("Score Where?", chooseYourOwnScoringBOT));
+
+    HashMap<String, Command> chooseYourOwnScoringTOP = new HashMap<>();
+    chooseYourOwnScoringTOP.put("Score A", NamedCommands.getCommand("Score A"));
+    chooseYourOwnScoringTOP.put("Score H", NamedCommands.getCommand("Score H"));
+    chooseYourOwnScoringTOP.put("Score I", NamedCommands.getCommand("Score I"));
+    chooseYourOwnScoringTOP.put("Score J", NamedCommands.getCommand("Score J"));
+    chooseYourOwnScoringTOP.put("Score K", NamedCommands.getCommand("Score K"));
+    chooseYourOwnScoringTOP.put("Score L", NamedCommands.getCommand("Score L"));
+    chooseYourOwnScoringTOP.put("Do Nothing", new PrintCommand("Skipped"));
+    dashboardCmds.put("TopScoringChooser", new DashboardCmd("Score Where?", chooseYourOwnScoringTOP));
+
+
+    for (String question : dashboardCmds.keySet()) {
+      NamedCommands.registerCommand(question, dashboardCmds.get(question));
+    }
 
     for (File autoFile : autosDirectory.listFiles()) {
       String autoName = autoFile.getName().replaceFirst("[.][^.]+$", "");
@@ -190,13 +213,6 @@ public class CatzAutonomous extends SubsystemBase {
     return new WheelRadiusCharacterization(m_container.getCatzDrivetrain(), Direction.COUNTER_CLOCKWISE);
   }
 
-  // ---------------------------------------------------------------------------------------------------------
-  //
-  //          Pathfinding
-  //
-  // ---------------------------------------------------------------------------------------------------------
-
-
   /** Getter for final autonomous Program */
   public Command getCommand() {
     System.out.println("e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e " + lastProgram.getName());
@@ -208,31 +224,5 @@ public class CatzAutonomous extends SubsystemBase {
   //          Record Types
   //
   // ---------------------------------------------------------------------------------------------------------
-  /** A customizable auto routine associated with a single command. */
-  private static final record DashboardAutoProgram(
-      String name, List<AutoQuestion> questions, Command command) {}
 
-  /** A question to ask for customizing an auto routine. */
-  public static record AutoQuestion(String question, List<AutoQuestionResponse> responses) {}
-
-  /** Responses to auto routine questions. */
-  public static enum AutoQuestionResponse {
-    THINKING_ON_YOUR_FEET,
-    IMMEDIATELY,
-    SIX_SECONDS,
-    LAST_SECOND,
-    YES,
-    NO
-  }
-
-  public static enum AutoScoringOptions {
-    CORAL_ROD_1,
-    CORAL_ROD_2,
-    CORAL_ROD_4,
-    CORAL_ROD_5,
-    CORAL_ROD_7,
-    CORAL_ROD_8,
-    CORAL_ROD_10,
-    CORAL_ROD_11,
-  }
 }

@@ -229,6 +229,10 @@ public class TeleopPosSelector extends SubsystemBase {
     }));
   }
 
+  public Command runCoralStationPathFindingCommand(Supplier<Pose2d> stationPosition) {
+    return runPathfindingCommand(stationPosition);
+  }
+
   public Command stopPathfindingCommand(){
     return new InstantCommand(() -> {
       currentPathfindingCommand.cancel();
