@@ -131,6 +131,8 @@ public class CatzElevator extends SubsystemBase {
       io.stop();
     } else if(targetPosition != ElevatorPosition.PosManual){
         io.runSetpoint(targetPosition.getTargetPositionRads(), elevatorFeedForward);
+    } else if(getElevatorPositionRads() < 10.0) {
+      io.runMotor(0.0);
     } else {
       io.runSetpoint(targetManualPosition, elevatorFeedForward);
     }
