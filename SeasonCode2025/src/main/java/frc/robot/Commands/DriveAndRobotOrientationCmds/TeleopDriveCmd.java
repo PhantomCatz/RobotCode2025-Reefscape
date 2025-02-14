@@ -77,8 +77,8 @@ public class TeleopDriveCmd extends Command {
   @Override
   public void execute() {
     // Obtain realtime joystick inputs with supplier methods
-    m_headingAndVelocity_X = -Math.atan(Math.PI/4*m_headingPctOutput_Y.get()); //Raw accel
-    m_headingAndVelocity_Y = -Math.atan(Math.PI/4*m_headingPctOutput_X.get());
+    m_headingAndVelocity_X = -m_headingPctOutput_Y.get(); //Raw accel
+    m_headingAndVelocity_Y = -m_headingPctOutput_X.get();
     turningVelocity        = -m_angVelocityPctOutput.get(); // alliance flip shouldn't change for turing speed when switching alliances
 
     // Flip Directions for left joystick if alliance is red

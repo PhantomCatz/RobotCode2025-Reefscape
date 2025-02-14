@@ -32,7 +32,6 @@ import frc.robot.Commands.DriveAndRobotOrientationCmds.TeleopDriveCmd;
 import frc.robot.Utilities.Alert;
 import frc.robot.Utilities.Alert.AlertType;
 
-
 import org.littletonrobotics.junction.networktables.LoggedNetworkNumber;
 
 public class RobotContainer {
@@ -264,6 +263,10 @@ public class RobotContainer {
 
   public CatzAutonomous getAutonomous(){
     return auto;
+  }
+
+  public CatzAlgaePivot getAlgaePivot(){
+    return algaePivot;
   }
 
 }

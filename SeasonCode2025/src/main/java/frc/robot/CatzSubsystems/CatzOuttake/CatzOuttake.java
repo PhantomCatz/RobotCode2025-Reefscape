@@ -108,6 +108,8 @@ public class CatzOuttake extends SubsystemBase {
   private void case_adjustInit() {
 
     io.runMotor(INTAKE_SPD, INTAKE_SPD);
+    io.runIntakesIntakeMotor(INTAKE_INTAKE_SPEED);
+    System.out.println("case adj_init");
     if(inputs.bbreakFrntTriggered) {
       io.runMotor(0.0, 0.0);
       intakeIterationCoutner++;
@@ -126,6 +128,7 @@ public class CatzOuttake extends SubsystemBase {
   }
 
   private void case_adjustBack() {
+    io.runIntakesIntakeMotor(0.0);
     io.runMotor(-ADJ_SPD, -ADJ_SPD);
     if (inputs.bbreakBackTriggered) {
       currentState = outtakeStates.STOP;
@@ -135,6 +138,7 @@ public class CatzOuttake extends SubsystemBase {
   }
 
   private void case_adjustFwd() {
+    io.runIntakesIntakeMotor(0.0);
     io.runMotor(ADJ_SPD, ADJ_SPD);
     if (!inputs.bbreakBackTriggered) {
       currentState = outtakeStates.STOP;
@@ -144,14 +148,16 @@ public class CatzOuttake extends SubsystemBase {
 
 
   private void case_shoot() {
+    io.runIntakesIntakeMotor(0.0);
     io.runMotor(OUTTAKE_LT, OUTTAKE_RT);
     interationCounter++;
-    if(!inputs.bbreakFrntTriggered && interationCounter >= 25) {
+    if(!inputs.bbreakFrntTriggered && interationCounter >= 25) { //0.02s per iteration
         interationCounter = 0;
         currentState = outtakeStates.STOP;
     }
   }
   private void case_shootL1() {
+    io.runIntakesIntakeMotor(0.0);
     io.runMotor(OUTTAKE_L1_LT, OUTTAKE_L1_RT);
     interationCounter++;
     if(!inputs.bbreakFrntTriggered&& interationCounter >= 100) {
@@ -199,6 +205,6 @@ public class CatzOuttake extends SubsystemBase {
   }
 
   public Command stopOuttake() {
-    return runOnce(() -> io.runMotor(0,0));
+    return runOnce(() -> currentState = outtakeStates.STOP);
   }
 }
