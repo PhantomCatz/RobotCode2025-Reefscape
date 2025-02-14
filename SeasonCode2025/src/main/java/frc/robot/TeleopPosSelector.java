@@ -73,6 +73,18 @@ public class TeleopPosSelector extends SubsystemBase {
   }
 
   public void pathQueueAddFront(Pair<Integer, LeftRight> pose) {
+    // there was no joystick input
+    if (pose == null && queuedPaths.size() <= NUM_QUEUE_DISPLAY)
+      return;
+
+    queuedPaths.addFirst(pose);
+  }
+
+  public void pathQueueAddBack(Pair<Integer, LeftRight> pose) {
+    // there was no joystick input
+    if (pose == null && queuedPaths.size() <= NUM_QUEUE_DISPLAY)
+      return;
+
     queuedPaths.addLast(pose);
   }
 
@@ -88,9 +100,15 @@ public class TeleopPosSelector extends SubsystemBase {
     queuedPaths.pollLast();
   }
 
+  public void pathQueueClear() {
+    queuedPaths.clear();
+  }
+
   public void updateCurrentlySelected() {
     Pair<Integer, LeftRight> currentlySelected = getXBoxReefPos();
-    if (currentlySelected.getFirst() == -1) {
+
+    // there was no joystick selection, so display NBA
+    if (currentlySelected == null) {
       currentlySelected = getClosestReefPos();
     }
 
@@ -110,6 +128,7 @@ public class TeleopPosSelector extends SubsystemBase {
       SmartDashboard.putString(QUEUE + i, poseToLetter.get(pair.getFirst() + " " + pair.getSecond()));
       i++;
     }
+
   }
 
   public Pair<Integer, LeftRight> getXBoxReefPos() {
@@ -133,7 +152,7 @@ public class TeleopPosSelector extends SubsystemBase {
         leftRight = leftOrRight % 2 == 0 ? LeftRight.LEFT : LeftRight.RIGHT;
       }
     } else {
-      return new Pair<Integer, LeftRight>(-1, LeftRight.LEFT);
+      return null;
     }
     return new Pair<Integer, LeftRight>(side, leftRight);
   }

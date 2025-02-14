@@ -161,8 +161,10 @@ public class RobotContainer {
     // XBOX AUX
     //---------------------------------------------------------------------------------------------------------------------
     // Scoring Level Determination
-    xboxAux.a().onTrue(Commands.runOnce(() -> selector.pathQueueAddFront(selector.getXBoxReefPos())));
-    xboxAux.y().onTrue(Commands.runOnce(() -> selector.pathQueuePopBack()));
+    xboxAux.rightTrigger().onTrue(Commands.runOnce(() -> selector.pathQueueAddBack(selector.getXBoxReefPos())));
+    xboxAux.y().onTrue(Commands.runOnce(() -> selector.pathQueuePopFront()));
+    xboxAux.b().onTrue(Commands.runOnce(() -> selector.pathQueuePopBack()));
+    xboxAux.rightStick().onTrue(Commands.runOnce(() -> selector.pathQueueClear()));
 
     xboxAux.povRight().onTrue(Commands.runOnce(()->{superstructure.setLevel(1); SmartDashboard.putNumber("Reef Level", 1);}));
     xboxAux.povUp().onTrue(Commands.runOnce(() -> {superstructure.setLevel(2); SmartDashboard.putNumber("Reef Level", 2);}));
