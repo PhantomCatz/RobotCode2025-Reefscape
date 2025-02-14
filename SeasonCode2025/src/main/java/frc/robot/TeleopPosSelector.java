@@ -35,6 +35,7 @@ import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.CatzRobotTracker;
 import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.Drivetrain.DriveConstants;
 import frc.robot.Commands.DriveAndRobotOrientationCmds.TrajectoryDriveCmd;
 
+@SuppressWarnings({ "rawtypes", "unchecked" })
 public class TeleopPosSelector extends SubsystemBase {
   private final RobotContainer m_container;
 
@@ -49,7 +50,7 @@ public class TeleopPosSelector extends SubsystemBase {
   private CatzRobotTracker tracker = CatzRobotTracker.getInstance();
   private Command currentPathfindingCommand = new InstantCommand();
   private Pair<Integer, LeftRight> currentPathfindingPair = new Pair<Integer, LeftRight>(0, LeftRight.LEFT);
-  private Deque<Pair<Integer, LeftRight>> queuedPaths = new LinkedList<>();
+  private Deque<Pair<Pair<Integer, LeftRight>, Integer>> queuedPaths = new LinkedList<>();
 
   private HashMap<String, String> poseToLetter = new HashMap<>();
 
@@ -72,23 +73,23 @@ public class TeleopPosSelector extends SubsystemBase {
     poseToLetter.put("5 LEFT", "F");
   }
 
-  public void pathQueueAddFront(Pair<Integer, LeftRight> pose) {
+  public void pathQueueAddFront(Pair<Integer, LeftRight> pose, int reefLevel) {
     // there was no joystick input
     if (pose == null && queuedPaths.size() <= NUM_QUEUE_DISPLAY)
       return;
 
-    queuedPaths.addFirst(pose);
+    queuedPaths.addFirst(new Pair(pose, reefLevel));
   }
 
-  public void pathQueueAddBack(Pair<Integer, LeftRight> pose) {
+  public void pathQueueAddBack(Pair<Integer, LeftRight> pose, int reefLevel) {
     // there was no joystick input
     if (pose == null && queuedPaths.size() <= NUM_QUEUE_DISPLAY)
       return;
 
-    queuedPaths.addLast(pose);
+    queuedPaths.addLast(new Pair(pose, reefLevel));
   }
 
-  public Pair<Integer, LeftRight> pathQueuePeekFront() {
+  public Pair<Pair<Integer, LeftRight>,Integer> pathQueuePeekFront() {
     return queuedPaths.peekFirst();
   }
 
@@ -124,8 +125,9 @@ public class TeleopPosSelector extends SubsystemBase {
     }
 
     int i = 0;
-    for (Pair<Integer, LeftRight> pair : queuedPaths) {
-      SmartDashboard.putString(QUEUE + i, poseToLetter.get(pair.getFirst() + " " + pair.getSecond()));
+    for (Pair<Pair<Integer, LeftRight>,Integer> pair : queuedPaths) {
+      Pair<Integer, LeftRight> pose = pair.getFirst();
+      SmartDashboard.putString(QUEUE + i, poseToLetter.get(pose.getFirst() + " " + pose.getSecond()) + " " + pair.getSecond());
       i++;
     }
 
@@ -243,7 +245,13 @@ public class TeleopPosSelector extends SubsystemBase {
         null,
         new GoalEndState(0, goal.getRotation())
       ), m_container.getCatzDrivetrain(), true);
-      currentPathfindingCommand.schedule();
+
+      try{
+        currentPathfindingCommand.schedule();
+      } catch(IndexOutOfBoundsException e){
+        e.printStackTrace();
+        System.out.println("Stop spamming bumpers");
+      }
     });
   }
 

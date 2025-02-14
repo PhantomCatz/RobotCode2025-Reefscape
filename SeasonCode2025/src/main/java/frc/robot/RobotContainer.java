@@ -33,7 +33,6 @@ import frc.robot.CatzSubsystems.CatzOuttake.CatzOuttake;
 import frc.robot.Commands.DriveAndRobotOrientationCmds.TeleopDriveCmd;
 import frc.robot.Utilities.Alert;
 import frc.robot.Utilities.Alert.AlertType;
-import edu.wpi.first.wpilibj.Joystick;
 
 import org.littletonrobotics.junction.networktables.LoggedNetworkNumber;
 
@@ -121,7 +120,7 @@ public class RobotContainer {
     xboxDrv.b().onTrue(selector.runReefPathfindingCommand(() -> selector.getClosestReefPos()));
     xboxDrv.b().onFalse(selector.stopPathfindingCommand());
 
-    xboxDrv.a().onTrue(selector.runReefPathfindingCommand(() -> selector.pathQueuePeekFront()).alongWith(new InstantCommand(() -> selector.pathQueuePopFront())));
+    xboxDrv.a().onTrue(selector.runReefPathfindingCommand(() -> selector.pathQueuePeekFront().getFirst()).alongWith(new InstantCommand(() -> selector.pathQueuePopFront())));
     xboxDrv.a().onFalse(selector.stopPathfindingCommand());
 
     xboxDrv.leftBumper().onTrue(selector.runLeftRightCommand(LeftRight.LEFT));
@@ -166,11 +165,11 @@ public class RobotContainer {
     // XBOX AUX
     //---------------------------------------------------------------------------------------------------------------------
     // Reef autopathfind
-    xboxAux.a().onTrue(Commands.runOnce(() -> selector.pathQueueAddFront(selector.getXBoxReefPos())));
+    xboxAux.a().onTrue(Commands.runOnce(() -> selector.pathQueueAddFront(selector.getXBoxReefPos(), superstructure.getLevel())));
     xboxAux.y().onTrue(Commands.runOnce(() -> selector.pathQueuePopBack()));
 
     // Scoring Level Determination
-    xboxAux.rightTrigger().onTrue(Commands.runOnce(() -> selector.pathQueueAddBack(selector.getXBoxReefPos())));
+    xboxAux.rightTrigger().onTrue(Commands.runOnce(() -> selector.pathQueueAddBack(selector.getXBoxReefPos(), superstructure.getLevel())));
     xboxAux.y().onTrue(Commands.runOnce(() -> selector.pathQueuePopFront()));
     xboxAux.b().onTrue(Commands.runOnce(() -> selector.pathQueuePopBack()));
     xboxAux.rightStick().onTrue(Commands.runOnce(() -> selector.pathQueueClear()));
