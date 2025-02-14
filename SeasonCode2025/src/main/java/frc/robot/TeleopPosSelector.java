@@ -122,14 +122,15 @@ public class TeleopPosSelector extends SubsystemBase {
     if (Math.hypot(x, y) > SELECTION_THRESHOLD) {
       // ensures angle is between 0-2pi (Dr. Eric Yuchen Lu (MD)'s idea)
       double angle = (Math.atan2(y, x) + 2 * Math.PI) % (2 * Math.PI);
+      side = (int) Math.round(angle * 3.0 / Math.PI) % 6;
 
       // if angle is too close to 2pi, then it will return 12, but we want selected to
       // be between 0-11 (Dr. Eric Yuchen Lu (MD)'s idea)
-      side = (int) Math.ceil(angle * 6.0 / Math.PI) % 12;
+      int leftOrRight = (int) Math.ceil(angle * 6.0 / Math.PI) % 12;
       if (x > 0) {
-        leftRight = side % 2 == 0 ? LeftRight.RIGHT : LeftRight.LEFT;
+        leftRight = leftOrRight % 2 == 0 ? LeftRight.RIGHT : LeftRight.LEFT;
       } else {
-        leftRight = side % 2 == 0 ? LeftRight.LEFT : LeftRight.RIGHT;
+        leftRight = leftOrRight % 2 == 0 ? LeftRight.LEFT : LeftRight.RIGHT;
       }
     } else {
       return new Pair<Integer, LeftRight>(-1, LeftRight.LEFT);

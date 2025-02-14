@@ -9,6 +9,7 @@ package frc.robot;
 
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.GenericHID.RumbleType;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
@@ -163,10 +164,10 @@ public class RobotContainer {
     xboxAux.a().onTrue(Commands.runOnce(() -> selector.pathQueueAddFront(selector.getXBoxReefPos())));
     xboxAux.y().onTrue(Commands.runOnce(() -> selector.pathQueuePopBack()));
 
-    xboxAux.povRight().onTrue(Commands.runOnce(()->superstructure.setLevel(1)));
-    xboxAux.povUp().onTrue(Commands.runOnce(() -> superstructure.setLevel(2)));
-    xboxAux.povLeft().onTrue(Commands.runOnce(() -> superstructure.setLevel(3)));
-    xboxAux.povDown().onTrue(Commands.runOnce(() -> superstructure.setLevel(4)));
+    xboxAux.povRight().onTrue(Commands.runOnce(()->{superstructure.setLevel(1); SmartDashboard.putNumber("Reef Level", 1);}));
+    xboxAux.povUp().onTrue(Commands.runOnce(() -> {superstructure.setLevel(2); SmartDashboard.putNumber("Reef Level", 2);}));
+    xboxAux.povLeft().onTrue(Commands.runOnce(() -> {superstructure.setLevel(3); SmartDashboard.putNumber("Reef Level", 3);}));
+    xboxAux.povDown().onTrue(Commands.runOnce(() -> {superstructure.setLevel(4); SmartDashboard.putNumber("Reef Level", 4);}));
 
     // Gamepiece Selection
     xboxAux.leftBumper().onTrue(Commands.runOnce(() -> superstructure.setChosenGamepiece(Gamepiece.CORAL)));
