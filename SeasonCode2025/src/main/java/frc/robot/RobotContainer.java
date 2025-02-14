@@ -9,6 +9,7 @@ package frc.robot;
 
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.GenericHID.RumbleType;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
@@ -32,8 +33,6 @@ import frc.robot.CatzSubsystems.CatzOuttake.CatzOuttake;
 import frc.robot.Commands.DriveAndRobotOrientationCmds.TeleopDriveCmd;
 import frc.robot.Utilities.Alert;
 import frc.robot.Utilities.Alert.AlertType;
-import edu.wpi.first.wpilibj2.command.button.Trigger;
-
 
 import org.littletonrobotics.junction.networktables.LoggedNetworkNumber;
 
@@ -111,6 +110,8 @@ public class RobotContainer {
   //
   // ---------------------------------------------------------------------------
 
+  private int POVReefAngle = 0;
+
   private void configureBindings() {
     //---------------------------------------------------------------------------------------------------------------------
     // XBOX Drive
@@ -119,7 +120,7 @@ public class RobotContainer {
     xboxDrv.b().onTrue(selector.runReefPathfindingCommand(() -> selector.getClosestReefPos()));
     xboxDrv.b().onFalse(selector.stopPathfindingCommand());
 
-    xboxDrv.a().onTrue(selector.runReefPathfindingCommand(() -> selector.pathQueuePeekFront()).alongWith(new InstantCommand(() -> selector.pathQueuePopFront())));
+    xboxDrv.a().onTrue(selector.runReefPathfindingCommand(() -> selector.pathQueuePeekFront().getFirst()).alongWith(new InstantCommand(() -> selector.pathQueuePopFront())));
     xboxDrv.a().onFalse(selector.stopPathfindingCommand());
 
     xboxDrv.leftBumper().onTrue(selector.runLeftRightCommand(LeftRight.LEFT));
@@ -164,14 +165,17 @@ public class RobotContainer {
     // XBOX AUX
     //---------------------------------------------------------------------------------------------------------------------
     // Reef autopathfind
-    xboxAux.a().onTrue(Commands.runOnce(() -> selector.pathQueueAddFront(selector.getXBoxReefPos())));
-    xboxAux.y().onTrue(Commands.runOnce(() -> selector.pathQueuePopBack()));
 
     // Scoring Level Determination
-    xboxAux.povRight().onTrue(Commands.runOnce(()->superstructure.setLevel(1)));
-    xboxAux.povUp().onTrue(Commands.runOnce(() -> superstructure.setLevel(2)));
-    xboxAux.povLeft().onTrue(Commands.runOnce(() -> superstructure.setLevel(3)));
-    xboxAux.povDown().onTrue(Commands.runOnce(() -> superstructure.setLevel(4)));
+    xboxAux.rightTrigger().onTrue(Commands.runOnce(() -> selector.pathQueueAddBack(selector.getXBoxReefPos(), superstructure.getLevel())));
+    xboxAux.y().onTrue(Commands.runOnce(() -> selector.pathQueuePopFront()));
+    xboxAux.b().onTrue(Commands.runOnce(() -> selector.pathQueuePopBack()));
+    xboxAux.rightStick().onTrue(Commands.runOnce(() -> selector.pathQueueClear()));
+
+    xboxAux.povRight().onTrue(Commands.runOnce(()->{superstructure.setLevel(1); SmartDashboard.putNumber("Reef Level", 1);}));
+    xboxAux.povUp().onTrue(Commands.runOnce(() -> {superstructure.setLevel(2); SmartDashboard.putNumber("Reef Level", 2);}));
+    xboxAux.povLeft().onTrue(Commands.runOnce(() -> {superstructure.setLevel(3); SmartDashboard.putNumber("Reef Level", 3);}));
+    xboxAux.povDown().onTrue(Commands.runOnce(() -> {superstructure.setLevel(4); SmartDashboard.putNumber("Reef Level", 4);}));
 
     // Gamepiece Selection
     xboxAux.leftBumper().onTrue(Commands.runOnce(() -> superstructure.setChosenGamepiece(Gamepiece.CORAL)));
@@ -255,6 +259,10 @@ public class RobotContainer {
 
   public TeleopPosSelector getSelector(){
     return selector;
+  }
+
+  public int getReefAngle(){
+    return POVReefAngle;
   }
 
 }

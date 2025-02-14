@@ -73,6 +73,8 @@ public class CatzSuperstructure extends VirtualSubsystem {
 
     public CatzSuperstructure(RobotContainer container) {
         this.container = container;
+        this.level = 1;
+
     }
 
     public Command setCurrentRobotAction(RobotAction action) {
