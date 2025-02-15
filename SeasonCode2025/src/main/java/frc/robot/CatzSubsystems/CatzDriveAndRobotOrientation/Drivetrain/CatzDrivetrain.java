@@ -187,7 +187,13 @@ public class CatzDrivetrain extends SubsystemBase {
   //
   // --------------------------------------------------------------------------------------------------------------------------
   public void drive(ChassisSpeeds chassisSpeeds) {
-    ChassisSpeeds descreteSpeeds = ChassisSpeeds.discretize(chassisSpeeds, CatzConstants.LOOP_TIME);
+    ChassisSpeeds descreteSpeeds = chassisSpeeds;
+    try{
+      descreteSpeeds = ChassisSpeeds.discretize(chassisSpeeds, CatzConstants.LOOP_TIME);
+    }catch(Error e){
+      e.printStackTrace();
+      System.out.println("This happened because the components of chassisspeeds was too small.");
+    }
     // --------------------------------------------------------
     // Convert chassis speeds to individual module states and set module states
     // --------------------------------------------------------

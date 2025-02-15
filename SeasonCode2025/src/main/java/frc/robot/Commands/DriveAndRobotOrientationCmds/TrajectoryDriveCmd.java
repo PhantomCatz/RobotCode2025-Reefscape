@@ -55,6 +55,7 @@ public class TrajectoryDriveCmd extends Command {
   public static final double ALLOWABLE_ROTATION_ERROR = 2.0;
   public static final double ALLOWABLE_VEL_ERROR = 0.2;
   private static final double TIMEOUT_SCALAR = 5;
+  private static final double CONVERGE_DISTANCE = 1.0;
 
   // Subsystems
   private CatzDrivetrain m_driveTrain;
@@ -76,6 +77,8 @@ public class TrajectoryDriveCmd extends Command {
   private final Map<Command, Boolean> currentEventCommands = new HashMap();
   private final List<Pair<Double, Command>> untriggeredEvents = new ArrayList();
   private boolean isEventCommandRunning = false;
+
+  private double translationError = Double.MAX_VALUE;
 
   // ---------------------------------------------------------------------------------------------
   //
@@ -187,6 +190,14 @@ public class TrajectoryDriveCmd extends Command {
     ChassisSpeeds adjustedSpeeds =
         hocontroller.calculate(currentPose, state, goal.pose.getRotation());
 
+    if(autoalign){
+      // Graph x^2/(1+x^2) on desmos
+      // Smaller speed for closer distances
+      double x = Math.pow(CONVERGE_DISTANCE * translationError, 2);
+      adjustedSpeeds = adjustedSpeeds.times(x / (x+1));
+    }
+    System.out.println(adjustedSpeeds);
+
     // send to drivetrain
     m_driveTrain.drive(adjustedSpeeds);
     // Log desired pose
@@ -258,16 +269,6 @@ public class TrajectoryDriveCmd extends Command {
 
   @Override
   public boolean isFinished() {
-    // Command not intended to end
-    // if (autoalign){
-    //   return false;
-    // }
-
-    // Finish command if the total time the path takes is over
-    if (timer.hasElapsed(pathTimeOut) && !isEventCommandRunning){
-      return true;
-    }
-
     // Finish command if the robot is near goal (and if robot velocity is zero if goal velocity is zero)
     PathPlannerTrajectoryState endState = trajectory.getEndState();
 
@@ -292,6 +293,17 @@ public class TrajectoryDriveCmd extends Command {
     double rotationError = Math.abs(desiredRotation - currentRotation);
     if (rotationError > 180) {
       rotationError = 360 - rotationError;
+    }
+    translationError = Math.hypot(xError, yError);
+
+    // Command not intended to end
+    if (autoalign){
+      return false;
+    }
+
+    // Finish command if the total time the path takes is over
+    if (timer.hasElapsed(pathTimeOut) && !isEventCommandRunning){
+      return true;
     }
 
     return

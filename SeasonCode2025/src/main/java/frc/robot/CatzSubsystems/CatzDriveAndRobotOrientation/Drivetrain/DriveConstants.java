@@ -226,7 +226,7 @@ public class DriveConstants {
         new PIDController(8.0, 0.0, 0.0),
         new PIDController(8.0, 0.0, 0.0),
         new ProfiledPIDController(
-            4,
+            12,
             0,
             0,
             new TrapezoidProfile.Constraints(
