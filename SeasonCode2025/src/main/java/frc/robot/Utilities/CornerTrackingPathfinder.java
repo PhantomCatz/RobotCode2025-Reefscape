@@ -256,23 +256,36 @@ public class CornerTrackingPathfinder{
       Translation2d realStartPos,
       Translation2d realGoalPos,
       Set<GridPosition> obstacles) {
-    if (path.isEmpty()) {
-      return new ArrayList<>();
-    }
 
     List<Translation2d> fieldPosPath = new ArrayList<>();
     fieldPosPath.add(realStartPos);
-    for (int i = path.size() - 1; i > 0; i--) {
-      fieldPosPath.add(gridPosToTranslation2d(path.get(i)));
+
+    //if the path is empty, just go straight to the goal, because it means the start and goal were too close.
+    if(!path.isEmpty()){
+      for (int i = path.size() - 1; i > 0; i--) {
+        fieldPosPath.add(gridPosToTranslation2d(path.get(i)));
+      }
     }
+
     fieldPosPath.add(realGoalPos);
 
     List<Pose2d> pathPoses = new ArrayList<>();
+
     pathPoses.add(
       new Pose2d(
         fieldPosPath.get(0),
         fieldPosPath.get(1).minus(fieldPosPath.get(0)).getAngle()));
 
+    if(path.isEmpty()){
+      pathPoses.add(
+        new Pose2d(
+          fieldPosPath.get(1),
+          fieldPosPath.get(1).minus(fieldPosPath.get(0)).getAngle()
+        )
+      );
+      return PathPlannerPath.waypointsFromPoses(pathPoses);
+    }
+    
     //smoothens the path by splitting a path into smaller sections at some midpoint.
     for (int i = 1; i < fieldPosPath.size() - 1; i++) {
       Translation2d last = fieldPosPath.get(i - 1);

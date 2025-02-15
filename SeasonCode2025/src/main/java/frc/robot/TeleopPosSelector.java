@@ -195,7 +195,7 @@ public class TeleopPosSelector extends SubsystemBase {
     }
 
     Translation2d scoringPos = radius.plus(leftRight).plus(Reef.center);
-    return AllianceFlipUtil.apply(new Pose2d(scoringPos, selectedAngle));
+    return AllianceFlipUtil.apply(new Pose2d(scoringPos, selectedAngle.plus(Rotation2d.k180deg)));
   }
 
   public Pose2d calculateReefPose(Pair<Integer, LeftRight> pair) {
@@ -208,6 +208,7 @@ public class TeleopPosSelector extends SubsystemBase {
 
   public Command getPathfindingCommand(Pose2d goal) {
     if (goal == null) {
+      System.out.println("The goal is null");
       return new InstantCommand();
     }
 
@@ -215,7 +216,9 @@ public class TeleopPosSelector extends SubsystemBase {
     PathPlannerPath path = pathfinder.getPath(robotPos, goal.getTranslation(),
         new GoalEndState(0.0, goal.getRotation()));
 
+
     if (path == null) {
+      System.out.println("The path is null: " + robotPos + goal.getTranslation());
       return new InstantCommand();
     } else {
       if (AllianceFlipUtil.shouldFlipToRed()) {

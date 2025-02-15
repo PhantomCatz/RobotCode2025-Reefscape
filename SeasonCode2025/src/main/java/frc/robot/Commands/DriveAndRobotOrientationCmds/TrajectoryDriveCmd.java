@@ -191,9 +191,9 @@ public class TrajectoryDriveCmd extends Command {
         hocontroller.calculate(currentPose, state, goal.pose.getRotation());
 
     if(autoalign){
-      // Graph x^2/(1+x^2) on desmos
+      // Graph x^b/(1+x^b) on desmos
       // Smaller speed for closer distances
-      double x = Math.pow(CONVERGE_DISTANCE * translationError, 2);
+      double x = Math.pow(CONVERGE_DISTANCE * translationError, 1);
       adjustedSpeeds = adjustedSpeeds.times(x / (x+1));
     }
     System.out.println(adjustedSpeeds);
@@ -296,7 +296,7 @@ public class TrajectoryDriveCmd extends Command {
     }
     translationError = Math.hypot(xError, yError);
 
-    // Command not intended to end
+    // Command not intended to end for con
     if (autoalign){
       return false;
     }
