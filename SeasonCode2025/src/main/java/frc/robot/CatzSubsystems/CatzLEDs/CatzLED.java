@@ -41,6 +41,8 @@ public class CatzLED extends VirtualSubsystem {
   @Getter @Setter @AutoLogOutput (key = "CatzLED/ledState")
   public ControllerLEDState ledState = ControllerLEDState.BALLS;
 
+  @Getter @Setter @AutoLogOutput (key = "CatzLED/ledScoringState")
+  public ScoringLEDLocation ledScoringState = ScoringLEDLocation.nuhthing;
 
   public enum ControllerLEDState {
     LEDmanual_none,
@@ -56,6 +58,22 @@ public class CatzLED extends VirtualSubsystem {
     sameBattery,
     autoFinished,
     lowBatteryAlert
+  }
+
+  public enum ScoringLEDLocation {
+    A,
+    B,
+    C,
+    D,
+    E,
+    F,
+    G,
+    H,
+    I,
+    J,
+    K,
+    L,
+    nuhthing
   }
 
   public double autoFinishedTime = 0.0;
@@ -82,6 +100,14 @@ public class CatzLED extends VirtualSubsystem {
   private static final boolean paradeLeds = false;
   private static final int minLoopCycleCount = 10;
   private static final int length = 34;
+  //22 11 24
+  private static final int LED_Sidebar_Start_LT = 0;
+  private static final int LED_Sidebar_End_LT   = 22;
+  private static final int LED_Crossbar_Start   = 23;
+  private static final int LED_Crossbar_End     = 33;
+  private static final int LED_Sidebar_Start_RT = 34;
+  private static final int LED_Sidebar_End_RT   = 57;
+  
   private static final double strobeDuration = 0.1;
   private static final double breathDuration = 1.0;
   private static final double rainbowCycleLength = 25.0;
@@ -211,6 +237,35 @@ public class CatzLED extends VirtualSubsystem {
         default:
           break;
       }
+
+      switch(ledScoringState) {
+        case A, G:
+          setSolidElevatorColor(Color.kPurple);
+          setSolidCrossbarColor(Color.kRed);
+          break;
+        case B, H:
+          setSolidElevatorColor(Color.kPurple);
+          setSolidCrossbarColor(Color.kBlue);
+          break;
+        case C, I:
+          setSolidElevatorColor(Color.kGreen);
+          setSolidCrossbarColor(Color.kRed);
+          break;
+        case D, J:
+          setSolidElevatorColor(Color.kGreen);
+          setSolidCrossbarColor(Color.kBlue);
+          break;
+        case E, K:
+          setSolidElevatorColor(Color.kYellow);
+          setSolidCrossbarColor(Color.kRed);
+          break;
+        case F, L:
+          setSolidElevatorColor(Color.kYellow);
+          setSolidCrossbarColor(Color.kBlue);
+          break;
+        default:
+          break;
+      }
     }
 
     // Update LEDs
@@ -219,7 +274,10 @@ public class CatzLED extends VirtualSubsystem {
 
   private void setSolidElevatorColor(Color color) {
     if (color != null) {
-      for (int i = 0; i < length/2; i++) {
+      for (int i = LED_Sidebar_Start_LT; i < LED_Sidebar_End_LT; i++) {
+        buffer.setLED(i, color);
+      }
+      for (int i = LED_Sidebar_Start_RT; i < LED_Sidebar_End_RT; i++) {
         buffer.setLED(i, color);
       }
     }
@@ -227,7 +285,7 @@ public class CatzLED extends VirtualSubsystem {
 
   private void setSolidCrossbarColor(Color color) {
     if (color != null) {
-      for (int i = length/2; i < length; i++) {
+      for (int i = LED_Crossbar_Start; i < LED_Crossbar_End; i++) {
         buffer.setLED(i, color);
       }
     }
