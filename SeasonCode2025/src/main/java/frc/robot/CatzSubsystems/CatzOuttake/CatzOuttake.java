@@ -101,6 +101,16 @@ public class CatzOuttake extends SubsystemBase {
 
   }
 
+  public boolean coral = true;
+
+  public boolean hasCoral(){
+    return coral;
+  }
+
+  public void setCoral(boolean coral){
+    this.coral = coral;
+  }
+
   // ============================================
   //
   //              Case methods
@@ -141,7 +151,6 @@ public class CatzOuttake extends SubsystemBase {
       currentState = outtakeStates.STOP;
       CatzSuperstructure.currentCoralState = CoralState.IN_OUTTAKE;
       System.out.println("stopping adjbck");
-
     }
   }
 

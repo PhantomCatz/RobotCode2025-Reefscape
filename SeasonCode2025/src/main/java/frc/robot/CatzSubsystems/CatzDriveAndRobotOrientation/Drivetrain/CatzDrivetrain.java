@@ -188,20 +188,21 @@ public class CatzDrivetrain extends SubsystemBase {
   // --------------------------------------------------------------------------------------------------------------------------
   public void drive(ChassisSpeeds chassisSpeeds) {
     ChassisSpeeds descreteSpeeds = chassisSpeeds;
-    try{
+
+    if(Math.hypot(chassisSpeeds.vxMetersPerSecond, chassisSpeeds.vyMetersPerSecond) > 1e-4) {
       descreteSpeeds = ChassisSpeeds.discretize(chassisSpeeds, CatzConstants.LOOP_TIME);
-    }catch(Error e){
-      e.printStackTrace();
-      System.out.println("This happened because the components of chassisspeeds was too small.");
     }
+
     // --------------------------------------------------------
     // Convert chassis speeds to individual module states and set module states
     // --------------------------------------------------------
     SwerveModuleState[] unoptimizedModuleStates = DriveConstants.SWERVE_KINEMATICS.toSwerveModuleStates(descreteSpeeds);
+
     // --------------------------------------------------------
     // Scale down wheel speeds
     // --------------------------------------------------------
     SwerveDriveKinematics.desaturateWheelSpeeds(unoptimizedModuleStates, DriveConstants.DRIVE_CONFIG.maxLinearVelocity());
+
     // --------------------------------------------------------
     // Optimize Wheel Angles
     // --------------------------------------------------------

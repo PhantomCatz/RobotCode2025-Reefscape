@@ -8,31 +8,27 @@
 package frc.robot.Commands.DriveAndRobotOrientationCmds;
 
 import com.pathplanner.lib.commands.PathPlannerAuto;
-import com.pathplanner.lib.controllers.PathFollowingController;
 import com.pathplanner.lib.events.EventScheduler;
 import com.pathplanner.lib.path.PathPlannerPath;
 import com.pathplanner.lib.trajectory.PathPlannerTrajectory;
 import com.pathplanner.lib.trajectory.PathPlannerTrajectoryState;
 import com.pathplanner.lib.util.PPLibTelemetry;
 import com.pathplanner.lib.util.PathPlannerLogging;
-import edu.wpi.first.math.Pair;
 import edu.wpi.first.math.controller.HolonomicDriveController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.trajectory.Trajectory;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
+import frc.robot.FieldConstants;
 import frc.robot.Robot;
 import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.CatzRobotTracker;
 import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.Drivetrain.CatzDrivetrain;
 import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.Drivetrain.DriveConstants;
 import frc.robot.Utilities.AllianceFlipUtil;
-import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Set;
 
@@ -54,8 +50,9 @@ public class TrajectoryDriveCmd extends Command {
   public static final double ALLOWABLE_POSE_ERROR = 0.05;
   public static final double ALLOWABLE_ROTATION_ERROR = 2.0;
   public static final double ALLOWABLE_VEL_ERROR = 0.2;
+  public static final double ALLOWABLE_OMEGA_ERROR = Units.degreesToRadians(5.0);
   private static final double TIMEOUT_SCALAR = 5;
-  private static final double CONVERGE_DISTANCE = 1.0;
+  private static final double CONVERGE_DISTANCE = 2.0;
 
   // Subsystems
   private CatzDrivetrain m_driveTrain;
@@ -63,22 +60,16 @@ public class TrajectoryDriveCmd extends Command {
 
   // Trajectory variables
   private HolonomicDriveController hocontroller;
-  private PathFollowingController ppHoController;
   private PathPlannerTrajectory trajectory;
-  private Trajectory testTrajectory;
   private PathPlannerPath path;
-  private boolean atTarget = false;
   private double pathTimeOut = -999.0;
   private Timer timer = new Timer();
   private boolean autoalign;
 
   // Event Command variables
   private final EventScheduler eventScheduler;
-  private final Map<Command, Boolean> currentEventCommands = new HashMap();
-  private final List<Pair<Double, Command>> untriggeredEvents = new ArrayList();
   private boolean isEventCommandRunning = false;
-
-  private double translationError = Double.MAX_VALUE;
+  private double translationError = FieldConstants.FIELD_LENGTH_MTRS * 2;
 
   // ---------------------------------------------------------------------------------------------
   //
@@ -141,7 +132,6 @@ public class TrajectoryDriveCmd extends Command {
             DriveConstants.TRAJECTORY_CONFIG);
 
     hocontroller = DriveConstants.getNewHolController();
-    ppHoController = DriveConstants.getNewPathFollowingController();
     pathTimeOut = trajectory.getTotalTimeSeconds() * TIMEOUT_SCALAR;
 
     // Reset
@@ -182,7 +172,7 @@ public class TrajectoryDriveCmd extends Command {
         new Trajectory.State(
             currentTime,
             goal.linearVelocity * DriveConstants.TRAJECTORY_FF_SCALAR,
-            0.0, // TODO verify if this does what we want it to do
+            0.0,
             new Pose2d(goal.pose.getTranslation(), goal.heading),
             0.0);
 
@@ -191,12 +181,15 @@ public class TrajectoryDriveCmd extends Command {
         hocontroller.calculate(currentPose, state, goal.pose.getRotation());
 
     if(autoalign){
-      // Graph x^b/(1+x^b) on desmos
+      // Graph x/(1+x) on desmos
       // Smaller speed for closer distances
-      double x = Math.pow(CONVERGE_DISTANCE * translationError, 1);
+      double x = CONVERGE_DISTANCE * translationError;
       adjustedSpeeds = adjustedSpeeds.times(x / (x+1));
     }
-    System.out.println(adjustedSpeeds);
+    if(Double.isNaN(adjustedSpeeds.vxMetersPerSecond) || Double.isNaN(adjustedSpeeds.vyMetersPerSecond) || Double.isNaN(adjustedSpeeds.omegaRadiansPerSecond)){
+      // If the target and current positions are the same, bad
+      adjustedSpeeds = new ChassisSpeeds();
+    }
 
     // send to drivetrain
     m_driveTrain.drive(adjustedSpeeds);
@@ -244,22 +237,13 @@ public class TrajectoryDriveCmd extends Command {
   @Override
   public void end(boolean interrupted) {
     if(interrupted){
-      System.out.println("trajectory following was interrupted");
-    }
-
-    timer.stop(); // Stop timer
-    if(interrupted)
-    {
       System.out.println("OH NO I GOT INTERUPTED HOW RUDE");
     }
-    {
-      System.out.println("trajectory done");
-      m_driveTrain.stopDriving();
-    }
-
     System.out.println("trajectory done");
 
-    timer.stop();
+    timer.stop(); // Stop timer
+    m_driveTrain.stopDriving();
+
     PathPlannerAuto.currentPathName = "";
     PathPlannerAuto.setCurrentTrajectory(null);
     PathPlannerLogging.logActivePath(null);
@@ -268,34 +252,7 @@ public class TrajectoryDriveCmd extends Command {
   }
 
   @Override
-  public boolean isFinished() {
-    // Finish command if the robot is near goal (and if robot velocity is zero if goal velocity is zero)
-    PathPlannerTrajectoryState endState = trajectory.getEndState();
-
-    double currentPosX = tracker.getEstimatedPose().getX();
-    double currentPosY = tracker.getEstimatedPose().getY();
-    double currentRotation = tracker.getEstimatedPose().getRotation().getDegrees();
-
-    double desiredPosX = endState.pose.getX();
-    double desiredPosY = endState.pose.getY();
-    double desiredRotation = endState.pose.getRotation().getDegrees();
-
-    double desiredMPS = trajectory.getEndState().linearVelocity;
-    ChassisSpeeds currentChassisSpeeds = tracker.getRobotChassisSpeeds();
-    double currentMPS =
-        Math.hypot(
-            Math.hypot(
-                currentChassisSpeeds.vxMetersPerSecond, currentChassisSpeeds.vyMetersPerSecond),
-            currentChassisSpeeds.omegaRadiansPerSecond);
-
-    double xError = Math.abs(desiredPosX - currentPosX);
-    double yError = Math.abs(desiredPosY - currentPosY);
-    double rotationError = Math.abs(desiredRotation - currentRotation);
-    if (rotationError > 180) {
-      rotationError = 360 - rotationError;
-    }
-    translationError = Math.hypot(xError, yError);
-
+  public boolean isFinished(){
     // Command not intended to end for con
     if (autoalign){
       return false;
@@ -306,10 +263,43 @@ public class TrajectoryDriveCmd extends Command {
       return true;
     }
 
+    return isAtTarget();
+  }
+
+  public boolean isAtTarget() {
+    // Check if the robot is near goal (and if robot velocity is zero if goal velocity is zero)
+    PathPlannerTrajectoryState endState = trajectory.getEndState();
+
+    double currentPosX = tracker.getEstimatedPose().getX();
+    double currentPosY = tracker.getEstimatedPose().getY();
+    double currentRotation = tracker.getEstimatedPose().getRotation().getDegrees();
+
+    double desiredPosX = endState.pose.getX();
+    double desiredPosY = endState.pose.getY();
+    double desiredRotation = endState.pose.getRotation().getDegrees();
+
+    ChassisSpeeds currentChassisSpeeds = tracker.getRobotChassisSpeeds();
+    double desiredMPS = trajectory.getEndState().linearVelocity;
+    double currentMPS = Math.hypot(currentChassisSpeeds.vxMetersPerSecond, currentChassisSpeeds.vyMetersPerSecond);
+    double currentRPS = currentChassisSpeeds.omegaRadiansPerSecond;
+
+    double xError = Math.abs(desiredPosX - currentPosX);
+    double yError = Math.abs(desiredPosY - currentPosY);
+    double rotationError = Math.abs(desiredRotation - currentRotation);
+    if (rotationError > 180) {
+      rotationError = 360 - rotationError;
+    }
+    translationError = Math.hypot(xError, yError);
+
+    System.out.println(xError < ALLOWABLE_POSE_ERROR &&
+    yError < ALLOWABLE_POSE_ERROR &&
+    rotationError < ALLOWABLE_ROTATION_ERROR &&
+    (desiredMPS == 0 || (currentMPS < ALLOWABLE_VEL_ERROR && currentRPS < ALLOWABLE_OMEGA_ERROR)));
+
     return
       xError < ALLOWABLE_POSE_ERROR &&
       yError < ALLOWABLE_POSE_ERROR &&
       rotationError < ALLOWABLE_ROTATION_ERROR &&
-      (desiredMPS == 0 || currentMPS < ALLOWABLE_VEL_ERROR);
+      (desiredMPS == 0 || (currentMPS < ALLOWABLE_VEL_ERROR && currentRPS < ALLOWABLE_OMEGA_ERROR));
   }
 }

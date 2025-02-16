@@ -71,7 +71,7 @@ public class DriveConstants {
                 .bumperWidthX(Units.inchesToMeters(32))
                 .bumperWidthY(Units.inchesToMeters(32))
                 .maxLinearVelocity(Units.feetToMeters(17))
-                .maxLinearAcceleration(Units.feetToMeters(120.0)) // TODO emperically calculate
+                .maxLinearAcceleration(Units.feetToMeters(120)) // TODO emperically calculate
                 .maxAngularVelocity(12.0) // Radians
                 .maxAngularAcceleration(30) // Radians // TODO verify angle constraints
                 .build();

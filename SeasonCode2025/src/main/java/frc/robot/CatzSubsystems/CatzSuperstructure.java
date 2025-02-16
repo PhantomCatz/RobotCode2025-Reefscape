@@ -87,13 +87,19 @@ public class CatzSuperstructure extends VirtualSubsystem {
 
     }
 
-    public void setCurrentRobotAction(RobotAction action) {
+    public void setCurrentRobotAction(RobotAction action){
+        setCurrentRobotAction(action, level);
+    }
+
+    public void setCurrentRobotAction(RobotAction action, int level) {
         Command robotActionCommand = Commands.print("No robot Action Selected");
         this.currentRobotAction = action;
         switch(currentRobotAction) {
 
             // Outtaking Algae or Coral
             case OUTTAKE:
+                container.getCatzOuttake().setCoral(false);
+
                 if(chosenGamepiece == Gamepiece.CORAL) {
                     switch (level) {
                         case 1:
@@ -126,6 +132,8 @@ public class CatzSuperstructure extends VirtualSubsystem {
 
             // Intake Algae From Reef or Coral from Coral Substation
             case INTAKE:
+                container.getCatzOuttake().setCoral(true);
+
                 if(chosenGamepiece == Gamepiece.CORAL) {
                         currentRobotState = RobotState.INTAKE_CORAL_STATION;
                         System.out.println("Intake coral station");

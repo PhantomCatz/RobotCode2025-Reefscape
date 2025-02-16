@@ -186,7 +186,6 @@ public class CornerTrackingPathfinder{
       GridPosition currentCorner = currentPathfindingPos.corner;
       double currentCornerDistance = currentPathfindingPos.cornerDistancesTraveled;
       if(currentPos.compareTo(goal) == 0){
-        System.out.println("GOALLLL!" + lastCorner.size());
         break;
       }
 
@@ -285,7 +284,7 @@ public class CornerTrackingPathfinder{
       );
       return PathPlannerPath.waypointsFromPoses(pathPoses);
     }
-    
+
     //smoothens the path by splitting a path into smaller sections at some midpoint.
     for (int i = 1; i < fieldPosPath.size() - 1; i++) {
       Translation2d last = fieldPosPath.get(i - 1);
