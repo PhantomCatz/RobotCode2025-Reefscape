@@ -137,12 +137,15 @@ public class CatzRobotTracker {
               twist.dx, twist.dy, observation.gyroAngle().minus(lastGyroAngle).getRadians());
       lastGyroAngle = observation.gyroAngle();
     }
+
     //Add twist to odometry pose
-    odometryPose = odometryPose.exp(twist);
+    if((twist.dx != 0 || twist.dy != 0 || twist.dtheta != 0) && (!Double.isNaN(twist.dx) && !Double.isNaN(twist.dy) && !Double.isNaN(twist.dtheta))){
+      odometryPose = odometryPose.exp(twist);
+      estimatedPose = estimatedPose.exp(twist);
+    }
     // Add pose to buffer at timestamp
     POSE_BUFFER.addSample(observation.timestamp(), odometryPose);
     // Calculate diff from last odometry pose and add onto pose estimate
-    estimatedPose = estimatedPose.exp(twist);
 
     // Collect Velocity and Accerleration values
     var chassisSpeeds = KINEMATICS.toChassisSpeeds(observation.moduleStates);

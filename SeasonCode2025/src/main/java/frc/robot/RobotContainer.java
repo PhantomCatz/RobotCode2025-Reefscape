@@ -12,7 +12,6 @@ import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
-import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Autonomous.CatzAutonomous;
@@ -110,34 +109,38 @@ public class RobotContainer {
   //
   // ---------------------------------------------------------------------------
 
-  private int POVReefAngle = 0;
-
   private void configureBindings() {
     //---------------------------------------------------------------------------------------------------------------------
     // XBOX Drive
     //---------------------------------------------------------------------------------------------------------------------
     // Reef autopathfind
-    xboxDrv.b().onTrue(selector.runReefPathfindingCommand(() -> selector.getClosestReefPos()));
-    xboxDrv.b().onFalse(selector.stopPathfindingCommand());
+    xboxDrv.b().onTrue(selector.runReefCommand(() -> selector.getClosestReefPos()));
+    xboxDrv.b().onFalse(selector.cancelPathfindingCommand());
 
-    xboxDrv.a().onTrue(selector.runReefPathfindingCommand(() -> selector.pathQueuePeekFront().getFirst()).alongWith(new InstantCommand(() -> selector.pathQueuePopFront())));
-    xboxDrv.a().onFalse(selector.stopPathfindingCommand());
+    xboxDrv.x().onTrue(selector.runCoralStationCommand(() -> selector.getBestCoralStation()));
+    xboxDrv.x().onFalse(selector.cancelPathfindingCommand());
+
+    xboxDrv.y().onTrue(selector.runQueuedCommand());
+    xboxDrv.y().onFalse(selector.cancelPathfindingCommand());
+
+    xboxDrv.a().onTrue(selector.runAutoCommand());
+    xboxDrv.a().onFalse(selector.cancelAutoCommand());
 
     xboxDrv.leftBumper().onTrue(selector.runLeftRightCommand(LeftRight.LEFT));
-    xboxDrv.leftBumper().onFalse(selector.stopPathfindingCommand());
+    xboxDrv.leftBumper().onFalse(selector.cancelPathfindingCommand());
 
-    xboxDrv.leftBumper().and(xboxDrv.rightBumper()).onTrue(selector.stopPathfindingCommand());
+    xboxDrv.leftBumper().and(xboxDrv.rightBumper()).onTrue(selector.cancelPathfindingCommand());
 
     xboxDrv.rightBumper().onTrue(selector.runLeftRightCommand(LeftRight.RIGHT));
-    xboxDrv.rightBumper().onFalse(selector.stopPathfindingCommand());
+    xboxDrv.rightBumper().onFalse(selector.cancelPathfindingCommand());
 
-    xboxDrv.rightTrigger().onTrue(selector.runCoralStationPathFindingCommand(()-> FieldConstants.CoralStation.rightCenterFace));
-    xboxDrv.rightTrigger().onFalse(selector.stopPathfindingCommand());
+    xboxDrv.rightTrigger().onTrue(selector.runCoralStationCommand(()-> FieldConstants.CoralStation.rightCenterFace));
+    xboxDrv.rightTrigger().onFalse(selector.cancelPathfindingCommand());
 
-    xboxDrv.leftTrigger().onTrue(selector.runCoralStationPathFindingCommand(()-> FieldConstants.CoralStation.leftCenterFace));
-    xboxDrv.leftTrigger().onFalse(selector.stopPathfindingCommand());
+    xboxDrv.leftTrigger().onTrue(selector.runCoralStationCommand(()-> FieldConstants.CoralStation.leftCenterFace));
+    xboxDrv.leftTrigger().onFalse(selector.cancelPathfindingCommand());
 
-    xboxDrv.rightTrigger().and(xboxDrv.leftTrigger()).onTrue(selector.stopPathfindingCommand());
+    xboxDrv.rightTrigger().and(xboxDrv.leftTrigger()).onTrue(selector.cancelPathfindingCommand());
 
     // Default driving
     drive.setDefaultCommand(new TeleopDriveCmd(() -> xboxDrv.getLeftX(), () -> xboxDrv.getLeftY(), () -> xboxDrv.getRightX(), drive));
@@ -179,8 +182,8 @@ public class RobotContainer {
 
     // Scoring Level Determination
     xboxAux.rightTrigger().onTrue(Commands.runOnce(() -> selector.pathQueueAddBack(selector.getXBoxReefPos(), superstructure.getLevel())));
-    xboxAux.y().onTrue(Commands.runOnce(() -> selector.pathQueuePopFront()));
-    xboxAux.b().onTrue(Commands.runOnce(() -> selector.pathQueuePopBack()));
+    // xboxAux.y().onTrue(Commands.runOnce(() -> selector.pathQueuePopFront()));
+    // xboxAux.b().onTrue(Commands.runOnce(() -> selector.pathQueuePopBack()));
     xboxAux.rightStick().onTrue(Commands.runOnce(() -> selector.pathQueueClear()));
 
     xboxAux.povRight().onTrue(Commands.runOnce(()->{superstructure.setLevel(1); SmartDashboard.putNumber("Reef Level", 1);}));
@@ -276,4 +279,7 @@ public class RobotContainer {
     return algaePivot;
   }
 
+  public CatzSuperstructure getSuperstructure(){
+    return superstructure;
+  }
 }

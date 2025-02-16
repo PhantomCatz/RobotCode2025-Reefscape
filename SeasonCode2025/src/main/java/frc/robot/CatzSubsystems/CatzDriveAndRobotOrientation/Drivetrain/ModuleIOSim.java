@@ -7,6 +7,7 @@
 
 package frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.Drivetrain;
 
+
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.filter.SlewRateLimiter;
@@ -108,6 +109,7 @@ public class ModuleIOSim implements ModuleIO {
     // TLDR ignore autonomous paths drifting in sim because it won't happen in real life since setControl has an internal PID running in a separate thread
 
     // driveSim.setAngularVelocity(velocityRadsPerSec);
+
     runDriveVolts(
         driveFeedback.calculate(driveSim.getAngularVelocityRadPerSec(), velocityRadsPerSec));
   }

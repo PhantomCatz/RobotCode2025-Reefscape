@@ -10,6 +10,8 @@ package frc.robot;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.RobotController;
@@ -365,8 +367,7 @@ public class Robot extends LoggedRobot {
     teleStart = Timer.getFPGATimestamp();
     //CatzRobotTracker.getInstance().resetPose(m_robotContainer.getAutonomous().calculateReefPos(2, LeftRight.LEFT));
 
-    System.out.println("resetstsetserweset");
-    CatzRobotTracker.getInstance().resetPose(new Pose2d(Reef.center, Rotation2d.kZero));
+    CatzRobotTracker.getInstance().resetPose(new Pose2d(Reef.center.minus(new Translation2d(Units.inchesToMeters(52.743), 0)), Rotation2d.kZero));
 
   }
 

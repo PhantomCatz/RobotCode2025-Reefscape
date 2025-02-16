@@ -58,11 +58,11 @@ public class FieldConstants {
     public static final double faceToZoneLine =
         Units.inchesToMeters(12); // Side of the reef to the inside of the reef zone line
     public static final double scoringDistance =
-        Units.inchesToMeters(24); // Scoring distance from the side of the reef
+        Units.inchesToMeters(0); // Scoring distance from the side of the reef
     public static final double reefOrthogonalRadius =
-        Units.inchesToMeters(32.743); // Distance from the center to the side of the reef
+        Units.inchesToMeters(52.743); // Distance from the center to the side of the reef
     public static final double leftRightDistance =
-        Units.inchesToMeters(12); // Center of each face to the left and right scoring positions of each face
+        Units.inchesToMeters(0); // Center of each face to the left and right scoring positions of each face
   }
 
   public static class StagingPositions {
