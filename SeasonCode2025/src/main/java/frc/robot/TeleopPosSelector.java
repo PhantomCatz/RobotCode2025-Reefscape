@@ -26,6 +26,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.PrintCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
@@ -55,11 +56,12 @@ public class TeleopPosSelector extends SubsystemBase {
   private CatzSuperstructure superstructure;
   private CatzDrivetrain drivetrain;
   private CatzOuttake outtake;
-
-  private CornerTrackingPathfinder pathfinder = new CornerTrackingPathfinder();
   private CatzRobotTracker tracker = CatzRobotTracker.getInstance();
+
+  private Command currentTrajectoryCommand = new InstantCommand();
   private Command currentPathfindingCommand = new InstantCommand();
-  private Command currentAutoCommand = new InstantCommand();
+  private Command currentAutoplayCommand = new InstantCommand();
+  private CornerTrackingPathfinder pathfinder = new CornerTrackingPathfinder();
   private Pair<Integer, LeftRight> currentPathfindingPair = new Pair<Integer, LeftRight>(0, LeftRight.LEFT);
   private Deque<Pair<Pair<Integer, LeftRight>, Integer>> queuedPaths = new LinkedList<>();
   private HashMap<String, String> poseToLetter = new HashMap<>();
@@ -70,7 +72,7 @@ public class TeleopPosSelector extends SubsystemBase {
   public TeleopPosSelector(CommandXboxController aux, RobotContainer container) {
     this.xboxAux = aux;
     this.m_container = container;
-    this.currentPathfindingCommand.addRequirements(container.getCatzDrivetrain());
+    this.currentTrajectoryCommand.addRequirements(container.getCatzDrivetrain());
 
     superstructure = m_container.getSuperstructure();
     drivetrain = m_container.getCatzDrivetrain();
@@ -306,8 +308,8 @@ public class TeleopPosSelector extends SubsystemBase {
 
   public Command runAutoCommand() {
     return new InstantCommand(() -> {
-      currentAutoCommand.cancel();
-      currentAutoCommand = new Command() {
+      currentAutoplayCommand.cancel();
+      currentAutoplayCommand = new Command() {
         @Override
         public void initialize() {
           if (outtake.hasCoral()) {
@@ -334,16 +336,15 @@ public class TeleopPosSelector extends SubsystemBase {
           currentPathfindingCommand.cancel();
         }
       };
-      currentAutoCommand.schedule();
+      currentAutoplayCommand.schedule();
     });
   }
 
   private Command runPathfindingCommand(Supplier<Pose2d> goal) {
     return new InstantCommand(() -> {
-      System.out.println("running path");
-      currentPathfindingCommand.cancel();
-      currentPathfindingCommand = getPathfindingCommand(goal);
-      currentPathfindingCommand.schedule();
+      currentTrajectoryCommand.cancel();
+      currentTrajectoryCommand = getPathfindingCommand(goal);
+      currentTrajectoryCommand.schedule();
     });
   }
 
@@ -352,27 +353,39 @@ public class TeleopPosSelector extends SubsystemBase {
   }
 
   public Command runReefCommand(Supplier<Pair<Pair<Integer, LeftRight>, Integer>> pairSupplier) {
-    System.out.println(pairSupplier.get());
-
-    return new SequentialCommandGroup(
+    return new InstantCommand(() -> {
+      currentPathfindingCommand.cancel();
+      currentPathfindingCommand = new SequentialCommandGroup(
+        new PrintCommand("dddd1"),
+        new InstantCommand(),
+        new PrintCommand("ddddd2342342"),
         runPathfindingCommand(() -> calculateReefPose(pairSupplier.get().getFirst())).alongWith(new InstantCommand(() -> {
           Pair<Integer, LeftRight> pair = pairSupplier.get().getFirst();
           if (pair != null) {
             currentPathfindingPair = pair;
           }
         })),
-        Commands.waitUntil(() -> {System.out.println(((TrajectoryDriveCmd) currentPathfindingCommand).isAtTarget()); return ((TrajectoryDriveCmd) currentPathfindingCommand).isAtTarget();}),
+        Commands.waitUntil(() -> ((TrajectoryDriveCmd) currentTrajectoryCommand).isAtTarget()),
         new InstantCommand(() -> superstructure.setCurrentRobotAction(RobotAction.OUTTAKE, pairSupplier.get().getSecond())),
         Commands.waitUntil(() -> !outtake.hasCoral()),
-        getPathfindingCommand(() -> getBestCoralStation()).alongWith(Commands.waitUntil(() -> outtake.hasCoral()))
+        getPathfindingCommand(() -> getBestCoralStation())
+          .alongWith(new InstantCommand(() -> superstructure.setCurrentRobotAction(RobotAction.INTAKE, pairSupplier.get().getSecond())))
+          .alongWith(Commands.waitUntil(() -> outtake.hasCoral())),
+        Commands.waitUntil(() -> ((TrajectoryDriveCmd) currentTrajectoryCommand).isAtTarget()) // TODO dont need this in real life
       );
+      currentPathfindingCommand.schedule();
+    });
   }
 
   public Command runCoralStationCommand(Supplier<Pose2d> pose) {
-    return
-      runPathfindingCommand(() -> pose.get())
-      .alongWith(new InstantCommand(() -> superstructure.setCurrentRobotAction(RobotAction.INTAKE)))
-      .alongWith().alongWith(Commands.waitUntil(() -> outtake.hasCoral()));
+    return new InstantCommand(() -> {
+      currentPathfindingCommand.cancel();
+      currentPathfindingCommand =
+        runPathfindingCommand(() -> pose.get())
+        .alongWith(new InstantCommand(() -> superstructure.setCurrentRobotAction(RobotAction.INTAKE)))
+        .alongWith().alongWith(Commands.waitUntil(() -> outtake.hasCoral()));
+      currentPathfindingCommand.schedule();
+    });
   }
 
   public Command cancelPathfindingCommand() {
@@ -383,7 +396,7 @@ public class TeleopPosSelector extends SubsystemBase {
 
   public Command cancelAutoCommand() {
     return new InstantCommand(() -> {
-      currentAutoCommand.cancel();
+      currentAutoplayCommand.cancel();
     });
   }
 }

@@ -99,6 +99,7 @@ public class CatzSuperstructure extends VirtualSubsystem {
             // Outtaking Algae or Coral
             case OUTTAKE:
                 container.getCatzOuttake().setCoral(false);
+                System.out.println("ehehahaha");
 
                 if(chosenGamepiece == Gamepiece.CORAL) {
                     switch (level) {
