@@ -134,6 +134,7 @@ public class TeleopPosSelector extends SubsystemBase {
   }
 
   public Pair<Pair<Integer, LeftRight>, Integer> pathQueuePeekFront() {
+    System.out.println("pepekpekpekpkep: " + queuedPaths);
     if (queuedPaths.peekFirst() != null) {
       return queuedPaths.peekFirst();
     } else {
@@ -142,6 +143,7 @@ public class TeleopPosSelector extends SubsystemBase {
   }
 
   public void pathQueuePopFront() {
+    System.out.println("poppoity popopop: " + queuedPaths);
     queuedPaths.pollFirst();
   }
 
@@ -244,6 +246,8 @@ public class TeleopPosSelector extends SubsystemBase {
   }
 
   public Pose2d calculateReefPose(Pair<Integer, LeftRight> pair) {
+
+    System.out.println("this is pair: " + pair);
     if (pair == null) {
       return null;
     } else {
@@ -310,11 +314,14 @@ public class TeleopPosSelector extends SubsystemBase {
     return new InstantCommand(() -> {
       currentAutoplayCommand.cancel();
       currentAutoplayCommand = new Command() {
+        private Command currentCmd;
+
         @Override
         public void initialize() {
           if (outtake.hasCoral()) {
-            runQueuedCommand().schedule();;
+            currentCmd = runNextQueuedCommand();
           } else {
+            System.out.println("you dnt have a coralalalalalala");
             runCoralStationCommand(() -> getBestCoralStation()).schedule();;
           }
         }
@@ -322,6 +329,7 @@ public class TeleopPosSelector extends SubsystemBase {
         @Override
         public void execute() {
           if (currentPathfindingCommand.isFinished()) {
+            System.out.println("queue the next onepneoneoneonoenone");
             runQueuedCommand().schedule();
           }
         }
@@ -340,38 +348,62 @@ public class TeleopPosSelector extends SubsystemBase {
     });
   }
 
+  private Command runNextQueuedCommand(){
+    return runReefSequenceCommand(() -> pathQueuePeekFront());
+  }
+
+  private Command runReefSequenceCommand(Supplier<Pair<Pair<Integer, LeftRight>, Integer>> pairSupplier){
+    return new SequentialCommandGroup(
+      getPathfindingCommand(() -> calculateReefPose(pairSupplier.get().getFirst())).andThen(new InstantCommand(() -> {
+        //for left right movemnet with bumpers
+        Pair<Integer, LeftRight> pair = pairSupplier.get().getFirst();
+        if (pair != null) {
+          currentPathfindingPair = pair;
+        }
+        pathQueuePopFront();
+      })),
+      new PrintCommand("done pathfindign!!!!"),
+      new InstantCommand(() -> superstructure.setCurrentRobotAction(RobotAction.OUTTAKE, pairSupplier.get().getSecond())),
+      Commands.waitUntil(() -> !outtake.hasCoral()),
+      getPathfindingCommand(() -> getBestCoralStation())
+        .alongWith(new InstantCommand(() -> superstructure.setCurrentRobotAction(RobotAction.INTAKE, pairSupplier.get().getSecond())))
+        .alongWith(Commands.waitUntil(() -> outtake.hasCoral()))
+    );
+  }
+
   private Command runPathfindingCommand(Supplier<Pose2d> goal) {
     return new InstantCommand(() -> {
       currentTrajectoryCommand.cancel();
       currentTrajectoryCommand = getPathfindingCommand(goal);
       currentTrajectoryCommand.schedule();
+      System.out.println("i am literally instantntntntntntntnt");
     });
   }
 
   public Command runQueuedCommand() {
-    return runReefCommand(() -> pathQueuePeekFront()).alongWith(new InstantCommand(() -> pathQueuePopFront()));
+    return runReefCommand(() -> pathQueuePeekFront());
   }
 
+  //pairSupplier is safe, meaning calling this supplier multiple times wont break anything because it is just peeking
   public Command runReefCommand(Supplier<Pair<Pair<Integer, LeftRight>, Integer>> pairSupplier) {
     return new InstantCommand(() -> {
       currentPathfindingCommand.cancel();
       currentPathfindingCommand = new SequentialCommandGroup(
-        new PrintCommand("dddd1"),
-        new InstantCommand(),
-        new PrintCommand("ddddd2342342"),
-        runPathfindingCommand(() -> calculateReefPose(pairSupplier.get().getFirst())).alongWith(new InstantCommand(() -> {
+        new PrintCommand("before schueldingingininginignin!"),
+        getPathfindingCommand(() -> calculateReefPose(pairSupplier.get().getFirst())).andThen(new InstantCommand(() -> {
           Pair<Integer, LeftRight> pair = pairSupplier.get().getFirst();
           if (pair != null) {
             currentPathfindingPair = pair;
           }
-        })),
-        Commands.waitUntil(() -> ((TrajectoryDriveCmd) currentTrajectoryCommand).isAtTarget()),
+          pathQueuePopFront();
+        }),
+        new PrintCommand("done pathfindign!!!!"),
         new InstantCommand(() -> superstructure.setCurrentRobotAction(RobotAction.OUTTAKE, pairSupplier.get().getSecond())),
         Commands.waitUntil(() -> !outtake.hasCoral()),
         getPathfindingCommand(() -> getBestCoralStation())
           .alongWith(new InstantCommand(() -> superstructure.setCurrentRobotAction(RobotAction.INTAKE, pairSupplier.get().getSecond())))
           .alongWith(Commands.waitUntil(() -> outtake.hasCoral())),
-        Commands.waitUntil(() -> ((TrajectoryDriveCmd) currentTrajectoryCommand).isAtTarget()) // TODO dont need this in real life
+        Commands.waitUntil(() -> ((TrajectoryDriveCmd) currentTrajectoryCommand).isAtTarget())) // TODO dont need this in real life
       );
       currentPathfindingCommand.schedule();
     });
