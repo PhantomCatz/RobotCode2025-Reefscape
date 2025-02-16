@@ -72,24 +72,31 @@ public class CatzOuttake extends SubsystemBase {
 
     switch (currentState) {
       case ADJ_INIT:
+      //Starts the intake until 0.1s has passed and if the BackBeambreak = Triggered, goes to ADJ_FWD. Else ADJ_BACK
         case_adjustInit();
         break;
       case ADJ_BACK:
+      //Goes backwards until the BackBeambreak = triggered, then STOP
         case_adjustBack();
         break;
       case ADJ_FWD:
+      //Goes forwards until the FrontBeambreak = triggered, then STOP
         case_adjustFwd();
         break;
       case SCORE:
+      //Outtakes until the FrontBeambreak = triggered AND once 0.5s has passed
         case_shoot();
         break;
       case SCORE_L1:
+      //Outtakes with speeds fit for L1 Scoring until FrontBeambreak = triggered AND once 1s has passed
         case_shootL1();
         break;
       case SCORE_L4:
+      //Outtakes with speeds fit for L4 Scoring until FrontBeambreak = triggered AND once 0.5s has passed
         case_shootL4();
         break;
       case STOP:
+        io.runIntakesIntakeMotor(0.0);
         io.runMotor(0,0);
         break;
       case TEMP_RUN:
@@ -127,7 +134,7 @@ public class CatzOuttake extends SubsystemBase {
     if(inputs.bbreakFrntTriggered) {
       io.runMotor(0.0, 0.0);
       intakeIterationCoutner++;
-      if(intakeIterationCoutner >= 5) {
+      if(intakeIterationCoutner >= 25) {
         if(inputs.bbreakBackTriggered) {
           intakeIterationCoutner = 0;
           System.out.println("going to adj_fwd");
@@ -175,11 +182,12 @@ public class CatzOuttake extends SubsystemBase {
         currentState = outtakeStates.STOP;
     }
   }
+
   private void case_shootL1() {
     io.runIntakesIntakeMotor(0.0);
     io.runMotor(OUTTAKE_L1_LT, OUTTAKE_L1_RT);
     interationCounter++;
-    if(!inputs.bbreakFrntTriggered&& interationCounter >= 100) {
+    if(!inputs.bbreakFrntTriggered&& interationCounter >= 50) {
       interationCounter = 0;
       CatzSuperstructure.currentCoralState = CoralState.NOT_IN_OUTTAKE;
       currentState = outtakeStates.STOP;
@@ -189,7 +197,7 @@ public class CatzOuttake extends SubsystemBase {
   private void case_shootL4() {
     io.runMotor(OUTTAKE_L4, OUTTAKE_L4);
     interationCounter++;
-    if(!inputs.bbreakFrntTriggered && interationCounter >= 25) {
+    if(!inputs.bbreakFrntTriggered && interationCounter >= 50) {
         interationCounter = 0;
         CatzSuperstructure.currentCoralState = CoralState.NOT_IN_OUTTAKE;
         currentState = outtakeStates.STOP;

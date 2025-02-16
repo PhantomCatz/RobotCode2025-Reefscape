@@ -19,6 +19,7 @@ import frc.robot.CatzSubsystems.CatzAlgaeEffector.CatzAlgaeRemover.CatzAlgaeRemo
 import frc.robot.CatzSubsystems.CatzClimb.CatzClimb;
 import frc.robot.CatzSubsystems.CatzElevator.CatzElevator;
 import frc.robot.CatzSubsystems.CatzOuttake.CatzOuttake;
+import frc.robot.CatzSubsystems.CatzSuperstructure.CoralState;
 
 public class CatzStateCommands {
 
@@ -34,7 +35,7 @@ public class CatzStateCommands {
             climb.Climb_Retract(),
             algae.stopAlgae(),
             outtake.stopOuttake(),
-            elevator.Elevator_L1()
+            elevator.Elevator_Stow()
         ).unless(()-> Robot.isSimulation()).alongWith(Commands.print("Stow"));
 
     }
@@ -58,7 +59,7 @@ public class CatzStateCommands {
             // climb.Climb_Retract(),
             algae.stopAlgae(),
             outtake.startIntaking(),
-            elevator.Elevator_L1()
+            elevator.Elevator_Stow()
         ).unless(()-> Robot.isSimulation()).alongWith(Commands.print("Intake Coral Station"));
     }
 
@@ -72,7 +73,7 @@ public class CatzStateCommands {
             climb.Climb_Retract(),
             algae.eatAlgae(),
             outtake.stopOuttake(),
-            elevator.Elevator_L1()
+            elevator.Elevator_Stow()
         ).unless(()-> Robot.isSimulation()).alongWith(Commands.print("intakeAlgae"));
     }
 
@@ -87,10 +88,11 @@ public class CatzStateCommands {
             algae.stopAlgae(),
 
             new SequentialCommandGroup(
-               // elevator.Elevator_L1(),
+                elevator.Elevator_Stow(),
                 outtake.outtakeL1()
             )
-        ).unless(()-> Robot.isSimulation()).alongWith(Commands.print("L1 Scoring State"));
+        ).onlyIf(() -> CatzSuperstructure.currentCoralState == CoralState.IN_OUTTAKE)
+         .unless(()-> Robot.isSimulation()).alongWith(Commands.print("L1 Scoring State"));
     }
 
     public static Command L2Coral(RobotContainer robotContainer) {
@@ -108,7 +110,8 @@ public class CatzStateCommands {
                 Commands.waitUntil(() -> elevator.isElevatorInPosition()),
                 outtake.startOuttake()
             )
-        ).unless(()-> Robot.isSimulation()).alongWith(Commands.print("L2 Scoring State")).unless(()-> Robot.isSimulation());
+        ).onlyIf(() -> CatzSuperstructure.currentCoralState == CoralState.IN_OUTTAKE)
+         .unless(()-> Robot.isSimulation()).alongWith(Commands.print("L2 Scoring State")).unless(()-> Robot.isSimulation());
     }
 
     public static Command L3Coral(RobotContainer robotContainer) {
@@ -126,7 +129,8 @@ public class CatzStateCommands {
                 Commands.waitUntil(() -> elevator.isElevatorInPosition()),
                 outtake.startOuttake()
             )
-        ).unless(()-> Robot.isSimulation()).alongWith(Commands.print("L3 scoring state"));
+        ).onlyIf(() -> CatzSuperstructure.currentCoralState == CoralState.IN_OUTTAKE)
+         .unless(()-> Robot.isSimulation()).alongWith(Commands.print("L3 scoring state"));
     }
 
     public static Command L4Coral(RobotContainer robotContainer) {
@@ -144,7 +148,8 @@ public class CatzStateCommands {
                 Commands.waitUntil(() -> elevator.isElevatorInPosition()),
                 outtake.outtakeL4()
             )
-        ).unless(()-> Robot.isSimulation()).alongWith(Commands.print("L4 Scoring State"));
+        ).onlyIf(() -> CatzSuperstructure.currentCoralState == CoralState.IN_OUTTAKE)
+         .unless(()-> Robot.isSimulation()).alongWith(Commands.print("L4 Scoring State"));
     }
 
     public static Command processor(RobotContainer robotContainer) {
@@ -159,7 +164,7 @@ public class CatzStateCommands {
             outtake.stopOuttake(),
 
             new SequentialCommandGroup(
-                elevator.Elevator_L1(),
+                elevator.Elevator_Stow(),
                 algaePivot.AlgaePivot_Stow(),
                 algae.vomitAlgae()
 
@@ -215,7 +220,7 @@ public class CatzStateCommands {
             new ParallelCommandGroup(
                 outtake.stopOuttake(),
                 algae.stopAlgae(),
-                elevator.Elevator_L1()
+                elevator.Elevator_Stow()
             ),
             climb.Climb_Full()
         ).unless(()-> Robot.isSimulation()).alongWith(Commands.print("Climb"));
