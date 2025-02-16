@@ -16,7 +16,6 @@ public interface ElevatorIO {
 
     public boolean isLeaderMotorConnected = false;
     public boolean isFollowerMotorConnected = false;
-    public boolean isTopLimitSwitched = false;
     public boolean isBotLimitSwitched = false;
 
     public double positionRads = 0.0;

@@ -116,8 +116,6 @@ public class CatzElevator extends SubsystemBase {
     //---------------------------------------------------------------------------------------------------------------------------
     // if(inputs.isBotLimitSwitched) {
     //   io.setPosition(ElevatorPosition.PosL4.getTargetPositionRads());
-    // } else if (inputs.isTopLimitSwitched) {
-    //   io.setPosition(ElevatorPosition.PosL1Home.getTargetPositionRads());
     // }
 
     //---------------------------------------------------------------------------------------------------------------------------
@@ -132,7 +130,7 @@ public class CatzElevator extends SubsystemBase {
       io.stop();
     } else if(targetPosition != ElevatorPosition.PosManual){
         io.runSetpoint(targetPosition.getTargetPositionRads(), elevatorFeedForward);
-    } else if(getElevatorPositionRads() < 10.0) {
+    } else if(getElevatorPositionRads() < 5.0) {
       io.runMotor(0.0);
     } else {
       io.runSetpoint(targetManualPosition, elevatorFeedForward);

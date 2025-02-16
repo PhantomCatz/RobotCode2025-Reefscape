@@ -39,10 +39,10 @@ public class CatzLED extends VirtualSubsystem {
   // Robot state LED tracking
   // ----------------------------------------------------------------------------------------------
   @Getter @Setter @AutoLogOutput (key = "CatzLED/ledState")
-  public ControllerLEDState ledState = ControllerLEDState.BALLS;
+  public ControllerLEDState ledState = ControllerLEDState.nuhuh;
 
   @Getter @Setter @AutoLogOutput (key = "CatzLED/ledScoringState")
-  public ScoringLEDLocation ledScoringState = ScoringLEDLocation.nuhthing;
+  public ScoringLEDLocation ledScoringState = ScoringLEDLocation.A;
 
   public enum ControllerLEDState {
     LEDmanual_none,
@@ -57,7 +57,8 @@ public class CatzLED extends VirtualSubsystem {
     endgameAlert,
     sameBattery,
     autoFinished,
-    lowBatteryAlert
+    lowBatteryAlert,
+    nuhuh
   }
 
   public enum ScoringLEDLocation {
@@ -99,15 +100,15 @@ public class CatzLED extends VirtualSubsystem {
   // Constants
   private static final boolean paradeLeds = false;
   private static final int minLoopCycleCount = 10;
-  private static final int length = 34;
+  private static final int length = 56;
   //22 11 24
   private static final int LED_Sidebar_Start_LT = 0;
   private static final int LED_Sidebar_End_LT   = 22;
   private static final int LED_Crossbar_Start   = 23;
   private static final int LED_Crossbar_End     = 33;
   private static final int LED_Sidebar_Start_RT = 34;
-  private static final int LED_Sidebar_End_RT   = 57;
-  
+  private static final int LED_Sidebar_End_RT   = 56;
+
   private static final double strobeDuration = 0.1;
   private static final double breathDuration = 1.0;
   private static final double rainbowCycleLength = 25.0;
@@ -274,12 +275,14 @@ public class CatzLED extends VirtualSubsystem {
 
   private void setSolidElevatorColor(Color color) {
     if (color != null) {
-      for (int i = LED_Sidebar_Start_LT; i < LED_Sidebar_End_LT; i++) {
-        buffer.setLED(i, color);
+      for (int i = LED_Sidebar_Start_LT; i < LED_Sidebar_End_RT; i++) {
+        if(!(LED_Sidebar_End_LT<i && i<LED_Sidebar_Start_RT)) {
+          buffer.setLED(i, color);
+        }
       }
-      for (int i = LED_Sidebar_Start_RT; i < LED_Sidebar_End_RT; i++) {
-        buffer.setLED(i, color);
-      }
+      // for (int j = LED_Sidebar_Start_RT; j < LED_Sidebar_End_RT; j++) {
+      //   buffer.setLED(j, color);
+      // }
     }
   }
 

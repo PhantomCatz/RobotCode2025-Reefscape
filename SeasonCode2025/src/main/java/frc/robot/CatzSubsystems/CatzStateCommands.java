@@ -88,7 +88,7 @@ public class CatzStateCommands {
             algae.stopAlgae(),
 
             new SequentialCommandGroup(
-                elevator.Elevator_L1(),
+                elevator.Elevator_Stow(),
                 outtake.outtakeL1()
             )
         ).onlyIf(() -> CatzSuperstructure.currentCoralState == CoralState.IN_OUTTAKE)
