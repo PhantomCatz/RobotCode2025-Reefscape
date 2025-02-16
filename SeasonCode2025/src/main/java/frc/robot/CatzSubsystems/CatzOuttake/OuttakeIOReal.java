@@ -16,6 +16,10 @@ import com.revrobotics.spark.SparkLowLevel.MotorType;
 
 import static frc.robot.CatzSubsystems.CatzOuttake.OuttakeConstants.*;
 
+import com.ctre.phoenix6.configs.TalonFXConfiguration;
+import com.ctre.phoenix6.controls.DutyCycleOut;
+import com.ctre.phoenix6.hardware.TalonFX;
+import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkMaxConfig;
@@ -30,22 +34,43 @@ public class OuttakeIOReal implements OuttakeIO {
 
   private final SparkMax OuttakeLeftMtr;
   private final SparkMax OuttakeRightMtr;
-  private final SparkMax IntakeCoralMtr;
+  private final TalonFX IntakeCoralMtr;
 
+  private final TalonFXConfiguration config = new TalonFXConfiguration();
   private SparkMaxConfig globalConfig = new SparkMaxConfig();
 
   public OuttakeIOReal() {
 
     OuttakeLeftMtr = new SparkMax(LEFT_OUTTAKE_ID, MotorType.kBrushless);
     OuttakeRightMtr = new SparkMax(RIGHT_OUTTAKE_ID, MotorType.kBrushless);
-    IntakeCoralMtr = new SparkMax(50, MotorType.kBrushless);
+    IntakeCoralMtr = new TalonFX(INTAKE_CORAL_ID);
 
     // globalConfig.smartCurrentLimit(OUTTAKE_CURRENT_LIMIT);
     globalConfig.smartCurrentLimit(20);
     globalConfig.idleMode(IdleMode.kBrake);
     globalConfig.voltageCompensation(12);
     updateConfig();
-    System.out.println("HELLLLO");
+
+    config.Slot0.kS = gains.kS();
+    config.Slot0.kV = gains.kV();
+    config.Slot0.kA = gains.kA();
+    config.Slot0.kP = gains.kP();
+    config.Slot0.kI = gains.kI();
+    config.Slot0.kD = gains.kD();
+
+    config.TorqueCurrent.PeakForwardTorqueCurrent =  80.0;
+    config.TorqueCurrent.PeakReverseTorqueCurrent = -80.0;
+    config.MotorOutput.NeutralMode = NeutralModeValue.Brake;
+
+    // config.MotionMagic.MotionMagicCruiseVelocity = motionMagicParameters.mmCruiseVelocity();
+    // config.MotionMagic.MotionMagicAcceleration = motionMagicParameters.mmAcceleration();
+    // config.MotionMagic.MotionMagicJerk = motionMagicParameters.mmJerk();
+    // config.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
+
+    IntakeCoralMtr.setPosition(0);
+
+    IntakeCoralMtr.getConfigurator().apply(config, 1.0);
+
     beamBreakBck = new DigitalInput(BACK_BEAM_BREAK_ID);
     beamBreakFrnt = new DigitalInput(FRONT_BEAM_BREAK_ID);
   }
@@ -72,7 +97,7 @@ public class OuttakeIOReal implements OuttakeIO {
 
   @Override
   public void runIntakesIntakeMotor(double speed) {
-    IntakeCoralMtr.set(speed);
+    IntakeCoralMtr.setControl(new DutyCycleOut(speed));
   }
 
   @Override

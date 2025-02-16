@@ -160,7 +160,7 @@ public class RobotContainer {
     xboxTest.rightBumper().toggleOnTrue(algaePivot.AlgaePivot_Stow().alongWith(Commands.print("stow")));
     xboxTest.leftBumper().toggleOnTrue(algaePivot.AlgaePivot_Horizontal().alongWith(Commands.print("stow")));
 
-    xboxTest.a().toggleOnTrue(elevator.Elevator_L1().alongWith(Commands.print("L1")));
+    xboxTest.a().toggleOnTrue(elevator.Elevator_Stow().alongWith(Commands.print("L1")));
     xboxTest.b().toggleOnTrue(elevator.Elevator_L2().alongWith(Commands.print("L2")));
     xboxTest.x().toggleOnTrue(elevator.Elevator_L3().alongWith(Commands.print("L3")));
     xboxTest.y().toggleOnTrue(elevator.Elevator_L4().alongWith(Commands.print("L4")));
@@ -173,6 +173,7 @@ public class RobotContainer {
 
     //---------------------------------------------------------------------------------------------------------------------
     // XBOX AUX
+
     //---------------------------------------------------------------------------------------------------------------------
     // Reef autopathfind
 

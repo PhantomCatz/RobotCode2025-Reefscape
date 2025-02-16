@@ -45,7 +45,6 @@ public class ElevatorIOReal implements ElevatorIO {
   private final List<StatusSignal<Current>> torqueCurrent;
   private final List<StatusSignal<Temperature>> tempCelsius;
 
-  final DigitalInput m_elevatorLimitTop = new DigitalInput(TOP_LIMIT_SWITCH);
   final DigitalInput m_elevatorLimitBot = new DigitalInput(BOT_LIMIT_SWITCH);
 
   public ElevatorIOReal() {
@@ -70,6 +69,7 @@ public class ElevatorIOReal implements ElevatorIO {
         tempCelsius.get(0),
         tempCelsius.get(1));
 
+    // PID configs
     config.Slot0.kS = gains.kS();
     config.Slot0.kV = gains.kV();
     config.Slot0.kA = gains.kA();
@@ -77,21 +77,28 @@ public class ElevatorIOReal implements ElevatorIO {
     config.Slot0.kI = gains.kI();
     config.Slot0.kD = gains.kD();
 
+    // Supply Current Limits
     config.TorqueCurrent.PeakForwardTorqueCurrent =  80.0;
     config.TorqueCurrent.PeakReverseTorqueCurrent = -80.0;
+    config.CurrentLimits.SupplyCurrentLimitEnable = true;
+    config.CurrentLimits.SupplyCurrentLimit = 80.0;
     config.MotorOutput.NeutralMode = NeutralModeValue.Brake;
 
+    // Motion Magic Parameters
     config.MotionMagic.MotionMagicCruiseVelocity = motionMagicParameters.mmCruiseVelocity();
     config.MotionMagic.MotionMagicAcceleration = motionMagicParameters.mmAcceleration();
     config.MotionMagic.MotionMagicJerk = motionMagicParameters.mmJerk();
     config.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
 
+    // Encoder Resetting
     leaderTalon.setPosition(0);
     followerTalon.setPosition(0);
 
+    // Applying Configs
     leaderTalon.getConfigurator().apply(config, 1.0);
     followerTalon.getConfigurator().apply(config, 1.0);
 
+    // Setting follower
     followerTalon.setControl(new Follower(leaderTalon.getDeviceID(), true));
     positionControl.EnableFOC = true;
   }
@@ -131,7 +138,6 @@ public class ElevatorIOReal implements ElevatorIO {
                                             .mapToDouble(StatusSignal::getValueAsDouble)
                                             .toArray();
 
-      inputs.isTopLimitSwitched = m_elevatorLimitTop.get();
       inputs.isBotLimitSwitched = m_elevatorLimitBot.get();
     }
 

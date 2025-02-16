@@ -48,11 +48,12 @@ public class CatzElevator extends SubsystemBase {
 
   private ElevatorFeedforward ff = new ElevatorFeedforward(gains.kS(), gains.kG(), gains.kV(), gains.kA());
 
-  private ElevatorPosition targetPosition = ElevatorPosition.PosL1Home;
+  private ElevatorPosition targetPosition = ElevatorPosition.PosStow;
 
   @RequiredArgsConstructor
   public static enum ElevatorPosition {
-      PosL1Home(() -> 0.0), //TBD
+      PosStow(() -> 0.0),
+      PosL1(() -> 10.0),
       PosL2(() -> 34.7),
       PosL3(() -> 80.0),
       PosL4(() -> 155.0),
@@ -115,8 +116,6 @@ public class CatzElevator extends SubsystemBase {
     //---------------------------------------------------------------------------------------------------------------------------
     // if(inputs.isBotLimitSwitched) {
     //   io.setPosition(ElevatorPosition.PosL4.getTargetPositionRads());
-    // } else if (inputs.isTopLimitSwitched) {
-    //   io.setPosition(ElevatorPosition.PosL1Home.getTargetPositionRads());
     // }
 
     //---------------------------------------------------------------------------------------------------------------------------
@@ -131,6 +130,8 @@ public class CatzElevator extends SubsystemBase {
       io.stop();
     } else if(targetPosition != ElevatorPosition.PosManual){
         io.runSetpoint(targetPosition.getTargetPositionRads(), elevatorFeedForward);
+    } else if(getElevatorPositionRads() < 5.0) {
+      io.runMotor(0.0);
     } else {
       io.runSetpoint(targetManualPosition, elevatorFeedForward);
     }
@@ -148,9 +149,12 @@ public class CatzElevator extends SubsystemBase {
   //  Elevator Setpos Commands
   //
   //--------------------------------------------------------------------------------------------------------------------------
+  public Command Elevator_Stow() {
+    return runOnce(() -> setElevatorPos(ElevatorPosition.PosStow));
+  }
 
   public Command Elevator_L1() {
-    return runOnce(() -> setElevatorPos(ElevatorPosition.PosL1Home));
+    return runOnce(() -> setElevatorPos(ElevatorPosition.PosL1));
   }
 
   public Command Elevator_L2() {
