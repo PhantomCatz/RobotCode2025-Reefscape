@@ -12,6 +12,7 @@ import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Autonomous.CatzAutonomous;
@@ -114,30 +115,30 @@ public class RobotContainer {
     // XBOX Drive
     //---------------------------------------------------------------------------------------------------------------------
     // Reef autopathfind
-    xboxDrv.b().onTrue(selector.runCycleCommand(() -> selector.getClosestReefPos()));
+    xboxDrv.b().onTrue(new InstantCommand(() -> selector.runCycleCommand(selector.getClosestReefPos()).schedule()));
     xboxDrv.b().onFalse(selector.cancelCurrentRunningCommand());
 
-    xboxDrv.x().onTrue(selector.runOnlyCoralStationCommand(() -> selector.getBestCoralStation()));
+    xboxDrv.x().onTrue(new InstantCommand(() -> selector.runOnlyCoralStationCommand(selector.getBestCoralStation()).schedule()));
     xboxDrv.x().onFalse(selector.cancelCurrentRunningCommand());
 
     // xboxDrv.y().onTrue(selector.runQueuedCommand());
     // xboxDrv.y().onFalse(selector.cancelPathfindingCommand()); //TODO is this needed?
 
-    xboxDrv.a().onTrue(selector.runAutoCommand());
+    xboxDrv.a().onTrue(new InstantCommand(() -> selector.runAutoCommand().schedule()));
     xboxDrv.a().onFalse(selector.cancelAutoCommand());
 
-    xboxDrv.leftBumper().onTrue(selector.runLeftRightCommand(LeftRight.LEFT));
+    xboxDrv.leftBumper().onTrue(new InstantCommand(() -> selector.runLeftRightCommand(LeftRight.LEFT).schedule()));
     xboxDrv.leftBumper().onFalse(selector.cancelCurrentRunningCommand());
 
     xboxDrv.leftBumper().and(xboxDrv.rightBumper()).onTrue(selector.cancelCurrentRunningCommand());
 
-    xboxDrv.rightBumper().onTrue(selector.runLeftRightCommand(LeftRight.RIGHT));
+    xboxDrv.rightBumper().onTrue(new InstantCommand(() -> selector.runLeftRightCommand(LeftRight.RIGHT).schedule()));
     xboxDrv.rightBumper().onFalse(selector.cancelCurrentRunningCommand());
 
-    xboxDrv.rightTrigger().onTrue(selector.runOnlyCoralStationCommand(()-> FieldConstants.CoralStation.rightCenterFace));
+    xboxDrv.rightTrigger().onTrue(new InstantCommand(() -> selector.runOnlyCoralStationCommand(FieldConstants.CoralStation.rightCenterFace).schedule()));
     xboxDrv.rightTrigger().onFalse(selector.cancelCurrentRunningCommand());
 
-    xboxDrv.leftTrigger().onTrue(selector.runOnlyCoralStationCommand(()-> FieldConstants.CoralStation.leftCenterFace));
+    xboxDrv.leftTrigger().onTrue(new InstantCommand(() -> selector.runOnlyCoralStationCommand(FieldConstants.CoralStation.leftCenterFace).schedule()));
     xboxDrv.leftTrigger().onFalse(selector.cancelCurrentRunningCommand());
 
     xboxDrv.rightTrigger().and(xboxDrv.leftTrigger()).onTrue(selector.cancelCurrentRunningCommand());
