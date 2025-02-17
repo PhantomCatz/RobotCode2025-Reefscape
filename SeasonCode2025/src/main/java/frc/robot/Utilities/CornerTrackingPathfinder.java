@@ -165,6 +165,9 @@ public class CornerTrackingPathfinder{
     if (goal.equals(start)) {
       return new ArrayList<>();
     }
+    final GridPosition g = goal;
+
+    System.out.println("goall:;: " + goal);
     //Queue to store the nodes to explore, prioritizing the shortest paths.
     PriorityQueue<PathfindingPosition> frontier = new PriorityQueue<>(new CompareDistances());
 
@@ -238,6 +241,9 @@ public class CornerTrackingPathfinder{
         if(start.equals(new GridPosition(col, row))){
           //starting point
           System.out.print("s");
+        }
+        else if(g.equals(new GridPosition(col, row))){
+          System.out.print("e");
         }
         else if (obstacles.contains(new GridPosition(col, row))){
           //wall
