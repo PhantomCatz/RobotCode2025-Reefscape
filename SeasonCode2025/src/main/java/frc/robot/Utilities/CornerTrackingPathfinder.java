@@ -120,6 +120,7 @@ public class CornerTrackingPathfinder{
   }
 
   public PathPlannerPath getPath(Translation2d start, Translation2d end, GoalEndState goal){
+    System.out.println("my goal:::: " + end);
     List<Waypoint> waypoints = createWaypoints(
       findReversePath(
         findClosestNonObstacle(translation2dToGridPos(start), walls),
@@ -127,6 +128,8 @@ public class CornerTrackingPathfinder{
         walls
       ),
     start, end, walls);
+
+    System.out.println("my grid gaollll: " + translation2dToGridPos(end));
 
     if(waypoints.size() >= 2){
       PathPlannerPath path = new PathPlannerPath(waypoints, DriveConstants.PATHFINDING_CONSTRAINTS, null, goal);
@@ -223,7 +226,7 @@ public class CornerTrackingPathfinder{
       }
     }
 
-    
+
     //either a path was found (or wasn't found)
     //retrace the path backwards by going through the corners that this path visited.
     List<GridPosition> path = new ArrayList<>();
@@ -234,7 +237,15 @@ public class CornerTrackingPathfinder{
     // Visualize path
     for (int row = nodesY - 1; row >= 0; row--) {
       for (int col = 0; col < nodesX; col++) {
-        if (obstacles.contains(new GridPosition(col, row))){
+        if(start.equals(new GridPosition(col, row))){
+          //starting point
+          System.out.print("s");
+        }
+        else if(goal.equals(new GridPosition(col, row))){
+          //end point
+          System.out.print("e");
+        }
+        else if (obstacles.contains(new GridPosition(col, row))){
           //wall
           System.out.print("#");
         }
