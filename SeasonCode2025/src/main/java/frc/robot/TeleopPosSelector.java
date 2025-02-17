@@ -33,6 +33,7 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.FieldConstants.Reef;
 import frc.robot.Utilities.AllianceFlipUtil;
 import frc.robot.Utilities.CornerTrackingPathfinder;
+import frc.robot.CatzSubsystems.CatzSuperstructure.CoralState;
 import frc.robot.CatzSubsystems.CatzSuperstructure.LeftRight;
 import frc.robot.CatzSubsystems.CatzSuperstructure.RobotAction;
 import frc.robot.CatzSubsystems.CatzSuperstructure;
@@ -312,7 +313,7 @@ public class TeleopPosSelector extends SubsystemBase {
       currentAutoplayCommand = new Command() {
         @Override
         public void initialize() {
-          if (outtake.hasCoral()) {
+          if (CatzSuperstructure.currentCoralState == CoralState.IN_OUTTAKE) {
             runQueuedCommand().schedule();;
           } else {
             runCoralStationCommand(() -> getBestCoralStation()).schedule();;
@@ -352,6 +353,15 @@ public class TeleopPosSelector extends SubsystemBase {
     return runReefCommand(() -> pathQueuePeekFront()).alongWith(new InstantCommand(() -> pathQueuePopFront()));
   }
 
+  public Command testCommand(Supplier<Pair<Pair<Integer, LeftRight>, Integer>> pairSupplier){
+    return runPathfindingCommand(() -> calculateReefPose(pairSupplier.get().getFirst())).alongWith(new InstantCommand(() -> {
+      Pair<Integer, LeftRight> pair = pairSupplier.get().getFirst();
+      if (pair != null) {
+        currentPathfindingPair = pair;
+      }
+    }));
+  }
+
   public Command runReefCommand(Supplier<Pair<Pair<Integer, LeftRight>, Integer>> pairSupplier) {
     return new InstantCommand(() -> {
       currentPathfindingCommand.cancel();
@@ -367,10 +377,10 @@ public class TeleopPosSelector extends SubsystemBase {
         })),
         Commands.waitUntil(() -> ((TrajectoryDriveCmd) currentTrajectoryCommand).isAtTarget()),
         new InstantCommand(() -> superstructure.setCurrentRobotAction(RobotAction.OUTTAKE, pairSupplier.get().getSecond())),
-        Commands.waitUntil(() -> !outtake.hasCoral()),
+        Commands.waitUntil(() -> !(CatzSuperstructure.currentCoralState == CoralState.NOT_IN_OUTTAKE)),
         getPathfindingCommand(() -> getBestCoralStation())
           .alongWith(new InstantCommand(() -> superstructure.setCurrentRobotAction(RobotAction.INTAKE, pairSupplier.get().getSecond())))
-          .alongWith(Commands.waitUntil(() -> outtake.hasCoral())),
+          .alongWith(Commands.waitUntil(() -> CatzSuperstructure.currentCoralState == CoralState.IN_OUTTAKE)),
         Commands.waitUntil(() -> ((TrajectoryDriveCmd) currentTrajectoryCommand).isAtTarget()) // TODO dont need this in real life
       );
       currentPathfindingCommand.schedule();
@@ -383,7 +393,7 @@ public class TeleopPosSelector extends SubsystemBase {
       currentPathfindingCommand =
         runPathfindingCommand(() -> pose.get())
         .alongWith(new InstantCommand(() -> superstructure.setCurrentRobotAction(RobotAction.INTAKE)))
-        .alongWith().alongWith(Commands.waitUntil(() -> outtake.hasCoral()));
+        .alongWith().alongWith(Commands.waitUntil(() -> CatzSuperstructure.currentCoralState == CoralState.IN_OUTTAKE));
       currentPathfindingCommand.schedule();
     });
   }
@@ -391,7 +401,7 @@ public class TeleopPosSelector extends SubsystemBase {
   public Command cancelPathfindingCommand() {
     return new InstantCommand(() -> {
       currentPathfindingCommand.cancel();
-    });
+    }, drivetrain);
   }
 
   public Command cancelAutoCommand() {

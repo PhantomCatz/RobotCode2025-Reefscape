@@ -64,7 +64,8 @@ public class TrajectoryDriveCmd extends Command {
   private PathPlannerPath path;
   private double pathTimeOut = -999.0;
   private Timer timer = new Timer();
-  private boolean autoalign;
+  private boolean autoalign = false;
+  private boolean isPIDAimEnabled = false;
 
   // Event Command variables
   private final EventScheduler eventScheduler;
@@ -99,6 +100,7 @@ public class TrajectoryDriveCmd extends Command {
   // ---------------------------------------------------------------------------------------------
   @Override
   public void initialize() {
+    isPIDAimEnabled = false;
     // Flip path if necessary
     System.out.println("trajec start");
     PathPlannerPath usePath = path;
@@ -123,24 +125,30 @@ public class TrajectoryDriveCmd extends Command {
     if (Math.hypot(currentSpeeds.vxMetersPerSecond, currentSpeeds.vxMetersPerSecond) < 1e-6) {
       currentSpeeds = DriveConstants.NON_ZERO_CHASSIS_SPEED;
     }
-    // Construct trajectory
-    this.trajectory =
-        new PathPlannerTrajectory(
-            usePath,
-            currentSpeeds,
-            tracker.getEstimatedPose().getRotation(),
-            DriveConstants.TRAJECTORY_CONFIG);
 
-    hocontroller = DriveConstants.getNewHolController();
-    pathTimeOut = trajectory.getTotalTimeSeconds() * TIMEOUT_SCALAR;
+    if(usePath.getAllPathPoints().size() <= 1) {
+      this.cancel();
+      isPIDAimEnabled = true;
+    } else {
+      // Construct trajectory
+      this.trajectory =
+          new PathPlannerTrajectory(
+              usePath,
+              currentSpeeds,
+              tracker.getEstimatedPose().getRotation(),
+              DriveConstants.TRAJECTORY_CONFIG);
 
-    // Reset
-    PathPlannerLogging.logActivePath(usePath);
-    PPLibTelemetry.setCurrentPath(usePath);
+      hocontroller = DriveConstants.getNewHolController();
+      pathTimeOut = trajectory.getTotalTimeSeconds() * TIMEOUT_SCALAR;
 
-    eventScheduler.initialize(trajectory);
-    this.timer.reset();
-    this.timer.start();
+      // Reset
+      PathPlannerLogging.logActivePath(usePath);
+      PPLibTelemetry.setCurrentPath(usePath);
+
+      eventScheduler.initialize(trajectory);
+      this.timer.reset();
+      this.timer.start();
+    }
   } // end of initialize()
 
   // ---------------------------------------------------------------------------------------------

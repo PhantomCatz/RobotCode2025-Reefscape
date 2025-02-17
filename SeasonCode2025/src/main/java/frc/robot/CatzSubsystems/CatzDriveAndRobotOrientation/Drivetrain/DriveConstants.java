@@ -82,7 +82,7 @@ public class DriveConstants {
                 Units.inchesToMeters(29.0),
                 Units.inchesToMeters(32),
                 Units.inchesToMeters(32),
-                Units.feetToMeters(17),
+                Units.feetToMeters(2), //TBD neeed to change
                 Units.feetToMeters(120),
                 12,
                 30);
