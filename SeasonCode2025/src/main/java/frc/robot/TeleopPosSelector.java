@@ -124,6 +124,14 @@ public class TeleopPosSelector extends SubsystemBase {
     queuedPaths.addLast(new Pair(pose, reefLevel));
   }
 
+  public Pair<Pair<Integer, LeftRight>, Integer> pathQueuePeekFront(){
+    if (queuedPaths.peekFirst() != null) {
+      return queuedPaths.peekFirst();
+    }else{
+      return new Pair(null, 0);
+    }
+  }
+
   public Pair<Pair<Integer, LeftRight>, Integer> pathQueuePopFront() {
     if (queuedPaths.peekFirst() != null) {
       return queuedPaths.pollFirst();
@@ -239,35 +247,19 @@ public class TeleopPosSelector extends SubsystemBase {
     }
   }
 
-  public Command getPathfindingCommand(Pose2d goal) {
-    if (goal == null) {
-      System.out.println("The goal is null");
-      return new InstantCommand();
-    }
-
-    Translation2d robotPos = tracker.getEstimatedPose().getTranslation();
-    System.out.println("robot pos: " + robotPos);
-    PathPlannerPath path = pathfinder.getPath(robotPos, goal.getTranslation(),
-        new GoalEndState(0.0, goal.getRotation()));
-
-    if (path == null) {
-      System.out.println("The path is null: " + robotPos + goal.getTranslation());
-      return new InstantCommand();
-    } else {
-      if (AllianceFlipUtil.shouldFlipToRed()) {
-        path = path.flipPath();
-      }
-      return new TrajectoryDriveCmd(path, drivetrain, true);
-    }
-  }
-
   public Command getPathfindingCommand(Pose2d goal, Pose2d start) {
     if (goal == null) {
       System.out.println("The goal is null");
       return new InstantCommand();
     }
+    
+    Translation2d robotPos;
+    if(start != null){
+      robotPos = start.getTranslation();
+    }else{
+      robotPos = tracker.getEstimatedPose().getTranslation();
+    }
 
-    Translation2d robotPos = start.getTranslation();
     PathPlannerPath path = pathfinder.getPath(robotPos, goal.getTranslation(),
         new GoalEndState(0.0, goal.getRotation()));
 
@@ -283,6 +275,8 @@ public class TeleopPosSelector extends SubsystemBase {
   }
 
   public Command runLeftRightCommand(LeftRight leftRight) {
+    if(currentPathfindingPair == null) return new InstantCommand(); //means it is in AQUA
+
     Pose2d goal = calculateReefPose(new Pair<Integer, LeftRight>(currentPathfindingPair.getFirst(), leftRight));
     Pose2d currentPose = tracker.getEstimatedPose();
 
@@ -317,7 +311,8 @@ public class TeleopPosSelector extends SubsystemBase {
           if (outtake.hasCoral()) {
             currentRunningCommand = runNextQueuedCommand();
           } else {
-            currentRunningCommand = runCoralStationCommand(getBestCoralStation());
+            System.out.println("yoouve got no corlalll");
+            currentRunningCommand = runCoralStationCommand(getBestCoralStation(), null);
           }
           currentRunningCommand.initialize();
         }
@@ -338,6 +333,11 @@ public class TeleopPosSelector extends SubsystemBase {
           return false;
         }
 
+        @Override
+        public void end(boolean interrupted){
+          currentRunningCommand.end(interrupted);
+        }
+
       };
       currentAutoplayCommand.schedule();
     });
@@ -345,50 +345,96 @@ public class TeleopPosSelector extends SubsystemBase {
 
   private Command runNextQueuedCommand() {
     if(queuedPaths.isEmpty()) return new InstantCommand();
-    return runCycleCommand(pathQueuePopFront());
+    return runCycleCommand(pathQueuePeekFront());
   }
 
   public Command runCycleCommand(Pair<Pair<Integer, LeftRight>, Integer> pair) {
     return new SequentialCommandGroup(
         runReefScoreCommand(pair),
+        new InstantCommand(() -> pathQueuePopFront()),
         runCoralStationCommand(getBestCoralStation(), calculateReefPose(pair.getFirst())) //the start pos of the robot is same for both of these commands, even though they run sequentially
       );
   }
 
   public Command runReefScoreCommand(Pair<Pair<Integer, LeftRight>, Integer> pair) {
-    return new SequentialCommandGroup(
-        getPathfindingCommand(calculateReefPose(pair.getFirst())).andThen(new InstantCommand(() -> {
-          // for left right movemnet with bumpers
-          Pair<Integer, LeftRight> pairPos = pair.getFirst();
-          if (pair != null) {
-            currentPathfindingPair = pairPos;
-          }
-        })),
-        new InstantCommand(
-            () -> superstructure.setCurrentRobotAction(RobotAction.OUTTAKE, pair.getSecond())
-        ),
-        Commands.waitUntil(() -> !outtake.hasCoral())
-    );
+    return new Command() {
+      private Command pathfindingCommand;
+
+      @Override
+      public void initialize(){
+        pathfindingCommand = getPathfindingCommand(calculateReefPose(pair.getFirst()), null);
+        pathfindingCommand.initialize();
+        currentPathfindingPair = null; //we don't want left right movement during AQUA
+      }
+
+      @Override
+      public void execute(){
+        if(pathfindingCommand.isFinished()){
+          pathfindingCommand.end(false);
+          superstructure.setCurrentRobotAction(RobotAction.OUTTAKE, pair.getSecond());
+        }else{
+          pathfindingCommand.execute();
+        }
+      }
+
+      @Override
+      public boolean isFinished(){
+        return !outtake.hasCoral();
+      }
+
+      @Override
+      public void end(boolean interrupted){
+        pathfindingCommand.end(interrupted);
+      }
+    };
   }
 
   public Command runOnlyCoralStationCommand(Pose2d pose) {
     return new InstantCommand(() -> {
       currentRunningCommand.cancel();
-      currentRunningCommand = runCoralStationCommand(pose);
+      currentRunningCommand = runCoralStationCommand(pose, null);
       currentRunningCommand.schedule();
     });
   }
 
   private Command runCoralStationCommand(Pose2d goalPose, Pose2d startPose) {
-    return getPathfindingCommand(goalPose, startPose)
-        .alongWith(new InstantCommand(() -> superstructure.setCurrentRobotAction(RobotAction.INTAKE)))
-        .alongWith().alongWith(Commands.waitUntil(() -> outtake.hasCoral()));
-  }
+    return new Command() {
+      private Command pathfindingCommand;
+      @Override
+      public void initialize(){
+        pathfindingCommand = getPathfindingCommand(goalPose, startPose);
+        pathfindingCommand.initialize();
+      }
 
-  private Command runCoralStationCommand(Pose2d goalPose) {
-    return getPathfindingCommand(goalPose)
-        .alongWith(new InstantCommand(() -> superstructure.setCurrentRobotAction(RobotAction.INTAKE)))
-        .alongWith().alongWith(Commands.waitUntil(() -> outtake.hasCoral()));
+      @Override
+      public void execute(){
+        Translation2d robotPos = startPose.getTranslation();
+        if(startPose != null){
+          robotPos = tracker.getEstimatedPose().getTranslation();
+        }
+
+        if(pathfindingCommand.isFinished()){
+          pathfindingCommand.end(false);
+        }else{
+          pathfindingCommand.execute();
+        }
+
+        //if you are within 2 meters of coral station and don't already have intake on
+        if(robotPos.getDistance(goalPose.getTranslation()) < 2.0 && !superstructure.getCurrentRobotAction().equals(RobotAction.INTAKE)){
+          superstructure.setCurrentRobotAction(RobotAction.INTAKE);
+        }
+      }
+
+      @Override
+      public boolean isFinished(){
+        return outtake.hasCoral();
+      }
+
+      @Override
+      public void end(boolean interrupted){
+        pathfindingCommand.end(interrupted);
+      }
+    };
   }
 
   public Command cancelCurrentRunningCommand(){
