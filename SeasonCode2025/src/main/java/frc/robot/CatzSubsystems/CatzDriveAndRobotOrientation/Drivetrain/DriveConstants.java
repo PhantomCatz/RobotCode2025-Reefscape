@@ -63,7 +63,7 @@ public class DriveConstants {
 
   public static final DriveConfig DRIVE_CONFIG =
       switch (CatzConstants.getRobotType()) {
-        case SN_TEST, SN2 ->
+        case SN_TEST ->//, SN2 ->
             DriveConfig.builder()
                 .wheelRadius(Units.inchesToMeters(2.0)) // TODO make these repeated numbers into constants
                 .robotLengthX(Units.inchesToMeters(29.0))
@@ -75,7 +75,7 @@ public class DriveConstants {
                 .maxAngularVelocity(12.0) // Radians
                 .maxAngularAcceleration(30) // Radians // TODO verify angle constraints
                 .build();
-        case SN1, SN1_2024 ->
+        case SN1, SN2, SN1_2024 ->
             new DriveConfig( //TODO make the builder the same way for these configurations
                 Units.inchesToMeters(2.0),
                 Units.inchesToMeters(29.0),
@@ -90,7 +90,7 @@ public class DriveConstants {
 
   public static final ModuleGainsAndRatios MODULE_GAINS_AND_RATIOS =
       switch (CatzConstants.getRobotType()) {
-        case SN1 ->
+        case SN1, SN2 ->
             new ModuleGainsAndRatios(
                 5.0,
                 0.45,
@@ -101,17 +101,17 @@ public class DriveConstants {
                 0.005,
                 Mk4iReductions.L2_PLUS.reduction,
                 Mk4iReductions.steer.reduction);
-        case SN2 ->
-            new ModuleGainsAndRatios(
-                5.5,
-                0.6,
-                0.0,
-                1.2, // 1.2, //TODO fix to account for non foc // TODO characterize individual motors to ensure consistency before sn2
-                0.0,
-                0.001,
-                0.000,
-                Mk4iReductions.L2_PLUS.reduction,
-                Mk4iReductions.steer.reduction);
+        // case SN2 ->
+        //     new ModuleGainsAndRatios(
+        //         5.5,
+        //         0.6,
+        //         0.0,
+        //         1.2, // 1.2, //TODO fix to account for non foc // TODO characterize individual motors to ensure consistency before sn2
+        //         0.0,
+        //         0.001,
+        //         0.000,
+        //         Mk4iReductions.L2_PLUS.reduction,
+        //         Mk4iReductions.steer.reduction);
         case SN_TEST ->
             new ModuleGainsAndRatios(
                 0.014,
@@ -142,8 +142,8 @@ public class DriveConstants {
   public static final double GYRO_UPDATE_FREQUENCY =
       switch (CatzConstants.getRobotType()) {
         case SN_TEST -> 50.0;
-        case SN1, SN1_2024 -> 100.0;
-        case SN2 -> 250.0;
+        case SN2, SN1, SN1_2024 -> 100.0;
+        //case SN2 -> 250.0;
       };
 
   // ---------------------------------------------------------------------------------------------------------------------
@@ -160,10 +160,10 @@ public class DriveConstants {
   static{
     switch(CatzConstants.getRobotType()){
         case SN2:
-            MODULE_CONFIGS[INDEX_FR] = new ModuleIDs(1, 2, 9, 1.4196464857 / Math.PI / 2 + 0.5, false);
-            MODULE_CONFIGS[INDEX_BR] = new ModuleIDs(3, 4, 10, 4.6208462275 / Math.PI / 2 + 0.5, false);
-            MODULE_CONFIGS[INDEX_BL] = new ModuleIDs(5, 6, 11, 0.6691969510 / Math.PI / 2, false);
-            MODULE_CONFIGS[INDEX_FL] = new ModuleIDs(7, 8, 12, 2.0568857418 / Math.PI / 2, false);
+            MODULE_CONFIGS[INDEX_FR] = new ModuleIDs(1, 2, 11, -0.538330, false);
+            MODULE_CONFIGS[INDEX_BR] = new ModuleIDs(3, 4, 12,  0.084228, false);
+            MODULE_CONFIGS[INDEX_BL] = new ModuleIDs(5, 6, 13, -0.148437, false);
+            MODULE_CONFIGS[INDEX_FL] = new ModuleIDs(7, 8, 14, -0.052978, false);
         break;
 
         case SN1:
