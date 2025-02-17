@@ -26,7 +26,6 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.PrintCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
@@ -58,8 +57,7 @@ public class TeleopPosSelector extends SubsystemBase {
   private CatzOuttake outtake;
   private CatzRobotTracker tracker = CatzRobotTracker.getInstance();
 
-  private Command currentTrajectoryCommand = new InstantCommand();
-  private Command currentPathfindingCommand = new InstantCommand();
+  private Command currentRunningCommand = new InstantCommand();
   private Command currentAutoplayCommand = new InstantCommand();
   private CornerTrackingPathfinder pathfinder = new CornerTrackingPathfinder();
   private Pair<Integer, LeftRight> currentPathfindingPair = new Pair<Integer, LeftRight>(0, LeftRight.LEFT);
@@ -72,7 +70,8 @@ public class TeleopPosSelector extends SubsystemBase {
   public TeleopPosSelector(CommandXboxController aux, RobotContainer container) {
     this.xboxAux = aux;
     this.m_container = container;
-    this.currentTrajectoryCommand.addRequirements(container.getCatzDrivetrain());
+    this.currentRunningCommand.addRequirements(container.getCatzDrivetrain());
+    this.currentAutoplayCommand.addRequirements(container.getCatzDrivetrain());
 
     superstructure = m_container.getSuperstructure();
     drivetrain = m_container.getCatzDrivetrain();
@@ -245,13 +244,11 @@ public class TeleopPosSelector extends SubsystemBase {
     return AllianceFlipUtil.apply(new Pose2d(scoringPos, selectedAngle.plus(Rotation2d.k180deg)));
   }
 
-  public Pose2d calculateReefPose(Pair<Integer, LeftRight> pair) {
-
-    System.out.println("this is pair: " + pair);
-    if (pair == null) {
+  public Pose2d calculateReefPose(Supplier<Pair<Integer, LeftRight>> pair) {
+    if (pair.get() == null) {
       return null;
     } else {
-      return calculateReefPose(pair.getFirst(), pair.getSecond());
+      return calculateReefPose(pair.get().getFirst(), pair.get().getSecond());
     }
   }
 
@@ -279,7 +276,7 @@ public class TeleopPosSelector extends SubsystemBase {
 
   public Command runLeftRightCommand(LeftRight leftRight) {
     return new InstantCommand(() -> {
-      Pose2d goal = calculateReefPose(new Pair<Integer, LeftRight>(currentPathfindingPair.getFirst(), leftRight));
+      Pose2d goal = calculateReefPose(() -> new Pair<Integer, LeftRight>(currentPathfindingPair.getFirst(), leftRight));
       Pose2d currentPose = tracker.getEstimatedPose();
 
       Translation2d goalPos = goal.getTranslation();
@@ -291,8 +288,8 @@ public class TeleopPosSelector extends SubsystemBase {
         return;
       }
 
-      currentPathfindingCommand.cancel();
-      currentPathfindingCommand = new TrajectoryDriveCmd(new PathPlannerPath(
+      currentRunningCommand.cancel();
+      currentRunningCommand = new TrajectoryDriveCmd(new PathPlannerPath(
           Arrays.asList(new Waypoint[] {
               new Waypoint(null, currentPos, currentPos.plus(direction)),
               new Waypoint(goalPos.minus(direction), goalPos, null)
@@ -302,7 +299,7 @@ public class TeleopPosSelector extends SubsystemBase {
           new GoalEndState(0, goal.getRotation())), drivetrain, true);
 
       try {
-        currentPathfindingCommand.schedule();
+        currentRunningCommand.schedule();
       } catch (IndexOutOfBoundsException e) {
         e.printStackTrace();
         System.out.println("Stop spamming bumpers");
@@ -314,23 +311,23 @@ public class TeleopPosSelector extends SubsystemBase {
     return new InstantCommand(() -> {
       currentAutoplayCommand.cancel();
       currentAutoplayCommand = new Command() {
-        private Command currentCmd;
 
         @Override
         public void initialize() {
+          currentRunningCommand.cancel();
           if (outtake.hasCoral()) {
-            currentCmd = runNextQueuedCommand();
+            currentRunningCommand = runNextQueuedCommand();
           } else {
-            System.out.println("you dnt have a coralalalalalala");
-            runCoralStationCommand(() -> getBestCoralStation()).schedule();;
+            currentRunningCommand = runCoralStationCommand(() -> getBestCoralStation());
           }
         }
 
         @Override
         public void execute() {
-          if (currentPathfindingCommand.isFinished()) {
-            System.out.println("queue the next onepneoneoneonoenone");
-            runQueuedCommand().schedule();
+          currentRunningCommand.execute();
+
+          if (currentRunningCommand.isFinished()) {
+            currentRunningCommand = runNextQueuedCommand();
           }
         }
 
@@ -339,90 +336,55 @@ public class TeleopPosSelector extends SubsystemBase {
           return false;
         }
 
-        @Override
-        public void end(boolean interrupted) {
-          currentPathfindingCommand.cancel();
-        }
       };
       currentAutoplayCommand.schedule();
     });
   }
 
-  private Command runNextQueuedCommand(){
-    return runReefSequenceCommand(() -> pathQueuePeekFront());
+  private Command runNextQueuedCommand() {
+    return runCycleCommand(() -> pathQueuePeekFront());
   }
 
-  private Command runReefSequenceCommand(Supplier<Pair<Pair<Integer, LeftRight>, Integer>> pairSupplier){
+  public Command runCycleCommand(Supplier<Pair<Pair<Integer, LeftRight>, Integer>> pairSupplier) {
     return new SequentialCommandGroup(
-      getPathfindingCommand(() -> calculateReefPose(pairSupplier.get().getFirst())).andThen(new InstantCommand(() -> {
-        //for left right movemnet with bumpers
-        Pair<Integer, LeftRight> pair = pairSupplier.get().getFirst();
-        if (pair != null) {
-          currentPathfindingPair = pair;
-        }
-        pathQueuePopFront();
-      })),
-      new PrintCommand("done pathfindign!!!!"),
-      new InstantCommand(() -> superstructure.setCurrentRobotAction(RobotAction.OUTTAKE, pairSupplier.get().getSecond())),
-      Commands.waitUntil(() -> !outtake.hasCoral()),
-      getPathfindingCommand(() -> getBestCoralStation())
-        .alongWith(new InstantCommand(() -> superstructure.setCurrentRobotAction(RobotAction.INTAKE, pairSupplier.get().getSecond())))
-        .alongWith(Commands.waitUntil(() -> outtake.hasCoral()))
-    );
+        runReefScoreCommand(pairSupplier),
+        runCoralStationCommand(() -> calculateReefPose(() -> pairSupplier.get().getFirst())));
   }
 
-  private Command runPathfindingCommand(Supplier<Pose2d> goal) {
-    return new InstantCommand(() -> {
-      currentTrajectoryCommand.cancel();
-      currentTrajectoryCommand = getPathfindingCommand(goal);
-      currentTrajectoryCommand.schedule();
-      System.out.println("i am literally instantntntntntntntnt");
-    });
-  }
-
-  public Command runQueuedCommand() {
-    return runReefCommand(() -> pathQueuePeekFront());
-  }
-
-  //pairSupplier is safe, meaning calling this supplier multiple times wont break anything because it is just peeking
-  public Command runReefCommand(Supplier<Pair<Pair<Integer, LeftRight>, Integer>> pairSupplier) {
-    return new InstantCommand(() -> {
-      currentPathfindingCommand.cancel();
-      currentPathfindingCommand = new SequentialCommandGroup(
-        new PrintCommand("before schueldingingininginignin!"),
-        getPathfindingCommand(() -> calculateReefPose(pairSupplier.get().getFirst())).andThen(new InstantCommand(() -> {
+  public Command runReefScoreCommand(Supplier<Pair<Pair<Integer, LeftRight>, Integer>> pairSupplier) {
+    return new SequentialCommandGroup(
+        getPathfindingCommand(() -> calculateReefPose(() -> pairSupplier.get().getFirst())).andThen(new InstantCommand(() -> {
+          // for left right movemnet with bumpers
           Pair<Integer, LeftRight> pair = pairSupplier.get().getFirst();
           if (pair != null) {
             currentPathfindingPair = pair;
           }
           pathQueuePopFront();
-        }),
-        new PrintCommand("done pathfindign!!!!"),
-        new InstantCommand(() -> superstructure.setCurrentRobotAction(RobotAction.OUTTAKE, pairSupplier.get().getSecond())),
-        Commands.waitUntil(() -> !outtake.hasCoral()),
-        getPathfindingCommand(() -> getBestCoralStation())
-          .alongWith(new InstantCommand(() -> superstructure.setCurrentRobotAction(RobotAction.INTAKE, pairSupplier.get().getSecond())))
-          .alongWith(Commands.waitUntil(() -> outtake.hasCoral())),
-        Commands.waitUntil(() -> ((TrajectoryDriveCmd) currentTrajectoryCommand).isAtTarget())) // TODO dont need this in real life
-      );
-      currentPathfindingCommand.schedule();
+        })),
+        new InstantCommand(
+            () -> superstructure.setCurrentRobotAction(RobotAction.OUTTAKE, pairSupplier.get().getSecond())
+        ),
+        Commands.waitUntil(() -> !outtake.hasCoral())
+    );
+  }
+
+  public Command runOnlyCoralStationCommand(Supplier<Pose2d> pose) {
+    return new InstantCommand(() -> {
+      currentRunningCommand.cancel();
+      currentRunningCommand = runCoralStationCommand(pose);
+      currentRunningCommand.schedule();
     });
   }
 
-  public Command runCoralStationCommand(Supplier<Pose2d> pose) {
-    return new InstantCommand(() -> {
-      currentPathfindingCommand.cancel();
-      currentPathfindingCommand =
-        runPathfindingCommand(() -> pose.get())
+  private Command runCoralStationCommand(Supplier<Pose2d> pose) {
+    return getPathfindingCommand(() -> pose.get())
         .alongWith(new InstantCommand(() -> superstructure.setCurrentRobotAction(RobotAction.INTAKE)))
         .alongWith().alongWith(Commands.waitUntil(() -> outtake.hasCoral()));
-      currentPathfindingCommand.schedule();
-    });
   }
 
-  public Command cancelPathfindingCommand() {
+  public Command cancelCurrentRunningCommand(){
     return new InstantCommand(() -> {
-      currentPathfindingCommand.cancel();
+      currentRunningCommand.cancel();
     });
   }
 

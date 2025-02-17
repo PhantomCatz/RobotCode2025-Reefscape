@@ -114,33 +114,33 @@ public class RobotContainer {
     // XBOX Drive
     //---------------------------------------------------------------------------------------------------------------------
     // Reef autopathfind
-    xboxDrv.b().onTrue(selector.runReefCommand(() -> selector.getClosestReefPos()));
-    xboxDrv.b().onFalse(selector.cancelPathfindingCommand());
+    xboxDrv.b().onTrue(selector.runCycleCommand(() -> selector.getClosestReefPos()));
+    xboxDrv.b().onFalse(selector.cancelCurrentRunningCommand());
 
-    xboxDrv.x().onTrue(selector.runCoralStationCommand(() -> selector.getBestCoralStation()));
-    xboxDrv.x().onFalse(selector.cancelPathfindingCommand());
+    xboxDrv.x().onTrue(selector.runOnlyCoralStationCommand(() -> selector.getBestCoralStation()));
+    xboxDrv.x().onFalse(selector.cancelCurrentRunningCommand());
 
-    xboxDrv.y().onTrue(selector.runQueuedCommand());
-    xboxDrv.y().onFalse(selector.cancelPathfindingCommand());
+    // xboxDrv.y().onTrue(selector.runQueuedCommand());
+    // xboxDrv.y().onFalse(selector.cancelPathfindingCommand()); //TODO is this needed?
 
     xboxDrv.a().onTrue(selector.runAutoCommand());
     xboxDrv.a().onFalse(selector.cancelAutoCommand());
 
     xboxDrv.leftBumper().onTrue(selector.runLeftRightCommand(LeftRight.LEFT));
-    xboxDrv.leftBumper().onFalse(selector.cancelPathfindingCommand());
+    xboxDrv.leftBumper().onFalse(selector.cancelCurrentRunningCommand());
 
-    xboxDrv.leftBumper().and(xboxDrv.rightBumper()).onTrue(selector.cancelPathfindingCommand());
+    xboxDrv.leftBumper().and(xboxDrv.rightBumper()).onTrue(selector.cancelCurrentRunningCommand());
 
     xboxDrv.rightBumper().onTrue(selector.runLeftRightCommand(LeftRight.RIGHT));
-    xboxDrv.rightBumper().onFalse(selector.cancelPathfindingCommand());
+    xboxDrv.rightBumper().onFalse(selector.cancelCurrentRunningCommand());
 
-    xboxDrv.rightTrigger().onTrue(selector.runCoralStationCommand(()-> FieldConstants.CoralStation.rightCenterFace));
-    xboxDrv.rightTrigger().onFalse(selector.cancelPathfindingCommand());
+    xboxDrv.rightTrigger().onTrue(selector.runOnlyCoralStationCommand(()-> FieldConstants.CoralStation.rightCenterFace));
+    xboxDrv.rightTrigger().onFalse(selector.cancelCurrentRunningCommand());
 
-    xboxDrv.leftTrigger().onTrue(selector.runCoralStationCommand(()-> FieldConstants.CoralStation.leftCenterFace));
-    xboxDrv.leftTrigger().onFalse(selector.cancelPathfindingCommand());
+    xboxDrv.leftTrigger().onTrue(selector.runOnlyCoralStationCommand(()-> FieldConstants.CoralStation.leftCenterFace));
+    xboxDrv.leftTrigger().onFalse(selector.cancelCurrentRunningCommand());
 
-    xboxDrv.rightTrigger().and(xboxDrv.leftTrigger()).onTrue(selector.cancelPathfindingCommand());
+    xboxDrv.rightTrigger().and(xboxDrv.leftTrigger()).onTrue(selector.cancelCurrentRunningCommand());
 
     // Default driving
     drive.setDefaultCommand(new TeleopDriveCmd(() -> xboxDrv.getLeftX(), () -> xboxDrv.getLeftY(), () -> xboxDrv.getRightX(), drive));
