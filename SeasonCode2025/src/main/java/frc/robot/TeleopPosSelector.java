@@ -433,7 +433,7 @@ public class TeleopPosSelector extends SubsystemBase {
 
         //if you are within 2 meters of coral station and don't already have intake on
         if(robotPos.getDistance(goalPose.getTranslation()) < 2.0 && !superstructure.getCurrentRobotAction().equals(RobotAction.INTAKE)){
-          // superstructure.setCurrentRobotAction(RobotAction.INTAKE);
+          superstructure.setCurrentRobotAction(RobotAction.INTAKE);
         }
       }
 
