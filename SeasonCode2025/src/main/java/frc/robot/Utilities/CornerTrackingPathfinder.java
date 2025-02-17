@@ -223,28 +223,34 @@ public class CornerTrackingPathfinder{
       }
     }
 
-    // Visualize path
-    // for (int row = nodesY - 1; row >= 0; row--) {
-    //   for (int col = 0; col < nodesX; col++) {
-    //     if (obstacles.contains(new GridPosition(col, row))){
-    //       System.out.print("#");
-    //     }
-    //     else if (lastCorner.keySet().contains(new GridPosition(col, row))){
-    //       System.out.print("+");
-    //     }
-    //     else {
-    //       System.out.print("_");
-    //     }
-    //   }
-    //   System.out.println();
-    // }
-
+    
     //either a path was found (or wasn't found)
     //retrace the path backwards by going through the corners that this path visited.
     List<GridPosition> path = new ArrayList<>();
     while(goal != null && goal.compareTo(start) != 0){
       path.add(goal);
       goal = lastCorner.get(goal);
+    }
+    // Visualize path
+    for (int row = nodesY - 1; row >= 0; row--) {
+      for (int col = 0; col < nodesX; col++) {
+        if (obstacles.contains(new GridPosition(col, row))){
+          //wall
+          System.out.print("#");
+        }
+        else if(path.contains(new GridPosition(col, row))){
+          //goal points
+          System.out.print("@");
+        }
+        else if (lastCorner.keySet().contains(new GridPosition(col, row))){
+          //areas flood filled
+          System.out.print("+");
+        }
+        else {
+          System.out.print("_");
+        }
+      }
+      System.out.println();
     }
 
     return path;
