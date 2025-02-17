@@ -22,7 +22,6 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -252,7 +251,7 @@ public class TeleopPosSelector extends SubsystemBase {
       System.out.println("The goal is null");
       return new InstantCommand();
     }
-    
+
     Translation2d robotPos;
     if(start != null){
       robotPos = start.getTranslation();
@@ -276,6 +275,7 @@ public class TeleopPosSelector extends SubsystemBase {
 
   public Command runLeftRightCommand(LeftRight leftRight) {
     if(currentPathfindingPair == null) return new InstantCommand(); //means it is in AQUA
+    currentRunningCommand.cancel();
 
     Pose2d goal = calculateReefPose(new Pair<Integer, LeftRight>(currentPathfindingPair.getFirst(), leftRight));
     Pose2d currentPose = tracker.getEstimatedPose();
@@ -387,6 +387,16 @@ public class TeleopPosSelector extends SubsystemBase {
         pathfindingCommand.end(interrupted);
       }
     };
+  }
+
+  public Command runToNearestBranch(){
+    return new InstantCommand(() ->{
+      Pair<Integer, LeftRight> newPathfindingPair = getClosestReefPos().getFirst();
+      currentPathfindingPair = newPathfindingPair;
+      currentRunningCommand.cancel();
+      currentRunningCommand = getPathfindingCommand(calculateReefPose(newPathfindingPair), null);
+      currentRunningCommand.schedule();
+    });
   }
 
   public Command runOnlyCoralStationCommand(Pose2d pose) {

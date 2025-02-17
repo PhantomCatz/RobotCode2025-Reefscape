@@ -115,7 +115,7 @@ public class RobotContainer {
     // XBOX Drive
     //---------------------------------------------------------------------------------------------------------------------
     // Reef autopathfind
-    xboxDrv.b().onTrue(new InstantCommand(() -> selector.runCycleCommand(selector.getClosestReefPos()).schedule()));
+    xboxDrv.b().onTrue(new InstantCommand(() -> selector.runToNearestBranch().schedule()));
     xboxDrv.b().onFalse(selector.cancelCurrentRunningCommand());
 
     xboxDrv.x().onTrue(new InstantCommand(() -> selector.runOnlyCoralStationCommand(selector.getBestCoralStation()).schedule()));
@@ -179,7 +179,7 @@ public class RobotContainer {
     // XBOX AUX
 
     //---------------------------------------------------------------------------------------------------------------------
-    // Reef autopathfind
+    //TODO add coral station toggle buttons
 
     // Scoring Level Determination
     xboxAux.rightTrigger().onTrue(Commands.runOnce(() -> selector.pathQueueAddBack(selector.getXBoxReefPos(), superstructure.getLevel())));
