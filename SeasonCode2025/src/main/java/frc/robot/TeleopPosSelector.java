@@ -418,8 +418,10 @@ public class TeleopPosSelector extends SubsystemBase {
 
       @Override
       public void execute(){
-        Translation2d robotPos = startPose.getTranslation();
+        Translation2d robotPos;
         if(startPose != null){
+          robotPos = startPose.getTranslation();
+        }else{
           robotPos = tracker.getEstimatedPose().getTranslation();
         }
 
