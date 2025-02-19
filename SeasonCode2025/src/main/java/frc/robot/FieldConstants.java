@@ -62,7 +62,7 @@ public class FieldConstants {
     public static final double reefOrthogonalRadius =
         Units.inchesToMeters(52.743); // Distance from the center to the side of the reef
     public static final double leftRightDistance =
-        Units.inchesToMeters(0); // Center of each face to the left and right scoring positions of each face
+        Units.inchesToMeters(7); // Center of each face to the left and right scoring positions of each face
   }
 
   public static class StagingPositions {

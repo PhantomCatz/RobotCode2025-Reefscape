@@ -30,7 +30,6 @@ public class ElevatorConstants {
     public static final int LEFT_LEADER_ID  = 30;
     public static final int RIGHT_FOLLOWER_ID = 31;
 
-    public static final int TOP_LIMIT_SWITCH = 2;
     public static final int BOT_LIMIT_SWITCH = 3;
 
 

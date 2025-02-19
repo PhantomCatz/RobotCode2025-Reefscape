@@ -15,6 +15,7 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Autonomous.CatzAutonomous;
+import frc.robot.CatzConstants.XboxInterfaceConstants;
 import frc.robot.CatzSubsystems.CatzSuperstructure;
 import frc.robot.CatzSubsystems.CatzAlgaeEffector.CatzAlgaePivot.CatzAlgaePivot;
 import frc.robot.CatzSubsystems.CatzAlgaeEffector.CatzAlgaeRemover.CatzAlgaeRemover;
@@ -114,7 +115,7 @@ public class RobotContainer {
     // XBOX Drive
     //---------------------------------------------------------------------------------------------------------------------
     // Reef autopathfind
-    xboxDrv.b().onTrue(selector.runReefCommand(() -> selector.getClosestReefPos()));
+    xboxDrv.b().onTrue(selector.testCommand(() -> selector.getClosestReefPos()));
     xboxDrv.b().onFalse(selector.cancelPathfindingCommand());
 
     xboxDrv.x().onTrue(selector.runCoralStationCommand(() -> selector.getBestCoralStation()));
@@ -143,6 +144,8 @@ public class RobotContainer {
     xboxDrv.rightTrigger().and(xboxDrv.leftTrigger()).onTrue(selector.cancelPathfindingCommand());
 
     // Default driving
+    Trigger escapeTrajectory = new Trigger(()->(xboxDrv.getLeftY() > XboxInterfaceConstants.kDeadband));
+    escapeTrajectory.onTrue(selector.cancelPathfindingCommand());
     drive.setDefaultCommand(new TeleopDriveCmd(() -> xboxDrv.getLeftX(), () -> xboxDrv.getLeftY(), () -> xboxDrv.getRightX(), drive));
 
     // Manual Climb Control
@@ -277,6 +280,10 @@ public class RobotContainer {
 
   public CatzAlgaePivot getAlgaePivot(){
     return algaePivot;
+  }
+
+  public CatzVision getCatzVision() {
+    return vision;
   }
 
   public CatzSuperstructure getSuperstructure(){
