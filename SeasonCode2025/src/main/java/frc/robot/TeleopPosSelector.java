@@ -29,6 +29,7 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.FieldConstants.Reef;
 import frc.robot.Utilities.AllianceFlipUtil;
 import frc.robot.Utilities.CornerTrackingPathfinder;
+import frc.robot.CatzSubsystems.CatzSuperstructure.CoralState;
 import frc.robot.CatzSubsystems.CatzSuperstructure.LeftRight;
 import frc.robot.CatzSubsystems.CatzSuperstructure.RobotAction;
 import frc.robot.CatzSubsystems.CatzSuperstructure;
@@ -51,7 +52,6 @@ public class TeleopPosSelector extends SubsystemBase {
 
   private CatzSuperstructure superstructure;
   private CatzDrivetrain drivetrain;
-  private CatzOuttake outtake;
   private CatzRobotTracker tracker = CatzRobotTracker.getInstance();
 
   private Command currentRunningCommand = new InstantCommand();
@@ -72,7 +72,6 @@ public class TeleopPosSelector extends SubsystemBase {
 
     superstructure = m_container.getSuperstructure();
     drivetrain = m_container.getCatzDrivetrain();
-    outtake = m_container.getCatzOuttake();
 
     poseToLetter.put("0 RIGHT", "G");
     poseToLetter.put("0 LEFT", "H");
@@ -308,7 +307,7 @@ public class TeleopPosSelector extends SubsystemBase {
         @Override
         public void initialize() {
           currentRunningCommand.cancel();
-          if (outtake.hasCoral()) {
+          if (CatzSuperstructure.getCurrentCoralState() == CoralState.IN_OUTTAKE) {
             currentRunningCommand = runNextQueuedCommand();
           } else {
             System.out.println("yoouve got no corlalll");
@@ -379,7 +378,7 @@ public class TeleopPosSelector extends SubsystemBase {
 
       @Override
       public boolean isFinished(){
-        return !outtake.hasCoral();
+        return (CatzSuperstructure.getCurrentCoralState() == CoralState.NOT_IN_OUTTAKE);
       }
 
       @Override
@@ -439,7 +438,7 @@ public class TeleopPosSelector extends SubsystemBase {
 
       @Override
       public boolean isFinished(){
-        return outtake.hasCoral();
+        return (CatzSuperstructure.getCurrentCoralState() == CoralState.IN_OUTTAKE);
       }
 
       @Override

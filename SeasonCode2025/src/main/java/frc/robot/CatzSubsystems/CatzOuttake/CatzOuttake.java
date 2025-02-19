@@ -14,6 +14,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.CatzConstants;
 import frc.robot.CatzSubsystems.CatzSuperstructure;
 import frc.robot.CatzSubsystems.CatzSuperstructure.CoralState;
+import lombok.Setter;
 
 import org.littletonrobotics.junction.Logger;
 
@@ -37,6 +38,13 @@ public class CatzOuttake extends SubsystemBase {
 
   private outtakeStates currentState = outtakeStates.STOP;
   private outtakeStates previousState = outtakeStates.STOP;
+
+  @Setter
+  private boolean coral = true;
+
+  public boolean hasCoral(){
+    return coral;
+  }
 
   public CatzOuttake() {
     if(isOuttakeDisabled) {
@@ -108,16 +116,6 @@ public class CatzOuttake extends SubsystemBase {
 
   }
 
-  public boolean coral = true;
-
-  public boolean hasCoral(){
-    return coral;
-  }
-
-  public void setCoral(boolean coral){
-    this.coral = coral;
-  }
-
   // ============================================
   //
   //              Case methods
@@ -129,7 +127,7 @@ public class CatzOuttake extends SubsystemBase {
     io.runMotor(INTAKE_SPD, INTAKE_SPD);
     io.runIntakesIntakeMotor(INTAKE_INTAKE_SPEED);
 
-    CatzSuperstructure.currentCoralState = CoralState.CORAL_ADJUSTING;
+    CatzSuperstructure.setCurrentCoralState(CoralState.CORAL_ADJUSTING);
 
     if(inputs.bbreakFrntTriggered) {
       io.runMotor(0.0, 0.0);
@@ -152,11 +150,11 @@ public class CatzOuttake extends SubsystemBase {
     io.runIntakesIntakeMotor(0.0);
     io.runMotor(-ADJ_SPD, -ADJ_SPD);
 
-    CatzSuperstructure.currentCoralState = CoralState.NOT_IN_OUTTAKE;
+    CatzSuperstructure.setCurrentCoralState(CoralState.NOT_IN_OUTTAKE);
 
     if (inputs.bbreakBackTriggered) {
       currentState = outtakeStates.STOP;
-      CatzSuperstructure.currentCoralState = CoralState.IN_OUTTAKE;
+      CatzSuperstructure.setCurrentCoralState(CoralState.IN_OUTTAKE);
       System.out.println("stopping adjbck");
     }
   }
@@ -166,7 +164,7 @@ public class CatzOuttake extends SubsystemBase {
     io.runMotor(ADJ_SPD, ADJ_SPD);
     if (!inputs.bbreakBackTriggered) {
       currentState = outtakeStates.STOP;
-      CatzSuperstructure.currentCoralState = CoralState.IN_OUTTAKE;
+      CatzSuperstructure.setCurrentCoralState(CoralState.IN_OUTTAKE);
       System.out.println("stopping adjfwd");
     }
   }
@@ -178,7 +176,7 @@ public class CatzOuttake extends SubsystemBase {
     interationCounter++;
     if(!inputs.bbreakFrntTriggered && interationCounter >= 25) { //0.02s per iteration
         interationCounter = 0;
-        CatzSuperstructure.currentCoralState = CoralState.NOT_IN_OUTTAKE;
+        CatzSuperstructure.setCurrentCoralState(CoralState.NOT_IN_OUTTAKE);
         currentState = outtakeStates.STOP;
     }
   }
@@ -189,7 +187,7 @@ public class CatzOuttake extends SubsystemBase {
     interationCounter++;
     if(!inputs.bbreakFrntTriggered&& interationCounter >= 50) {
       interationCounter = 0;
-      CatzSuperstructure.currentCoralState = CoralState.NOT_IN_OUTTAKE;
+      CatzSuperstructure.setCurrentCoralState(CoralState.NOT_IN_OUTTAKE);
       currentState = outtakeStates.STOP;
     }
   }
@@ -199,7 +197,7 @@ public class CatzOuttake extends SubsystemBase {
     interationCounter++;
     if(!inputs.bbreakFrntTriggered && interationCounter >= 50) {
         interationCounter = 0;
-        CatzSuperstructure.currentCoralState = CoralState.NOT_IN_OUTTAKE;
+        CatzSuperstructure.setCurrentCoralState(CoralState.NOT_IN_OUTTAKE);
         currentState = outtakeStates.STOP;
     }
   }
