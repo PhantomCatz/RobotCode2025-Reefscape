@@ -15,6 +15,7 @@ import com.pathplanner.lib.trajectory.PathPlannerTrajectoryState;
 import com.pathplanner.lib.util.PPLibTelemetry;
 import com.pathplanner.lib.util.PathPlannerLogging;
 import edu.wpi.first.math.controller.HolonomicDriveController;
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.trajectory.Trajectory;
@@ -65,12 +66,23 @@ public class TrajectoryDriveCmd extends Command {
   private double pathTimeOut = -999.0;
   private Timer timer = new Timer();
   private boolean autoalign = false;
+  private double translationError = FieldConstants.FIELD_LENGTH_MTRS * 2;
+
+  // PID aim variables
   private boolean isPIDAimEnabled = false;
+  private PIDController XadjustController = new PIDController(0.7, 0.0, 0.0);
+  private PIDController YadjustController = new PIDController(0.7, 0.0, 0.0);
+  private PIDController thethaController  = new PIDController(0.1, 0.0, 0.0);
+  private ChassisSpeeds PIDaimSpeeds = new ChassisSpeeds();
+  private Pose2d goalPIDAimPose           = new Pose2d();
+
+  // Swerve Drive Variables
+  private ChassisSpeeds adjustedSpeeds = new ChassisSpeeds();
+
 
   // Event Command variables
   private final EventScheduler eventScheduler;
   private boolean isEventCommandRunning = false;
-  private double translationError = FieldConstants.FIELD_LENGTH_MTRS * 2;
 
   // ---------------------------------------------------------------------------------------------
   //
@@ -100,7 +112,6 @@ public class TrajectoryDriveCmd extends Command {
   // ---------------------------------------------------------------------------------------------
   @Override
   public void initialize() {
-    isPIDAimEnabled = false;
     // Flip path if necessary
     System.out.println("trajec start");
     PathPlannerPath usePath = path;
@@ -108,6 +119,7 @@ public class TrajectoryDriveCmd extends Command {
       usePath = path.flipPath();
     }
 
+    // Pose Reseting
     if(Robot.isFirstPath && DriverStation.isAutonomous()){
       try {
         tracker.resetPose(usePath.getStartingHolonomicPose().get());
@@ -117,17 +129,22 @@ public class TrajectoryDriveCmd extends Command {
       }
     }
 
+    //Initialize variables
+    isPIDAimEnabled = false;
+    goalPIDAimPose  = usePath.getPathPoses().get(usePath.getPathPoses().size() - 1);
 
-    ChassisSpeeds currentSpeeds =
-        DriveConstants.SWERVE_KINEMATICS.toChassisSpeeds(tracker.getCurrentModuleStates());
+    // Collect current drive state
+    ChassisSpeeds currentSpeeds = DriveConstants.SWERVE_KINEMATICS.toChassisSpeeds(tracker.getCurrentModuleStates());
+
     // If we provide an initial speed of zero the trajectory will take an infinite time to finish
     // (divide by 0) and not be sampleable
     if (Math.hypot(currentSpeeds.vxMetersPerSecond, currentSpeeds.vxMetersPerSecond) < 1e-6) {
       currentSpeeds = DriveConstants.NON_ZERO_CHASSIS_SPEED;
     }
 
+    // Determine Trajectory vs Simple PID path following
     if(usePath.getAllPathPoints().size() <= 1) {
-      this.cancel();
+      System.out.println(isPIDAimEnabled);
       isPIDAimEnabled = true;
     } else {
       // Construct trajectory
@@ -158,71 +175,81 @@ public class TrajectoryDriveCmd extends Command {
   // ---------------------------------------------------------------------------------------------
   @Override
   public void execute() {
+    // Collect instananous variables
     double currentTime = this.timer.get();
-    // Getters from pathplanner and current robot pose
-    PathPlannerTrajectoryState goal =
-        trajectory.sample(Math.min(currentTime, trajectory.getTotalTimeSeconds()));
-    Pose2d currentPose = tracker.getEstimatedPose();
-    ChassisSpeeds currentSpeeds =
-        DriveConstants.SWERVE_KINEMATICS.toChassisSpeeds(m_driveTrain.getModuleStates());
-    double currentVel =
-        Math.hypot(currentSpeeds.vxMetersPerSecond, currentSpeeds.vyMetersPerSecond);
-    // Trajectory Executor
+    Pose2d currentPose              = tracker.getEstimatedPose();
+    ChassisSpeeds currentSpeeds     = DriveConstants.SWERVE_KINEMATICS.toChassisSpeeds(m_driveTrain.getModuleStates());
+    double currentVel               = Math.hypot(currentSpeeds.vxMetersPerSecond, currentSpeeds.vyMetersPerSecond);
 
-    // -------------------------------------------------------------------------------------
-    // Convert PP trajectory into a wpilib trajectory type
-    // Only takes in the current robot position
-    // Does not take acceleration to be used with the internal WPILIB trajectory library
-    // Holonomic drive controller only relies on its current position, not its velocity because the
-    // target velocity is used as a ff
-    // -------------------------------------------------------------------------------------
-    Trajectory.State state =
-        new Trajectory.State(
-            currentTime,
-            goal.linearVelocity * DriveConstants.TRAJECTORY_FF_SCALAR,
-            0.0,
-            new Pose2d(goal.pose.getTranslation(), goal.heading),
-            0.0);
 
-    // construct chassisspeeds
-    ChassisSpeeds adjustedSpeeds =
-        hocontroller.calculate(currentPose, state, goal.pose.getRotation());
+    // Simple PID aim
+    if(isPIDAimEnabled) {
+      PIDaimSpeeds = new ChassisSpeeds(
+        XadjustController.calculate(currentPose.getX(), goalPIDAimPose.getX()),
+        YadjustController.calculate(currentPose.getY(), goalPIDAimPose.getY()),
+        thethaController.calculate(currentPose.getRotation().getDegrees(), goalPIDAimPose.getRotation().getDegrees())
+      );
+      adjustedSpeeds = PIDaimSpeeds;
 
-    if(autoalign){
-      // Graph x/(1+x) on desmos
-      // Smaller speed for closer distances
-      double x = CONVERGE_DISTANCE * translationError;
-      adjustedSpeeds = adjustedSpeeds.times(x / (x+1));
+    // Trajectory Aim
+    } else {
+      // -------------------------------------------------------------------------------------
+      // Convert PP trajectory into a wpilib trajectory type
+      // Only takes in the current robot position
+      // Does not take acceleration to be used with the internal WPILIB trajectory library
+      // Holonomic drive controller only relies on its current position, not its velocity because the
+      // target velocity is used as a ff
+      // -------------------------------------------------------------------------------------
+      PathPlannerTrajectoryState goal = trajectory.sample(Math.min(currentTime, trajectory.getTotalTimeSeconds()));
+      Trajectory.State state =
+          new Trajectory.State(
+              currentTime,
+              goal.linearVelocity * DriveConstants.TRAJECTORY_FF_SCALAR,
+              0.0,
+              new Pose2d(goal.pose.getTranslation(), goal.heading),
+              0.0);
+
+      // construct chassisspeeds
+      adjustedSpeeds = hocontroller.calculate(currentPose, state, goal.pose.getRotation());
+
+      if(autoalign){ //TODO is this causing modules to spin erratically?
+        // Graph x/(1+x) on desmos
+        // Smaller speed for closer distances
+        double x = CONVERGE_DISTANCE * translationError;
+        adjustedSpeeds = adjustedSpeeds.times(x / (x+1));
+      }
+      if(Double.isNaN(adjustedSpeeds.vxMetersPerSecond) || Double.isNaN(adjustedSpeeds.vyMetersPerSecond) || Double.isNaN(adjustedSpeeds.omegaRadiansPerSecond)){
+        // If the target and current positions are the same, bad
+        adjustedSpeeds = new ChassisSpeeds();
+      }
+
+      // Logging
+      Logger.recordOutput("CatzRobotTracker/Desired Auto Pose", goal.pose);
+
+      PPLibTelemetry.setCurrentPose(currentPose);
+      PathPlannerLogging.logCurrentPose(currentPose);
+
+      PPLibTelemetry.setTargetPose(goal.pose);
+      PathPlannerLogging.logTargetPose(goal.pose);
+
+      PPLibTelemetry.setVelocities(
+          currentVel,
+          goal.linearVelocity,
+          currentSpeeds.omegaRadiansPerSecond,
+          goal.heading.getRadians()
+      );
     }
-    if(Double.isNaN(adjustedSpeeds.vxMetersPerSecond) || Double.isNaN(adjustedSpeeds.vyMetersPerSecond) || Double.isNaN(adjustedSpeeds.omegaRadiansPerSecond)){
-      // If the target and current positions are the same, bad
-      adjustedSpeeds = new ChassisSpeeds();
-    }
+
 
     // send to drivetrain
     m_driveTrain.drive(adjustedSpeeds);
-    // Log desired pose
-    Logger.recordOutput("CatzRobotTracker/Desired Auto Pose", goal.pose);
 
-    // ---------------------------------------------------------------------------------------------------------------------------
+
     // Named Commands
-    // ---------------------------------------------------------------------------------------------------------------------------
     eventScheduler.execute(currentTime);
 
-    // ---------------------------------------------------------------------------------------------------------------------------
+
     //  Logging
-    // ---------------------------------------------------------------------------------------------------------------------------
-    PPLibTelemetry.setCurrentPose(currentPose);
-    PathPlannerLogging.logCurrentPose(currentPose);
-
-    PPLibTelemetry.setTargetPose(goal.pose);
-    PathPlannerLogging.logTargetPose(goal.pose);
-
-    PPLibTelemetry.setVelocities(
-        currentVel,
-        goal.linearVelocity,
-        currentSpeeds.omegaRadiansPerSecond,
-        goal.heading.getRadians());
     debugLogsTrajectory();
   } // end of execute
 
@@ -232,14 +259,7 @@ public class TrajectoryDriveCmd extends Command {
   //
   // ---------------------------------------------------------------------------------------------
   public void debugLogsTrajectory() {
-    // Logger.recordOutput("Desired Auto Pose", new Pose2d(state.poseMeters.getTranslation(),
-    // goal.targetHolonomicRotation));
-    // Logger.recordOutput("Adjusted Speeds X", adjustedSpeeds.vxMetersPerSecond);
-    // Logger.recordOutput("Adjusted Speeds Y", adjustedSpeeds.vyMetersPerSecond);
-    // Logger.recordOutput("Trajectory Goal MPS", state.velocityMetersPerSecond);
-    // Logger.recordOutput("PathPlanner Goal MPS", goal.velocityMps);
-
-    // System.out.println(goal.getTargetHolonomicPose());
+    Logger.recordOutput("Trajectory/PID aim pose", goalPIDAimPose);
   }
 
   @Override

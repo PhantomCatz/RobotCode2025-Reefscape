@@ -243,9 +243,9 @@ public class DriveConstants {
   public static final PathFollowingController PATH_FOLLOWING_CONTROLLER =
       getNewPathFollowingController();
 
-  public static final ChassisSpeeds NON_ZERO_CHASSIS_SPEED = new ChassisSpeeds(1, 1, 0);
+  public static final ChassisSpeeds NON_ZERO_CHASSIS_SPEED = new ChassisSpeeds(1, 1, 0); //TODO should this be smaller?
 
-  public static final double ROBOT_MASS = 68.0;
+  public static final double ROBOT_MASS = 50.0;
   public static final double ROBOT_MOI =
       (1.0 / 12.0) * ROBOT_MASS * (Math.pow(DRIVE_CONFIG.bumperWidthX(), 2) + Math.pow(DRIVE_CONFIG.bumperWidthY(),2)); // ROBOT_MASS * (2/2) * (kA_ANGULAR_ACCEL/kA_LINEAR_ACCEL); // TODO need to
   // TODO recaculate with formula on Pathplanner
