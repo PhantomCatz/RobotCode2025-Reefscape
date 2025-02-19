@@ -17,6 +17,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.CatzRobotTracker;
 import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.CatzRobotTracker.TxTyObservation;
 import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.CatzRobotTracker.VisionObservation;
+import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.Vision.VisionIO.PoseObservation;
 import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.Vision.VisionIO.PoseObservationType;
 
 import java.util.HashMap;
@@ -30,6 +31,8 @@ public class CatzVision extends SubsystemBase {
   private final VisionIO[] io;
   private final VisionIOInputsAutoLogged[] inputs;
   private final Alert[] disconnectedAlerts;
+
+  private PoseObservation[] poseObservations;
 
   public CatzVision(VisionIO... io) {
     this.io = io;
@@ -57,12 +60,17 @@ public class CatzVision extends SubsystemBase {
     return inputs[cameraIndex].latestTargetObservations[0].tx();
   }
 
+  public PoseObservation[] getPoseObservation() {
+    return poseObservations;
+  }
+
   @Override
   public void periodic() {
     for (int i = 0; i < io.length; i++) {
       io[i].updateInputs(inputs[i]);
       Logger.processInputs("inputs/Vision/Camera" + i, inputs[i]);
     }
+    poseObservations = inputs[0].poseObservations;
 
     // Initialize logging values
     List<Pose3d> allTagPoses = new LinkedList<>();

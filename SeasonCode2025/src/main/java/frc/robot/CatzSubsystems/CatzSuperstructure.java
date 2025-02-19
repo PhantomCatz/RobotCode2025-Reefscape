@@ -98,7 +98,6 @@ public class CatzSuperstructure extends VirtualSubsystem {
 
             // Outtaking Algae or Coral
             case OUTTAKE:
-                container.getCatzOuttake().setCoral(false);
                 System.out.println("ehehahaha");
 
                 if(chosenGamepiece == Gamepiece.CORAL) {
@@ -133,7 +132,6 @@ public class CatzSuperstructure extends VirtualSubsystem {
 
             // Intake Algae From Reef or Coral from Coral Substation
             case INTAKE:
-                container.getCatzOuttake().setCoral(true);
 
                 if(chosenGamepiece == Gamepiece.CORAL) {
                         currentRobotState = RobotState.INTAKE_CORAL_STATION;

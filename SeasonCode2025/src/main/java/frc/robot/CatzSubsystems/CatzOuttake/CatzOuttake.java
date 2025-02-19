@@ -156,6 +156,7 @@ public class CatzOuttake extends SubsystemBase {
       currentState = outtakeStates.STOP;
       CatzSuperstructure.setCurrentCoralState(CoralState.IN_OUTTAKE);
       System.out.println("stopping adjbck");
+
     }
   }
 

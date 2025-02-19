@@ -17,7 +17,7 @@ import frc.robot.Utilities.MotorUtil.MotionMagicParameters;
 /** Add your docs here. */
 public class ElevatorConstants {
 
-    public static final boolean isElevatorDisabled = false;
+    public static final boolean isElevatorDisabled = true;
 
     // Gearbox definitions
     public static final double MAXPLANETARY_GEAR_RATIO   = 4.0 * 4.0;
@@ -30,7 +30,6 @@ public class ElevatorConstants {
     public static final int LEFT_LEADER_ID  = 30;
     public static final int RIGHT_FOLLOWER_ID = 31;
 
-    public static final int TOP_LIMIT_SWITCH = 2;
     public static final int BOT_LIMIT_SWITCH = 3;
 
 
