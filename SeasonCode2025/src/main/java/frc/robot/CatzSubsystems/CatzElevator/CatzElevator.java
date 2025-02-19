@@ -42,6 +42,7 @@ public class CatzElevator extends SubsystemBase {
   private double elevatorSpeed = 0.0;
   private double elevatorFeedForward = 0.0;
   private double targetManualPosition = 0.0;
+  private int settlingCounter = 0;
   private boolean breakModeEnabled = true;
   private boolean isCharacterizing = false;
 
@@ -184,7 +185,20 @@ public class CatzElevator extends SubsystemBase {
   }
 
   public boolean isElevatorInPosition() {
-    return (Math.abs((getElevatorPositionRads() - targetPosition.getTargetPositionRads())) < 5.0);
+    boolean isElevatorSettled = false;
+    boolean isElevatorInPos = (Math.abs((getElevatorPositionRads() - targetPosition.getTargetPositionRads())) < 5.0);
+    if(isElevatorInPos) {
+      settlingCounter++;
+      if(settlingCounter >= 5) {
+        isElevatorSettled = true;
+        settlingCounter = 0;
+        // System.out.println("////////////ELEVATOR SETTLED FOR .2 SECONDS///////////////////");
+      }
+    } else {
+      // System.out.println("-----IN POSITION-----");
+      isElevatorSettled = false;
+    }
+    return isElevatorSettled;
   }
 
   public void setBrakeMode(boolean enabled) {

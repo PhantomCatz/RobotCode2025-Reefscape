@@ -16,6 +16,7 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Autonomous.CatzAutonomous;
+import frc.robot.CatzConstants.XboxInterfaceConstants;
 import frc.robot.CatzSubsystems.CatzSuperstructure;
 import frc.robot.CatzSubsystems.CatzAlgaeEffector.CatzAlgaePivot.CatzAlgaePivot;
 import frc.robot.CatzSubsystems.CatzAlgaeEffector.CatzAlgaeRemover.CatzAlgaeRemover;
@@ -118,6 +119,7 @@ public class RobotContainer {
     xboxDrv.b().onTrue(new InstantCommand(() -> selector.runToNearestBranch().schedule()));
     xboxDrv.b().onFalse(selector.cancelCurrentRunningCommand());
 
+
     xboxDrv.x().onTrue(new InstantCommand(() -> selector.runOnlyCoralStationCommand(selector.getBestCoralStation()).schedule()));
     xboxDrv.x().onFalse(selector.cancelCurrentRunningCommand());
 
@@ -144,6 +146,8 @@ public class RobotContainer {
     xboxDrv.rightTrigger().and(xboxDrv.leftTrigger()).onTrue(selector.cancelCurrentRunningCommand());
 
     // Default driving
+    Trigger escapeTrajectory = new Trigger(()->(xboxDrv.getLeftY() > XboxInterfaceConstants.kDeadband));
+    escapeTrajectory.onTrue(selector.cancelPathfindingCommand());
     drive.setDefaultCommand(new TeleopDriveCmd(() -> xboxDrv.getLeftX(), () -> xboxDrv.getLeftY(), () -> xboxDrv.getRightX(), drive));
 
     // Manual Climb Control
@@ -278,6 +282,10 @@ public class RobotContainer {
 
   public CatzAlgaePivot getAlgaePivot(){
     return algaePivot;
+  }
+
+  public CatzVision getCatzVision() {
+    return vision;
   }
 
   public CatzSuperstructure getSuperstructure(){
