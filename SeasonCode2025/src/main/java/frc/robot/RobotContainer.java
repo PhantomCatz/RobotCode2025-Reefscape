@@ -147,7 +147,7 @@ public class RobotContainer {
 
     // Default driving
     Trigger escapeTrajectory = new Trigger(()->(xboxDrv.getLeftY() > XboxInterfaceConstants.kDeadband));
-    escapeTrajectory.onTrue(selector.cancelPathfindingCommand());
+    escapeTrajectory.onTrue(selector.cancelCurrentRunningCommand());
     drive.setDefaultCommand(new TeleopDriveCmd(() -> xboxDrv.getLeftX(), () -> xboxDrv.getLeftY(), () -> xboxDrv.getRightX(), drive));
 
     // Manual Climb Control
