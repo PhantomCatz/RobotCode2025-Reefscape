@@ -76,16 +76,17 @@ public class DriveConstants {
                 .maxAngularAcceleration(30) // Radians // TODO verify angle constraints
                 .build();
         case SN1, SN2, SN1_2024 ->
-            new DriveConfig( //TODO make the builder the same way for these configurations
-                Units.inchesToMeters(2.0),
-                Units.inchesToMeters(29.0),
-                Units.inchesToMeters(29.0),
-                Units.inchesToMeters(32),
-                Units.inchesToMeters(32),
-                Units.feetToMeters(2), //TBD neeed to change
-                Units.feetToMeters(120),
-                12,
-                30);
+        DriveConfig.builder()
+                .wheelRadius(Units.inchesToMeters(2.0)) // TODO make these repeated numbers into constants
+                .robotLengthX(Units.inchesToMeters(29.0))
+                .robotWidthY(Units.inchesToMeters(29.0))
+                .bumperWidthX(Units.inchesToMeters(32))
+                .bumperWidthY(Units.inchesToMeters(32))
+                .maxLinearVelocity(Units.feetToMeters(17))
+                .maxLinearAcceleration(Units.feetToMeters(120)) // TODO emperically calculate
+                .maxAngularVelocity(12.0) // Radians
+                .maxAngularAcceleration(30) // Radians // TODO verify angle constraints
+                .build();
       };
 
   public static final ModuleGainsAndRatios MODULE_GAINS_AND_RATIOS =
@@ -101,17 +102,6 @@ public class DriveConstants {
                 0.005,
                 Mk4iReductions.L2_PLUS.reduction,
                 Mk4iReductions.steer.reduction);
-        // case SN2 ->
-        //     new ModuleGainsAndRatios(
-        //         5.5,
-        //         0.6,
-        //         0.0,
-        //         1.2, // 1.2, //TODO fix to account for non foc // TODO characterize individual motors to ensure consistency before sn2
-        //         0.0,
-        //         0.001,
-        //         0.000,
-        //         Mk4iReductions.L2_PLUS.reduction,
-        //         Mk4iReductions.steer.reduction);
         case SN_TEST ->
             new ModuleGainsAndRatios(
                 0.014,
@@ -223,10 +213,10 @@ public class DriveConstants {
   // -----------------------------------------------------------------------------------------------------------------------------
   public static HolonomicDriveController getNewHolController() {
     return new HolonomicDriveController(
-        new PIDController(8.0, 0.0, 0.0),
-        new PIDController(8.0, 0.0, 0.0),
+        new PIDController(20.0, 0.0, 0.0),
+        new PIDController(20.0, 0.0, 0.0),
         new ProfiledPIDController(
-            12,
+            23.0,
             0,
             0,
             new TrapezoidProfile.Constraints(

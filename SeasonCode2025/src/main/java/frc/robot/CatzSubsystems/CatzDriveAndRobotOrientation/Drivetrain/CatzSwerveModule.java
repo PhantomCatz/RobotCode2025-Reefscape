@@ -88,7 +88,7 @@ public class CatzSwerveModule {
   public void periodic() {
     // Process and Log Module Inputs
     io.updateInputs(inputs);
-    Logger.processInputs("inputs/Drive/Motors " + m_moduleName, inputs);
+    Logger.processInputs("RealInputs/Drive/Motors " + m_moduleName, inputs);
 
     // Update ff and controllers
     LoggedTunableNumber.ifChanged(

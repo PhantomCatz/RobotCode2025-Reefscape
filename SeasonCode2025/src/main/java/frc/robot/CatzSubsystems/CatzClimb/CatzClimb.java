@@ -80,7 +80,7 @@ public class CatzClimb extends SubsystemBase {
   @Override
   public void periodic() {
     io.updateInputs(inputs);
-    Logger.processInputs("Climb/inputs", inputs);
+    Logger.processInputs("RealInputs/Climb", inputs);
     if (DriverStation.isDisabled()) {
 
     } else {

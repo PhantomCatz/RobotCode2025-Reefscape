@@ -12,14 +12,6 @@ import edu.wpi.first.wpilibj.util.Color;
 import frc.robot.Utilities.Alert;
 import frc.robot.Utilities.Alert.AlertType;
 
-/***
- * CatzConstants
- *
- * @version 1.0
- * @author Kynam Lenghiem
- *
- *         This class is where reusable constants are defined
- ***/
 public final class CatzConstants {
 
   // ----------------------------------------------------
@@ -28,8 +20,8 @@ public final class CatzConstants {
   //
   // --------------------------------------------------/
   public static final RobotSenario robotSenario = RobotSenario.PRACTICE;
-  public static final RobotHardwareMode hardwareMode = RobotHardwareMode.REAL;
-  private static RobotID robotType = RobotID.SN2;
+  public static final RobotHardwareMode hardwareMode = RobotHardwareMode.SIM;
+  private static RobotID robotType = RobotID.SN_TEST;
   private static AlertPriority alertWarningPriority = AlertPriority.ONE;
   public static boolean disableHAL = false;
 

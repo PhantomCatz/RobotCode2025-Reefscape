@@ -92,7 +92,7 @@ public class CatzElevator extends SubsystemBase {
   @Override
   public void periodic() {
     io.updateInputs(inputs);
-    Logger.processInputs("inputs/Elevator", inputs);
+    Logger.processInputs("RealInputs/Elevator", inputs);
 
     //--------------------------------------------------------------------------------------------------------
     // Update controllers when user specifies
