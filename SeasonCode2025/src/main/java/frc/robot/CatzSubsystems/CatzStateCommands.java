@@ -91,7 +91,7 @@ public class CatzStateCommands {
                 elevator.Elevator_Stow(),
                 outtake.outtakeL1()
             )
-        ).onlyIf(() -> CatzSuperstructure.currentCoralState == CoralState.IN_OUTTAKE)
+        ).onlyIf(() -> CatzSuperstructure.getCurrentCoralState() == CoralState.IN_OUTTAKE)
          .unless(()-> Robot.isSimulation()).alongWith(Commands.print("L1 Scoring State"));
     }
 
@@ -110,7 +110,7 @@ public class CatzStateCommands {
                 Commands.waitUntil(() -> elevator.isElevatorInPosition()),
                 outtake.startOuttake()
             )
-        ).onlyIf(() -> CatzSuperstructure.currentCoralState == CoralState.IN_OUTTAKE)
+        ).onlyIf(() -> CatzSuperstructure.getCurrentCoralState() == CoralState.IN_OUTTAKE)
          .unless(()-> Robot.isSimulation()).alongWith(Commands.print("L2 Scoring State")).unless(()-> Robot.isSimulation());
     }
 
@@ -129,7 +129,7 @@ public class CatzStateCommands {
                 Commands.waitUntil(() -> elevator.isElevatorInPosition()),
                 outtake.startOuttake()
             )
-        ).onlyIf(() -> CatzSuperstructure.currentCoralState == CoralState.IN_OUTTAKE)
+        ).onlyIf(() -> CatzSuperstructure.getCurrentCoralState() == CoralState.IN_OUTTAKE)
          .unless(()-> Robot.isSimulation()).alongWith(Commands.print("L3 scoring state"));
     }
 
@@ -148,7 +148,7 @@ public class CatzStateCommands {
                 Commands.waitUntil(() -> elevator.isElevatorInPosition()),
                 outtake.outtakeL4()
             )
-        ).onlyIf(() -> CatzSuperstructure.currentCoralState == CoralState.IN_OUTTAKE)
+        ).onlyIf(() -> CatzSuperstructure.getCurrentCoralState() == CoralState.IN_OUTTAKE)
          .unless(()-> Robot.isSimulation()).alongWith(Commands.print("L4 Scoring State"));
     }
 

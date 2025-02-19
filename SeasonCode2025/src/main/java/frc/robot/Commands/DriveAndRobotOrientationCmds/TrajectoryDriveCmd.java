@@ -282,9 +282,9 @@ public class TrajectoryDriveCmd extends Command {
   @Override
   public boolean isFinished(){
     // Command not intended to end for con
-    if (autoalign){
-      return false;
-    }
+    // if (autoalign){
+    //   return false;
+    // }
 
     // Finish command if the total time the path takes is over
     if (timer.hasElapsed(pathTimeOut) && !isEventCommandRunning){
@@ -318,16 +318,6 @@ public class TrajectoryDriveCmd extends Command {
       rotationError = 360 - rotationError;
     }
     translationError = Math.hypot(xError, yError);
-
-    System.out.println(xError < ALLOWABLE_POSE_ERROR &&
-    yError < ALLOWABLE_POSE_ERROR &&
-    rotationError < ALLOWABLE_ROTATION_ERROR &&
-    (desiredMPS == 0 || (currentMPS < ALLOWABLE_VEL_ERROR && currentRPS < ALLOWABLE_OMEGA_ERROR)));
-
-    System.out.println(xError < ALLOWABLE_POSE_ERROR &&
-    yError < ALLOWABLE_POSE_ERROR &&
-    rotationError < ALLOWABLE_ROTATION_ERROR &&
-    (desiredMPS == 0 || (currentMPS < ALLOWABLE_VEL_ERROR && currentRPS < ALLOWABLE_OMEGA_ERROR)));
 
     return
       xError < ALLOWABLE_POSE_ERROR &&

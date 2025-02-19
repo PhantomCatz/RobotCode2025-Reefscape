@@ -12,6 +12,7 @@ import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Autonomous.CatzAutonomous;
@@ -115,37 +116,38 @@ public class RobotContainer {
     // XBOX Drive
     //---------------------------------------------------------------------------------------------------------------------
     // Reef autopathfind
-    xboxDrv.b().onTrue(selector.testCommand(() -> selector.getClosestReefPos()));
-    xboxDrv.b().onFalse(selector.cancelPathfindingCommand());
+    xboxDrv.b().onTrue(new InstantCommand(() -> selector.runToNearestBranch().schedule()));
+    xboxDrv.b().onFalse(selector.cancelCurrentRunningCommand());
 
-    xboxDrv.x().onTrue(selector.runCoralStationCommand(() -> selector.getBestCoralStation()));
-    xboxDrv.x().onFalse(selector.cancelPathfindingCommand());
 
-    xboxDrv.y().onTrue(selector.runQueuedCommand());
-    xboxDrv.y().onFalse(selector.cancelPathfindingCommand());
+    xboxDrv.x().onTrue(new InstantCommand(() -> selector.runOnlyCoralStationCommand(selector.getBestCoralStation()).schedule()));
+    xboxDrv.x().onFalse(selector.cancelCurrentRunningCommand());
 
-    xboxDrv.a().onTrue(selector.runAutoCommand());
+    // xboxDrv.y().onTrue(selector.runQueuedCommand());
+    // xboxDrv.y().onFalse(selector.cancelPathfindingCommand()); //TODO is this needed?
+
+    xboxDrv.a().onTrue(new InstantCommand(() -> selector.runAutoCommand().schedule()));
     xboxDrv.a().onFalse(selector.cancelAutoCommand());
 
-    xboxDrv.leftBumper().onTrue(selector.runLeftRightCommand(LeftRight.LEFT));
-    xboxDrv.leftBumper().onFalse(selector.cancelPathfindingCommand());
+    xboxDrv.leftBumper().onTrue(new InstantCommand(() -> selector.runLeftRightCommand(LeftRight.LEFT).schedule()));
+    xboxDrv.leftBumper().onFalse(selector.cancelCurrentRunningCommand());
 
-    xboxDrv.leftBumper().and(xboxDrv.rightBumper()).onTrue(selector.cancelPathfindingCommand());
+    xboxDrv.leftBumper().and(xboxDrv.rightBumper()).onTrue(selector.cancelCurrentRunningCommand());
 
-    xboxDrv.rightBumper().onTrue(selector.runLeftRightCommand(LeftRight.RIGHT));
-    xboxDrv.rightBumper().onFalse(selector.cancelPathfindingCommand());
+    xboxDrv.rightBumper().onTrue(new InstantCommand(() -> selector.runLeftRightCommand(LeftRight.RIGHT).schedule()));
+    xboxDrv.rightBumper().onFalse(selector.cancelCurrentRunningCommand());
 
-    xboxDrv.rightTrigger().onTrue(selector.runCoralStationCommand(()-> FieldConstants.CoralStation.rightCenterFace));
-    xboxDrv.rightTrigger().onFalse(selector.cancelPathfindingCommand());
+    xboxDrv.rightTrigger().onTrue(new InstantCommand(() -> selector.runOnlyCoralStationCommand(FieldConstants.CoralStation.rightCenterFace).schedule()));
+    xboxDrv.rightTrigger().onFalse(selector.cancelCurrentRunningCommand());
 
-    xboxDrv.leftTrigger().onTrue(selector.runCoralStationCommand(()-> FieldConstants.CoralStation.leftCenterFace));
-    xboxDrv.leftTrigger().onFalse(selector.cancelPathfindingCommand());
+    xboxDrv.leftTrigger().onTrue(new InstantCommand(() -> selector.runOnlyCoralStationCommand(FieldConstants.CoralStation.leftCenterFace).schedule()));
+    xboxDrv.leftTrigger().onFalse(selector.cancelCurrentRunningCommand());
 
-    xboxDrv.rightTrigger().and(xboxDrv.leftTrigger()).onTrue(selector.cancelPathfindingCommand());
+    xboxDrv.rightTrigger().and(xboxDrv.leftTrigger()).onTrue(selector.cancelCurrentRunningCommand());
 
     // Default driving
     Trigger escapeTrajectory = new Trigger(()->(xboxDrv.getLeftY() > XboxInterfaceConstants.kDeadband));
-    escapeTrajectory.onTrue(selector.cancelPathfindingCommand());
+    escapeTrajectory.onTrue(selector.cancelCurrentRunningCommand());
     drive.setDefaultCommand(new TeleopDriveCmd(() -> xboxDrv.getLeftX(), () -> xboxDrv.getLeftY(), () -> xboxDrv.getRightX(), drive));
 
     // Manual Climb Control
@@ -181,7 +183,7 @@ public class RobotContainer {
     // XBOX AUX
 
     //---------------------------------------------------------------------------------------------------------------------
-    // Reef autopathfind
+    //TODO add coral station toggle buttons
 
     // Scoring Level Determination
     xboxAux.rightTrigger().onTrue(Commands.runOnce(() -> selector.pathQueueAddBack(selector.getXBoxReefPos(), superstructure.getLevel())));

@@ -128,6 +128,7 @@ public class CornerTrackingPathfinder{
       ),
     start, end, walls);
 
+
     if(waypoints.size() >= 2){
       PathPlannerPath path = new PathPlannerPath(waypoints, DriveConstants.PATHFINDING_CONSTRAINTS, null, goal);
       return path;
@@ -164,6 +165,8 @@ public class CornerTrackingPathfinder{
     if (goal.equals(start)) {
       return new ArrayList<>();
     }
+    final GridPosition g = goal;
+
     //Queue to store the nodes to explore, prioritizing the shortest paths.
     PriorityQueue<PathfindingPosition> frontier = new PriorityQueue<>(new CompareDistances());
 
@@ -223,21 +226,6 @@ public class CornerTrackingPathfinder{
       }
     }
 
-    // Visualize path
-    // for (int row = nodesY - 1; row >= 0; row--) {
-    //   for (int col = 0; col < nodesX; col++) {
-    //     if (obstacles.contains(new GridPosition(col, row))){
-    //       System.out.print("#");
-    //     }
-    //     else if (lastCorner.keySet().contains(new GridPosition(col, row))){
-    //       System.out.print("+");
-    //     }
-    //     else {
-    //       System.out.print("_");
-    //     }
-    //   }
-    //   System.out.println();
-    // }
 
     //either a path was found (or wasn't found)
     //retrace the path backwards by going through the corners that this path visited.
@@ -246,6 +234,35 @@ public class CornerTrackingPathfinder{
       path.add(goal);
       goal = lastCorner.get(goal);
     }
+    // Visualize path
+
+    // for (int row = nodesY - 1; row >= 0; row--) {
+    //   for (int col = 0; col < nodesX; col++) {
+    //     if(start.equals(new GridPosition(col, row))){
+    //       //starting point
+    //       System.out.print("s");
+    //     }
+    //     else if(g.equals(new GridPosition(col, row))){
+    //       System.out.print("e");
+    //     }
+    //     else if (obstacles.contains(new GridPosition(col, row))){
+    //       //wall
+    //       System.out.print("#");
+    //     }
+    //     else if(path.contains(new GridPosition(col, row))){
+    //       //goal points
+    //       System.out.print("@");
+    //     }
+    //     else if (lastCorner.keySet().contains(new GridPosition(col, row))){
+    //       //areas flood filled
+    //       System.out.print("+");
+    //     }
+    //     else {
+    //       System.out.print("_");
+    //     }
+    //   }
+    //   System.out.println();
+    // }
 
     return path;
   }
@@ -350,7 +367,7 @@ public class CornerTrackingPathfinder{
 
     while (!frontier.isEmpty()) {
       GridPosition currentPos = frontier.poll();
-      if (!obstacles.contains(currentPos)) {
+      if (!obstacles.contains(currentPos) && currentPos.x <= nodesX && currentPos.y <= nodesY-1) {
         return currentPos;
       }
       visited.add(currentPos);
