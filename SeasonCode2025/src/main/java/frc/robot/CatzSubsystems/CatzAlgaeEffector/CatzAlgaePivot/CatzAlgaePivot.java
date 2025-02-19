@@ -84,7 +84,7 @@ public class CatzAlgaePivot extends SubsystemBase {
   @Override
   public void periodic() {
     io.updateInputs(inputs);
-    Logger.processInputs("inputs/AlgaePivot", inputs);
+    Logger.processInputs("RealInputs/AlgaePivot", inputs);
     // System.out.println(position);
     if (DriverStation.isDisabled()) {
 

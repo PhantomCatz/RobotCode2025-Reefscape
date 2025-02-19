@@ -68,7 +68,7 @@ public class CatzVision extends SubsystemBase {
   public void periodic() {
     for (int i = 0; i < io.length; i++) {
       io[i].updateInputs(inputs[i]);
-      Logger.processInputs("inputs/Vision/Camera" + i, inputs[i]);
+      Logger.processInputs("RealInputs/Vision/Camera" + i, inputs[i]);
     }
     poseObservations = inputs[0].poseObservations;
 

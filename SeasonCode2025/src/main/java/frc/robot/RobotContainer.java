@@ -119,7 +119,6 @@ public class RobotContainer {
     xboxDrv.b().onTrue(new InstantCommand(() -> selector.runToNearestBranch().schedule()));
     xboxDrv.b().onFalse(selector.cancelCurrentRunningCommand());
 
-
     xboxDrv.x().onTrue(new InstantCommand(() -> selector.runOnlyCoralStationCommand(selector.getBestCoralStation()).schedule()));
     xboxDrv.x().onFalse(selector.cancelCurrentRunningCommand());
 
@@ -147,7 +146,7 @@ public class RobotContainer {
 
     // Default driving
     Trigger escapeTrajectory = new Trigger(()->(xboxDrv.getLeftY() > XboxInterfaceConstants.kDeadband));
-    escapeTrajectory.onTrue(selector.cancelCurrentRunningCommand());
+    escapeTrajectory.onTrue(drive.cancelTrajectory());
     drive.setDefaultCommand(new TeleopDriveCmd(() -> xboxDrv.getLeftX(), () -> xboxDrv.getLeftY(), () -> xboxDrv.getRightX(), drive));
 
     // Manual Climb Control

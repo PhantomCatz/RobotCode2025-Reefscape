@@ -71,7 +71,7 @@ public class CatzOuttake extends SubsystemBase {
   @Override
   public void periodic() {
     io.updateInputs(inputs);
-    Logger.processInputs("inputs/Outtake", inputs);
+    Logger.processInputs("RealInputs/Outtake", inputs);
 
     if(currentState != previousState) {
       interationCounter = 0;

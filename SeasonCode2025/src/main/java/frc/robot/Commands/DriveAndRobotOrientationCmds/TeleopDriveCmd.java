@@ -7,7 +7,6 @@
 
 package frc.robot.Commands.DriveAndRobotOrientationCmds;
 
-import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.CatzConstants.XboxInterfaceConstants;
@@ -102,9 +101,10 @@ public class TeleopDriveCmd extends Command {
             : 0.0;
 
     // Construct desired chassis speeds
-    //TODO understand why we need to flip the robot relative speeds on a live test on feild, Issue presented during 2025 api updates
-    Rotation2d flipped = Rotation2d.fromDegrees(-CatzRobotTracker.getInstance().getEstimatedPose().getRotation().getDegrees());
-    chassisSpeeds = ChassisSpeeds.fromRobotRelativeSpeeds(m_headingAndVelocity_X, m_headingAndVelocity_Y, turningVelocity, flipped);
+    chassisSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(m_headingAndVelocity_X,
+                                                          m_headingAndVelocity_Y,
+                                                          turningVelocity,
+                                                          CatzRobotTracker.getInstance().getEstimatedPose().getRotation());
 
     // Send new chassisspeeds object to the drivetrain
     m_drivetrain.drive(chassisSpeeds);

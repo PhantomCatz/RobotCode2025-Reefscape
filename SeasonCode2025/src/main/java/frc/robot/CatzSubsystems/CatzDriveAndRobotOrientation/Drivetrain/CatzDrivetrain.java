@@ -138,7 +138,7 @@ public class CatzDrivetrain extends SubsystemBase {
     } catch (Exception e) {
 
     }
-    Logger.processInputs("inputs/Drive/gyro ", gyroInputs);
+    Logger.processInputs("RealInputs/Drive/gyro ", gyroInputs);
     // NOTE Gyro needs to be firmly mounted to rio for accurate results.
     // Set Gyro Disconnect alert to go off when gyro is disconnected
     if (Robot.isReal()) {

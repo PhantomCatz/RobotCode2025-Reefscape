@@ -46,7 +46,7 @@ public class CatzAlgaeRemover extends SubsystemBase {
   @Override
   public void periodic() {
     io.updateInputs(inputs);
-    Logger.processInputs("inputs/AlgaeRemover", inputs);
+    Logger.processInputs("RealInputs/AlgaeRemover", inputs);
   }
 
   //=====================================================================================

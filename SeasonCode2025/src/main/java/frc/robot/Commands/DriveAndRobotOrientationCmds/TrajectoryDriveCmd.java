@@ -50,6 +50,8 @@ public class TrajectoryDriveCmd extends Command {
   // Trajectory constants
   public static final double ALLOWABLE_POSE_ERROR = 0.05;
   public static final double ALLOWABLE_ROTATION_ERROR = 2.0;
+  public static final double ALLOWABLE_POSE_ERROR_PID = 0.02;
+  public static final double ALLOWABLE_ROTATION_ERROR_PID = 0.5;
   public static final double ALLOWABLE_VEL_ERROR = 0.2;
   public static final double ALLOWABLE_OMEGA_ERROR = Units.degreesToRadians(5.0);
   private static final double TIMEOUT_SCALAR = 5;
@@ -70,9 +72,9 @@ public class TrajectoryDriveCmd extends Command {
 
   // PID aim variables
   private boolean isPIDAimEnabled = false;
-  private PIDController XadjustController = new PIDController(0.7, 0.0, 0.0);
-  private PIDController YadjustController = new PIDController(0.7, 0.0, 0.0);
-  private PIDController thethaController  = new PIDController(0.1, 0.0, 0.0);
+  private PIDController XadjustController = new PIDController(2.0, 0.0, 0.0);
+  private PIDController YadjustController = new PIDController(2.0, 0.0, 0.0);
+  private PIDController thethaController  = new PIDController(0.4, 0.0, 0.0);
   private ChassisSpeeds PIDaimSpeeds = new ChassisSpeeds();
   private Pose2d goalPIDAimPose           = new Pose2d();
 
@@ -103,6 +105,8 @@ public class TrajectoryDriveCmd extends Command {
           "Events that are triggered during path following cannot require the drive subsystem");
     }
     addRequirements(eventReqs);
+
+    thethaController.enableContinuousInput(-180.0, 180.0);
   }
 
   // ---------------------------------------------------------------------------------------------
@@ -129,10 +133,6 @@ public class TrajectoryDriveCmd extends Command {
       }
     }
 
-    //Initialize variables
-    isPIDAimEnabled = false;
-    goalPIDAimPose  = usePath.getPathPoses().get(usePath.getPathPoses().size() - 1);
-
     // Collect current drive state
     ChassisSpeeds currentSpeeds = DriveConstants.SWERVE_KINEMATICS.toChassisSpeeds(tracker.getCurrentModuleStates());
 
@@ -142,8 +142,16 @@ public class TrajectoryDriveCmd extends Command {
       currentSpeeds = DriveConstants.NON_ZERO_CHASSIS_SPEED;
     }
 
+    //Initialize variables
+    isPIDAimEnabled = false;
+    goalPIDAimPose  = new Pose2d(
+                            usePath.getPathPoses().get(usePath.getPathPoses().size() - 1).getX(),
+                            usePath.getPathPoses().get(usePath.getPathPoses().size() - 1).getY(),
+                            usePath.getGoalEndState().rotation()
+    );
+
     // Determine Trajectory vs Simple PID path following
-    if(usePath.getAllPathPoints().size() <= 1) {
+    if(usePath.getAllPathPoints().size() <= 2) {
       System.out.println(isPIDAimEnabled);
       isPIDAimEnabled = true;
     } else {
@@ -158,14 +166,15 @@ public class TrajectoryDriveCmd extends Command {
       hocontroller = DriveConstants.getNewHolController();
       pathTimeOut = trajectory.getTotalTimeSeconds() * TIMEOUT_SCALAR;
 
-      // Reset
-      PathPlannerLogging.logActivePath(usePath);
-      PPLibTelemetry.setCurrentPath(usePath);
-
       eventScheduler.initialize(trajectory);
-      this.timer.reset();
-      this.timer.start();
     }
+
+    // Reset
+    PathPlannerLogging.logActivePath(usePath);
+    PPLibTelemetry.setCurrentPath(usePath);
+
+    this.timer.reset();
+    this.timer.start();
   } // end of initialize()
 
   // ---------------------------------------------------------------------------------------------
@@ -184,11 +193,11 @@ public class TrajectoryDriveCmd extends Command {
 
     // Simple PID aim
     if(isPIDAimEnabled) {
-      PIDaimSpeeds = new ChassisSpeeds(
-        XadjustController.calculate(currentPose.getX(), goalPIDAimPose.getX()),
-        YadjustController.calculate(currentPose.getY(), goalPIDAimPose.getY()),
-        thethaController.calculate(currentPose.getRotation().getDegrees(), goalPIDAimPose.getRotation().getDegrees())
-      );
+      double pidSpeedX = XadjustController.calculate(currentPose.getX(), goalPIDAimPose.getX());
+      double pidSpeedY = YadjustController.calculate(currentPose.getY(), goalPIDAimPose.getY());
+      double thethaSpeed = thethaController.calculate(currentPose.getRotation().getDegrees(), goalPIDAimPose.getRotation().getDegrees());
+      System.out.println(thethaSpeed);
+      PIDaimSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(pidSpeedX, pidSpeedY, thethaSpeed, tracker.getEstimatedPose().getRotation());
       adjustedSpeeds = PIDaimSpeeds;
 
     // Trajectory Aim
@@ -319,10 +328,18 @@ public class TrajectoryDriveCmd extends Command {
     }
     translationError = Math.hypot(xError, yError);
 
-    return
-      xError < ALLOWABLE_POSE_ERROR &&
-      yError < ALLOWABLE_POSE_ERROR &&
-      rotationError < ALLOWABLE_ROTATION_ERROR &&
-      (desiredMPS == 0 || (currentMPS < ALLOWABLE_VEL_ERROR && currentRPS < ALLOWABLE_OMEGA_ERROR));
+    if(isPIDAimEnabled) {
+      return
+        xError < ALLOWABLE_POSE_ERROR_PID &&
+        yError < ALLOWABLE_POSE_ERROR_PID &&
+        rotationError < ALLOWABLE_ROTATION_ERROR &&
+        (desiredMPS == 0 || (currentMPS < ALLOWABLE_VEL_ERROR && currentRPS < ALLOWABLE_OMEGA_ERROR));
+    } else {
+      return
+        xError < ALLOWABLE_POSE_ERROR_PID &&
+        yError < ALLOWABLE_POSE_ERROR_PID &&
+        rotationError < ALLOWABLE_ROTATION_ERROR_PID &&
+        (desiredMPS == 0 || (currentMPS < ALLOWABLE_VEL_ERROR && currentRPS < ALLOWABLE_OMEGA_ERROR));
+    }
   }
 }
