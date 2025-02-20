@@ -51,6 +51,7 @@ public class TrajectoryDriveCmd extends Command {
   public static final double ALLOWABLE_ROTATION_ERROR = 2.0;
   public static final double ALLOWABLE_VEL_ERROR = 0.2;
   public static final double ALLOWABLE_OMEGA_ERROR = Units.degreesToRadians(5.0);
+  public static final double ALLOWABLE_VISION_ADJUST = 0.1; // TODO tune this thingy thing
   private static final double TIMEOUT_SCALAR = 5;
   private static final double CONVERGE_DISTANCE = 2.0;
 
@@ -254,9 +255,9 @@ public class TrajectoryDriveCmd extends Command {
   @Override
   public boolean isFinished(){
     // Command not intended to end for con
-    // if (autoalign){
-    //   return false;
-    // }
+    if (autoalign && tracker.getDEstimatedPose().getTranslation().getNorm() > ALLOWABLE_VISION_ADJUST){
+      return false;
+    }
 
     // Finish command if the total time the path takes is over
     if (timer.hasElapsed(pathTimeOut) && !isEventCommandRunning){

@@ -112,7 +112,7 @@ public class CatzLED extends VirtualSubsystem {
   private static final double strobeDuration = 0.1;
   private static final double breathDuration = 1.0;
   private static final double rainbowCycleLength = 25.0;
-  private static final double rainbowDuration = 0.25;
+  private static final double rainbowDuration = 1;
   private static final double waveExponent = 0.4;
   private static final double waveFastCycleLength = 25.0;
   private static final double waveFastDuration = 0.25;
@@ -120,8 +120,6 @@ public class CatzLED extends VirtualSubsystem {
   private static final double waveAllianceDuration = 2.0;
   private static final double autoFadeTime = 2.5; // 3s nominal
   private static final double autoFadeMaxTime = 5.0; // Return to normal
-
-
 
   private CatzLED() {
     ledStrip = new AddressableLED(LEADER_LED_PWM_PORT);
@@ -144,8 +142,6 @@ public class CatzLED extends VirtualSubsystem {
 
   @Override
   public void periodic() {
-
-
 
     // Update alliance color
     if (DriverStation.isDSAttached()) {
@@ -269,6 +265,7 @@ public class CatzLED extends VirtualSubsystem {
       }
     }
 
+    rainbow(rainbowCycleLength, rainbowDuration);
     // Update LEDs
     ledStrip.setData(buffer);
   } // end of periodic()

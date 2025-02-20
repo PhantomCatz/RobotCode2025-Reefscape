@@ -284,6 +284,7 @@ public class TeleopPosSelector extends SubsystemBase {
     Translation2d currentPos = currentPose.getTranslation();
     Translation2d direction = goalPos.minus(currentPos).div(2.0);
 
+    //only allow left right if you are close to the side of the reef
     if (currentPose.getTranslation().getDistance(goal.getTranslation()) > Reef.leftRightDistance * 3
         || direction.getNorm() <= 1e-3) {
       return new InstantCommand();
@@ -311,7 +312,6 @@ public class TeleopPosSelector extends SubsystemBase {
           if (outtake.hasCoral()) {
             currentRunningCommand = runNextQueuedCommand();
           } else {
-            System.out.println("yoouve got no corlalll");
             currentRunningCommand = runCoralStationCommand(getBestCoralStation(), null);
           }
           currentRunningCommand.initialize();
@@ -452,7 +452,6 @@ public class TeleopPosSelector extends SubsystemBase {
   public Command cancelCurrentRunningCommand(){
     return new InstantCommand(() -> {
       currentRunningCommand.cancel();
-      System.out.println("cancelleldl!");
     });
   }
 

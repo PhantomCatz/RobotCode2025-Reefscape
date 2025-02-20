@@ -31,7 +31,6 @@ import lombok.Getter;
 import lombok.experimental.ExtensionMethod;
 import org.littletonrobotics.junction.AutoLogOutput;
 
-
 @ExtensionMethod({GeomUtil.class})
 public class CatzRobotTracker {
   private static final double POSE_BUFFER_SIZE_SEC = 2.0;
@@ -104,6 +103,7 @@ public class CatzRobotTracker {
   private Twist2d robotAccelerations = new Twist2d();
   private Twist2d trajectoryVelocity = new Twist2d();
   private ChassisSpeeds m_lastChassisSpeeds = new ChassisSpeeds();
+  private Pose2d lastEstimatedPose = new Pose2d();
 
   // ------------------------------------------------------------------------------------------------------
   //
@@ -140,6 +140,7 @@ public class CatzRobotTracker {
 
     //Add twist to odometry pose
     if((twist.dx != 0 || twist.dy != 0 || twist.dtheta != 0) && (!Double.isNaN(twist.dx) && !Double.isNaN(twist.dy) && !Double.isNaN(twist.dtheta))){
+      lastEstimatedPose = estimatedPose;
       odometryPose = odometryPose.exp(twist);
       estimatedPose = estimatedPose.exp(twist);
     }
@@ -182,6 +183,7 @@ public class CatzRobotTracker {
     // sample --> odometryPose transform and backwards of that
     var sampleToOdometryTransform = new Transform2d(sample.get(), odometryPose);
     var odometryToSampleTransform = new Transform2d(odometryPose, sample.get());
+
     // get old estimate by applying odometryToSample Transform
     Pose2d estimateAtTime = estimatedPose.plus(odometryToSampleTransform);
 
@@ -216,6 +218,7 @@ public class CatzRobotTracker {
 
     // Recalculate current estimate by applying scaled transform to old estimate
     // then replaying odometry data
+    lastEstimatedPose = estimatedPose;
     estimatedPose = estimateAtTime.plus(scaledTransform).plus(sampleToOdometryTransform);
   } // end of addVisionObservation(OdometryObservation observation)
 
@@ -292,6 +295,7 @@ public class CatzRobotTracker {
    */
   public void resetPose(Pose2d initialPose) {
     // System.out.println(initialPose.getRotation().getDegrees());
+    lastEstimatedPose = estimatedPose;
     estimatedPose = initialPose;
     odometryPose = initialPose;
     POSE_BUFFER.clear();
@@ -308,6 +312,10 @@ public class CatzRobotTracker {
         new Translation2d(robotVelocity.dx, robotVelocity.dy).rotateBy(estimatedPose.getRotation());
     return new Twist2d(
         linearFieldVelocity.getX(), linearFieldVelocity.getY(), robotVelocity.dtheta);
+  }
+
+  public Pose2d getDEstimatedPose(){
+    return estimatedPose.relativeTo(lastEstimatedPose);
   }
 
   /**

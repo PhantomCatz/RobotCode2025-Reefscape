@@ -108,14 +108,8 @@ public class CatzOuttake extends SubsystemBase {
 
   }
 
-  public boolean coral = true;
-
   public boolean hasCoral(){
-    return coral;
-  }
-
-  public void setCoral(boolean coral){
-    this.coral = coral;
+    return CatzSuperstructure.currentCoralState == CoralState.IN_OUTTAKE;
   }
 
   // ============================================
@@ -149,7 +143,7 @@ public class CatzOuttake extends SubsystemBase {
   }
 
   private void case_adjustBack() {
-    io.runIntakesIntakeMotor(0.0);
+    // io.runIntakesIntakeMotor(0.0);
     io.runMotor(-ADJ_SPD, -ADJ_SPD);
 
     CatzSuperstructure.currentCoralState = CoralState.NOT_IN_OUTTAKE;
@@ -162,7 +156,7 @@ public class CatzOuttake extends SubsystemBase {
   }
 
   private void case_adjustFwd() {
-    io.runIntakesIntakeMotor(0.0);
+    // io.runIntakesIntakeMotor(0.0);
     io.runMotor(ADJ_SPD, ADJ_SPD);
     if (!inputs.bbreakBackTriggered) {
       currentState = outtakeStates.STOP;
