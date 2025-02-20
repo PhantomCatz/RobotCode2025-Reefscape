@@ -25,7 +25,14 @@ public class ElevatorConstants {
     public static final double ELEVATOR_DRIVEN_PULLEY    = 18.0;
     public static final double ELEVATOR_RATIO_STAGE_ONE  = ELEVATOR_DRIVING_PULLEY/ELEVATOR_DRIVEN_PULLEY;
     public static final double FINAL_REDUCATION          = MAXPLANETARY_GEAR_RATIO * ELEVATOR_RATIO_STAGE_ONE;
+    public static final double ELEVATOR_SPROCKET_RADIUS  = 0.86; //inches
 
+    // Elevator Heights:                 //Heights// (inches)
+    public static final double STOW_HEIGHT = 0.0    / ELEVATOR_SPROCKET_RADIUS;
+    public static final double L1_HEIGHT   = 8.6    / ELEVATOR_SPROCKET_RADIUS;
+    public static final double L2_HEIGHT   = 29.842 / ELEVATOR_SPROCKET_RADIUS;
+    public static final double L3_HEIGHT   = 68.8   / ELEVATOR_SPROCKET_RADIUS;
+    public static final double L4_HEIGHT   = 133.3  / ELEVATOR_SPROCKET_RADIUS;
     // Motor ID
     public static final int LEFT_LEADER_ID  = 30;
     public static final int RIGHT_FOLLOWER_ID = 31;
