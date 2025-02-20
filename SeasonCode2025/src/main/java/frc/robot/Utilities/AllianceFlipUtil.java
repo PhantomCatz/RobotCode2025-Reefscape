@@ -60,6 +60,7 @@ public class AllianceFlipUtil {
 
   /** Flips a pose to the correct side of the field based on the current alliance color. */
   public static Pose2d apply(Pose2d pose) {
+
     if (shouldFlipToRed()) {
       return new Pose2d(apply(pose.getTranslation()), apply(pose.getRotation()));
     } else {

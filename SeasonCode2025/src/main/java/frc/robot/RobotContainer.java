@@ -195,6 +195,10 @@ public class RobotContainer {
     xboxAux.povLeft().onTrue(Commands.runOnce(() -> {superstructure.setLevel(3); SmartDashboard.putNumber("Reef Level", 3);}));
     xboxAux.povDown().onTrue(Commands.runOnce(() -> {superstructure.setLevel(4); SmartDashboard.putNumber("Reef Level", 4);}));
 
+    xboxAux.button(7).onTrue(new InstantCommand(() -> selector.toggleLeftStation()));
+    xboxAux.button(8).onTrue(new InstantCommand(() -> selector.toggleRightStation()));
+
+
     // Gamepiece Selection
     xboxAux.leftBumper().onTrue(Commands.runOnce(() -> superstructure.setChosenGamepiece(Gamepiece.CORAL)));
     xboxAux.rightBumper().onTrue(Commands.runOnce(() -> superstructure.setChosenGamepiece(Gamepiece.ALGAE)));

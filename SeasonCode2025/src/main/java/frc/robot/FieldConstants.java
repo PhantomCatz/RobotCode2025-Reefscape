@@ -15,6 +15,7 @@ import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.geometry.*;
 import edu.wpi.first.math.util.Units;
+import frc.robot.Utilities.AllianceFlipUtil;
 import lombok.Getter;
 
 /**
@@ -50,6 +51,23 @@ public class FieldConstants {
             Units.inchesToMeters(33.526),
             Units.inchesToMeters(25.824),
             Rotation2d.fromDegrees(144.011 - 90));
+
+
+    public static Pose2d getRightStation(){
+      if(AllianceFlipUtil.shouldFlipToRed()){
+        return AllianceFlipUtil.apply(rightCenterFace);
+      }else{
+        return rightCenterFace;
+      }
+    }
+
+    public static Pose2d getLeftStation(){
+      if(AllianceFlipUtil.shouldFlipToRed()){
+        return AllianceFlipUtil.apply(leftCenterFace);
+      }else{
+        return leftCenterFace;
+      }
+    }
   }
 
   public static class Reef {
