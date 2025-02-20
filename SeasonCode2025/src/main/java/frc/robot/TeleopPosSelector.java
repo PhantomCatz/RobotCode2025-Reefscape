@@ -29,6 +29,7 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.FieldConstants.Reef;
 import frc.robot.Utilities.AllianceFlipUtil;
 import frc.robot.Utilities.CornerTrackingPathfinder;
+import frc.robot.CatzSubsystems.CatzSuperstructure.CoralState;
 import frc.robot.CatzSubsystems.CatzSuperstructure.LeftRight;
 import frc.robot.CatzSubsystems.CatzSuperstructure.RobotAction;
 import frc.robot.CatzSubsystems.CatzSuperstructure;
@@ -309,7 +310,6 @@ public class TeleopPosSelector extends SubsystemBase {
     return new TrajectoryDriveCmd(path, drivetrain, true);
   }
 
-  private boolean hasCoral = true;
 
   public Command runAutoCommand() {
     return new InstantCommand(() -> {
@@ -355,7 +355,7 @@ public class TeleopPosSelector extends SubsystemBase {
   private Command runNextCommand(){
     Pair<Pair<Integer, LeftRight>, Integer> pair = pathQueuePeekFront();
 
-    if(hasCoral){ //TODO change to actual check
+    if(CatzSuperstructure.getCurrentCoralState() == CoralState.IN_OUTTAKE){ 
       if(queuedPaths.isEmpty()) return new InstantCommand();
       return runReefScoreCommand(pair).andThen(new InstantCommand(() -> pathQueuePopFront()));
     }else{
@@ -379,7 +379,6 @@ public class TeleopPosSelector extends SubsystemBase {
       public void execute(){
         if(pathfindingCommand.isFinished()){
           pathfindingCommand.end(false);
-          hasCoral = false;
           superstructure.setCurrentRobotAction(RobotAction.OUTTAKE, pair.getSecond());
         }else{
           pathfindingCommand.execute();
@@ -388,7 +387,7 @@ public class TeleopPosSelector extends SubsystemBase {
 
       @Override
       public boolean isFinished(){
-        return !hasCoral; //(CatzSuperstructure.getCurrentCoralState() == CoralState.NOT_IN_OUTTAKE);
+        return (CatzSuperstructure.getCurrentCoralState() == CoralState.NOT_IN_OUTTAKE);
       }
 
       @Override
@@ -430,7 +429,6 @@ public class TeleopPosSelector extends SubsystemBase {
         Translation2d robotPos = tracker.getEstimatedPose().getTranslation();
 
         if(pathfindingCommand.isFinished()){
-          hasCoral = true;
           pathfindingCommand.end(false);
         }else{
           pathfindingCommand.execute();
@@ -444,7 +442,7 @@ public class TeleopPosSelector extends SubsystemBase {
 
       @Override
       public boolean isFinished(){
-        return hasCoral;//(CatzSuperstructure.getCurrentCoralState() == CoralState.IN_OUTTAKE);
+        return (CatzSuperstructure.getCurrentCoralState() == CoralState.IN_OUTTAKE);
       }
 
       @Override
@@ -457,7 +455,6 @@ public class TeleopPosSelector extends SubsystemBase {
   public Command cancelCurrentRunningCommand(){
     return new InstantCommand(() -> {
       currentRunningCommand.cancel();
-      System.out.println("cancelleldl!");
     });
   }
 
