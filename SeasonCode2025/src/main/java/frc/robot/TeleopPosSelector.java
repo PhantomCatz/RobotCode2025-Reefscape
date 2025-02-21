@@ -63,6 +63,8 @@ public class TeleopPosSelector extends SubsystemBase {
   private boolean leftCoralStation = true;
   private boolean rightCoralStation = true;
 
+  private boolean hasCoralSIM = true;
+
   public TeleopPosSelector(CommandXboxController aux, RobotContainer container) {
     this.xboxAux = aux;
     this.m_container = container;
@@ -355,12 +357,22 @@ public class TeleopPosSelector extends SubsystemBase {
   private Command runNextCommand(){
     Pair<Pair<Integer, LeftRight>, Integer> pair = pathQueuePeekFront();
 
-    if(CatzSuperstructure.getCurrentCoralState() == CoralState.IN_OUTTAKE){ 
-      if(queuedPaths.isEmpty()) return new InstantCommand();
-      return runReefScoreCommand(pair).andThen(new InstantCommand(() -> pathQueuePopFront()));
+    if(Robot.isSimulation()){
+      if(hasCoralSIM){
+        if(queuedPaths.isEmpty()) return new InstantCommand();
+        return runReefScoreCommand(pair).andThen(new InstantCommand(() -> pathQueuePopFront()));
+      }else{
+        return runCoralStationCommand(getBestCoralStation());
+      }
     }else{
-      return runCoralStationCommand(getBestCoralStation());
+      if(CatzSuperstructure.getCurrentCoralState() == CoralState.IN_OUTTAKE){
+        if(queuedPaths.isEmpty()) return new InstantCommand();
+        return runReefScoreCommand(pair).andThen(new InstantCommand(() -> pathQueuePopFront()));
+      }else{
+        return runCoralStationCommand(getBestCoralStation());
+      }
     }
+
   }
 
 
@@ -380,6 +392,7 @@ public class TeleopPosSelector extends SubsystemBase {
         if(pathfindingCommand.isFinished()){
           pathfindingCommand.end(false);
           superstructure.setCurrentRobotAction(RobotAction.OUTTAKE, pair.getSecond());
+          hasCoralSIM = false;
         }else{
           pathfindingCommand.execute();
         }
@@ -387,7 +400,11 @@ public class TeleopPosSelector extends SubsystemBase {
 
       @Override
       public boolean isFinished(){
-        return (CatzSuperstructure.getCurrentCoralState() == CoralState.NOT_IN_OUTTAKE);
+        if(Robot.isSimulation()){
+          return !hasCoralSIM;
+        }else{
+          return (CatzSuperstructure.getCurrentCoralState() == CoralState.NOT_IN_OUTTAKE);
+        }
       }
 
       @Override
@@ -430,6 +447,7 @@ public class TeleopPosSelector extends SubsystemBase {
 
         if(pathfindingCommand.isFinished()){
           pathfindingCommand.end(false);
+          hasCoralSIM = true;
         }else{
           pathfindingCommand.execute();
         }
@@ -442,7 +460,11 @@ public class TeleopPosSelector extends SubsystemBase {
 
       @Override
       public boolean isFinished(){
-        return (CatzSuperstructure.getCurrentCoralState() == CoralState.IN_OUTTAKE);
+        if(Robot.isSimulation()){
+          return hasCoralSIM;
+        }else{
+          return (CatzSuperstructure.getCurrentCoralState() == CoralState.IN_OUTTAKE);
+        }
       }
 
       @Override
