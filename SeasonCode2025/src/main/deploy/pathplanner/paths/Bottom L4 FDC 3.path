@@ -48,7 +48,7 @@
   "folder": "Bottom L4 FDC Paths",
   "idealStartingState": {
     "velocity": 0,
-    "rotation": -126.25383773744477
+    "rotation": 53.745999999999995
   },
   "useDefaultConstraints": true
 }

@@ -166,7 +166,6 @@ public class CornerTrackingPathfinder{
       return new ArrayList<>();
     }
     final GridPosition g = goal;
-
     //Queue to store the nodes to explore, prioritizing the shortest paths.
     PriorityQueue<PathfindingPosition> frontier = new PriorityQueue<>(new CompareDistances());
 
@@ -367,7 +366,7 @@ public class CornerTrackingPathfinder{
 
     while (!frontier.isEmpty()) {
       GridPosition currentPos = frontier.poll();
-      if (!obstacles.contains(currentPos) && currentPos.x <= nodesX && currentPos.y <= nodesY-1) {
+      if (!obstacles.contains(currentPos) && currentPos.x <= nodesX-1  && currentPos.x >= 0 && currentPos.y <= nodesY-1 && currentPos.y >= 0) {
         return currentPos;
       }
       visited.add(currentPos);
