@@ -58,7 +58,7 @@ public class CatzElevator extends SubsystemBase {
       PosL1(() -> L1_HEIGHT),
       PosL2(() -> L2_HEIGHT),
       PosL3(() -> L3_HEIGHT),
-      PosL4(() -> L4_HEIGHT),
+      PosL4(() -> 144.5),
       PosManual(new LoggedTunableNumber("Elevator/ScoreSourceSetpoint",0.0));
 
     private final DoubleSupplier elevatorSetpointSupplier;
@@ -187,7 +187,7 @@ public class CatzElevator extends SubsystemBase {
 
   public boolean isElevatorInPosition() {
     boolean isElevatorSettled = false;
-    boolean isElevatorInPos = (Math.abs((getElevatorPositionRads() - targetPosition.getTargetPositionRads())) < 5.0);
+    boolean isElevatorInPos = (Math.abs((getElevatorPositionRads() - targetPosition.getTargetPositionRads())) < 1.5);
     if(isElevatorInPos) {
       settlingCounter++;
       if(settlingCounter >= 10) {
