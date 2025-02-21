@@ -58,7 +58,7 @@ public class CatzElevator extends SubsystemBase {
       PosL1(() -> L1_HEIGHT),
       PosL2(() -> L2_HEIGHT),
       PosL3(() -> L3_HEIGHT),
-      PosL4(() -> 144.5),
+      PosL4(() -> 153),
       PosManual(new LoggedTunableNumber("Elevator/ScoreSourceSetpoint",0.0));
 
     private final DoubleSupplier elevatorSetpointSupplier;
@@ -123,7 +123,11 @@ public class CatzElevator extends SubsystemBase {
     //---------------------------------------------------------------------------------------------------------------------------
     //    Feed Foward
     //---------------------------------------------------------------------------------------------------------------------------
-    elevatorFeedForward =  gains.kG();
+    // if(targetPosition == ElevatorPosition.PosL4) {
+    //   elevatorFeedForward =  gains.kG() + 0.1;
+    // } else {
+      elevatorFeedForward =  gains.kG();
+    // }
 
     //---------------------------------------------------------------------------------------------------------------------------
     //    Control Mode setting
