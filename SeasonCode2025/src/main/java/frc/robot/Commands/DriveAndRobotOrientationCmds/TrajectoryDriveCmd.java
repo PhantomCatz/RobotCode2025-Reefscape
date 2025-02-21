@@ -170,6 +170,10 @@ public class TrajectoryDriveCmd extends Command {
       eventScheduler.initialize(trajectory);
     }
 
+    // System.out.println("current " + tracker.getEstimatedPose());
+    // System.out.println("start " + this.trajectory.getInitialPose());
+    // System.out.println("end " + this.trajectory.getEndState().pose);
+
     // Reset
     PathPlannerLogging.logActivePath(usePath);
     PPLibTelemetry.setCurrentPath(usePath);
@@ -295,6 +299,7 @@ public class TrajectoryDriveCmd extends Command {
     // if (autoalign){
     //   return false;
     // }
+    System.out.println("vision: " +tracker.getDEstimatedPose().getTranslation().getNorm() );
     if (autoalign && tracker.getDEstimatedPose().getTranslation().getNorm() > ALLOWABLE_VISION_ADJUST){
       return false;
     }

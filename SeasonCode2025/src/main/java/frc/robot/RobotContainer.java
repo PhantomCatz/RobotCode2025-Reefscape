@@ -37,6 +37,7 @@ import frc.robot.Utilities.Alert.AlertType;
 import org.littletonrobotics.junction.networktables.LoggedNetworkNumber;
 
 public class RobotContainer {
+  private double SCORE_TRIGGER_THRESHHOLD = 0.8;
 
   // -------------------------------------------------------------------------------------------------------------------
   // Subsystem Declaration
@@ -114,34 +115,28 @@ public class RobotContainer {
     //---------------------------------------------------------------------------------------------------------------------
     // XBOX Drive
     //---------------------------------------------------------------------------------------------------------------------
-    // Reef autopathfind
+    // NBA
     xboxDrv.b().onTrue(new InstantCommand(() -> selector.runToNearestBranch().schedule()));
     xboxDrv.b().onFalse(selector.cancelCurrentRunningCommand());
 
-    xboxDrv.x().onTrue(new InstantCommand(() -> selector.runOnlyCoralStationCommand(selector.getBestCoralStation()).schedule()));
-    xboxDrv.x().onFalse(selector.cancelCurrentRunningCommand());
+    // BALLS
+    xboxDrv.y().onTrue(new InstantCommand(() -> selector.runOnlyCoralStationCommand(selector.getBestCoralStation()).schedule()));
+    xboxDrv.y().onFalse(selector.cancelCurrentRunningCommand());
 
+    // Pop Queue
     // xboxDrv.y().onTrue(selector.runQueuedCommand());
     // xboxDrv.y().onFalse(selector.cancelPathfindingCommand()); //TODO is this needed?
 
+    // AQUA
     xboxDrv.a().onTrue(new InstantCommand(() -> selector.runAutoCommand().schedule()));
     xboxDrv.a().onFalse(selector.cancelAutoCommand());
 
+    // Left Right
     xboxDrv.leftBumper().onTrue(new InstantCommand(() -> selector.runLeftRightCommand(LeftRight.LEFT).schedule()));
-    xboxDrv.leftBumper().onFalse(selector.cancelCurrentRunningCommand());
-
-    xboxDrv.leftBumper().and(xboxDrv.rightBumper()).onTrue(selector.cancelCurrentRunningCommand());
-
     xboxDrv.rightBumper().onTrue(new InstantCommand(() -> selector.runLeftRightCommand(LeftRight.RIGHT).schedule()));
-    xboxDrv.rightBumper().onFalse(selector.cancelCurrentRunningCommand());
 
-    xboxDrv.rightTrigger().onTrue(new InstantCommand(() -> selector.runOnlyCoralStationCommand(FieldConstants.CoralStation.getRightStation()).schedule()));
-    xboxDrv.rightTrigger().onFalse(selector.cancelCurrentRunningCommand());
-
-    xboxDrv.leftTrigger().onTrue(new InstantCommand(() -> selector.runOnlyCoralStationCommand(FieldConstants.CoralStation.getLeftStation()).schedule()));
-    xboxDrv.leftTrigger().onFalse(selector.cancelCurrentRunningCommand());
-
-    // xboxDrv.rightTrigger().and(xboxDrv.leftTrigger()).onTrue(selector.cancelCurrentRunningCommand());
+    // Score
+    xboxDrv.leftTrigger(SCORE_TRIGGER_THRESHHOLD).onTrue(new InstantCommand(() -> superstructure.setCurrentRobotAction(RobotAction.OUTTAKE)));
 
     // Default driving
     Trigger escapeTrajectory = new Trigger(()->(xboxDrv.getLeftY() > XboxInterfaceConstants.kDeadband));

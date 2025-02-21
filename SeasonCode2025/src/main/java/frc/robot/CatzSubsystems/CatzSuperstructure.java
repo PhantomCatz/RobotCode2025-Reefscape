@@ -176,7 +176,6 @@ public class CatzSuperstructure extends VirtualSubsystem {
                 currentRobotState = RobotState.STOW;
                 robotActionCommand = CatzStateCommands.stow(container);
                 break;
-
         }
 
         robotActionCommand.schedule();

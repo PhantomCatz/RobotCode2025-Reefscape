@@ -361,8 +361,8 @@ public class TeleopPosSelector extends SubsystemBase {
   private Command runNextCommand(){
     Pair<Pair<Integer, LeftRight>, Integer> pair = pathQueuePeekFront();
 
-    if(Robot.isSimulation()){
-      if(hasCoralSIM){
+    if(true){
+      if(true){
         if(queuedPaths.isEmpty()) return new InstantCommand();
         return runReefScoreCommand(pair).andThen(new InstantCommand(() -> pathQueuePopFront()));
       }else{
