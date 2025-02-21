@@ -8,6 +8,7 @@
 package frc.robot;
 
 
+
 import java.util.Arrays;
 import java.util.Deque;
 import java.util.HashMap;
@@ -86,6 +87,9 @@ public class TeleopPosSelector extends SubsystemBase {
     poseToLetter.put("4 LEFT", "C");
     poseToLetter.put("5 RIGHT", "E");
     poseToLetter.put("5 LEFT", "F");
+
+    SmartDashboard.putBoolean("Left Coral Station", leftCoralStation);
+    SmartDashboard.putBoolean("Right Coral Station", rightCoralStation);
   }
 
   public void toggleLeftStation(){

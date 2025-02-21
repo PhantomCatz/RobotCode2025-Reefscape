@@ -136,13 +136,13 @@ public class RobotContainer {
     xboxDrv.rightBumper().onTrue(new InstantCommand(() -> selector.runLeftRightCommand(LeftRight.RIGHT).schedule()));
     xboxDrv.rightBumper().onFalse(selector.cancelCurrentRunningCommand());
 
-    xboxDrv.rightTrigger().onTrue(new InstantCommand(() -> selector.runOnlyCoralStationCommand(FieldConstants.CoralStation.rightCenterFace).schedule()));
+    xboxDrv.rightTrigger().onTrue(new InstantCommand(() -> selector.runOnlyCoralStationCommand(FieldConstants.CoralStation.getRightStation()).schedule()));
     xboxDrv.rightTrigger().onFalse(selector.cancelCurrentRunningCommand());
 
-    xboxDrv.leftTrigger().onTrue(new InstantCommand(() -> selector.runOnlyCoralStationCommand(FieldConstants.CoralStation.leftCenterFace).schedule()));
+    xboxDrv.leftTrigger().onTrue(new InstantCommand(() -> selector.runOnlyCoralStationCommand(FieldConstants.CoralStation.getLeftStation()).schedule()));
     xboxDrv.leftTrigger().onFalse(selector.cancelCurrentRunningCommand());
 
-    xboxDrv.rightTrigger().and(xboxDrv.leftTrigger()).onTrue(selector.cancelCurrentRunningCommand());
+    // xboxDrv.rightTrigger().and(xboxDrv.leftTrigger()).onTrue(selector.cancelCurrentRunningCommand());
 
     // Default driving
     Trigger escapeTrajectory = new Trigger(()->(xboxDrv.getLeftY() > XboxInterfaceConstants.kDeadband));
