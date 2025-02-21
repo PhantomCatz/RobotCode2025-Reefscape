@@ -126,6 +126,7 @@ public class CatzAutonomous extends SubsystemBase {
     NamedCommands.registerCommand("TopAlgae", CatzStateCommands.topAlgae(container));
     NamedCommands.registerCommand("Climb", CatzStateCommands.climb(container));
     NamedCommands.registerCommand("RestPose", Commands.runOnce(()->tracker.resetPose(new Pose2d())));
+    NamedCommands.registerCommand("WheelCharacterization", new WheelRadiusCharacterization(m_container.getCatzDrivetrain(), Direction.CLOCKWISE));
 
     //----------------------------------------------------------------------------------------------------
     //
@@ -159,6 +160,7 @@ public class CatzAutonomous extends SubsystemBase {
       String autoName = autoFile.getName().replaceFirst("[.][^.]+$", "");
       autoProgramChooser.addDefaultOption(autoName, new PathPlannerAuto(autoName));
     }
+    autoProgramChooser.addOption("Wheel Characterization", new PathPlannerAuto("Wheel Characterization"));
   }
 
 
