@@ -20,7 +20,6 @@ import frc.robot.CatzConstants.XboxInterfaceConstants;
 import frc.robot.CatzSubsystems.CatzSuperstructure;
 import frc.robot.CatzSubsystems.CatzAlgaeEffector.CatzAlgaePivot.CatzAlgaePivot;
 import frc.robot.CatzSubsystems.CatzAlgaeEffector.CatzAlgaeRemover.CatzAlgaeRemover;
-import frc.robot.CatzSubsystems.CatzSuperstructure.Gamepiece;
 import frc.robot.CatzSubsystems.CatzSuperstructure.LeftRight;
 import frc.robot.CatzSubsystems.CatzSuperstructure.RobotAction;
 import frc.robot.CatzSubsystems.CatzClimb.CatzClimb;
@@ -186,8 +185,8 @@ public class RobotContainer {
 
     // Scoring Level Determination
     xboxAux.rightTrigger().onTrue(Commands.runOnce(() -> selector.pathQueueAddBack(selector.getXBoxReefPos(), superstructure.getLevel())));
-    // xboxAux.y().onTrue(Commands.runOnce(() -> selector.pathQueuePopFront()));
-    // xboxAux.b().onTrue(Commands.runOnce(() -> selector.pathQueuePopBack()));
+    xboxAux.leftBumper().onTrue(Commands.runOnce(() -> selector.pathQueuePopFront()));
+    xboxAux.rightBumper().onTrue(Commands.runOnce(() -> selector.pathQueuePopBack()));
     xboxAux.rightStick().onTrue(Commands.runOnce(() -> selector.pathQueueClear()));
 
     xboxAux.povRight().onTrue(Commands.runOnce(()->{superstructure.setLevel(1); SmartDashboard.putNumber("Reef Level", 1);}));
@@ -200,8 +199,8 @@ public class RobotContainer {
 
 
     // Gamepiece Selection
-    xboxAux.leftBumper().onTrue(Commands.runOnce(() -> superstructure.setChosenGamepiece(Gamepiece.CORAL)));
-    xboxAux.rightBumper().onTrue(Commands.runOnce(() -> superstructure.setChosenGamepiece(Gamepiece.ALGAE)));
+    // xboxAux.leftBumper().onTrue(Commands.runOnce(() -> superstructure.setChosenGamepiece(Gamepiece.CORAL)));
+    // xboxAux.rightBumper().onTrue(Commands.runOnce(() -> superstructure.setChosenGamepiece(Gamepiece.ALGAE)));
 
     xboxAux.y().onTrue(Commands.runOnce(() -> superstructure.setCurrentRobotAction(RobotAction.OUTTAKE)).alongWith(Commands.print("OUTTAKE L" + superstructure.getLevel())));
     xboxAux.x().onTrue(Commands.runOnce(() -> superstructure.setCurrentRobotAction(RobotAction.INTAKE)).alongWith(Commands.print("INTAKE")));

@@ -230,11 +230,8 @@ public class TrajectoryDriveCmd extends Command {
       }
       if(Double.isNaN(adjustedSpeeds.vxMetersPerSecond) || Double.isNaN(adjustedSpeeds.vyMetersPerSecond) || Double.isNaN(adjustedSpeeds.omegaRadiansPerSecond)){
         // If the target and current positions are the same, bad
-        System.out.println("NAN");
         adjustedSpeeds = new ChassisSpeeds();
       }
-
-      System.out.println("speed: " + adjustedSpeeds);
 
       // Logging
       Logger.recordOutput("CatzRobotTracker/Desired Auto Pose", goal.pose);
