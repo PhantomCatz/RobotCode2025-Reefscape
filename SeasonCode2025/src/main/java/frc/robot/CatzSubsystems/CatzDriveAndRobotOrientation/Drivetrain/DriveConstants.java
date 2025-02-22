@@ -185,7 +185,7 @@ public class DriveConstants {
   //
   // -----------------------------------------------------------------------------------------------------------------------------
   public static final PathConstraints PATHFINDING_CONSTRAINTS = new PathConstraints( // 540 // 720
-                                                                        1,
+                                                                        2,
                                                                         DRIVE_CONFIG.maxLinearAcceleration, // max vel causing messup
                                                                         DRIVE_CONFIG.maxAngularVelocity,
                                                                         DRIVE_CONFIG.maxAngularAcceleration
@@ -213,10 +213,10 @@ public class DriveConstants {
   // -----------------------------------------------------------------------------------------------------------------------------
   public static HolonomicDriveController getNewHolController() {
     return new HolonomicDriveController(
-        new PIDController(20.0, 0.0, 0.0),
-        new PIDController(20.0, 0.0, 0.0),
+        new PIDController(4.0, 0.0, 0.0),
+        new PIDController(4.0, 0.0, 0.0),
         new ProfiledPIDController(
-            23.0,
+            4.0,
             0,
             0,
             new TrapezoidProfile.Constraints(

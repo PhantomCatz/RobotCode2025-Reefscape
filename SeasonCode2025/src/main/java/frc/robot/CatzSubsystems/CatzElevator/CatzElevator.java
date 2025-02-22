@@ -58,7 +58,7 @@ public class CatzElevator extends SubsystemBase {
       PosL1(() -> L1_HEIGHT),
       PosL2(() -> L2_HEIGHT),
       PosL3(() -> L3_HEIGHT),
-      PosL4(() -> 153),
+      PosL4(() -> 150),
       PosManual(new LoggedTunableNumber("Elevator/ScoreSourceSetpoint",0.0));
 
     private final DoubleSupplier elevatorSetpointSupplier;

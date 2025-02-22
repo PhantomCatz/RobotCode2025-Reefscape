@@ -15,6 +15,7 @@ import java.util.HashMap;
 import java.util.LinkedList;
 
 import com.pathplanner.lib.path.GoalEndState;
+import com.pathplanner.lib.path.PathConstraints;
 import com.pathplanner.lib.path.PathPlannerPath;
 import com.pathplanner.lib.path.Waypoint;
 
@@ -22,6 +23,7 @@ import edu.wpi.first.math.Pair;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
@@ -245,6 +247,10 @@ public class TeleopPosSelector extends SubsystemBase {
     Translation2d unitLeftRight = unitRadius.rotateBy(Rotation2d.fromDegrees(90));
 
     Translation2d radius = unitRadius.times(Reef.reefOrthogonalRadius + Reef.scoringDistance);
+
+    double centerShift = Units.inchesToMeters(3);
+    radius = radius.plus(unitLeftRight.times(centerShift));
+
     Translation2d leftRight = unitLeftRight.times(leftRightPos.NUM * Reef.leftRightDistance);
     if (unitLeftRight.getY() < 0) {
       leftRight = leftRight.times(-1);
@@ -284,36 +290,79 @@ public class TeleopPosSelector extends SubsystemBase {
     }
   }
 
+  // public Command runLeftRightCommand(LeftRight leftRight) {
+  //   if(currentPathfindingPair == null) return new InstantCommand(); //means it is in AQUA
+  //   currentRunningCommand.cancel();
+
+  //   Pose2d goal = calculateReefPose(new Pair<Integer, LeftRight>(currentPathfindingPair.getFirst(), leftRight));
+  //   Pose2d currentPose = tracker.getEstimatedPose();
+
+  //   Translation2d goalPos = goal.getTranslation();
+  //   Translation2d currentPos = currentPose.getTranslation();
+  //   Translation2d direction = goalPos.minus(currentPos).div(2.0);
+
+  //   if (currentPose.getTranslation().getDistance(goal.getTranslation()) > Reef.leftRightDistance * 3
+  //       || direction.getNorm() <= 1e-3) {
+  //     return new InstantCommand();
+  //   }
+
+  //   PathPlannerPath path = new PathPlannerPath(
+  //     Arrays.asList(new Waypoint[] {
+  //         new Waypoint(null, currentPos, currentPos.plus(direction)),
+  //         new Waypoint(goalPos.minus(direction), goalPos, null)
+  //     }),
+  //     DriveConstants.PATHFINDING_CONSTRAINTS,
+  //     null,
+  //     new GoalEndState(0, goal.getRotation()));
+
+  //     if (AllianceFlipUtil.shouldFlipToRed()) {
+  //       path = path.flipPath();
+  //     }
+
+  //   return new TrajectoryDriveCmd(path, drivetrain, true);
+  // }
+
   public Command runLeftRightCommand(LeftRight leftRight) {
-    if(currentPathfindingPair == null) return new InstantCommand(); //means it is in AQUA
-    currentRunningCommand.cancel();
+    return new InstantCommand(() -> {
+      if(currentPathfindingPair == null) return; //means it is in AQUA
+      currentRunningCommand.cancel();
 
-    Pose2d goal = calculateReefPose(new Pair<Integer, LeftRight>(currentPathfindingPair.getFirst(), leftRight));
-    Pose2d currentPose = tracker.getEstimatedPose();
+      Pose2d goal = calculateReefPose(new Pair<Integer, LeftRight>(currentPathfindingPair.getFirst(), leftRight));
+      Pose2d currentPose = tracker.getEstimatedPose();
 
-    Translation2d goalPos = goal.getTranslation();
-    Translation2d currentPos = currentPose.getTranslation();
-    Translation2d direction = goalPos.minus(currentPos).div(2.0);
+      Translation2d goalPos = goal.getTranslation();
+      Translation2d currentPos = currentPose.getTranslation();
+      Translation2d direction = goalPos.minus(currentPos).div(2.0);
 
-    if (currentPose.getTranslation().getDistance(goal.getTranslation()) > Reef.leftRightDistance * 3
-        || direction.getNorm() <= 1e-3) {
-      return new InstantCommand();
-    }
-
-    PathPlannerPath path = new PathPlannerPath(
-      Arrays.asList(new Waypoint[] {
-          new Waypoint(null, currentPos, currentPos.plus(direction)),
-          new Waypoint(goalPos.minus(direction), goalPos, null)
-      }),
-      DriveConstants.PATHFINDING_CONSTRAINTS,
-      null,
-      new GoalEndState(0, goal.getRotation()));
-
-      if (AllianceFlipUtil.shouldFlipToRed()) {
-        path = path.flipPath();
+      if (currentPose.getTranslation().getDistance(goal.getTranslation()) > Reef.leftRightDistance * 3
+          || direction.getNorm() <= 1e-3) {
+        return;
       }
 
-    return new TrajectoryDriveCmd(path, drivetrain, true);
+      PathConstraints PATHFINDING_CONSTRAINTS = new PathConstraints( // 540 // 720
+                                                                        1.5,
+                                                                        DriveConstants.DRIVE_CONFIG.maxAngularAcceleration(), // max vel causing messup
+                                                                        DriveConstants.DRIVE_CONFIG.maxAngularVelocity(),
+                                                                        DriveConstants.DRIVE_CONFIG.maxAngularAcceleration()
+                                                                );
+
+      PathPlannerPath path = new PathPlannerPath(
+        Arrays.asList(new Waypoint[] {
+            new Waypoint(null, currentPos, currentPos.plus(direction)),
+            new Waypoint(goalPos.minus(direction), goalPos, null)
+        }),
+        PATHFINDING_CONSTRAINTS,
+        null,
+        new GoalEndState(0, goal.getRotation()));
+
+        if (AllianceFlipUtil.shouldFlipToRed()) {
+          path = path.flipPath();
+        }
+
+      currentRunningCommand = new TrajectoryDriveCmd(path, drivetrain, true);
+      currentRunningCommand.schedule();
+    });
+
   }
 
 
@@ -361,8 +410,8 @@ public class TeleopPosSelector extends SubsystemBase {
   private Command runNextCommand(){
     Pair<Pair<Integer, LeftRight>, Integer> pair = pathQueuePeekFront();
 
-    if(true){
-      if(true){
+    if(Robot.isSimulation()){
+      if(hasCoralSIM){
         if(queuedPaths.isEmpty()) return new InstantCommand();
         return runReefScoreCommand(pair).andThen(new InstantCommand(() -> pathQueuePopFront()));
       }else{

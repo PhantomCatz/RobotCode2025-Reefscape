@@ -48,7 +48,8 @@ public class RobotContainer {
   // Assistance Subsystem declaration
   private CatzLED led = CatzLED.getInstance();
   private CatzRobotTracker robotTracker = CatzRobotTracker.getInstance();
-  private CatzVision vision = new CatzVision(new VisionIOLimelight("limelight-soba"));
+  private CatzVision vision = new CatzVision(new VisionIOLimelight("limelight-tempura"),
+                                             new VisionIOLimelight("limelight-gyoza"));
   private CatzOuttake outtake = new CatzOuttake();
   private CatzElevator elevator = new CatzElevator();
   private CatzClimb climb = new CatzClimb();
@@ -133,8 +134,10 @@ public class RobotContainer {
 
     // Left Right
     xboxDrv.leftBumper().onTrue(new InstantCommand(() -> selector.runLeftRightCommand(LeftRight.LEFT).schedule()));
-    xboxDrv.rightBumper().onTrue(new InstantCommand(() -> selector.runLeftRightCommand(LeftRight.RIGHT).schedule()));
+    xboxDrv.leftBumper().onFalse(selector.cancelCurrentRunningCommand());
 
+    xboxDrv.rightBumper().onTrue(new InstantCommand(() -> selector.runLeftRightCommand(LeftRight.RIGHT).schedule()));
+    xboxDrv.rightBumper().onFalse(selector.cancelCurrentRunningCommand());
     // Score
     xboxDrv.leftTrigger(SCORE_TRIGGER_THRESHHOLD).onTrue(new InstantCommand(() -> superstructure.setCurrentRobotAction(RobotAction.OUTTAKE)));
 
