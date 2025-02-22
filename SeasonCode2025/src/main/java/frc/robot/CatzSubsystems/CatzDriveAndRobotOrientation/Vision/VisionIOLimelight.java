@@ -32,11 +32,15 @@ public class VisionIOLimelight implements VisionIO {
 
   private final DoubleSubscriber latencySubscriber;
   private final DoubleSubscriber txSubscriber;
+  private final DoubleSubscriber taSubscriber;
+
   private final DoubleSubscriber tySubscriber;
   private final DoubleSubscriber tagIDSubscriber;
   private final DoubleArraySubscriber cameraSpaceSubscriber;
   private final DoubleArraySubscriber megatag1Subscriber;
   private final DoubleArraySubscriber megatag2Subscriber;
+
+
 
   /**
    * Creates a new VisionIOLimelight.
@@ -50,6 +54,8 @@ public class VisionIOLimelight implements VisionIO {
     latencySubscriber    = table.getDoubleTopic("tl").subscribe(0.0);
     txSubscriber         = table.getDoubleTopic("tx").subscribe(0.0);
     tySubscriber         = table.getDoubleTopic("ty").subscribe(0.0);
+    taSubscriber         = table.getDoubleTopic("ta").subscribe(0.0);
+
     tagIDSubscriber      = table.getDoubleTopic("tid").subscribe(0.0);
     cameraSpaceSubscriber= table.getDoubleArrayTopic("targetpose_cameraspace").subscribe(new double[] {});
     megatag1Subscriber   = table.getDoubleArrayTopic("botpose_wpiblue").subscribe(new double[] {});
@@ -62,13 +68,13 @@ public class VisionIOLimelight implements VisionIO {
     // Update connection status based on whether an update has been seen in the last 250ms
     inputs.connected = (usedTimestamp - latencySubscriber.getLastChange()) < 250;
 
-
     // Update orientation for MegaTag 2
     orientationPublisher.accept(
-        new double[] {rotationSupplier.get().getDegrees(), 0.0, 0.0, 0.0, 0.0, 0.0});
-    // System.out.println(rotationSupplier.get().getDegrees());
-    NetworkTableInstance.getDefault().flush(); // Increases network traffic but recommended by Limelight
+      new double[] {rotationSupplier.get().getDegrees(), 0.0, 0.0, 0.0, 0.0, 0.0});
+      // System.out.println(rotationSupplier.get().getDegrees());
+      NetworkTableInstance.getDefault().flush(); // Increases network traffic but recommended by Limelight
 
+    inputs.ta = taSubscriber.get();
     // Read new pose observations from NetworkTables
     Set<Integer> tagIds = new HashSet<>();
     List<PoseObservation> poseObservations = new LinkedList<>();
