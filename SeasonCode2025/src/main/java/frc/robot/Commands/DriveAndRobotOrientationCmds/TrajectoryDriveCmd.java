@@ -48,15 +48,15 @@ import org.littletonrobotics.junction.Logger;
 
 public class TrajectoryDriveCmd extends Command {
   // Trajectory constants
-  public static final double ALLOWABLE_POSE_ERROR = 0.05;
+  public static final double ALLOWABLE_POSE_ERROR = 0.01;
   public static final double ALLOWABLE_ROTATION_ERROR = 2.0;
   public static final double ALLOWABLE_POSE_ERROR_PID = 0.02;
   public static final double ALLOWABLE_ROTATION_ERROR_PID = 0.5;
   public static final double ALLOWABLE_VEL_ERROR = 0.2;
   public static final double ALLOWABLE_OMEGA_ERROR = Units.degreesToRadians(5.0);
   private static final double TIMEOUT_SCALAR = 5;
-  private static final double CONVERGE_DISTANCE = 2.0;
-  private final double ALLOWABLE_VISION_ADJUST = 0.002; //TODO tune
+  private static final double CONVERGE_DISTANCE = 3.0;
+  private final double ALLOWABLE_VISION_ADJUST = 5e-4; //TODO tune
 
   // Subsystems
   private CatzDrivetrain m_driveTrain;

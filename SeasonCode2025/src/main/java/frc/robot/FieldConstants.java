@@ -43,12 +43,12 @@ public class FieldConstants {
   public static class CoralStation {
     public static final Pose2d leftCenterFace =
         new Pose2d(
-            Units.inchesToMeters(33.526),
-            Units.inchesToMeters(291.176),
+            Units.inchesToMeters(53.526),
+            Units.inchesToMeters(281.176),
             Rotation2d.fromDegrees(90 - 144.011));
     public static final Pose2d rightCenterFace =
         new Pose2d(
-            Units.inchesToMeters(33.526),
+            Units.inchesToMeters(53.526),
             Units.inchesToMeters(25.824),
             Rotation2d.fromDegrees(144.011 - 90));
 
@@ -76,11 +76,11 @@ public class FieldConstants {
     public static final double faceToZoneLine =
         Units.inchesToMeters(12); // Side of the reef to the inside of the reef zone line
     public static final double scoringDistance =
-        Units.inchesToMeters(24); // Scoring distance from the side of the reef
+        Units.inchesToMeters(19); // Scoring distance from the side of the reef
     public static final double reefOrthogonalRadius =
         Units.inchesToMeters(32.305); // Distance from the center to the side of the reef
     public static final double leftRightDistance =
-        Units.inchesToMeters(8); // Center of each face to the left and right scoring positions of each face
+        Units.inchesToMeters(7); // Center of each face to the left and right scoring positions of each face
   }
 
   public static class StagingPositions {
