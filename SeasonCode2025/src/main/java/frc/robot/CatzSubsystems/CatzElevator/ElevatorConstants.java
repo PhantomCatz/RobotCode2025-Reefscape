@@ -17,7 +17,7 @@ import frc.robot.Utilities.MotorUtil.MotionMagicParameters;
 /** Add your docs here. */
 public class ElevatorConstants {
 
-    public static final boolean isElevatorDisabled = true;
+    public static final boolean isElevatorDisabled = false;
 
     // Gearbox definitions
     public static final double MAXPLANETARY_GEAR_RATIO   = 4.0 * 4.0;
@@ -25,7 +25,14 @@ public class ElevatorConstants {
     public static final double ELEVATOR_DRIVEN_PULLEY    = 18.0;
     public static final double ELEVATOR_RATIO_STAGE_ONE  = ELEVATOR_DRIVING_PULLEY/ELEVATOR_DRIVEN_PULLEY;
     public static final double FINAL_REDUCATION          = MAXPLANETARY_GEAR_RATIO * ELEVATOR_RATIO_STAGE_ONE;
+    public static final double ELEVATOR_SPROCKET_RADIUS  = 0.86; //inches
 
+    // Elevator Heights:                 //Heights// (inches)
+    public static final double STOW_HEIGHT = 0.0    / ELEVATOR_SPROCKET_RADIUS;
+    public static final double L1_HEIGHT   = 8.6    / ELEVATOR_SPROCKET_RADIUS;
+    public static final double L2_HEIGHT   = (25.77-5)/* 29.842*/ / ELEVATOR_SPROCKET_RADIUS; //25.77
+    public static final double L3_HEIGHT   = (70.1-8) /*68.8 */  / ELEVATOR_SPROCKET_RADIUS; //70.1
+    public static final double L4_HEIGHT   = (141)/* 133.3*/  / ELEVATOR_SPROCKET_RADIUS; //143.12
     // Motor ID
     public static final int LEFT_LEADER_ID  = 30;
     public static final int RIGHT_FOLLOWER_ID = 31;
@@ -49,7 +56,7 @@ public class ElevatorConstants {
     public static final Gains gains =
         switch (CatzConstants.getRobotType()) {
             case SN2 -> new Gains(7.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0); //TODO fix gains
-            case SN1 -> new Gains(75.0, 0.0, 0.0, 0.175, 0.13, 0.013, 0.4); //
+            case SN1 -> new Gains(75.0, 0.01, 0.0, 0.175, 0.13, 0.013, 0.4); //
             case SN_TEST, SN1_2024 -> new Gains(7000.0, 0.0, 250.0, 8.4, 0.2, 0.2, 22.9);
         };
     public static final MotionMagicParameters motionMagicParameters =

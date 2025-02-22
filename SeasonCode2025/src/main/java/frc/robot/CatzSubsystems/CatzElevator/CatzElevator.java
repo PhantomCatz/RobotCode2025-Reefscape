@@ -53,11 +53,12 @@ public class CatzElevator extends SubsystemBase {
 
   @RequiredArgsConstructor
   public static enum ElevatorPosition {
-      PosStow(() -> 0.0),
-      PosL1(() -> 10.0),
-      PosL2(() -> 34.7),
-      PosL3(() -> 80.0),
-      PosL4(() -> 155.0),
+      //TO CHANGE HEIGHT GO TO ElevatorConstants.java
+      PosStow(() -> STOW_HEIGHT),
+      PosL1(() -> L1_HEIGHT),
+      PosL2(() -> L2_HEIGHT),
+      PosL3(() -> L3_HEIGHT),
+      PosL4(() -> 153),
       PosManual(new LoggedTunableNumber("Elevator/ScoreSourceSetpoint",0.0));
 
     private final DoubleSupplier elevatorSetpointSupplier;
@@ -122,7 +123,11 @@ public class CatzElevator extends SubsystemBase {
     //---------------------------------------------------------------------------------------------------------------------------
     //    Feed Foward
     //---------------------------------------------------------------------------------------------------------------------------
-    elevatorFeedForward =  gains.kG();
+    // if(targetPosition == ElevatorPosition.PosL4) {
+    //   elevatorFeedForward =  gains.kG() + 0.1;
+    // } else {
+      elevatorFeedForward =  gains.kG();
+    // }
 
     //---------------------------------------------------------------------------------------------------------------------------
     //    Control Mode setting
@@ -186,10 +191,10 @@ public class CatzElevator extends SubsystemBase {
 
   public boolean isElevatorInPosition() {
     boolean isElevatorSettled = false;
-    boolean isElevatorInPos = (Math.abs((getElevatorPositionRads() - targetPosition.getTargetPositionRads())) < 5.0);
+    boolean isElevatorInPos = (Math.abs((getElevatorPositionRads() - targetPosition.getTargetPositionRads())) < 1.5);
     if(isElevatorInPos) {
       settlingCounter++;
-      if(settlingCounter >= 5) {
+      if(settlingCounter >= 10) {
         isElevatorSettled = true;
         settlingCounter = 0;
         // System.out.println("////////////ELEVATOR SETTLED FOR .2 SECONDS///////////////////");
