@@ -43,12 +43,12 @@ public class FieldConstants {
   public static class CoralStation {
     public static final Pose2d leftCenterFace =
         new Pose2d(
-            Units.inchesToMeters(40.526),
+            Units.inchesToMeters(53.526),
             Units.inchesToMeters(281.176),
             Rotation2d.fromDegrees(90 - 144.011));
     public static final Pose2d rightCenterFace =
         new Pose2d(
-            Units.inchesToMeters(40.526),
+            Units.inchesToMeters(53.526),
             Units.inchesToMeters(25.824),
             Rotation2d.fromDegrees(144.011 - 90));
 

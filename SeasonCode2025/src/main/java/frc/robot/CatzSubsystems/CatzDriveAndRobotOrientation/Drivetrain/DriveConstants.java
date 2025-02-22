@@ -77,7 +77,7 @@ public class DriveConstants {
                 .build();
         case SN1, SN2, SN1_2024 ->
         DriveConfig.builder()
-                .wheelRadius(Units.inchesToMeters(2.0)) // TODO make these repeated numbers into constants
+                .wheelRadius(Units.inchesToMeters(1.74)) // TODO make these repeated numbers into constants
                 .robotLengthX(Units.inchesToMeters(29.0))
                 .robotWidthY(Units.inchesToMeters(29.0))
                 .bumperWidthX(Units.inchesToMeters(32))
