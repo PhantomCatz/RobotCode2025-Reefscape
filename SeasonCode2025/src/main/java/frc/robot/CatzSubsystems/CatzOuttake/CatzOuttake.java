@@ -147,7 +147,6 @@ public class CatzOuttake extends SubsystemBase {
   }
 
   private void case_adjustBack() {
-    io.runIntakesIntakeMotor(0.0);
     io.runMotor(-ADJ_SPD, -ADJ_SPD);
 
     CatzSuperstructure.setCurrentCoralState(CoralState.NOT_IN_OUTTAKE);
@@ -161,7 +160,6 @@ public class CatzOuttake extends SubsystemBase {
   }
 
   private void case_adjustFwd() {
-    io.runIntakesIntakeMotor(0.0);
     io.runMotor(ADJ_SPD, ADJ_SPD);
     if (!inputs.bbreakBackTriggered) {
       currentState = outtakeStates.STOP;
