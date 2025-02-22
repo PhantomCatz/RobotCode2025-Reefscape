@@ -20,7 +20,6 @@ import frc.robot.CatzConstants.XboxInterfaceConstants;
 import frc.robot.CatzSubsystems.CatzSuperstructure;
 import frc.robot.CatzSubsystems.CatzAlgaeEffector.CatzAlgaePivot.CatzAlgaePivot;
 import frc.robot.CatzSubsystems.CatzAlgaeEffector.CatzAlgaeRemover.CatzAlgaeRemover;
-import frc.robot.CatzSubsystems.CatzSuperstructure.Gamepiece;
 import frc.robot.CatzSubsystems.CatzSuperstructure.LeftRight;
 import frc.robot.CatzSubsystems.CatzSuperstructure.RobotAction;
 import frc.robot.CatzSubsystems.CatzClimb.CatzClimb;
@@ -38,6 +37,7 @@ import frc.robot.Utilities.Alert.AlertType;
 import org.littletonrobotics.junction.networktables.LoggedNetworkNumber;
 
 public class RobotContainer {
+  private double SCORE_TRIGGER_THRESHHOLD = 0.8;
 
   // -------------------------------------------------------------------------------------------------------------------
   // Subsystem Declaration
@@ -115,34 +115,28 @@ public class RobotContainer {
     //---------------------------------------------------------------------------------------------------------------------
     // XBOX Drive
     //---------------------------------------------------------------------------------------------------------------------
-    // Reef autopathfind
+    // NBA
     xboxDrv.b().onTrue(new InstantCommand(() -> selector.runToNearestBranch().schedule()));
     xboxDrv.b().onFalse(selector.cancelCurrentRunningCommand());
 
-    xboxDrv.x().onTrue(new InstantCommand(() -> selector.runOnlyCoralStationCommand(selector.getBestCoralStation()).schedule()));
-    xboxDrv.x().onFalse(selector.cancelCurrentRunningCommand());
+    // BALLS
+    xboxDrv.y().onTrue(new InstantCommand(() -> selector.runOnlyCoralStationCommand(selector.getBestCoralStation()).schedule()));
+    xboxDrv.y().onFalse(selector.cancelCurrentRunningCommand());
 
+    // Pop Queue
     // xboxDrv.y().onTrue(selector.runQueuedCommand());
     // xboxDrv.y().onFalse(selector.cancelPathfindingCommand()); //TODO is this needed?
 
+    // AQUA
     xboxDrv.a().onTrue(new InstantCommand(() -> selector.runAutoCommand().schedule()));
     xboxDrv.a().onFalse(selector.cancelAutoCommand());
 
+    // Left Right
     xboxDrv.leftBumper().onTrue(new InstantCommand(() -> selector.runLeftRightCommand(LeftRight.LEFT).schedule()));
-    xboxDrv.leftBumper().onFalse(selector.cancelCurrentRunningCommand());
-
-    xboxDrv.leftBumper().and(xboxDrv.rightBumper()).onTrue(selector.cancelCurrentRunningCommand());
-
     xboxDrv.rightBumper().onTrue(new InstantCommand(() -> selector.runLeftRightCommand(LeftRight.RIGHT).schedule()));
-    xboxDrv.rightBumper().onFalse(selector.cancelCurrentRunningCommand());
 
-    xboxDrv.rightTrigger().onTrue(new InstantCommand(() -> selector.runOnlyCoralStationCommand(FieldConstants.CoralStation.rightCenterFace).schedule()));
-    xboxDrv.rightTrigger().onFalse(selector.cancelCurrentRunningCommand());
-
-    xboxDrv.leftTrigger().onTrue(new InstantCommand(() -> selector.runOnlyCoralStationCommand(FieldConstants.CoralStation.leftCenterFace).schedule()));
-    xboxDrv.leftTrigger().onFalse(selector.cancelCurrentRunningCommand());
-
-    xboxDrv.rightTrigger().and(xboxDrv.leftTrigger()).onTrue(selector.cancelCurrentRunningCommand());
+    // Score
+    xboxDrv.leftTrigger(SCORE_TRIGGER_THRESHHOLD).onTrue(new InstantCommand(() -> superstructure.setCurrentRobotAction(RobotAction.OUTTAKE)));
 
     // Default driving
     Trigger escapeTrajectory = new Trigger(()->(xboxDrv.getLeftY() > XboxInterfaceConstants.kDeadband));
@@ -186,8 +180,8 @@ public class RobotContainer {
 
     // Scoring Level Determination
     xboxAux.rightTrigger().onTrue(Commands.runOnce(() -> selector.pathQueueAddBack(selector.getXBoxReefPos(), superstructure.getLevel())));
-    // xboxAux.y().onTrue(Commands.runOnce(() -> selector.pathQueuePopFront()));
-    // xboxAux.b().onTrue(Commands.runOnce(() -> selector.pathQueuePopBack()));
+    xboxAux.leftBumper().onTrue(Commands.runOnce(() -> selector.pathQueuePopFront()));
+    xboxAux.rightBumper().onTrue(Commands.runOnce(() -> selector.pathQueuePopBack()));
     xboxAux.rightStick().onTrue(Commands.runOnce(() -> selector.pathQueueClear()));
 
     xboxAux.povRight().onTrue(Commands.runOnce(()->{superstructure.setLevel(1); SmartDashboard.putNumber("Reef Level", 1);}));
@@ -195,9 +189,13 @@ public class RobotContainer {
     xboxAux.povLeft().onTrue(Commands.runOnce(() -> {superstructure.setLevel(3); SmartDashboard.putNumber("Reef Level", 3);}));
     xboxAux.povDown().onTrue(Commands.runOnce(() -> {superstructure.setLevel(4); SmartDashboard.putNumber("Reef Level", 4);}));
 
+    xboxAux.button(7).onTrue(new InstantCommand(() -> selector.toggleLeftStation()));
+    xboxAux.button(8).onTrue(new InstantCommand(() -> selector.toggleRightStation()));
+
+
     // Gamepiece Selection
-    xboxAux.leftBumper().onTrue(Commands.runOnce(() -> superstructure.setChosenGamepiece(Gamepiece.CORAL)));
-    xboxAux.rightBumper().onTrue(Commands.runOnce(() -> superstructure.setChosenGamepiece(Gamepiece.ALGAE)));
+    // xboxAux.leftBumper().onTrue(Commands.runOnce(() -> superstructure.setChosenGamepiece(Gamepiece.CORAL)));
+    // xboxAux.rightBumper().onTrue(Commands.runOnce(() -> superstructure.setChosenGamepiece(Gamepiece.ALGAE)));
 
     xboxAux.y().onTrue(Commands.runOnce(() -> superstructure.setCurrentRobotAction(RobotAction.OUTTAKE)).alongWith(Commands.print("OUTTAKE L" + superstructure.getLevel())));
     xboxAux.x().onTrue(Commands.runOnce(() -> superstructure.setCurrentRobotAction(RobotAction.INTAKE)).alongWith(Commands.print("INTAKE")));

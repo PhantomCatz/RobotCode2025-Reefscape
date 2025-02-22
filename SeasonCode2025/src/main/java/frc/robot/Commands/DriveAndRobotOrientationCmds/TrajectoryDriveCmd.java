@@ -56,6 +56,7 @@ public class TrajectoryDriveCmd extends Command {
   public static final double ALLOWABLE_OMEGA_ERROR = Units.degreesToRadians(5.0);
   private static final double TIMEOUT_SCALAR = 5;
   private static final double CONVERGE_DISTANCE = 2.0;
+  private final double ALLOWABLE_VISION_ADJUST = 0.002; //TODO tune
 
   // Subsystems
   private CatzDrivetrain m_driveTrain;
@@ -168,6 +169,10 @@ public class TrajectoryDriveCmd extends Command {
 
       eventScheduler.initialize(trajectory);
     }
+
+    // System.out.println("current " + tracker.getEstimatedPose());
+    // System.out.println("start " + this.trajectory.getInitialPose());
+    // System.out.println("end " + this.trajectory.getEndState().pose);
 
     // Reset
     PathPlannerLogging.logActivePath(usePath);
@@ -294,6 +299,10 @@ public class TrajectoryDriveCmd extends Command {
     // if (autoalign){
     //   return false;
     // }
+    System.out.println("vision: " +tracker.getDEstimatedPose().getTranslation().getNorm() );
+    if (autoalign && tracker.getDEstimatedPose().getTranslation().getNorm() > ALLOWABLE_VISION_ADJUST){
+      return false;
+    }
 
     // Finish command if the total time the path takes is over
     if (timer.hasElapsed(pathTimeOut) && !isEventCommandRunning){

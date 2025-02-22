@@ -15,6 +15,7 @@ import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.geometry.*;
 import edu.wpi.first.math.util.Units;
+import frc.robot.Utilities.AllianceFlipUtil;
 import lombok.Getter;
 
 /**
@@ -50,6 +51,23 @@ public class FieldConstants {
             Units.inchesToMeters(33.526),
             Units.inchesToMeters(25.824),
             Rotation2d.fromDegrees(144.011 - 90));
+
+
+    public static Pose2d getRightStation(){
+      if(AllianceFlipUtil.shouldFlipToRed()){
+        return AllianceFlipUtil.apply(rightCenterFace);
+      }else{
+        return rightCenterFace;
+      }
+    }
+
+    public static Pose2d getLeftStation(){
+      if(AllianceFlipUtil.shouldFlipToRed()){
+        return AllianceFlipUtil.apply(leftCenterFace);
+      }else{
+        return leftCenterFace;
+      }
+    }
   }
 
   public static class Reef {
@@ -58,11 +76,11 @@ public class FieldConstants {
     public static final double faceToZoneLine =
         Units.inchesToMeters(12); // Side of the reef to the inside of the reef zone line
     public static final double scoringDistance =
-        Units.inchesToMeters(0); // Scoring distance from the side of the reef
+        Units.inchesToMeters(24); // Scoring distance from the side of the reef
     public static final double reefOrthogonalRadius =
-        Units.inchesToMeters(52.743); // Distance from the center to the side of the reef
+        Units.inchesToMeters(32.305); // Distance from the center to the side of the reef
     public static final double leftRightDistance =
-        Units.inchesToMeters(12); // Center of each face to the left and right scoring positions of each face
+        Units.inchesToMeters(8); // Center of each face to the left and right scoring positions of each face
   }
 
   public static class StagingPositions {
