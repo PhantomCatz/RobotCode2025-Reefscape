@@ -133,8 +133,10 @@ public class RobotContainer {
 
     // Left Right
     xboxDrv.leftBumper().onTrue(new InstantCommand(() -> selector.runLeftRightCommand(LeftRight.LEFT).schedule()));
+    xboxDrv.leftBumper().onFalse(selector.cancelCurrentRunningCommand());
+    
     xboxDrv.rightBumper().onTrue(new InstantCommand(() -> selector.runLeftRightCommand(LeftRight.RIGHT).schedule()));
-
+    xboxDrv.rightBumper().onFalse(selector.cancelCurrentRunningCommand());
     // Score
     xboxDrv.leftTrigger(SCORE_TRIGGER_THRESHHOLD).onTrue(new InstantCommand(() -> superstructure.setCurrentRobotAction(RobotAction.OUTTAKE)));
 
