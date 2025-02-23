@@ -19,4 +19,4 @@ We welcome contributions from the community to improve and expand the functional
 - Push your changes to your fork.
 - Submit a pull request to merge your changes into the main repository.
 ## Contact
-For questions, feedback, or support, please contact our lead software manager[us](kynamleng@gmail.com).
+For questions, feedback, or support, please contact our lead software manager [here](kynamleng@gmail.com).
