@@ -40,8 +40,6 @@ public class VisionIOLimelight implements VisionIO {
   private final DoubleArraySubscriber megatag1Subscriber;
   private final DoubleArraySubscriber megatag2Subscriber;
 
-
-
   /**
    * Creates a new VisionIOLimelight.
    *

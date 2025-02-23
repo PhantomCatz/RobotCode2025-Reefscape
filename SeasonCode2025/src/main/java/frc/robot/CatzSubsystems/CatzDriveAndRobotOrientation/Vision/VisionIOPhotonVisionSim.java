@@ -19,7 +19,7 @@ import org.photonvision.simulation.SimCameraProperties;
 import org.photonvision.simulation.VisionSystemSim;
 
 /** IO implementation for physics sim using PhotonVision simulator. */
-public class VisionIOPhotonVisionSim extends VisionIOPhotonVision {
+public class VisionIOPhotonVisionSim extends VisionIOPhotonVision2 {
   private static VisionSystemSim visionSim;
 
   private final Supplier<Pose2d> poseSupplier = ()->CatzRobotTracker.getInstance().getEstimatedPose();

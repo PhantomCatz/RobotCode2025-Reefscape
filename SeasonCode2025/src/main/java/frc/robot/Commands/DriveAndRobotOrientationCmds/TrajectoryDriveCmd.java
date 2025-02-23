@@ -175,10 +175,6 @@ public class TrajectoryDriveCmd extends Command {
       eventScheduler.initialize(trajectory);
     }
 
-    // System.out.println("current " + tracker.getEstimatedPose());
-    // System.out.println("start " + this.trajectory.getInitialPose());
-    // System.out.println("end " + this.trajectory.getEndState().pose);
-
     // Reset
     PathPlannerLogging.logActivePath(usePath);
     PPLibTelemetry.setCurrentPath(usePath);
@@ -236,7 +232,7 @@ public class TrajectoryDriveCmd extends Command {
       if(Double.isNaN(adjustedSpeeds.vxMetersPerSecond) || Double.isNaN(adjustedSpeeds.vyMetersPerSecond) || Double.isNaN(adjustedSpeeds.omegaRadiansPerSecond)){
         adjustedSpeeds = new ChassisSpeeds();
       }
-      
+
       // Logging
       Logger.recordOutput("CatzRobotTracker/Desired Auto Pose", goal.pose);
 
