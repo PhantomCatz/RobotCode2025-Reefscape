@@ -7,6 +7,8 @@
 
 package frc.robot;
 
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -32,6 +34,7 @@ import frc.robot.CatzSubsystems.CatzLEDs.CatzLED;
 import frc.robot.CatzSubsystems.CatzOuttake.CatzOuttake;
 import frc.robot.Commands.DriveAndRobotOrientationCmds.TeleopDriveCmd;
 import frc.robot.Utilities.Alert;
+import frc.robot.Utilities.AllianceFlipUtil;
 import frc.robot.Utilities.Alert.AlertType;
 
 import org.littletonrobotics.junction.networktables.LoggedNetworkNumber;
@@ -117,6 +120,15 @@ public class RobotContainer {
     // XBOX Drive
     //---------------------------------------------------------------------------------------------------------------------
     // NBA
+    xboxDrv.button(8).onTrue(new InstantCommand(() -> {
+      if(AllianceFlipUtil.shouldFlipToRed()){
+        robotTracker.resetPose(new Pose2d(robotTracker.getEstimatedPose().getTranslation(), Rotation2d.k180deg));
+      }else{
+        robotTracker.resetPose(new Pose2d(robotTracker.getEstimatedPose().getTranslation(), new Rotation2d()));
+
+      }
+    }));
+
     xboxDrv.b().onTrue(new InstantCommand(() -> selector.runToNearestBranch().schedule()));
     xboxDrv.b().onFalse(selector.cancelCurrentRunningCommand());
 
@@ -136,8 +148,13 @@ public class RobotContainer {
     xboxDrv.leftBumper().onTrue(new InstantCommand(() -> selector.runLeftRightCommand(LeftRight.LEFT).schedule()));
     xboxDrv.rightBumper().onTrue(new InstantCommand(() -> selector.runLeftRightCommand(LeftRight.RIGHT).schedule()));
 
+    xboxDrv.leftTrigger().onTrue(new InstantCommand(() -> selector.runLeftRightShiftCommand(LeftRight.LEFT).schedule()));
+    xboxDrv.leftTrigger().onFalse(selector.cancelCurrentRunningCommand());
+
+    xboxDrv.rightTrigger().onTrue(new InstantCommand(() -> selector.runLeftRightShiftCommand(LeftRight.RIGHT).schedule()));
+    xboxDrv.rightTrigger().onFalse(selector.cancelCurrentRunningCommand());
     // Score
-    xboxDrv.leftTrigger(SCORE_TRIGGER_THRESHHOLD).onTrue(new InstantCommand(() -> superstructure.setCurrentRobotAction(RobotAction.OUTTAKE)));
+    // xboxDrv.leftTrigger(SCORE_TRIGGER_THRESHHOLD).onTrue(new InstantCommand(() -> superstructure.setCurrentRobotAction(RobotAction.OUTTAKE)));
 
     // Default driving
     Trigger escapeTrajectory = new Trigger(()->(xboxDrv.getLeftY() > XboxInterfaceConstants.kDeadband));
@@ -185,10 +202,12 @@ public class RobotContainer {
     xboxAux.rightBumper().onTrue(Commands.runOnce(() -> selector.pathQueuePopBack()));
     xboxAux.rightStick().onTrue(Commands.runOnce(() -> selector.pathQueueClear()));
 
+
     xboxAux.povRight().onTrue(Commands.runOnce(()->{superstructure.setLevel(1); SmartDashboard.putNumber("Reef Level", 1);}));
     xboxAux.povUp().onTrue(Commands.runOnce(() -> {superstructure.setLevel(2); SmartDashboard.putNumber("Reef Level", 2);}));
     xboxAux.povLeft().onTrue(Commands.runOnce(() -> {superstructure.setLevel(3); SmartDashboard.putNumber("Reef Level", 3);}));
     xboxAux.povDown().onTrue(Commands.runOnce(() -> {superstructure.setLevel(4); SmartDashboard.putNumber("Reef Level", 4);}));
+    xboxAux.leftStick().onTrue(elevator.elevatorFullManual(()->xboxTest.getLeftY()));
 
     xboxAux.button(7).onTrue(new InstantCommand(() -> selector.toggleLeftStation()));
     xboxAux.button(8).onTrue(new InstantCommand(() -> selector.toggleRightStation()));

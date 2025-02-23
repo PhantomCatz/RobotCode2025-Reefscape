@@ -82,8 +82,8 @@ public class DriveConstants {
                 .robotWidthY(Units.inchesToMeters(29.0))
                 .bumperWidthX(Units.inchesToMeters(32))
                 .bumperWidthY(Units.inchesToMeters(32))
-                .maxLinearVelocity(Units.feetToMeters(17))
-                .maxLinearAcceleration(Units.feetToMeters(120)) // TODO emperically calculate
+                .maxLinearVelocity(4)
+                .maxLinearAcceleration(3) // TODO emperically calculate
                 .maxAngularVelocity(12.0) // Radians
                 .maxAngularAcceleration(30) // Radians // TODO verify angle constraints
                 .build();
@@ -100,7 +100,7 @@ public class DriveConstants {
                 0.0,
                 0.50,
                 0.005,
-                Mk4iReductions.L2_PLUS.reduction,
+                Mk4iReductions.L2_16t.reduction,
                 Mk4iReductions.steer.reduction);
         case SN_TEST ->
             new ModuleGainsAndRatios(
@@ -111,7 +111,7 @@ public class DriveConstants {
                 0.0,
                 1.0,
                 0.0,
-                Mk4iReductions.L2_PLUS.reduction,
+                Mk4iReductions.L2_16t.reduction,
                 Mk4iReductions.steer.reduction);
         case SN1_2024 ->
             new ModuleGainsAndRatios(
@@ -186,7 +186,7 @@ public class DriveConstants {
   // -----------------------------------------------------------------------------------------------------------------------------
   public static final PathConstraints PATHFINDING_CONSTRAINTS = new PathConstraints( // 540 // 720
                                                                         2,
-                                                                        DRIVE_CONFIG.maxLinearAcceleration, // max vel causing messup
+                                                                        3, // max vel causing messup
                                                                         DRIVE_CONFIG.maxAngularVelocity,
                                                                         DRIVE_CONFIG.maxAngularAcceleration
                                                                 );

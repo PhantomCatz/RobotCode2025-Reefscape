@@ -56,7 +56,7 @@ public class TrajectoryDriveCmd extends Command {
   public static final double ALLOWABLE_OMEGA_ERROR = Units.degreesToRadians(5.0);
   private static final double TIMEOUT_SCALAR = 5;
   private static final double CONVERGE_DISTANCE = 3.0;
-  private final double ALLOWABLE_VISION_ADJUST = 5e-4; //TODO tune
+  private final double ALLOWABLE_VISION_ADJUST = 9e-4; //TODO tune
 
   // Subsystems
   private CatzDrivetrain m_driveTrain;
@@ -230,7 +230,7 @@ public class TrajectoryDriveCmd extends Command {
         // Graph x/(1+x) on desmos
         // Smaller speed for closer distances
         double x = CONVERGE_DISTANCE * translationError;
-        adjustedSpeeds = adjustedSpeeds.times(x / (x+1));
+        adjustedSpeeds = adjustedSpeeds.times(x / (x+1)).times(currentTime / (currentTime+1));
       }
       if(Double.isNaN(adjustedSpeeds.vxMetersPerSecond) || Double.isNaN(adjustedSpeeds.vyMetersPerSecond) || Double.isNaN(adjustedSpeeds.omegaRadiansPerSecond)){
         // If the target and current positions are the same, bad

@@ -8,11 +8,6 @@
 package frc.robot;
 
 
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.math.util.Units;
-import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.RobotController;
@@ -20,7 +15,6 @@ import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import frc.robot.CatzConstants.RobotHardwareMode;
-import frc.robot.FieldConstants.Reef;
 import frc.robot.CatzConstants.RobotID;
 import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.CatzRobotTracker;
 import frc.robot.CatzSubsystems.CatzLEDs.CatzLED;
@@ -130,8 +124,8 @@ public class Robot extends LoggedRobot {
     switch (CatzConstants.hardwareMode) {
       case REAL:
         // Running on a real robot, log to a USB stick ("/U/logs")
-        Logger.addDataReceiver(new WPILOGWriter());
-        Logger.addDataReceiver(new WPILOGWriter("E:/Logs"));
+        //Logger.addDataReceiver(new WPILOGWriter());
+        Logger.addDataReceiver(new WPILOGWriter("D:/Logs"));
         Logger.addDataReceiver(new NT4Publisher());
         break;
 
@@ -367,7 +361,7 @@ public class Robot extends LoggedRobot {
     teleStart = Timer.getFPGATimestamp();
     //CatzRobotTracker.getInstance().resetPose(m_robotContainer.getAutonomous().calculateReefPos(2, LeftRight.LEFT));
 
-   CatzRobotTracker.getInstance().resetPose(new Pose2d(Reef.center.minus(new Translation2d(Units.inchesToMeters(52.743), 0)), Rotation2d.k180deg));
+  //  CatzRobotTracker.getInstance().resetPose(new Pose2d(Reef.center.minus(new Translation2d(Units.inchesToMeters(52.743), 0)), Rotation2d.k180deg));
 
   }
 

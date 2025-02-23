@@ -58,7 +58,8 @@ public class CatzElevator extends SubsystemBase {
       PosL1(() -> L1_HEIGHT),
       PosL2(() -> L2_HEIGHT),
       PosL3(() -> L3_HEIGHT),
-      PosL4(() -> 150),
+      PosL4(() -> L4_HEIGHT),
+      PosL4Adj(() -> L4_CORAL_ADJ),
       PosManual(new LoggedTunableNumber("Elevator/ScoreSourceSetpoint",0.0));
 
     private final DoubleSupplier elevatorSetpointSupplier;
@@ -124,6 +125,7 @@ public class CatzElevator extends SubsystemBase {
     //    Feed Foward
     //---------------------------------------------------------------------------------------------------------------------------
     // if(targetPosition == ElevatorPosition.PosL4) {
+
     //   elevatorFeedForward =  gains.kG() + 0.1;
     // } else {
       elevatorFeedForward =  gains.kG();
@@ -175,6 +177,10 @@ public class CatzElevator extends SubsystemBase {
     return runOnce(() -> setElevatorPos(ElevatorPosition.PosL4));
   }
 
+  public Command Elevator_L4_Adj() {
+    return runOnce(() -> setElevatorPos(ElevatorPosition.PosL4Adj));
+  }
+
   public void setElevatorPos(ElevatorPosition target) {
     this.targetPosition = target;
   }
@@ -188,6 +194,8 @@ public class CatzElevator extends SubsystemBase {
   public double getElevatorPositionRads() {
     return inputs.positionRads;
   }
+
+
 
   public boolean isElevatorInPosition() {
     boolean isElevatorSettled = false;
