@@ -46,8 +46,8 @@ public class CatzAlgaePivot extends SubsystemBase {
   // ==========================================================//
   @RequiredArgsConstructor
   public enum Position { //In degrees
-    STOW(() -> 0.0),
-    HORIZONTAL(() -> -30), // TBD
+    STOW(() -> 109.0),
+    HORIZONTAL(() -> -30.0), // TBD
     UNDISCLOSED(() -> 999), // TBD
     MANUAL(() -> manualPow),
     TUNNABLE(tunnablePos);
@@ -89,11 +89,11 @@ public class CatzAlgaePivot extends SubsystemBase {
     if (DriverStation.isDisabled()) {
 
     } else {
-      // if(isManual) {
-      //   io.setPower(manualPow);
-      // } else {
-        //io.runSetpoint(position, 0.0);
-      // }
+      if(isManual) {
+
+      } else {
+        io.runSetpoint(position, 0.0);
+      }
     }
     Logger.recordOutput("AlgaePivot/targetPosition", position);
 

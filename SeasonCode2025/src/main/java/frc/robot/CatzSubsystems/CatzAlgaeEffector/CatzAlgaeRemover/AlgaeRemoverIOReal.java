@@ -15,6 +15,7 @@ import com.ctre.phoenix6.controls.DutyCycleOut;
 import com.ctre.phoenix6.hardware.TalonFXS;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 
+import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.Temperature;
 import edu.wpi.first.units.measure.Voltage;
@@ -31,6 +32,7 @@ public class AlgaeRemoverIOReal implements AlgaeRemoverIO {
   private final StatusSignal<Current> algaeRemoverSupplyCurrent;
   private final StatusSignal<Current> algaeRemoverTorqueCurrent;
   private final StatusSignal<Temperature> algaeRemoverTempCelsius;
+  private final StatusSignal<Angle> algaeRemoverPosition;
 
   public AlgaeRemoverIOReal() {
     algaeRemoverMotor = new TalonFXS(ALGAE_REMOVER_MOTOR_ID);
@@ -39,6 +41,7 @@ public class AlgaeRemoverIOReal implements AlgaeRemoverIO {
     config.CurrentLimits.SupplyCurrentLimitEnable = true;
     config.MotorOutput.NeutralMode = NeutralModeValue.Brake;
 
+    algaeRemoverPosition = algaeRemoverMotor.getPosition();
     algaeRemoverAppliedVolts = algaeRemoverMotor.getMotorVoltage();
     algaeRemoverSupplyCurrent = algaeRemoverMotor.getSupplyCurrent();
     algaeRemoverTorqueCurrent = algaeRemoverMotor.getTorqueCurrent();
@@ -52,11 +55,13 @@ public class AlgaeRemoverIOReal implements AlgaeRemoverIO {
   public void updateInputs(AlgaeEffectorIOInputs inputs) {
     inputs.isAlgaeEffectorMotorConnected =
         BaseStatusSignal.refreshAll(
+                algaeRemoverPosition,
                 algaeRemoverAppliedVolts,
                 algaeRemoverSupplyCurrent,
                 algaeRemoverTorqueCurrent,
                 algaeRemoverTempCelsius)
             .isOK();
+    inputs.positionMechs =     algaeRemoverPosition.getValueAsDouble();
     inputs.appliedVolts      = algaeRemoverAppliedVolts.getValueAsDouble();
     inputs.supplyCurrentAmps = algaeRemoverSupplyCurrent.getValueAsDouble();
     inputs.torqueCurrentAmps = algaeRemoverTorqueCurrent.getValueAsDouble();
