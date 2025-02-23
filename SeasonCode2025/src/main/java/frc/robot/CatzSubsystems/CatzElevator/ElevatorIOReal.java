@@ -90,6 +90,12 @@ public class ElevatorIOReal implements ElevatorIO {
     config.MotionMagic.MotionMagicJerk = motionMagicParameters.mmJerk();
     config.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
 
+    // Software Limits
+    config.SoftwareLimitSwitch.ForwardSoftLimitEnable = true;
+    config.SoftwareLimitSwitch.ForwardSoftLimitThreshold = Units.radiansToRotations(UPPER_LIMIT_RAD);
+    config.SoftwareLimitSwitch.ReverseSoftLimitEnable = true;
+    config.SoftwareLimitSwitch.ReverseSoftLimitThreshold = Units.radiansToRotations(LOWER_LIMIT_RAD);
+
     // Encoder Resetting
     leaderTalon.setPosition(0);
     followerTalon.setPosition(0);

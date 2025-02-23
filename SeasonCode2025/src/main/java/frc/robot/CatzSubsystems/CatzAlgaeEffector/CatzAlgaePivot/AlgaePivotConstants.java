@@ -25,7 +25,7 @@ public class AlgaePivotConstants {
     public static final Gains gains =
         switch (CatzConstants.getRobotType()) {
             case SN2 -> new Gains(7.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0); //TODO fix gains
-            case SN1 -> new Gains(4.0, 0.0, 0.0, 0.25, 0.12, 0.0, 0.0); //TODO need an kA for robot
+            case SN1 -> new Gains(4.0, 0.0, 0.0, 0.00, 0.06, 0.0, 0.0); //TODO need an kA for robot
             case SN_TEST, SN1_2024 -> new Gains(7000.0, 0.0, 250.0, 8.4, 0.2, 0.2, 22.9);
         };
     public static final MotionMagicParameters motionMagicParameters =

@@ -13,6 +13,8 @@ import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.TalonFXSConfiguration;
 import com.ctre.phoenix6.controls.DutyCycleOut;
 import com.ctre.phoenix6.hardware.TalonFXS;
+import com.ctre.phoenix6.signals.AdvancedHallSupportValue;
+import com.ctre.phoenix6.signals.MotorArrangementValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 
 import edu.wpi.first.units.measure.Angle;
@@ -40,6 +42,7 @@ public class AlgaeRemoverIOReal implements AlgaeRemoverIO {
     config.CurrentLimits.SupplyCurrentLimit = STALL_CURRENT_LIMIT;
     config.CurrentLimits.SupplyCurrentLimitEnable = true;
     config.MotorOutput.NeutralMode = NeutralModeValue.Brake;
+    config.Commutation.MotorArrangement = MotorArrangementValue.Minion_JST;
 
     algaeRemoverPosition = algaeRemoverMotor.getPosition();
     algaeRemoverAppliedVolts = algaeRemoverMotor.getMotorVoltage();
@@ -48,7 +51,6 @@ public class AlgaeRemoverIOReal implements AlgaeRemoverIO {
     algaeRemoverTempCelsius = algaeRemoverMotor.getDeviceTemp();
 
     algaeRemoverMotor.getConfigurator().apply(config, 1.0);
-
   }
 
   @Override
@@ -72,10 +74,5 @@ public class AlgaeRemoverIOReal implements AlgaeRemoverIO {
   public void runPercentOutput(double speed) {
     System.out.println(speed + " ");
     algaeRemoverMotor.setControl(new DutyCycleOut(speed));
-  }
-
-  @Override
-  public void runPercentOutputBck(double speed) {
-    algaeRemoverMotor.setControl(new DutyCycleOut(-speed));
   }
 }

@@ -33,6 +33,11 @@ public class ElevatorConstants {
     public static final double L2_HEIGHT   = (25.77-5)/* 29.842*/ / ELEVATOR_SPROCKET_RADIUS; //25.77
     public static final double L3_HEIGHT   = (70.1-8) /*68.8 */  / ELEVATOR_SPROCKET_RADIUS; //70.1
     public static final double L4_HEIGHT   = (141)/* 133.3*/  / ELEVATOR_SPROCKET_RADIUS; //143.12
+
+    // Elevator Limits
+    public static final double UPPER_LIMIT_RAD = 162.0;
+    public static final double LOWER_LIMIT_RAD = 0.0;
+
     // Motor ID
     public static final int LEFT_LEADER_ID  = 30;
     public static final int RIGHT_FOLLOWER_ID = 31;
@@ -48,8 +53,6 @@ public class ElevatorConstants {
 
     // Misc constants
     public static final boolean IS_LEADER_INVERTED = false;
-    public static final double  MIN_ROTATIONS = 0.0;
-    public static final double  MAX_ROTATIONS = 117.0;
     public static final Translation2d elevatorOrigin = new Translation2d(-0.238, 0.298);
     public static final double MANUAL_SCALE = 0.5;
     // Initial PIDF and motion magic assignment
@@ -76,7 +79,5 @@ public class ElevatorConstants {
     public static final LoggedTunableNumber mmCruiseVelocity = new LoggedTunableNumber("Elevator/Gains/kV", motionMagicParameters.mmCruiseVelocity());
     public static final LoggedTunableNumber mmAcceleration = new LoggedTunableNumber("Elevator/Gains/kA", motionMagicParameters.mmAcceleration());
     public static final LoggedTunableNumber mmJerk = new LoggedTunableNumber("Elevator/Gains/kG", motionMagicParameters.mmJerk());
-    public static final LoggedTunableNumber lowerLimitRotations = new LoggedTunableNumber("Elevator/LowerLimitDegrees", MIN_ROTATIONS);
-    public static final LoggedTunableNumber upperLimitRotations = new LoggedTunableNumber("Elevator/UpperLimitDegrees", MAX_ROTATIONS);
 
 }
