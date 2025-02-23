@@ -7,6 +7,8 @@
 
 package frc.robot;
 
+import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -26,7 +28,7 @@ import frc.robot.CatzSubsystems.CatzClimb.CatzClimb;
 import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.CatzRobotTracker;
 import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.Drivetrain.CatzDrivetrain;
 import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.Vision.CatzVision;
-import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.Vision.VisionIOLimelight;
+import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.Vision.VisionIOPhotonVisionSim;
 import frc.robot.CatzSubsystems.CatzElevator.*;
 import frc.robot.CatzSubsystems.CatzLEDs.CatzLED;
 import frc.robot.CatzSubsystems.CatzOuttake.CatzOuttake;
@@ -48,8 +50,7 @@ public class RobotContainer {
   // Assistance Subsystem declaration
   private CatzLED led = CatzLED.getInstance();
   private CatzRobotTracker robotTracker = CatzRobotTracker.getInstance();
-  private CatzVision vision = new CatzVision(new VisionIOLimelight("limelight-tempura"),
-                                             new VisionIOLimelight("limelight-gyoza"));
+  private CatzVision vision = new CatzVision(new VisionIOPhotonVisionSim("limelight-soba", new Transform3d(0, 0, 0, new Rotation3d(0, 0.5, 0))));
   private CatzOuttake outtake = new CatzOuttake();
   private CatzElevator elevator = new CatzElevator();
   private CatzClimb climb = new CatzClimb();
