@@ -100,7 +100,7 @@ public class VisionIOPhotonVision implements VisionIO {
                 robotPose, // 3D pose estimate
                 multitagResult.estimatedPose.ambiguity, // Ambiguity
                 multitagResult.fiducialIDsUsed.size(), // Tag count
-                totalTagDistance / result.targets.size(), // Average tag distance
+                totalTagDistance / result.targets.size(), // Average tag distace
                 PoseObservationType.PHOTONVISION)); // Observation type
       }
     }

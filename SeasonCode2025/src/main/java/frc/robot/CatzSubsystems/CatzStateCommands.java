@@ -88,7 +88,7 @@ public class CatzStateCommands {
             algae.stopAlgae(),
 
             new SequentialCommandGroup(
-                elevator.Elevator_Stow(),
+                elevator.Elevator_L1(),
                 outtake.outtakeL1()
             )
         )//.onlyIf(() -> CatzSuperstructure.getCurrentCoralState() == CoralState.IN_OUTTAKE)
@@ -153,6 +153,62 @@ public class CatzStateCommands {
             )
         )//.onlyIf(() -> CatzSuperstructure.getCurrentCoralState() == CoralState.IN_OUTTAKE)
          .unless(()-> Robot.isSimulation()).alongWith(Commands.print("L4 Scoring State"));
+    }
+
+    public static Command L1Elevator(RobotContainer robotContainer) {
+        CatzClimb climb = robotContainer.getCatzClimb();
+        CatzAlgaeRemover algae = robotContainer.getCatzAlgaeRemover();
+        CatzOuttake outtake = robotContainer.getCatzOuttake();
+        CatzElevator elevator = robotContainer.getCatzElevator();
+
+        return new ParallelCommandGroup(
+            climb.Climb_Retract(),
+            algae.stopAlgae(),
+            elevator.Elevator_L1()
+        )//.onlyIf(() -> CatzSuperstructure.getCurrentCoralState() == CoralState.IN_OUTTAKE)
+         .unless(()-> Robot.isSimulation()).alongWith(Commands.print("L1 Elevator")).unless(()-> Robot.isSimulation());
+    }
+
+    public static Command L2Elevator(RobotContainer robotContainer) {
+        CatzClimb climb = robotContainer.getCatzClimb();
+        CatzAlgaeRemover algae = robotContainer.getCatzAlgaeRemover();
+        CatzOuttake outtake = robotContainer.getCatzOuttake();
+        CatzElevator elevator = robotContainer.getCatzElevator();
+
+        return new ParallelCommandGroup(
+            climb.Climb_Retract(),
+            algae.stopAlgae(),
+            elevator.Elevator_L2()
+        )//.onlyIf(() -> CatzSuperstructure.getCurrentCoralState() == CoralState.IN_OUTTAKE)
+         .unless(()-> Robot.isSimulation()).alongWith(Commands.print("L2 Scoring State")).unless(()-> Robot.isSimulation());
+    }
+
+    public static Command L3Elevator(RobotContainer robotContainer) {
+        CatzClimb climb = robotContainer.getCatzClimb();
+        CatzAlgaeRemover algae = robotContainer.getCatzAlgaeRemover();
+        CatzOuttake outtake = robotContainer.getCatzOuttake();
+        CatzElevator elevator = robotContainer.getCatzElevator();
+
+        return new ParallelCommandGroup(
+            climb.Climb_Retract(),
+            algae.stopAlgae(),
+            elevator.Elevator_L3()
+        )//.onlyIf(() -> CatzSuperstructure.getCurrentCoralState() == CoralState.IN_OUTTAKE)
+         .unless(()-> Robot.isSimulation()).alongWith(Commands.print("L3 Scoring State")).unless(()-> Robot.isSimulation());
+    }
+
+    public static Command L4Elevator(RobotContainer robotContainer) {
+        CatzClimb climb = robotContainer.getCatzClimb();
+        CatzAlgaeRemover algae = robotContainer.getCatzAlgaeRemover();
+        CatzOuttake outtake = robotContainer.getCatzOuttake();
+        CatzElevator elevator = robotContainer.getCatzElevator();
+
+        return new ParallelCommandGroup(
+            climb.Climb_Retract(),
+            algae.stopAlgae(),
+            elevator.Elevator_L4()
+        )//.onlyIf(() -> CatzSuperstructure.getCurrentCoralState() == CoralState.IN_OUTTAKE)
+         .unless(()-> Robot.isSimulation()).alongWith(Commands.print("L4 Scoring State")).unless(()-> Robot.isSimulation());
     }
 
     public static Command processor(RobotContainer robotContainer) {

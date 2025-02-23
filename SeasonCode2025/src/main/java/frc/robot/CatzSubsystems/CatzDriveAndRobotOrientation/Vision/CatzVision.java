@@ -110,7 +110,7 @@ public class CatzVision extends SubsystemBase {
             ((observation.tagCount() == 0) // Must have at least one tag
                 // || (observation.tagCount() == 1  && observation.ambiguity() > maxAmbiguity) //
                 // Cannot be high ambiguity // TODO add back in
-                || inputs[cameraIndex].ta < 2
+                || inputs[cameraIndex].ta < 2 //TODO add scalar for distance to the ta for standard devs
                 || (Math.abs(observation.pose().getZ())
                     >= maxZError) // Must have realistic Z coordinate
                 // Must be within the field boundaries

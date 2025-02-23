@@ -21,6 +21,7 @@ import edu.wpi.first.math.Pair;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
@@ -48,6 +49,7 @@ public class TeleopPosSelector extends SubsystemBase {
   private final String QUEUE = "PathQueue ";
   private final int NUM_QUEUE_DISPLAY = 4;
   private final double SELECTION_THRESHOLD = 0.3;
+  private final double ELEVATOR_RAISE_DIST = 1.0; // meters
 
   private CatzSuperstructure superstructure;
   private CatzDrivetrain drivetrain;
@@ -441,6 +443,9 @@ public class TeleopPosSelector extends SubsystemBase {
 
       @Override
       public void execute() {
+        if (((TrajectoryDriveCmd) pathfindingCommand).isWithinThreshold(ELEVATOR_RAISE_DIST)){
+          superstructure.setCurrentRobotAction(RobotAction.AIMING, pair.getSecond());
+        }
         if (pathfindingCommand.isFinished()) {
           pathfindingCommand.end(false);
           superstructure.setCurrentRobotAction(RobotAction.OUTTAKE, pair.getSecond());

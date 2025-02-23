@@ -56,6 +56,10 @@ public class CatzSuperstructure extends VirtualSubsystem {
         L2_CORAL,
         L3_CORAL,
         L4_CORAL,
+        L1_AIMING,
+        L2_AIMING,
+        L3_AIMING,
+        L4_AIMING,
         PROCESSOR,
         BOT_ALGAE,
         TOP_ALGAE,
@@ -65,6 +69,7 @@ public class CatzSuperstructure extends VirtualSubsystem {
     public enum RobotAction {
         OUTTAKE,
         INTAKE,
+        AIMING,
         INTAKE_GROUND,
         STOW
     }
@@ -93,9 +98,10 @@ public class CatzSuperstructure extends VirtualSubsystem {
 
     public void setCurrentRobotAction(RobotAction action, int level) {
         Command robotActionCommand = Commands.print("No robot Action Selected");
+        RobotState prevRobotState = currentRobotState;
         this.currentRobotAction = action;
-        switch(currentRobotAction) {
 
+        switch(currentRobotAction) {
             // Outtaking Algae or Coral
             case OUTTAKE:
 
@@ -119,6 +125,38 @@ public class CatzSuperstructure extends VirtualSubsystem {
                         case 4:
                         currentRobotState = RobotState.L4_CORAL;
                         robotActionCommand = CatzStateCommands.L4Coral(container);
+                        break;
+                    }
+                } else {
+                    currentRobotState = RobotState.PROCESSOR;
+                    robotActionCommand = CatzStateCommands.processor(container);
+                    System.out.println("Processor");
+
+                }
+                break;
+
+            case AIMING:
+
+                if(chosenGamepiece == Gamepiece.CORAL) {
+                    switch (level) {
+                        case 1:
+                        currentRobotState = RobotState.L1_AIMING;
+                        robotActionCommand = CatzStateCommands.L1Elevator(container);
+                        break;
+
+                        case 2:
+                        currentRobotState = RobotState.L2_AIMING;
+                        robotActionCommand =  CatzStateCommands.L2Elevator(container);
+                        break;
+
+                        case 3:
+                        currentRobotState = RobotState.L3_AIMING;
+                        robotActionCommand = CatzStateCommands.L3Elevator(container);
+                        break;
+
+                        case 4:
+                        currentRobotState = RobotState.L4_AIMING;
+                        robotActionCommand = CatzStateCommands.L4Elevator(container);
                         break;
                     }
                 } else {
@@ -178,9 +216,9 @@ public class CatzSuperstructure extends VirtualSubsystem {
                 break;
         }
 
-        robotActionCommand.schedule();
-
-
+        if(prevRobotState != currentRobotState){
+            robotActionCommand.schedule();
+        }
     }
 
 

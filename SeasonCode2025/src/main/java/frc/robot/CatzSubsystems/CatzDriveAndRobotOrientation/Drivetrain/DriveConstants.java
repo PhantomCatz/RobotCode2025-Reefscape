@@ -66,8 +66,8 @@ public class DriveConstants {
         case SN_TEST ->//, SN2 ->
             DriveConfig.builder()
                 .wheelRadius(Units.inchesToMeters(2.0)) // TODO make these repeated numbers into constants
-                .robotLengthX(Units.inchesToMeters(29.0))
-                .robotWidthY(Units.inchesToMeters(29.0))
+                .robotLengthX(Units.inchesToMeters(24.2)) // Wheel positions
+                .robotWidthY(Units.inchesToMeters(24.2))
                 .bumperWidthX(Units.inchesToMeters(32))
                 .bumperWidthY(Units.inchesToMeters(32))
                 .maxLinearVelocity(Units.feetToMeters(17))

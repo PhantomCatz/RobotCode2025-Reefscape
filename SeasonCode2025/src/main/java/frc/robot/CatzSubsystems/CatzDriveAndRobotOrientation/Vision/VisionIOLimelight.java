@@ -7,6 +7,7 @@
 
 package frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.Vision;
 
+import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
@@ -29,6 +30,8 @@ import java.util.function.Supplier;
 public class VisionIOLimelight implements VisionIO {
   private final Supplier<Rotation2d> rotationSupplier = () -> CatzRobotTracker.getInstance().getEstimatedPose().getRotation();
   private final DoubleArrayPublisher orientationPublisher;
+
+  private final SwerveDrivePoseEstimator
 
   private final DoubleSubscriber latencySubscriber;
   private final DoubleSubscriber txSubscriber;
@@ -69,10 +72,8 @@ public class VisionIOLimelight implements VisionIO {
     inputs.connected = (usedTimestamp - latencySubscriber.getLastChange()) < 250;
 
     // Update orientation for MegaTag 2
-    orientationPublisher.accept(
-      new double[] {rotationSupplier.get().getDegrees(), 0.0, 0.0, 0.0, 0.0, 0.0});
-      // System.out.println(rotationSupplier.get().getDegrees());
-      NetworkTableInstance.getDefault().flush(); // Increases network traffic but recommended by Limelight
+    orientationPublisher.accept(new double[] {rotationSupplier.get().getDegrees(), 0.0, 0.0, 0.0, 0.0, 0.0}); //TODO possible sync error
+    NetworkTableInstance.getDefault().flush(); // Increases network traffic but recommended by Limelight
 
     inputs.ta = taSubscriber.get();
     // Read new pose observations from NetworkTables
@@ -122,7 +123,7 @@ public class VisionIOLimelight implements VisionIO {
               (int) rawSample.value[7],
 
               // Average tag distance
-              rawSample.value[10],
+              rawSample.value[9], // Used to grab area at value 10 //TODO 
 
               // Observation type
               PoseObservationType.MEGATAG_2)

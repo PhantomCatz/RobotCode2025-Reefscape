@@ -97,7 +97,7 @@ public class WheelRadiusCharacterization extends Command {
     for (int i = 0; i < 4; i++) {
       averageWheelPosition += Math.abs(wheelPositiions[i] - startWheelPositions[i]) / 4.0;
     }
-    currentEffectiveWheelRadius = (accumGyroYawRads * driveRadius) / averageWheelPosition;
+    currentEffectiveWheelRadius = (accumGyroYawRads * driveRadius) / (averageWheelPosition * DriveConstants.MODULE_GAINS_AND_RATIOS.driveReduction());
 
     System.out.println("accum angle: " + accumGyroYawRads);
     System.out.println("avg wheel: " + averageWheelPosition);
