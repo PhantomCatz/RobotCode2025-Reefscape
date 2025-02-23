@@ -2,7 +2,7 @@
 This repository contains integrated Robot Programming software developed for the 2025 season.
 This reposistory can help provide valuable insights for teams participating in robotics competitions through a unique "Shimmed" Robot Code Persepctive
 ## Features
-- Shimmed Pathplaning and Trajectory: By utilizing Pathplanners underlying "trajectory following" libraries, we've customized our path following specifically for percise scoring on the 2025 reef. It has enabled us to perform automated scoring functions deemed previously impractical.
+- Shimmed Pathplaning and Trajectory: By utilizing Pathplanners underlying "trajectory following" libraries, we've customized our path following specifically for precise scoring on the 2025 reef. It has enabled us to perform automated scoring functions deemed previously impractical.
 - Real-Time/Replay Data Collection Analysis: Standardized data logging for optimized debugging and timelining of every single variable passing through our software. 
 - Custom Multithreaded Pose estimation: Optimized pose estimation from vision.
 - 2 Controller Xbox Interface: Score queuing system.
