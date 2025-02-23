@@ -135,7 +135,7 @@ public class RobotContainer {
     // Left Right
     xboxDrv.leftBumper().onTrue(new InstantCommand(() -> selector.runLeftRightCommand(LeftRight.LEFT).schedule()));
     xboxDrv.leftBumper().onFalse(selector.cancelCurrentRunningCommand());
-    
+
     xboxDrv.rightBumper().onTrue(new InstantCommand(() -> selector.runLeftRightCommand(LeftRight.RIGHT).schedule()));
     xboxDrv.rightBumper().onFalse(selector.cancelCurrentRunningCommand());
     // Score
@@ -164,7 +164,8 @@ public class RobotContainer {
     xboxTest.rightBumper().toggleOnTrue(algaePivot.AlgaePivot_Stow().alongWith(Commands.print("stow")));
     xboxTest.leftBumper().toggleOnTrue(algaePivot.AlgaePivot_Horizontal().alongWith(Commands.print("stow")));
 
-    xboxTest.a().toggleOnTrue(elevator.Elevator_Stow().alongWith(Commands.print("L1")));
+    xboxTest.a().onTrue(algaeRemover.eatAlgae().alongWith(Commands.print("eat")));
+    //xboxTest.a().toggleOnTrue(elevator.Elevator_Stow().alongWith(Commands.print("L1")));
     xboxTest.b().toggleOnTrue(elevator.Elevator_L2().alongWith(Commands.print("L2")));
     xboxTest.x().toggleOnTrue(elevator.Elevator_L3().alongWith(Commands.print("L3")));
     xboxTest.y().toggleOnTrue(elevator.Elevator_L4().alongWith(Commands.print("L4")));
@@ -173,7 +174,9 @@ public class RobotContainer {
     xboxTest.rightTrigger().onTrue(outtake.startOuttake().alongWith(Commands.print("Outtaking")));
     xboxTest.leftBumper().onTrue(outtake.outtakeL4().alongWith(Commands.print("Outtaking L4")));
 
-    xboxTest.rightStick().onTrue(elevator.elevatorFullManual(()->xboxTest.getRightY()));
+    xboxTest.rightStick().onTrue(elevator.elevatorFullManual(() -> xboxTest.getRightY()));
+    xboxTest.leftStick().onTrue(algaePivot.AlgaePivotFullManualCommand(() -> xboxTest.getLeftY()));
+
 
     //---------------------------------------------------------------------------------------------------------------------
     // XBOX AUX

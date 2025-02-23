@@ -247,10 +247,10 @@ public class TeleopPosSelector extends SubsystemBase {
     Translation2d unitLeftRight = unitRadius.rotateBy(Rotation2d.fromDegrees(90));
 
     Translation2d radius = unitRadius.times(Reef.reefOrthogonalRadius + Reef.scoringDistance);
-    
+
     double centerShift = Units.inchesToMeters(3);
     radius = radius.plus(unitLeftRight.times(centerShift));
-    
+
     Translation2d leftRight = unitLeftRight.times(leftRightPos.NUM * Reef.leftRightDistance);
     if (unitLeftRight.getY() < 0) {
       leftRight = leftRight.times(-1);
@@ -326,14 +326,14 @@ public class TeleopPosSelector extends SubsystemBase {
     return new InstantCommand(() -> {
       if(currentPathfindingPair == null) return; //means it is in AQUA
       currentRunningCommand.cancel();
-  
+
       Pose2d goal = calculateReefPose(new Pair<Integer, LeftRight>(currentPathfindingPair.getFirst(), leftRight));
       Pose2d currentPose = tracker.getEstimatedPose();
-  
+
       Translation2d goalPos = goal.getTranslation();
       Translation2d currentPos = currentPose.getTranslation();
       Translation2d direction = goalPos.minus(currentPos).div(2.0);
-  
+
       if (currentPose.getTranslation().getDistance(goal.getTranslation()) > Reef.leftRightDistance * 3
           || direction.getNorm() <= 1e-3) {
         return;
@@ -345,7 +345,7 @@ public class TeleopPosSelector extends SubsystemBase {
                                                                         DriveConstants.DRIVE_CONFIG.maxAngularVelocity(),
                                                                         DriveConstants.DRIVE_CONFIG.maxAngularAcceleration()
                                                                 );
-  
+
       PathPlannerPath path = new PathPlannerPath(
         Arrays.asList(new Waypoint[] {
             new Waypoint(null, currentPos, currentPos.plus(direction)),
@@ -354,11 +354,11 @@ public class TeleopPosSelector extends SubsystemBase {
         PATHFINDING_CONSTRAINTS,
         null,
         new GoalEndState(0, goal.getRotation()));
-  
+
         if (AllianceFlipUtil.shouldFlipToRed()) {
           path = path.flipPath();
         }
-  
+
       currentRunningCommand = new TrajectoryDriveCmd(path, drivetrain, true);
       currentRunningCommand.schedule();
     });

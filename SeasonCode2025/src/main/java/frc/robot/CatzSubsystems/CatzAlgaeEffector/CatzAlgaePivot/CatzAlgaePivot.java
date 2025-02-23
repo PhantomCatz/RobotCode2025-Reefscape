@@ -47,7 +47,7 @@ public class CatzAlgaePivot extends SubsystemBase {
   @RequiredArgsConstructor
   public enum Position { //In degrees
     STOW(() -> 0.0),
-    HORIZONTAL(() -> 90), // TBD
+    HORIZONTAL(() -> -30), // TBD
     UNDISCLOSED(() -> 999), // TBD
     MANUAL(() -> manualPow),
     TUNNABLE(tunnablePos);
@@ -92,7 +92,7 @@ public class CatzAlgaePivot extends SubsystemBase {
       // if(isManual) {
       //   io.setPower(manualPow);
       // } else {
-        io.runSetpoint(position, 0.0);
+        //io.runSetpoint(position, 0.0);
       // }
     }
     Logger.recordOutput("AlgaePivot/targetPosition", position);
@@ -122,13 +122,21 @@ public class CatzAlgaePivot extends SubsystemBase {
   }
 
   public void algaePivotManual(Supplier<Double> manualSupplier) {
-    // manualPow = manualSupplier.get();
-    // isManual = true;
     position += manualSupplier.get() * MANUAL_SCALE;
     System.out.println("algae:" +position);
   }
 
-  public Command AlgaePivotManualMode(Supplier<Double> manualSupplier) {
+  public Command AlgaePivotFullManual(Supplier<Double> manualSupplier) {
     return run(() -> algaePivotManual(manualSupplier));
   }
+
+  public void algaePivotFullManual(Supplier<Double> manualSupplier) {
+    io.setPercentOutput(manualSupplier.get()/10);
+  }
+
+  public Command AlgaePivotFullManualCommand(Supplier<Double> manualSupplier) {
+    return run(() -> algaePivotFullManual(manualSupplier));
+  }
+
+
 }

@@ -12,9 +12,11 @@ import frc.robot.Utilities.MotorUtil.Gains;
 import frc.robot.Utilities.MotorUtil.MotionMagicParameters;
 
 public class AlgaePivotConstants {
-    public static final boolean isAlgaePivotDisabled = true;
+    public static final boolean isAlgaePivotDisabled = false;
 
     // Gearbox definitions
+    public static final double ALGAE_PIVOT_GEAR_REDUCTION = 6.0;
+    public static final double PIVOT_INITIAL_POS = (109.0 / 360.0) * ALGAE_PIVOT_GEAR_REDUCTION;
 
     // Motor ID
     public static final int ALGAE_PIVOT_MOTOR_ID = 40;
