@@ -77,9 +77,9 @@ public class DriveConstants {
                 .build();
         case SN1, SN2, SN1_2024 ->
         DriveConfig.builder()
-                .wheelRadius(Units.inchesToMeters(1.74)) // TODO make these repeated numbers into constants
-                .robotLengthX(Units.inchesToMeters(29.0))
-                .robotWidthY(Units.inchesToMeters(29.0))
+                .wheelRadius(Units.inchesToMeters(1.91363711)) // TODO make these repeated numbers into constants
+                .robotLengthX(Units.inchesToMeters(24.2))
+                .robotWidthY(Units.inchesToMeters(24.2))
                 .bumperWidthX(Units.inchesToMeters(32))
                 .bumperWidthY(Units.inchesToMeters(32))
                 .maxLinearVelocity(4)
@@ -157,10 +157,10 @@ public class DriveConstants {
         break;
 
         case SN1:
-            MODULE_CONFIGS[INDEX_FR] = new ModuleIDs(1, 2, 11, 0.8887, false);
-            MODULE_CONFIGS[INDEX_BR] = new ModuleIDs(3, 4, 12, -1.6421, false);
-            MODULE_CONFIGS[INDEX_BL] = new ModuleIDs(5, 6, 13, -0.882, false);
-            MODULE_CONFIGS[INDEX_FL] = new ModuleIDs(7, 8, 14, -0.7688, false);
+            MODULE_CONFIGS[INDEX_FR] = new ModuleIDs(1, 2, 11, 0.885986, false);
+            MODULE_CONFIGS[INDEX_BR] = new ModuleIDs(3, 4, 12, 0.8620605, false);
+            MODULE_CONFIGS[INDEX_BL] = new ModuleIDs(5, 6, 13, 0.13012695, false);
+            MODULE_CONFIGS[INDEX_FL] = new ModuleIDs(7, 8, 14, 0.22900, false);
         break;
 
         case SN_TEST:

@@ -7,7 +7,6 @@
 
 package frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.Vision;
 
-import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
@@ -31,7 +30,7 @@ public class VisionIOLimelight implements VisionIO {
   private final Supplier<Rotation2d> rotationSupplier = () -> CatzRobotTracker.getInstance().getEstimatedPose().getRotation();
   private final DoubleArrayPublisher orientationPublisher;
 
-  private final SwerveDrivePoseEstimator
+  // private final SwerveDrivePoseEstimator
 
   private final DoubleSubscriber latencySubscriber;
   private final DoubleSubscriber txSubscriber;
@@ -123,7 +122,7 @@ public class VisionIOLimelight implements VisionIO {
               (int) rawSample.value[7],
 
               // Average tag distance
-              rawSample.value[9], // Used to grab area at value 10 //TODO 
+              rawSample.value[9], // Used to grab area at value 10 //TODO
 
               // Observation type
               PoseObservationType.MEGATAG_2)

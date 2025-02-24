@@ -57,7 +57,7 @@ public class TrajectoryDriveCmd extends Command {
   private static final double TIMEOUT_SCALAR = 5;
   private static final double CONVERGE_DISTANCE = 3.0;
   private static final double DIVERGE_TIME = 1.0;
-  private final double ALLOWABLE_VISION_ADJUST = 9e-4; //TODO tune
+  private final double ALLOWABLE_VISION_ADJUST = 3e-4; //TODO tune
 
   // Subsystems
   private CatzDrivetrain m_driveTrain;
@@ -228,7 +228,7 @@ public class TrajectoryDriveCmd extends Command {
       adjustedSpeeds = hocontroller.calculate(currentPose, state, goal.pose.getRotation());
 
       // Cusps x/(1+x)
-      adjustedSpeeds.times(DIVERGE_TIME * currentTime / (DIVERGE_TIME *currentTime+1));
+      adjustedSpeeds = adjustedSpeeds.times(DIVERGE_TIME * currentTime / (DIVERGE_TIME * currentTime + 1));
       if(autoalign){
         adjustedSpeeds = adjustedSpeeds.times(CONVERGE_DISTANCE * translationError / (CONVERGE_DISTANCE * translationError + 1));
       }
