@@ -19,7 +19,6 @@ import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.trajectory.Trajectory;
-import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -54,7 +53,7 @@ public class TrajectoryDriveCmd extends Command {
   public static final double ALLOWABLE_POSE_ERROR_PID = 0.02;
   public static final double ALLOWABLE_ROTATION_ERROR_PID = 0.5;
   public static final double ALLOWABLE_VEL_ERROR = 0.2;
-  public static final double ALLOWABLE_OMEGA_ERROR = Units.degreesToRadians(5.0);
+  public static final double ALLOWABLE_OMEGA_ERROR = 3.0;
   private static final double TIMEOUT_SCALAR = 5.0;
   private static final double CONVERGE_DISTANCE = 1.0;
   private static final double DIVERGE_TIME = 1.0;

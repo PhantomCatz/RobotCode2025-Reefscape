@@ -24,7 +24,6 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.FieldConstants.Reef;
@@ -55,7 +54,6 @@ public class TeleopPosSelector extends SubsystemBase {
   private CatzDrivetrain drivetrain;
   private CatzRobotTracker tracker = CatzRobotTracker.getInstance();
 
-  private Command currentPathfindingCommand = new InstantCommand();
   private Command currentRunningCommand = new InstantCommand();
   private Command currentAutoplayCommand = new InstantCommand();
   private CornerTrackingPathfinder pathfinder = new CornerTrackingPathfinder();
@@ -68,12 +66,15 @@ public class TeleopPosSelector extends SubsystemBase {
 
   private boolean hasCoralSIM = true;
 
+  private RobotContainer container;
+
   public TeleopPosSelector(CommandXboxController aux, RobotContainer container) {
     this.xboxAux = aux;
     this.m_container = container;
     this.currentRunningCommand.addRequirements(container.getCatzDrivetrain());
     this.currentAutoplayCommand.addRequirements(container.getCatzDrivetrain());
 
+    this.container = container;
     superstructure = m_container.getSuperstructure();
     drivetrain = m_container.getCatzDrivetrain();
 
@@ -439,7 +440,11 @@ public class TeleopPosSelector extends SubsystemBase {
       @Override
       public void initialize() {
         pathfindingCommand = getPathfindingCommand(calculateReefPose(pair.getFirst()));
+
+        // CommandScheduler.getInstance().registerComposedCommands(pathfindingCommand);
+        // addRequirements(pathfindingCommand.getRequirements());
         pathfindingCommand.initialize();
+
         currentPathfindingPair = null; // we don't want left right movement during AQUA
       }
 
@@ -500,6 +505,8 @@ public class TeleopPosSelector extends SubsystemBase {
       @Override
       public void initialize() {
         pathfindingCommand = getPathfindingCommand(goalPose);
+        // CommandScheduler.getInstance().registerComposedCommands(pathfindingCommand);
+        // addRequirements(pathfindingCommand.getRequirements());
         pathfindingCommand.initialize();
         System.out.println("coral station start!!@!@!@!@!@");
       }
