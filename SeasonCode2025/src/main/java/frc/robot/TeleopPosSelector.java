@@ -24,6 +24,7 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.FieldConstants.Reef;
@@ -54,6 +55,7 @@ public class TeleopPosSelector extends SubsystemBase {
   private CatzDrivetrain drivetrain;
   private CatzRobotTracker tracker = CatzRobotTracker.getInstance();
 
+  private Command currentPathfindingCommand = new InstantCommand();
   private Command currentRunningCommand = new InstantCommand();
   private Command currentAutoplayCommand = new InstantCommand();
   private CornerTrackingPathfinder pathfinder = new CornerTrackingPathfinder();
@@ -297,6 +299,7 @@ public class TeleopPosSelector extends SubsystemBase {
     Translation2d currentPos = currentPose.getTranslation();
     Translation2d direction = goalPos.minus(currentPos).div(2.0);
 
+    //if too far from reef side, then don't NBA
     if (currentPose.getTranslation().getDistance(goal.getTranslation()) > Reef.leftRightDistance * 3
         || direction.getNorm() <= 1e-3) {
       return new InstantCommand();
@@ -409,7 +412,7 @@ public class TeleopPosSelector extends SubsystemBase {
   private Command runNextCommand() {
     Pair<Pair<Integer, LeftRight>, Integer> pair = pathQueuePeekFront();
 
-    if (Robot.isSimulation()) {
+    if (true) {
       if (hasCoralSIM) {
         if (queuedPaths.isEmpty())
           return new InstantCommand();
@@ -443,11 +446,13 @@ public class TeleopPosSelector extends SubsystemBase {
       @Override
       public void execute() {
         if (((TrajectoryDriveCmd) pathfindingCommand).isWithinThreshold(ELEVATOR_RAISE_DIST)){
-          superstructure.setCurrentRobotAction(RobotAction.AIMING, pair.getSecond());
+          // superstructure.setCurrentRobotAction(RobotAction.AIMING, pair.getSecond());
         }
         if (pathfindingCommand.isFinished()) {
           pathfindingCommand.end(false);
-          superstructure.setCurrentRobotAction(RobotAction.OUTTAKE, pair.getSecond());
+          System.out.println("finished!!!!!()*)(*!)(*!()*)");
+
+          // superstructure.setCurrentRobotAction(RobotAction.OUTTAKE, pair.getSecond());
           hasCoralSIM = false;
         } else {
           pathfindingCommand.execute();
@@ -456,7 +461,7 @@ public class TeleopPosSelector extends SubsystemBase {
 
       @Override
       public boolean isFinished() {
-        if (Robot.isSimulation()) {
+        if (true) {
           return !hasCoralSIM;
         } else {
           return (CatzSuperstructure.getCurrentCoralState() == CoralState.NOT_IN_OUTTAKE);
@@ -496,6 +501,7 @@ public class TeleopPosSelector extends SubsystemBase {
       public void initialize() {
         pathfindingCommand = getPathfindingCommand(goalPose);
         pathfindingCommand.initialize();
+        System.out.println("coral station start!!@!@!@!@!@");
       }
 
       @Override
@@ -506,19 +512,20 @@ public class TeleopPosSelector extends SubsystemBase {
           pathfindingCommand.end(false);
           hasCoralSIM = true;
         } else {
+          System.out.println("coral stationOIN!IONION!ONO!NIOIn");
           pathfindingCommand.execute();
         }
 
         // if you are within 2 meters of coral station and don't already have intake on
         if (robotPos.getDistance(goalPose.getTranslation()) < 2.0
             && !superstructure.getCurrentRobotAction().equals(RobotAction.INTAKE)) {
-          superstructure.setCurrentRobotAction(RobotAction.INTAKE);
+          // superstructure.setCurrentRobotAction(RobotAction.INTAKE);
         }
       }
 
       @Override
       public boolean isFinished() {
-        if (Robot.isSimulation()) {
+        if (true) {
           return hasCoralSIM;
         } else {
           return (CatzSuperstructure.getCurrentCoralState() == CoralState.IN_OUTTAKE);

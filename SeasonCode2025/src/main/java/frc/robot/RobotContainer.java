@@ -15,6 +15,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.PrintCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Autonomous.CatzAutonomous;
@@ -129,7 +130,7 @@ public class RobotContainer {
       }
     }));
 
-    xboxDrv.b().onTrue(new InstantCommand(() -> selector.runToNearestBranch().schedule()));
+    xboxDrv.b().onTrue(new InstantCommand(() -> selector.runToNearestBranch().schedule()).alongWith(new PrintCommand("NBA!!!!!!!!!!!!  !!!!!")));
     xboxDrv.b().onFalse(selector.cancelCurrentRunningCommand());
 
     // BALLS

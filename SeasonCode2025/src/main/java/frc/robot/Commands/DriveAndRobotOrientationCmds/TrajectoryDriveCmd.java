@@ -48,16 +48,17 @@ import org.littletonrobotics.junction.Logger;
 
 public class TrajectoryDriveCmd extends Command {
   // Trajectory constants
-  public static final double ALLOWABLE_POSE_ERROR = 0.01;
+  public static final double ALLOWABLE_POSE_ERROR = 0.05;
+  public static final double ALLOWABLE_AUTOAIM_ERROR = 0.05;
   public static final double ALLOWABLE_ROTATION_ERROR = 2.0;
   public static final double ALLOWABLE_POSE_ERROR_PID = 0.02;
   public static final double ALLOWABLE_ROTATION_ERROR_PID = 0.5;
   public static final double ALLOWABLE_VEL_ERROR = 0.2;
   public static final double ALLOWABLE_OMEGA_ERROR = Units.degreesToRadians(5.0);
-  private static final double TIMEOUT_SCALAR = 5;
-  private static final double CONVERGE_DISTANCE = 3.0;
+  private static final double TIMEOUT_SCALAR = 5.0;
+  private static final double CONVERGE_DISTANCE = 1.0;
   private static final double DIVERGE_TIME = 1.0;
-  private final double ALLOWABLE_VISION_ADJUST = 3e-4; //TODO tune
+  private final double ALLOWABLE_VISION_ADJUST = 9e-4; //TODO tune
 
   // Subsystems
   private CatzDrivetrain m_driveTrain;
@@ -74,8 +75,7 @@ public class TrajectoryDriveCmd extends Command {
 
   // PID aim variables
   private boolean isPIDAimEnabled = false;
-  private PIDController XadjustController = new PIDController(2.0, 0.0, 0.0);
-  private PIDController YadjustController = new PIDController(2.0, 0.0, 0.0);
+  private PIDController poseAdjustController = new PIDController(3.0, 0.0, 0.0);
   private PIDController thethaController  = new PIDController(0.4, 0.0, 0.0);
   private ChassisSpeeds PIDaimSpeeds = new ChassisSpeeds();
   private Pose2d goalPIDAimPose           = new Pose2d();
@@ -155,7 +155,8 @@ public class TrajectoryDriveCmd extends Command {
     // Determine Trajectory vs Simple PID path following
     if(usePath.getAllPathPoints().size() <= 2) {
       System.out.println(isPIDAimEnabled);
-      isPIDAimEnabled = true;
+      // isPIDAimEnabled = true; //TODO is this needed?
+      // System.out.println("PID AIM!!!!!!!!!!!!!!!");
     } else {
       // Construct trajectory
       this.trajectory =
@@ -199,8 +200,8 @@ public class TrajectoryDriveCmd extends Command {
 
     // Simple PID aim
     if(isPIDAimEnabled) {
-      double pidSpeedX = XadjustController.calculate(currentPose.getX(), goalPIDAimPose.getX());
-      double pidSpeedY = YadjustController.calculate(currentPose.getY(), goalPIDAimPose.getY());
+      double pidSpeedX = poseAdjustController.calculate(currentPose.getX(), goalPIDAimPose.getX());
+      double pidSpeedY = poseAdjustController.calculate(currentPose.getY(), goalPIDAimPose.getY());
       double thethaSpeed = thethaController.calculate(currentPose.getRotation().getDegrees(), goalPIDAimPose.getRotation().getDegrees());
       System.out.println(thethaSpeed);
       PIDaimSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(pidSpeedX, pidSpeedY, thethaSpeed, tracker.getEstimatedPose().getRotation());
@@ -227,9 +228,11 @@ public class TrajectoryDriveCmd extends Command {
       // construct chassisspeeds
       adjustedSpeeds = hocontroller.calculate(currentPose, state, goal.pose.getRotation());
 
-      // Cusps x/(1+x)
-      adjustedSpeeds = adjustedSpeeds.times(DIVERGE_TIME * currentTime / (DIVERGE_TIME * currentTime + 1));
-      if(autoalign){
+      // Cusps x/(1+x) Lower speed for closer distances to prevent jittering //TODO tune
+      if(currentTime <= 1.5){
+        adjustedSpeeds = adjustedSpeeds.times(DIVERGE_TIME * currentTime / (DIVERGE_TIME * currentTime + 1));
+      }
+      if(autoalign && translationError < 1.0){
         adjustedSpeeds = adjustedSpeeds.times(CONVERGE_DISTANCE * translationError / (CONVERGE_DISTANCE * translationError + 1));
       }
       if(Double.isNaN(adjustedSpeeds.vxMetersPerSecond) || Double.isNaN(adjustedSpeeds.vyMetersPerSecond) || Double.isNaN(adjustedSpeeds.omegaRadiansPerSecond)){
@@ -298,17 +301,31 @@ public class TrajectoryDriveCmd extends Command {
     // if (autoalign){
     //   return false;
     // }
-    System.out.println("vision: " +tracker.getDEstimatedPose().getTranslation().getNorm() );
-    if (autoalign && tracker.getDEstimatedPose().getTranslation().getNorm() > ALLOWABLE_VISION_ADJUST){
-      return false;
-    }
+    // System.out.println("vision: " +tracker.getDEstimatedPose().getTranslation().getNorm() );
+    System.out.println("vision: " + (tracker.getDEstimatedPose().getTranslation().getNorm()) + " pose: " + translationError);
 
-    // Finish command if the total time the path takes is over
+
+
     if (timer.hasElapsed(pathTimeOut) && !isEventCommandRunning){
+      System.out.println("timed out!!@)!*()*!)(#*)");
       return true;
     }
 
-    return isWithinThreshold(ALLOWABLE_POSE_ERROR);
+    if (autoalign && tracker.getDEstimatedPose().getTranslation().getNorm() > ALLOWABLE_VISION_ADJUST){
+      System.out.println("vision is not true!@!@!)@(!)@()(!@)");
+      return false;
+    }
+    // Finish command if the total time the path takes is over
+
+
+    if(autoalign){
+      System.out.println("passed vision check!!!@)*)(*)(@*#()*@)#(*)");
+      return isWithinThreshold(ALLOWABLE_AUTOAIM_ERROR);
+    }else{
+      System.out.println("not auto align!@!@!");
+      return isWithinThreshold(ALLOWABLE_POSE_ERROR);
+
+    }
   }
 
   public boolean isWithinThreshold(double poseError) {
@@ -336,6 +353,10 @@ public class TrajectoryDriveCmd extends Command {
     }
     translationError = Math.hypot(xError, yError);
 
+
+    System.out.println("rotait: " + (rotationError < ALLOWABLE_OMEGA_ERROR));
+    System.out.println("speed: " + (desiredMPS == 0.0 || (currentMPS < ALLOWABLE_VEL_ERROR && currentRPS < ALLOWABLE_OMEGA_ERROR)));
+
     if(isPIDAimEnabled) {
       return
         xError < ALLOWABLE_POSE_ERROR_PID &&
@@ -347,7 +368,7 @@ public class TrajectoryDriveCmd extends Command {
         xError < poseError &&
         yError < poseError &&
         rotationError < ALLOWABLE_OMEGA_ERROR &&
-        (desiredMPS == 0 || (currentMPS < ALLOWABLE_VEL_ERROR && currentRPS < ALLOWABLE_OMEGA_ERROR));
+        (desiredMPS == 0.0 || (currentMPS < ALLOWABLE_VEL_ERROR && currentRPS < ALLOWABLE_OMEGA_ERROR));
     }
   }
 }

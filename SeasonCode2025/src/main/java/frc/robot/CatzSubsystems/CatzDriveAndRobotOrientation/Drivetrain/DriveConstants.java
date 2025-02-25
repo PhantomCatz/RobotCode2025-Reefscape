@@ -82,8 +82,8 @@ public class DriveConstants {
                 .robotWidthY(Units.inchesToMeters(24.2))
                 .bumperWidthX(Units.inchesToMeters(32))
                 .bumperWidthY(Units.inchesToMeters(32))
-                .maxLinearVelocity(4)
-                .maxLinearAcceleration(3) // TODO emperically calculate
+                .maxLinearVelocity(2) //TODO find optimal maximum
+                .maxLinearAcceleration(2) // TODO emperically calculate
                 .maxAngularVelocity(12.0) // Radians
                 .maxAngularAcceleration(30) // Radians // TODO verify angle constraints
                 .build();
@@ -158,7 +158,7 @@ public class DriveConstants {
 
         case SN1:
             MODULE_CONFIGS[INDEX_FR] = new ModuleIDs(1, 2, 11, 0.885986, false);
-            MODULE_CONFIGS[INDEX_BR] = new ModuleIDs(3, 4, 12, 0.8620605, false);
+            MODULE_CONFIGS[INDEX_BR] = new ModuleIDs(3, 4, 12, 0.3620605, false);
             MODULE_CONFIGS[INDEX_BL] = new ModuleIDs(5, 6, 13, 0.13012695, false);
             MODULE_CONFIGS[INDEX_FL] = new ModuleIDs(7, 8, 14, 0.22900, false);
         break;
@@ -185,8 +185,8 @@ public class DriveConstants {
   //
   // -----------------------------------------------------------------------------------------------------------------------------
   public static final PathConstraints PATHFINDING_CONSTRAINTS = new PathConstraints( // 540 // 720
-                                                                        2,
-                                                                        3, // max vel causing messup
+                                                                        DRIVE_CONFIG.maxLinearVelocity,
+                                                                        DRIVE_CONFIG.maxLinearAcceleration, // max vel causing messup
                                                                         DRIVE_CONFIG.maxAngularVelocity,
                                                                         DRIVE_CONFIG.maxAngularAcceleration
                                                                 );
