@@ -11,6 +11,7 @@ import java.util.Arrays;
 import java.util.Deque;
 import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.function.Supplier;
 
 import com.pathplanner.lib.path.GoalEndState;
 import com.pathplanner.lib.path.PathConstraints;
@@ -23,7 +24,9 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.FieldConstants.Reef;
@@ -54,7 +57,7 @@ public class TeleopPosSelector extends SubsystemBase {
   private CatzDrivetrain drivetrain;
   private CatzRobotTracker tracker = CatzRobotTracker.getInstance();
 
-  private Command currentRunningCommand = new InstantCommand();
+  private Command currentDrivetrainCommand = new InstantCommand();
   private Command currentAutoplayCommand = new InstantCommand();
   private CornerTrackingPathfinder pathfinder = new CornerTrackingPathfinder();
   private Pair<Integer, LeftRight> currentPathfindingPair = new Pair<Integer, LeftRight>(0, LeftRight.LEFT);
@@ -68,15 +71,13 @@ public class TeleopPosSelector extends SubsystemBase {
 
   private boolean hasCoralSIM = true;
 
-  private RobotContainer container;
-
   public TeleopPosSelector(CommandXboxController aux, RobotContainer container) {
     this.xboxAux = aux;
     this.m_container = container;
-    this.currentRunningCommand.addRequirements(container.getCatzDrivetrain());
-    this.currentAutoplayCommand.addRequirements(container.getCatzDrivetrain());
+    this.currentDrivetrainCommand.addRequirements(container.getCatzDrivetrain());
+    //this.currentAutoplayCommand.addRequirements(container.getCatzDrivetrain());
+    this.currentAutoplayCommand.addRequirements(this);
 
-    this.container = container;
     superstructure = m_container.getSuperstructure();
     drivetrain = m_container.getCatzDrivetrain();
 
@@ -268,10 +269,10 @@ public class TeleopPosSelector extends SubsystemBase {
     }
   }
 
-  public Command getPathfindingCommand(Pose2d goal) {
+  public void runPathfinding(Pose2d goal) {
     if (goal == null) {
       System.out.println("The goal is null");
-      return new InstantCommand();
+      return;
     }
 
     Translation2d robotPos = tracker.getEstimatedPose().getTranslation();
@@ -281,19 +282,20 @@ public class TeleopPosSelector extends SubsystemBase {
 
     if (path == null) {
       System.out.println("The path is null: " + robotPos + goal.getTranslation());
-      return new InstantCommand();
+      return;
     } else {
       if (AllianceFlipUtil.shouldFlipToRed()) {
         path = path.flipPath();
       }
-      return new TrajectoryDriveCmd(path, drivetrain, true);
+      new TrajectoryDriveCmd(path, drivetrain, true).schedule();
     }
   }
 
-  public Command runLeftRightCommand(LeftRight leftRight) {
+  public void runLeftRight(LeftRight leftRight) {
     if (currentPathfindingPair == null)
-      return new InstantCommand(); // means it is in AQUA
-    currentRunningCommand.cancel();
+      return; // means it is in AQUA
+
+    currentDrivetrainCommand.cancel();
 
     Pose2d goal = calculateReefPose(new Pair<Integer, LeftRight>(currentPathfindingPair.getFirst(), leftRight));
     Pose2d currentPose = tracker.getEstimatedPose();
@@ -305,7 +307,7 @@ public class TeleopPosSelector extends SubsystemBase {
     //if too far from reef side, then don't NBA
     if (currentPose.getTranslation().getDistance(goal.getTranslation()) > Reef.leftRightDistance * 3
         || direction.getNorm() <= 1e-3) {
-      return new InstantCommand();
+      return;
     }
 
     PathPlannerPath path = new PathPlannerPath(
@@ -321,11 +323,11 @@ public class TeleopPosSelector extends SubsystemBase {
       path = path.flipPath();
     }
 
-    return new TrajectoryDriveCmd(path, drivetrain, true);
+    currentDrivetrainCommand = new TrajectoryDriveCmd(path, drivetrain, true);
+    currentDrivetrainCommand.schedule();
   }
 
-  public Command runLeftRightShiftCommand(LeftRight leftRight) {
-    return new InstantCommand(() -> {
+  public void runLeftRightShift(LeftRight leftRight) {
       if (currentPathfindingPair == null)
         return;
 
@@ -366,11 +368,15 @@ public class TeleopPosSelector extends SubsystemBase {
         path = path.flipPath();
       }
 
-      currentRunningCommand = new TrajectoryDriveCmd(path, drivetrain, true);
-      currentRunningCommand.schedule();
-
-    });
+      currentDrivetrainCommand = new TrajectoryDriveCmd(path, drivetrain, true);
+      currentDrivetrainCommand.schedule();
   }
+
+  //------------------------------------------------------------------------------------
+  //
+  //  Xbox Commands
+  //
+  //-----------------------------------------------------------------------------------
 
   public Command runAutoCommand() {
     return new InstantCommand(() -> {
@@ -379,21 +385,21 @@ public class TeleopPosSelector extends SubsystemBase {
 
         @Override
         public void initialize() {
-          currentRunningCommand.cancel();
+          currentDrivetrainCommand.cancel();
 
-          currentRunningCommand = runNextCommand();
+          currentDrivetrainCommand = runNextCommand();
 
-          currentRunningCommand.initialize();
+          currentDrivetrainCommand.initialize();
         }
 
         @Override
         public void execute() {
-          currentRunningCommand.execute();
+          currentDrivetrainCommand.execute();
 
-          if (currentRunningCommand.isFinished()) {
-            currentRunningCommand.end(false);
-            currentRunningCommand = runNextCommand();
-            currentRunningCommand.initialize();
+          if (currentDrivetrainCommand.isFinished()) {
+            currentDrivetrainCommand.end(false);
+            currentDrivetrainCommand = runNextCommand();
+            currentDrivetrainCommand.initialize();
           }
         }
 
@@ -404,7 +410,7 @@ public class TeleopPosSelector extends SubsystemBase {
 
         @Override
         public void end(boolean interrupted) {
-          currentRunningCommand.end(interrupted);
+          currentDrivetrainCommand.end(interrupted);
         }
 
       };
@@ -437,32 +443,30 @@ public class TeleopPosSelector extends SubsystemBase {
 
   public Command runReefScoreCommand(Pair<Pair<Integer, LeftRight>, Integer> pair) {
     return new Command() {
-      private Command pathfindingCommand;
-
       @Override
       public void initialize() {
-        pathfindingCommand = getPathfindingCommand(calculateReefPose(pair.getFirst()));
+        runPathfinding(calculateReefPose(pair.getFirst()));
 
         // CommandScheduler.getInstance().registerComposedCommands(pathfindingCommand);
         // addRequirements(pathfindingCommand.getRequirements());
-        pathfindingCommand.initialize();
+        // pathfindingCommand.initialize();
 
         currentPathfindingPair = null; // we don't want left right movement during AQUA
       }
 
       @Override
       public void execute() {
-        if (((TrajectoryDriveCmd) pathfindingCommand).isWithinThreshold(ELEVATOR_RAISE_DIST)){
+        if (((TrajectoryDriveCmd) currentDrivetrainCommand).isWithinThreshold(ELEVATOR_RAISE_DIST)){
           // superstructure.setCurrentRobotAction(RobotAction.AIMING, pair.getSecond());
         }
-        if (pathfindingCommand.isFinished()) {
-          pathfindingCommand.end(false);
+        if (currentDrivetrainCommand.isFinished()) {
+          currentDrivetrainCommand.end(false);
           System.out.println("finished!!!!!()*)(*!)(*!()*)");
 
           // superstructure.setCurrentRobotAction(RobotAction.OUTTAKE, pair.getSecond());
           hasCoralSIM = false;
         } else {
-          pathfindingCommand.execute();
+          currentDrivetrainCommand.execute();
         }
       }
 
@@ -477,26 +481,30 @@ public class TeleopPosSelector extends SubsystemBase {
 
       @Override
       public void end(boolean interrupted) {
-        pathfindingCommand.end(interrupted);
+        currentDrivetrainCommand.end(interrupted);
       }
     };
   }
 
-  public Command runToNearestBranch() {
-    return new InstantCommand(() -> {
-      Pair<Integer, LeftRight> newPathfindingPair = getClosestReefPos().getFirst();
-      currentPathfindingPair = newPathfindingPair;
-      currentRunningCommand.cancel();
-      currentRunningCommand = getPathfindingCommand(calculateReefPose(newPathfindingPair));
-      currentRunningCommand.schedule();
-    });
+//   public Command runToNearestBranch() {
+//     return new InstantCommand(() -> {
+//       Pair<Integer, LeftRight> newPathfindingPair = getClosestReefPos().getFirst();
+//       currentPathfindingPair = newPathfindingPair;
+//       currentRunningCommand.cancel();
+//       currentRunningCommand = getPathfindingCommand(calculateReefPose(newPathfindingPair));
+//       currentRunningCommand.schedule();
+//     });
+//   }
+// <
+  public Command runToNearestBranch2(Supplier<Pose2d> reefPose) {
+    return Commands.runOnce(() -> runPathfinding(reefPose.get()));
   }
 
   public Command runOnlyCoralStationCommand(Pose2d pose) {
     return new InstantCommand(() -> {
-      currentRunningCommand.cancel();
-      currentRunningCommand = runCoralStationCommand(pose);
-      currentRunningCommand.schedule();
+      currentDrivetrainCommand.cancel();
+      currentDrivetrainCommand = runCoralStationCommand(pose);
+      currentDrivetrainCommand.schedule();
     });
   }
 
@@ -506,7 +514,7 @@ public class TeleopPosSelector extends SubsystemBase {
 
       @Override
       public void initialize() {
-        pathfindingCommand = getPathfindingCommand(goalPose);
+        runPathfinding(goalPose);
         // CommandScheduler.getInstance().registerComposedCommands(pathfindingCommand);
         // addRequirements(pathfindingCommand.getRequirements());
         pathfindingCommand.initialize();
@@ -548,9 +556,9 @@ public class TeleopPosSelector extends SubsystemBase {
     };
   }
 
-  public Command cancelCurrentRunningCommand() {
+  public Command cancelCurrentDrivetrainCommand() {
     return new InstantCommand(() -> {
-      currentRunningCommand.cancel();
+      currentDrivetrainCommand.cancel();
     });
   }
 

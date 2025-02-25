@@ -130,12 +130,13 @@ public class RobotContainer {
       }
     }));
 
-    xboxDrv.b().onTrue(new InstantCommand(() -> selector.runToNearestBranch().schedule()).alongWith(new PrintCommand("NBA!!!!!!!!!!!!  !!!!!")));
-    xboxDrv.b().onFalse(selector.cancelCurrentRunningCommand());
+    //xboxDrv.b().onTrue(new InstantCommand(() -> selector.runToNearestBranch().schedule()).alongWith(new PrintCommand("NBA!!!!!!!!!!!!  !!!!!")));
+    xboxDrv.b().onTrue(selector.runToNearestBranch2(()->selector.calculateReefPose(selector.getClosestReefPos().getFirst())));
+    xboxDrv.b().onFalse(selector.cancelCurrentDrivetrainCommand());
 
     // BALLS
     xboxDrv.y().onTrue(new InstantCommand(() -> selector.runOnlyCoralStationCommand(selector.getBestCoralStation()).schedule()));
-    xboxDrv.y().onFalse(selector.cancelCurrentRunningCommand());
+    xboxDrv.y().onFalse(selector.cancelCurrentDrivetrainCommand());
 
     // Pop Queue
     // xboxDrv.y().onTrue(selector.runQueuedCommand());
@@ -146,14 +147,15 @@ public class RobotContainer {
     xboxDrv.a().onFalse(selector.cancelAutoCommand());
 
     // Left Right
-    xboxDrv.leftBumper().onTrue(new InstantCommand(() -> selector.runLeftRightCommand(LeftRight.LEFT).schedule()));
-    xboxDrv.rightBumper().onTrue(new InstantCommand(() -> selector.runLeftRightCommand(LeftRight.RIGHT).schedule()));
+    xboxDrv.leftBumper().onTrue(new InstantCommand(() -> selector.runLeftRight(LeftRight.LEFT)));
+    xboxDrv.rightBumper().onTrue(new InstantCommand(() -> selector.runLeftRight(LeftRight.RIGHT)));
 
-    xboxDrv.leftTrigger().onTrue(new InstantCommand(() -> selector.runLeftRightShiftCommand(LeftRight.LEFT).schedule()));
-    xboxDrv.leftTrigger().onFalse(selector.cancelCurrentRunningCommand());
 
-    xboxDrv.rightTrigger().onTrue(new InstantCommand(() -> selector.runLeftRightShiftCommand(LeftRight.RIGHT).schedule()));
-    xboxDrv.rightTrigger().onFalse(selector.cancelCurrentRunningCommand());
+    xboxDrv.leftTrigger().onTrue(new InstantCommand(() -> selector.runLeftRightShift(LeftRight.LEFT)));
+    xboxDrv.leftTrigger().onFalse(selector.cancelCurrentDrivetrainCommand());
+
+    xboxDrv.rightTrigger().onTrue(new InstantCommand(() -> selector.runLeftRightShift(LeftRight.RIGHT)));
+    xboxDrv.rightTrigger().onFalse(selector.cancelCurrentDrivetrainCommand());
     // Score
     // xboxDrv.leftTrigger(SCORE_TRIGGER_THRESHHOLD).onTrue(new InstantCommand(() -> superstructure.setCurrentRobotAction(RobotAction.OUTTAKE)));
 
