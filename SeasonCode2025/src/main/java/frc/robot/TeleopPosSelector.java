@@ -61,6 +61,8 @@ public class TeleopPosSelector extends SubsystemBase {
   private Deque<Pair<Pair<Integer, LeftRight>, Integer>> queuedPaths = new LinkedList<>();
   private HashMap<String, String> poseToLetter = new HashMap<>();
 
+  private final boolean doFakeCoral = true; //if the real robot doesn't have mechanisms to hold real coral, simulate one
+
   private boolean leftCoralStation = true;
   private boolean rightCoralStation = true;
 
@@ -413,7 +415,7 @@ public class TeleopPosSelector extends SubsystemBase {
   private Command runNextCommand() {
     Pair<Pair<Integer, LeftRight>, Integer> pair = pathQueuePeekFront();
 
-    if (true) {
+    if (Robot.isSimulation() || doFakeCoral) {
       if (hasCoralSIM) {
         if (queuedPaths.isEmpty())
           return new InstantCommand();
@@ -466,7 +468,7 @@ public class TeleopPosSelector extends SubsystemBase {
 
       @Override
       public boolean isFinished() {
-        if (true) {
+        if (Robot.isSimulation() || doFakeCoral) {
           return !hasCoralSIM;
         } else {
           return (CatzSuperstructure.getCurrentCoralState() == CoralState.NOT_IN_OUTTAKE);
@@ -532,7 +534,7 @@ public class TeleopPosSelector extends SubsystemBase {
 
       @Override
       public boolean isFinished() {
-        if (true) {
+        if (Robot.isSimulation() || doFakeCoral) {
           return hasCoralSIM;
         } else {
           return (CatzSuperstructure.getCurrentCoralState() == CoralState.IN_OUTTAKE);
