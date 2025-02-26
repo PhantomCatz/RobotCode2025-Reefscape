@@ -126,9 +126,9 @@ public class CatzElevator extends SubsystemBase {
     // if(targetPosition == ElevatorPosition.PosL4) {
 
     //   elevatorFeedForward =  gains.kG() + 0.1;
-    // } else {
+    //} else {
       elevatorFeedForward =  gains.kG();
-    // }
+    //}
 
     //---------------------------------------------------------------------------------------------------------------------------
     //    Control Mode setting

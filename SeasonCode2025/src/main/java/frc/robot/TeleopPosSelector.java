@@ -453,7 +453,6 @@ public class TeleopPosSelector extends SubsystemBase {
         // CommandScheduler.getInstance().registerComposedCommands(pathfindingCommand);
         // addRequirements(pathfindingCommand.getRequirements());
         // pathfindingCommand.initialize();
-
         currentPathfindingPair = null; // we don't want left right movement during AQUA
       }
 

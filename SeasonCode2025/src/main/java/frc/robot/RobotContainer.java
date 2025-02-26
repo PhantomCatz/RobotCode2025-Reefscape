@@ -179,10 +179,12 @@ public class RobotContainer {
     xboxDrv.b().toggleOnTrue(climb.Climb_Full().alongWith(Commands.print("pressed b")));
 
     xboxTest.rightBumper().toggleOnTrue(algaePivot.AlgaePivot_Stow().alongWith(Commands.print("stow")));
-    xboxTest.leftBumper().toggleOnTrue(algaePivot.AlgaePivot_Horizontal().alongWith(Commands.print("stow")));
+    xboxTest.leftBumper().toggleOnTrue(algaePivot.AlgaePivot_Horizontal().alongWith(Commands.print("Remove")));
 
-    xboxTest.a().toggleOnTrue(elevator.Elevator_Stow().alongWith(Commands.print("L1")));
-    xboxTest.b().toggleOnTrue(elevator.Elevator_L2().alongWith(Commands.print("L2")));
+    xboxTest.a().onTrue(algaeRemover.eatAlgae().alongWith(Commands.print("eat")));
+
+    //xboxTest.a().toggleOnTrue(elevator.Elevator_Stow().alongWith(Commands.print("L1")));
+    //xboxTest.b().toggleOnTrue(elevator.Elevator_L2().alongWith(Commands.print("L2")));
     xboxTest.x().toggleOnTrue(elevator.Elevator_L3().alongWith(Commands.print("L3")));
     xboxTest.y().toggleOnTrue(elevator.Elevator_L4().alongWith(Commands.print("L4")));
 
@@ -190,7 +192,9 @@ public class RobotContainer {
     xboxTest.rightTrigger().onTrue(outtake.startOuttake().alongWith(Commands.print("Outtaking")));
     xboxTest.leftBumper().onTrue(outtake.outtakeL4().alongWith(Commands.print("Outtaking L4")));
 
-    xboxTest.rightStick().onTrue(elevator.elevatorFullManual(()->xboxTest.getRightY()));
+    xboxTest.rightStick().onTrue(elevator.elevatorFullManual(() -> xboxTest.getRightY()));
+    xboxTest.leftStick().onTrue(algaePivot.AlgaePivotFullManualCommand(() -> xboxTest.getLeftY()));
+
 
     //---------------------------------------------------------------------------------------------------------------------
     // XBOX AUX
@@ -199,10 +203,11 @@ public class RobotContainer {
     //TODO add coral station toggle buttons
 
     // Scoring Level Determination
-    xboxAux.rightTrigger().onTrue(Commands.runOnce(() -> selector.pathQueueAddBack(selector.getXBoxReefPos(), superstructure.getLevel())));
-    xboxAux.leftBumper().onTrue(Commands.runOnce(() -> selector.pathQueuePopFront()));
-    xboxAux.rightBumper().onTrue(Commands.runOnce(() -> selector.pathQueuePopBack()));
-    xboxAux.rightStick().onTrue(Commands.runOnce(() -> selector.pathQueueClear()));
+    xboxAux.rightTrigger().onTrue(Commands.runOnce(() -> selector.pathQueueAddBack(selector.getXBoxReefPos(), superstructure.getLevel())).alongWith(Commands.runOnce(() -> led.setRailingState(CatzLED.railingState.aqua))));
+    xboxAux.leftBumper().onTrue(Commands.runOnce(() -> selector.pathQueuePopFront()).alongWith(Commands.runOnce(() -> led.setRailingState(CatzLED.railingState.aqua))));
+    xboxAux.rightBumper().onTrue(Commands.runOnce(() -> selector.pathQueuePopBack()).alongWith(Commands.runOnce(() -> led.setRailingState(CatzLED.railingState.aqua))));
+    xboxAux.rightStick().onTrue(Commands.runOnce(() -> selector.pathQueueClear()).alongWith(Commands.runOnce(() -> led.setRailingState(CatzLED.railingState.aqua))));
+
 
 
     xboxAux.povRight().onTrue(Commands.runOnce(()->{superstructure.setLevel(1); SmartDashboard.putNumber("Reef Level", 1);}));

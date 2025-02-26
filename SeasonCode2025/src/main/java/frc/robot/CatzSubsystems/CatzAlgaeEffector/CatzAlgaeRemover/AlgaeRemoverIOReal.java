@@ -8,46 +8,71 @@
 package frc.robot.CatzSubsystems.CatzAlgaeEffector.CatzAlgaeRemover;
 
 
-import com.revrobotics.spark.SparkBase.PersistMode;
-import com.revrobotics.spark.SparkBase.ResetMode;
-import com.revrobotics.spark.SparkLowLevel.MotorType;
+import com.ctre.phoenix6.BaseStatusSignal;
+import com.ctre.phoenix6.StatusSignal;
+import com.ctre.phoenix6.configs.TalonFXSConfiguration;
+import com.ctre.phoenix6.controls.DutyCycleOut;
+import com.ctre.phoenix6.hardware.TalonFXS;
+import com.ctre.phoenix6.signals.AdvancedHallSupportValue;
+import com.ctre.phoenix6.signals.MotorArrangementValue;
+import com.ctre.phoenix6.signals.NeutralModeValue;
+
+import edu.wpi.first.units.measure.Angle;
+import edu.wpi.first.units.measure.Current;
+import edu.wpi.first.units.measure.Temperature;
+import edu.wpi.first.units.measure.Voltage;
 
 import static frc.robot.CatzSubsystems.CatzAlgaeEffector.CatzAlgaeRemover.AlgaeRemoverConstants.*;
-
-import com.revrobotics.spark.SparkMax;
-import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
-import com.revrobotics.spark.config.SparkMaxConfig;
 
 
 public class AlgaeRemoverIOReal implements AlgaeRemoverIO {
 
-  private final SparkMax algaeRemoverMotor;
+  private final TalonFXS algaeRemoverMotor;
+  private final TalonFXSConfiguration config = new TalonFXSConfiguration();
+
+  private final StatusSignal<Voltage> algaeRemoverAppliedVolts;
+  private final StatusSignal<Current> algaeRemoverSupplyCurrent;
+  private final StatusSignal<Current> algaeRemoverTorqueCurrent;
+  private final StatusSignal<Temperature> algaeRemoverTempCelsius;
+  private final StatusSignal<Angle> algaeRemoverPosition;
 
   public AlgaeRemoverIOReal() {
-    algaeRemoverMotor = new SparkMax(ALGAE_REMOVER_MOTOR_ID, MotorType.kBrushless);
+    algaeRemoverMotor = new TalonFXS(ALGAE_REMOVER_MOTOR_ID);
 
-    SparkMaxConfig globalConfig = new SparkMaxConfig();
+    config.CurrentLimits.SupplyCurrentLimit = STALL_CURRENT_LIMIT;
+    config.CurrentLimits.SupplyCurrentLimitEnable = true;
+    config.MotorOutput.NeutralMode = NeutralModeValue.Brake;
+    config.Commutation.MotorArrangement = MotorArrangementValue.Minion_JST;
 
-    globalConfig.smartCurrentLimit(STALL_CURRENT_LIMIT);
-    globalConfig.idleMode(IdleMode.kBrake);
-    globalConfig.voltageCompensation(12);
+    algaeRemoverPosition = algaeRemoverMotor.getPosition();
+    algaeRemoverAppliedVolts = algaeRemoverMotor.getMotorVoltage();
+    algaeRemoverSupplyCurrent = algaeRemoverMotor.getSupplyCurrent();
+    algaeRemoverTorqueCurrent = algaeRemoverMotor.getTorqueCurrent();
+    algaeRemoverTempCelsius = algaeRemoverMotor.getDeviceTemp();
 
-    algaeRemoverMotor.configure(globalConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
-
-
+    algaeRemoverMotor.getConfigurator().apply(config, 1.0);
   }
 
   @Override
-  public void updateInputs(AlgaeEffectorIOInputs inputs) {  }
+  public void updateInputs(AlgaeEffectorIOInputs inputs) {
+    inputs.isAlgaeEffectorMotorConnected =
+        BaseStatusSignal.refreshAll(
+                algaeRemoverPosition,
+                algaeRemoverAppliedVolts,
+                algaeRemoverSupplyCurrent,
+                algaeRemoverTorqueCurrent,
+                algaeRemoverTempCelsius)
+            .isOK();
+    inputs.positionMechs =     algaeRemoverPosition.getValueAsDouble();
+    inputs.appliedVolts      = algaeRemoverAppliedVolts.getValueAsDouble();
+    inputs.supplyCurrentAmps = algaeRemoverSupplyCurrent.getValueAsDouble();
+    inputs.torqueCurrentAmps = algaeRemoverTorqueCurrent.getValueAsDouble();
+    inputs.tempCelsius       = algaeRemoverTempCelsius.getValueAsDouble();
+  }
 
   @Override
-  public void runVolts(double speed) {
+  public void runPercentOutput(double speed) {
     System.out.println(speed + " ");
-    algaeRemoverMotor.setVoltage(-speed);
-  }
-
-  @Override
-  public void runVoltsBck(double speed) {
-    algaeRemoverMotor.setVoltage(speed);
+    algaeRemoverMotor.setControl(new DutyCycleOut(speed));
   }
 }

@@ -28,9 +28,9 @@ public interface AlgaeRemoverIO {
 
   public default void updateInputs(AlgaeEffectorIOInputs inputs) {}
 
-  public default void runVolts(double Speed) {}
+  public default void runPercentOutput(double Speed) {}
 
-  public default void runVoltsBck(double Speed) {}
+  public default void runPercentOutputBck(double Speed) {}
 
   public default void runSparkMax(double Speed) {}
 

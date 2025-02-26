@@ -58,7 +58,6 @@ public class TrajectoryDriveCmd extends Command {
   private static final double CONVERGE_DISTANCE = 1.0;
   private static final double DIVERGE_TIME = 1.0;
   private final double ALLOWABLE_VISION_ADJUST = 9e-4; //TODO tune
-
   // Subsystems
   private CatzDrivetrain m_driveTrain;
   private CatzRobotTracker tracker = CatzRobotTracker.getInstance();
