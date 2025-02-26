@@ -3,13 +3,13 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 5.358504098360656,
-        "y": 5.193801229508197
+        "x": 5.286577868852459,
+        "y": 5.085911885245901
       },
       "prevControl": null,
       "nextControl": {
-        "x": 4.609118852459017,
-        "y": 6.046926229508197
+        "x": 4.537192622950819,
+        "y": 5.939036885245901
       },
       "isLocked": false,
       "linkedName": "Reef-I"
@@ -42,7 +42,7 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": -52.125016348901795
+    "rotation": -59.99999999999999
   },
   "reversed": false,
   "folder": "Top L4 ILK Paths",

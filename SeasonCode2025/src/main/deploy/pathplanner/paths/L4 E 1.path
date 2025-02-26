@@ -3,25 +3,25 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 7.564241803278687,
-        "y": 2.84421106557377
+        "x": 7.204610655737704,
+        "y": 2.978
       },
       "prevControl": null,
       "nextControl": {
-        "x": 6.564241803278694,
-        "y": 2.84421106557377
+        "x": 6.204610655737711,
+        "y": 2.978
       },
       "isLocked": false,
-      "linkedName": null
+      "linkedName": "Start4"
     },
     {
       "anchor": {
-        "x": 5.1067622950819676,
-        "y": 2.520543032786885
+        "x": 4.974897540983607,
+        "y": 2.820235655737705
       },
       "prevControl": {
-        "x": 6.66516393442623,
-        "y": 2.832223360655738
+        "x": 6.5332991803278695,
+        "y": 3.1319159836065578
       },
       "nextControl": null,
       "isLocked": false,
@@ -48,7 +48,7 @@
   "folder": "L4 E Paths",
   "idealStartingState": {
     "velocity": 0,
-    "rotation": 0.0
+    "rotation": 180.0
   },
   "useDefaultConstraints": true
 }

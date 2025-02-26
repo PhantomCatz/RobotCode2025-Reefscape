@@ -26,7 +26,6 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.FieldConstants.Reef;
@@ -261,7 +260,10 @@ public class TeleopPosSelector extends SubsystemBase {
     return AllianceFlipUtil.apply(new Pose2d(scoringPos, selectedAngle.plus(Rotation2d.k180deg)));
   }
 
-  public Pose2d calculateReefPose(Pair<Integer, LeftRight> pair) {
+  public Pose2d calculateReefPose(Pair<Integer, LeftRight> pair, boolean isNBA) {
+    if (isNBA) {
+      currentPathfindingPair = pair;
+    }
     if (pair == null) {
       return null;
     } else {
@@ -297,7 +299,7 @@ public class TeleopPosSelector extends SubsystemBase {
 
     currentDrivetrainCommand.cancel();
 
-    Pose2d goal = calculateReefPose(new Pair<Integer, LeftRight>(currentPathfindingPair.getFirst(), leftRight));
+    Pose2d goal = calculateReefPose(new Pair<Integer, LeftRight>(currentPathfindingPair.getFirst(), leftRight), true);
     Pose2d currentPose = tracker.getEstimatedPose();
 
     Translation2d goalPos = goal.getTranslation();
@@ -445,7 +447,7 @@ public class TeleopPosSelector extends SubsystemBase {
     return new Command() {
       @Override
       public void initialize() {
-        runPathfinding(calculateReefPose(pair.getFirst()));
+        runPathfinding(calculateReefPose(pair.getFirst(), false));
 
         // CommandScheduler.getInstance().registerComposedCommands(pathfindingCommand);
         // addRequirements(pathfindingCommand.getRequirements());
@@ -489,7 +491,6 @@ public class TeleopPosSelector extends SubsystemBase {
 //   public Command runToNearestBranch() {
 //     return new InstantCommand(() -> {
 //       Pair<Integer, LeftRight> newPathfindingPair = getClosestReefPos().getFirst();
-//       currentPathfindingPair = newPathfindingPair;
 //       currentRunningCommand.cancel();
 //       currentRunningCommand = getPathfindingCommand(calculateReefPose(newPathfindingPair));
 //       currentRunningCommand.schedule();

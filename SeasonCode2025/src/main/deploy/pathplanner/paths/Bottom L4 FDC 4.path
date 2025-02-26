@@ -3,13 +3,13 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 3.8960040983614794,
-        "y": 2.5205430327819456
+        "x": 3.9919057377049176,
+        "y": 2.820235655737705
       },
       "prevControl": null,
       "nextControl": {
-        "x": 2.3735655737704917,
-        "y": 1.669415983606557
+        "x": 2.46946721311393,
+        "y": 1.9691086065623162
       },
       "isLocked": false,
       "linkedName": "Reef-D"
@@ -48,7 +48,7 @@
   "folder": "Bottom L4 FDC Paths",
   "idealStartingState": {
     "velocity": 0,
-    "rotation": 57.847704858717634
+    "rotation": 59.99999999999999
   },
   "useDefaultConstraints": true
 }

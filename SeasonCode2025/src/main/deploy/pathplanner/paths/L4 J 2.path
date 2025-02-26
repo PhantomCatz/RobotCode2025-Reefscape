@@ -3,13 +3,13 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 5.070799180327868,
-        "y": 5.589395491803279
+        "x": 4.974897540983607,
+        "y": 5.229764344262294
       },
       "prevControl": null,
       "nextControl": {
-        "x": 4.070799180327875,
-        "y": 5.589395491803279
+        "x": 3.974897540983614,
+        "y": 5.229764344262294
       },
       "isLocked": false,
       "linkedName": "Reef-J"
@@ -42,7 +42,7 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": -52.125016348901795
+    "rotation": -59.99999999999999
   },
   "reversed": false,
   "folder": "L4 J Paths",

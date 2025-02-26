@@ -3,25 +3,25 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 7.648155737704917,
-        "y": 3.1079405737704913
+        "x": 7.204610655737704,
+        "y": 2.978
       },
       "prevControl": null,
       "nextControl": {
-        "x": 6.341495901639344,
-        "y": 2.9880635245901637
+        "x": 5.897950819672131,
+        "y": 2.8581229508196726
       },
       "isLocked": false,
-      "linkedName": null
+      "linkedName": "Start4"
     },
     {
       "anchor": {
-        "x": 5.5383196721311485,
-        "y": 2.7602971311475404
+        "x": 5.2985655737704915,
+        "y": 2.978
       },
       "prevControl": {
-        "x": 6.377459016393444,
-        "y": 2.8921618852459012
+        "x": 6.137704918032787,
+        "y": 3.109864754098361
       },
       "nextControl": null,
       "isLocked": false,
@@ -48,7 +48,7 @@
   "folder": "Bottom L4 FDC Paths",
   "idealStartingState": {
     "velocity": 0,
-    "rotation": 0.0
+    "rotation": 180.0
   },
   "useDefaultConstraints": true
 }

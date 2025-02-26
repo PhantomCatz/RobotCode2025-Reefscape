@@ -15,7 +15,6 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.PrintCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Autonomous.CatzAutonomous;
@@ -131,7 +130,7 @@ public class RobotContainer {
     }));
 
     //xboxDrv.b().onTrue(new InstantCommand(() -> selector.runToNearestBranch().schedule()).alongWith(new PrintCommand("NBA!!!!!!!!!!!!  !!!!!")));
-    xboxDrv.b().onTrue(selector.runToNearestBranch2(()->selector.calculateReefPose(selector.getClosestReefPos().getFirst())));
+    xboxDrv.b().onTrue(selector.runToNearestBranch2(()->selector.calculateReefPose(selector.getClosestReefPos().getFirst(), true)));
     xboxDrv.b().onFalse(selector.cancelCurrentDrivetrainCommand());
 
     // BALLS
@@ -210,7 +209,7 @@ public class RobotContainer {
     xboxAux.povUp().onTrue(Commands.runOnce(() -> {superstructure.setLevel(2); SmartDashboard.putNumber("Reef Level", 2);}));
     xboxAux.povLeft().onTrue(Commands.runOnce(() -> {superstructure.setLevel(3); SmartDashboard.putNumber("Reef Level", 3);}));
     xboxAux.povDown().onTrue(Commands.runOnce(() -> {superstructure.setLevel(4); SmartDashboard.putNumber("Reef Level", 4);}));
-    xboxAux.leftStick().onTrue(elevator.elevatorFullManual(()->xboxTest.getLeftY()));
+    xboxAux.leftStick().onTrue(elevator.elevatorFullManual(()->xboxAux.getLeftY()));
 
     xboxAux.button(7).onTrue(new InstantCommand(() -> selector.toggleLeftStation()));
     xboxAux.button(8).onTrue(new InstantCommand(() -> selector.toggleRightStation()));
