@@ -66,8 +66,8 @@ public class DriveConstants {
         case SN_TEST ->//, SN2 ->
             DriveConfig.builder()
                 .wheelRadius(Units.inchesToMeters(2.0)) // TODO make these repeated numbers into constants
-                .robotLengthX(Units.inchesToMeters(29.0))
-                .robotWidthY(Units.inchesToMeters(29.0))
+                .robotLengthX(Units.inchesToMeters(24.2)) // Wheel positions
+                .robotWidthY(Units.inchesToMeters(24.2))
                 .bumperWidthX(Units.inchesToMeters(32))
                 .bumperWidthY(Units.inchesToMeters(32))
                 .maxLinearVelocity(Units.feetToMeters(17))
@@ -77,13 +77,13 @@ public class DriveConstants {
                 .build();
         case SN1, SN2, SN1_2024 ->
         DriveConfig.builder()
-                .wheelRadius(Units.inchesToMeters(2.0)) // TODO make these repeated numbers into constants
-                .robotLengthX(Units.inchesToMeters(29.0))
-                .robotWidthY(Units.inchesToMeters(29.0))
+                .wheelRadius(Units.inchesToMeters(1.91363711)) // TODO make these repeated numbers into constants
+                .robotLengthX(Units.inchesToMeters(24.2))
+                .robotWidthY(Units.inchesToMeters(24.2))
                 .bumperWidthX(Units.inchesToMeters(32))
                 .bumperWidthY(Units.inchesToMeters(32))
-                .maxLinearVelocity(Units.feetToMeters(17))
-                .maxLinearAcceleration(Units.feetToMeters(120)) // TODO emperically calculate
+                .maxLinearVelocity(4)
+                .maxLinearAcceleration(3) // TODO emperically calculate
                 .maxAngularVelocity(12.0) // Radians
                 .maxAngularAcceleration(30) // Radians // TODO verify angle constraints
                 .build();
@@ -100,7 +100,7 @@ public class DriveConstants {
                 0.0,
                 0.50,
                 0.005,
-                Mk4iReductions.L2_PLUS.reduction,
+                Mk4iReductions.L2_16t.reduction,
                 Mk4iReductions.steer.reduction);
         case SN_TEST ->
             new ModuleGainsAndRatios(
@@ -111,7 +111,7 @@ public class DriveConstants {
                 0.0,
                 1.0,
                 0.0,
-                Mk4iReductions.L2_PLUS.reduction,
+                Mk4iReductions.L2_16t.reduction,
                 Mk4iReductions.steer.reduction);
         case SN1_2024 ->
             new ModuleGainsAndRatios(
@@ -157,10 +157,10 @@ public class DriveConstants {
         break;
 
         case SN1:
-            MODULE_CONFIGS[INDEX_FR] = new ModuleIDs(1, 2, 11, 0.8887, false);
-            MODULE_CONFIGS[INDEX_BR] = new ModuleIDs(3, 4, 12, -1.6421, false);
-            MODULE_CONFIGS[INDEX_BL] = new ModuleIDs(5, 6, 13, -0.882, false);
-            MODULE_CONFIGS[INDEX_FL] = new ModuleIDs(7, 8, 14, -0.7688, false);
+            MODULE_CONFIGS[INDEX_FR] = new ModuleIDs(1, 2, 11, 0.885986, false);
+            MODULE_CONFIGS[INDEX_BR] = new ModuleIDs(3, 4, 12, 0.8620605, false);
+            MODULE_CONFIGS[INDEX_BL] = new ModuleIDs(5, 6, 13, 0.13012695, false);
+            MODULE_CONFIGS[INDEX_FL] = new ModuleIDs(7, 8, 14, 0.22900, false);
         break;
 
         case SN_TEST:
@@ -186,7 +186,7 @@ public class DriveConstants {
   // -----------------------------------------------------------------------------------------------------------------------------
   public static final PathConstraints PATHFINDING_CONSTRAINTS = new PathConstraints( // 540 // 720
                                                                         2,
-                                                                        DRIVE_CONFIG.maxLinearAcceleration, // max vel causing messup
+                                                                        3, // max vel causing messup
                                                                         DRIVE_CONFIG.maxAngularVelocity,
                                                                         DRIVE_CONFIG.maxAngularAcceleration
                                                                 );

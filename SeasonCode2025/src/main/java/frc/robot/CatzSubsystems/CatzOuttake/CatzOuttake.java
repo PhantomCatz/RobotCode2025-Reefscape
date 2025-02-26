@@ -132,7 +132,7 @@ public class CatzOuttake extends SubsystemBase {
     if(inputs.bbreakFrntTriggered) {
       io.runMotor(0.0, 0.0);
       intakeIterationCoutner++;
-      if(intakeIterationCoutner >= 25) {
+      if(intakeIterationCoutner >= 20) {
         if(inputs.bbreakBackTriggered) {
           intakeIterationCoutner = 0;
           System.out.println("going to adj_fwd");
@@ -161,7 +161,7 @@ public class CatzOuttake extends SubsystemBase {
 
   private void case_adjustFwd() {
     io.runMotor(ADJ_SPD, ADJ_SPD);
-    if (!inputs.bbreakBackTriggered) {
+    if (!inputs.bbreakBackTriggered || inputs.bbreakFrntTriggered) {
       currentState = outtakeStates.STOP;
       CatzSuperstructure.setCurrentCoralState(CoralState.IN_OUTTAKE);
       System.out.println("stopping adjfwd");
@@ -193,6 +193,7 @@ public class CatzOuttake extends SubsystemBase {
 
   private void case_shootL4() {
     io.runMotor(OUTTAKE_L4, OUTTAKE_L4);
+    System.out.println("L4 outakingggggg");
     interationCounter++;
     if(!inputs.bbreakFrntTriggered && interationCounter >= 50) {
         interationCounter = 0;

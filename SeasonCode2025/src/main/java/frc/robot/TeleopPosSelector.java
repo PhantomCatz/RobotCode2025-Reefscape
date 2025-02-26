@@ -7,8 +7,6 @@
 
 package frc.robot;
 
-
-
 import java.util.Arrays;
 import java.util.Deque;
 import java.util.HashMap;
@@ -51,6 +49,7 @@ public class TeleopPosSelector extends SubsystemBase {
   private final String QUEUE = "PathQueue ";
   private final int NUM_QUEUE_DISPLAY = 4;
   private final double SELECTION_THRESHOLD = 0.3;
+  private final double ELEVATOR_RAISE_DIST = 1.0; // meters
 
   private CatzSuperstructure superstructure;
   private CatzDrivetrain drivetrain;
@@ -94,12 +93,12 @@ public class TeleopPosSelector extends SubsystemBase {
     SmartDashboard.putBoolean("Right Coral Station", rightCoralStation);
   }
 
-  public void toggleLeftStation(){
+  public void toggleLeftStation() {
     leftCoralStation = !leftCoralStation;
     SmartDashboard.putBoolean("Left Coral Station", leftCoralStation);
   }
 
-  public void toggleRightStation(){
+  public void toggleRightStation() {
     rightCoralStation = !rightCoralStation;
     SmartDashboard.putBoolean("Right Coral Station", rightCoralStation);
   }
@@ -107,7 +106,7 @@ public class TeleopPosSelector extends SubsystemBase {
   public Pose2d getBestCoralStation() {
     Pose2d right = FieldConstants.CoralStation.getRightStation();
     Pose2d left = FieldConstants.CoralStation.getLeftStation();
-    //TODO flip right and left when on red alliance
+    // TODO flip right and left when on red alliance
 
     if (!leftCoralStation && rightCoralStation) {
       return right;
@@ -140,10 +139,10 @@ public class TeleopPosSelector extends SubsystemBase {
     queuedPaths.addLast(new Pair(pose, reefLevel));
   }
 
-  public Pair<Pair<Integer, LeftRight>, Integer> pathQueuePeekFront(){
+  public Pair<Pair<Integer, LeftRight>, Integer> pathQueuePeekFront() {
     if (queuedPaths.peekFirst() != null) {
       return queuedPaths.peekFirst();
-    }else{
+    } else {
       return new Pair(null, 0);
     }
   }
@@ -151,7 +150,7 @@ public class TeleopPosSelector extends SubsystemBase {
   public Pair<Pair<Integer, LeftRight>, Integer> pathQueuePopFront() {
     if (queuedPaths.peekFirst() != null) {
       return queuedPaths.pollFirst();
-    }else{
+    } else {
       return new Pair(null, 0);
     }
   }
@@ -163,7 +162,6 @@ public class TeleopPosSelector extends SubsystemBase {
   public void pathQueueClear() {
     queuedPaths.clear();
   }
-
 
   public void updateCurrentlySelected() {
     Pair<Integer, LeftRight> currentlySelected = getXBoxReefPos();
@@ -239,7 +237,7 @@ public class TeleopPosSelector extends SubsystemBase {
     return new Pair(new Pair(closestSide, closestLeftRight), superstructure.getLevel());
   }
 
-  //TODO calculate this on comptime and store it in an array
+  // TODO calculate this on comptime and store it in an array
   public Pose2d calculateReefPose(int reefAngle, LeftRight leftRightPos) {
     Rotation2d selectedAngle = Rotation2d.fromRotations(reefAngle / 6.0);
 
@@ -247,9 +245,7 @@ public class TeleopPosSelector extends SubsystemBase {
     Translation2d unitLeftRight = unitRadius.rotateBy(Rotation2d.fromDegrees(90));
 
     Translation2d radius = unitRadius.times(Reef.reefOrthogonalRadius + Reef.scoringDistance);
-
-    double centerShift = Units.inchesToMeters(3);
-    radius = radius.plus(unitLeftRight.times(centerShift));
+    // radius = radius.plus(unitLeftRight.times(-Units.inchesToMeters(0)));
 
     Translation2d leftRight = unitLeftRight.times(leftRightPos.NUM * Reef.leftRightDistance);
     if (unitLeftRight.getY() < 0) {
@@ -323,9 +319,9 @@ public class TeleopPosSelector extends SubsystemBase {
   // }
 
   public Command runLeftRightCommand(LeftRight leftRight) {
-    return new InstantCommand(() -> {
-      if(currentPathfindingPair == null) return; //means it is in AQUA
-      currentRunningCommand.cancel();
+    if (currentPathfindingPair == null)
+      return new InstantCommand(); // means it is in AQUA
+    currentRunningCommand.cancel();
 
       Pose2d goal = calculateReefPose(new Pair<Integer, LeftRight>(currentPathfindingPair.getFirst(), leftRight));
       Pose2d currentPose = tracker.getEstimatedPose();
@@ -334,14 +330,52 @@ public class TeleopPosSelector extends SubsystemBase {
       Translation2d currentPos = currentPose.getTranslation();
       Translation2d direction = goalPos.minus(currentPos).div(2.0);
 
-      if (currentPose.getTranslation().getDistance(goal.getTranslation()) > Reef.leftRightDistance * 3
-          || direction.getNorm() <= 1e-3) {
+    if (currentPose.getTranslation().getDistance(goal.getTranslation()) > Reef.leftRightDistance * 3
+        || direction.getNorm() <= 1e-3) {
+      return new InstantCommand();
+    }
+
+    PathPlannerPath path = new PathPlannerPath(
+        Arrays.asList(new Waypoint[] {
+            new Waypoint(null, currentPos, currentPos.plus(direction)),
+            new Waypoint(goalPos.minus(direction), goalPos, null)
+        }),
+        DriveConstants.PATHFINDING_CONSTRAINTS,
+        null,
+        new GoalEndState(0, goal.getRotation()));
+
+    if (AllianceFlipUtil.shouldFlipToRed()) {
+      path = path.flipPath();
+    }
+
+    return new TrajectoryDriveCmd(path, drivetrain, true);
+  }
+
+  public Command runLeftRightShiftCommand(LeftRight leftRight) {
+    return new InstantCommand(() -> {
+      if (currentPathfindingPair == null)
         return;
+
+      Pose2d currentPose = tracker.getEstimatedPose();
+      Rotation2d angle = Rotation2d.fromRotations(currentPathfindingPair.getFirst()/6.0);
+      Translation2d direction = new Translation2d(angle.getCos(),angle.getSin());
+      direction = direction.rotateBy(Rotation2d.fromDegrees(90));
+
+      Translation2d currentPos = currentPose.getTranslation();
+
+      if(leftRight == LeftRight.LEFT){
+        direction = direction.times(-1);
       }
 
+      if(currentPathfindingPair.getFirst() == 5 ||currentPathfindingPair.getFirst() == 0 ||currentPathfindingPair.getFirst() == 0){
+        direction = direction.times(-1);
+      }
+
+      Translation2d goalPos = currentPos.plus(direction.times(10));
+
       PathConstraints PATHFINDING_CONSTRAINTS = new PathConstraints( // 540 // 720
-                                                                        1.5,
-                                                                        DriveConstants.DRIVE_CONFIG.maxAngularAcceleration(), // max vel causing messup
+                                                                        1.0,
+                                                                        DriveConstants.DRIVE_CONFIG.maxLinearAcceleration(), // max vel causing messup
                                                                         DriveConstants.DRIVE_CONFIG.maxAngularVelocity(),
                                                                         DriveConstants.DRIVE_CONFIG.maxAngularAcceleration()
                                                                 );
@@ -353,18 +387,17 @@ public class TeleopPosSelector extends SubsystemBase {
         }),
         PATHFINDING_CONSTRAINTS,
         null,
-        new GoalEndState(0, goal.getRotation()));
+        new GoalEndState(0, currentPos.getAngle()));
 
-        if (AllianceFlipUtil.shouldFlipToRed()) {
-          path = path.flipPath();
-        }
+      if (AllianceFlipUtil.shouldFlipToRed()) {
+        path = path.flipPath();
+      }
 
       currentRunningCommand = new TrajectoryDriveCmd(path, drivetrain, true);
       currentRunningCommand.schedule();
+
     });
-
   }
-
 
   public Command runAutoCommand() {
     return new InstantCommand(() -> {
@@ -397,7 +430,7 @@ public class TeleopPosSelector extends SubsystemBase {
         }
 
         @Override
-        public void end(boolean interrupted){
+        public void end(boolean interrupted) {
           currentRunningCommand.end(interrupted);
         }
 
@@ -406,69 +439,72 @@ public class TeleopPosSelector extends SubsystemBase {
     });
   }
 
-
-  private Command runNextCommand(){
+  private Command runNextCommand() {
     Pair<Pair<Integer, LeftRight>, Integer> pair = pathQueuePeekFront();
 
-    if(Robot.isSimulation()){
-      if(hasCoralSIM){
-        if(queuedPaths.isEmpty()) return new InstantCommand();
+    if (Robot.isSimulation()) {
+      if (hasCoralSIM) {
+        if (queuedPaths.isEmpty())
+          return new InstantCommand();
         return runReefScoreCommand(pair).andThen(new InstantCommand(() -> pathQueuePopFront()));
-      }else{
+      } else {
         return runCoralStationCommand(getBestCoralStation());
       }
-    }else{
-      if(CatzSuperstructure.getCurrentCoralState() == CoralState.IN_OUTTAKE){
-        if(queuedPaths.isEmpty()) return new InstantCommand();
+    } else {
+      if (CatzSuperstructure.getCurrentCoralState() == CoralState.IN_OUTTAKE) {
+        if (queuedPaths.isEmpty())
+          return new InstantCommand();
         return runReefScoreCommand(pair).andThen(new InstantCommand(() -> pathQueuePopFront()));
-      }else{
+      } else {
         return runCoralStationCommand(getBestCoralStation());
       }
     }
 
   }
 
-
   public Command runReefScoreCommand(Pair<Pair<Integer, LeftRight>, Integer> pair) {
     return new Command() {
       private Command pathfindingCommand;
 
       @Override
-      public void initialize(){
+      public void initialize() {
         pathfindingCommand = getPathfindingCommand(calculateReefPose(pair.getFirst()));
         pathfindingCommand.initialize();
-        currentPathfindingPair = null; //we don't want left right movement during AQUA
+        currentPathfindingPair = null; // we don't want left right movement during AQUA
       }
 
       @Override
-      public void execute(){
-        if(pathfindingCommand.isFinished()){
+      public void execute() {
+        if (((TrajectoryDriveCmd) pathfindingCommand).isWithinThreshold(ELEVATOR_RAISE_DIST)){
+          superstructure.setCurrentRobotAction(RobotAction.AIMING, pair.getSecond());
+        }
+        if (pathfindingCommand.isFinished()) {
           pathfindingCommand.end(false);
           superstructure.setCurrentRobotAction(RobotAction.OUTTAKE, pair.getSecond());
           hasCoralSIM = false;
-        }else{
+        } else {
           pathfindingCommand.execute();
         }
       }
 
       @Override
-      public boolean isFinished(){
-        if(Robot.isSimulation()){
+      public boolean isFinished() {
+        if (Robot.isSimulation()) {
           return !hasCoralSIM;
-        }else{
+        } else {
           return (CatzSuperstructure.getCurrentCoralState() == CoralState.NOT_IN_OUTTAKE);
         }
       }
 
       @Override
-      public void end(boolean interrupted){
+      public void end(boolean interrupted) {
         pathfindingCommand.end(interrupted);
       }
     };
   }
 
-  public Command runToNearestBranch(){
-    return new InstantCommand(() ->{
+  public Command runToNearestBranch() {
+    return new InstantCommand(() -> {
       Pair<Integer, LeftRight> newPathfindingPair = getClosestReefPos().getFirst();
       currentPathfindingPair = newPathfindingPair;
       currentRunningCommand.cancel();
@@ -488,46 +524,48 @@ public class TeleopPosSelector extends SubsystemBase {
   private Command runCoralStationCommand(Pose2d goalPose) {
     return new Command() {
       private Command pathfindingCommand;
+
       @Override
-      public void initialize(){
+      public void initialize() {
         pathfindingCommand = getPathfindingCommand(goalPose);
         pathfindingCommand.initialize();
       }
 
       @Override
-      public void execute(){
+      public void execute() {
         Translation2d robotPos = tracker.getEstimatedPose().getTranslation();
 
-        if(pathfindingCommand.isFinished()){
+        if (pathfindingCommand.isFinished()) {
           pathfindingCommand.end(false);
           hasCoralSIM = true;
-        }else{
+        } else {
           pathfindingCommand.execute();
         }
 
-        //if you are within 2 meters of coral station and don't already have intake on
-        if(robotPos.getDistance(goalPose.getTranslation()) < 2.0 && !superstructure.getCurrentRobotAction().equals(RobotAction.INTAKE)){
+        // if you are within 2 meters of coral station and don't already have intake on
+        if (robotPos.getDistance(goalPose.getTranslation()) < 2.0
+            && !superstructure.getCurrentRobotAction().equals(RobotAction.INTAKE)) {
           superstructure.setCurrentRobotAction(RobotAction.INTAKE);
         }
       }
 
       @Override
-      public boolean isFinished(){
-        if(Robot.isSimulation()){
+      public boolean isFinished() {
+        if (Robot.isSimulation()) {
           return hasCoralSIM;
-        }else{
+        } else {
           return (CatzSuperstructure.getCurrentCoralState() == CoralState.IN_OUTTAKE);
         }
       }
 
       @Override
-      public void end(boolean interrupted){
+      public void end(boolean interrupted) {
         pathfindingCommand.end(interrupted);
       }
     };
   }
 
-  public Command cancelCurrentRunningCommand(){
+  public Command cancelCurrentRunningCommand() {
     return new InstantCommand(() -> {
       currentRunningCommand.cancel();
     });

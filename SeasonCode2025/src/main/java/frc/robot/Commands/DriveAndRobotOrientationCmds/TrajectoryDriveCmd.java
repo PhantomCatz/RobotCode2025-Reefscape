@@ -56,8 +56,8 @@ public class TrajectoryDriveCmd extends Command {
   public static final double ALLOWABLE_OMEGA_ERROR = Units.degreesToRadians(5.0);
   private static final double TIMEOUT_SCALAR = 5;
   private static final double CONVERGE_DISTANCE = 3.0;
-  private static final double DIVERGE_TIME = 0.5;
-  private final double ALLOWABLE_VISION_ADJUST = 5e-4; //TODO tune
+  private static final double DIVERGE_TIME = 1.0;
+  private final double ALLOWABLE_VISION_ADJUST = 3e-4; //TODO tune
 
   // Subsystems
   private CatzDrivetrain m_driveTrain;
@@ -229,9 +229,10 @@ public class TrajectoryDriveCmd extends Command {
       // construct chassisspeeds
       adjustedSpeeds = hocontroller.calculate(currentPose, state, goal.pose.getRotation());
 
-      adjustedSpeeds = applyCusp(adjustedSpeeds, currentTime * DIVERGE_TIME);
+      // Cusps x/(1+x)
+      adjustedSpeeds = adjustedSpeeds.times(DIVERGE_TIME * currentTime / (DIVERGE_TIME * currentTime + 1));
       if(autoalign){
-        adjustedSpeeds = applyCusp(adjustedSpeeds, translationError * CONVERGE_DISTANCE);
+        adjustedSpeeds = adjustedSpeeds.times(CONVERGE_DISTANCE * translationError / (CONVERGE_DISTANCE * translationError + 1));
       }
       if(Double.isNaN(adjustedSpeeds.vxMetersPerSecond) || Double.isNaN(adjustedSpeeds.vyMetersPerSecond) || Double.isNaN(adjustedSpeeds.omegaRadiansPerSecond)){
         adjustedSpeeds = new ChassisSpeeds();
@@ -309,10 +310,10 @@ public class TrajectoryDriveCmd extends Command {
       return true;
     }
 
-    return isAtTarget();
+    return isWithinThreshold(ALLOWABLE_POSE_ERROR);
   }
 
-  public boolean isAtTarget() {
+  public boolean isWithinThreshold(double poseError) {
     // Check if the robot is near goal (and if robot velocity is zero if goal velocity is zero)
     PathPlannerTrajectoryState endState = trajectory.getEndState();
 
@@ -345,9 +346,9 @@ public class TrajectoryDriveCmd extends Command {
         (desiredMPS == 0 || (currentMPS < ALLOWABLE_VEL_ERROR && currentRPS < ALLOWABLE_OMEGA_ERROR));
     } else {
       return
-        xError < ALLOWABLE_POSE_ERROR &&
-        yError < ALLOWABLE_POSE_ERROR &&
-        rotationError < ALLOWABLE_ROTATION_ERROR &&
+        xError < poseError &&
+        yError < poseError &&
+        rotationError < ALLOWABLE_OMEGA_ERROR &&
         (desiredMPS == 0 || (currentMPS < ALLOWABLE_VEL_ERROR && currentRPS < ALLOWABLE_OMEGA_ERROR));
     }
   }
