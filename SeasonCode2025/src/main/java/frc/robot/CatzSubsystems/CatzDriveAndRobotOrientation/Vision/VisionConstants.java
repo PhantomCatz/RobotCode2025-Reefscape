@@ -50,8 +50,8 @@ public class VisionConstants {
   // (Adjust to trust some cameras more than others)
   public static double[] cameraStdDevFactors =
       new double[] {
-        0.7, // Camera 0
-        0.7 // Camera 1
+        0.05, // Camera 0
+        0.05 // Camera 1
       };
 
   public static final boolean USE_MEGATAG1 = true; // megatag 1 3d solve allows robot to fly

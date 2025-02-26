@@ -56,7 +56,8 @@ public class TrajectoryDriveCmd extends Command {
   public static final double ALLOWABLE_OMEGA_ERROR = Units.degreesToRadians(5.0);
   private static final double TIMEOUT_SCALAR = 5;
   private static final double CONVERGE_DISTANCE = 3.0;
-  private final double ALLOWABLE_VISION_ADJUST = 5e-4; //TODO tune
+  private static final double DIVERGE_TIME = 1.0;
+  private final double ALLOWABLE_VISION_ADJUST = 3e-4; //TODO tune
 
   // Subsystems
   private CatzDrivetrain m_driveTrain;
@@ -82,10 +83,14 @@ public class TrajectoryDriveCmd extends Command {
   // Swerve Drive Variables
   private ChassisSpeeds adjustedSpeeds = new ChassisSpeeds();
 
-
   // Event Command variables
   private final EventScheduler eventScheduler;
   private boolean isEventCommandRunning = false;
+
+  private ChassisSpeeds applyCusp(ChassisSpeeds speeds, double distance){
+    // graph 1 / (1+x) on desmos
+    return speeds.times(distance / (1 + distance));
+  }
 
   // ---------------------------------------------------------------------------------------------
   //
@@ -178,8 +183,8 @@ public class TrajectoryDriveCmd extends Command {
     PathPlannerLogging.logActivePath(usePath);
     PPLibTelemetry.setCurrentPath(usePath);
 
-    this.timer.reset();
-    this.timer.start();
+    timer.reset();
+    timer.start();
   } // end of initialize()
 
   // ---------------------------------------------------------------------------------------------
@@ -190,19 +195,17 @@ public class TrajectoryDriveCmd extends Command {
   @Override
   public void execute() {
     // Collect instananous variables
-    double currentTime = this.timer.get();
+    double currentTime = timer.get();
     Pose2d currentPose              = tracker.getEstimatedPose();
     ChassisSpeeds currentSpeeds     = DriveConstants.SWERVE_KINEMATICS.toChassisSpeeds(m_driveTrain.getModuleStates());
     double currentVel               = Math.hypot(currentSpeeds.vxMetersPerSecond, currentSpeeds.vyMetersPerSecond);
-
 
     // Simple PID aim
     if(isPIDAimEnabled) {
       double pidSpeedX = XadjustController.calculate(currentPose.getX(), goalPIDAimPose.getX());
       double pidSpeedY = YadjustController.calculate(currentPose.getY(), goalPIDAimPose.getY());
       double thethaSpeed = thethaController.calculate(currentPose.getRotation().getDegrees(), goalPIDAimPose.getRotation().getDegrees());
-      System.out.println(thethaSpeed);
-      PIDaimSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(pidSpeedX, pidSpeedY, thethaSpeed, tracker.getEstimatedPose().getRotation());
+      PIDaimSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(pidSpeedX, pidSpeedY, thethaSpeed, currentPose.getRotation());
       adjustedSpeeds = PIDaimSpeeds;
 
     // Trajectory Aim
@@ -226,17 +229,15 @@ public class TrajectoryDriveCmd extends Command {
       // construct chassisspeeds
       adjustedSpeeds = hocontroller.calculate(currentPose, state, goal.pose.getRotation());
 
-      if(autoalign){ //TODO is this causing modules to spin erratically?
-        // Graph x/(1+x) on desmos
-        // Smaller speed for closer distances
-        double x = CONVERGE_DISTANCE * translationError;
-        adjustedSpeeds = adjustedSpeeds.times(x / (x+1));
+      // Cusps x/(1+x)
+      adjustedSpeeds = adjustedSpeeds.times(DIVERGE_TIME * currentTime / (DIVERGE_TIME * currentTime + 1));
+      if(autoalign){
+        adjustedSpeeds = adjustedSpeeds.times(CONVERGE_DISTANCE * translationError / (CONVERGE_DISTANCE * translationError + 1));
       }
       if(Double.isNaN(adjustedSpeeds.vxMetersPerSecond) || Double.isNaN(adjustedSpeeds.vyMetersPerSecond) || Double.isNaN(adjustedSpeeds.omegaRadiansPerSecond)){
-        // If the target and current positions are the same, bad
         adjustedSpeeds = new ChassisSpeeds();
       }
-
+      
       // Logging
       Logger.recordOutput("CatzRobotTracker/Desired Auto Pose", goal.pose);
 
@@ -299,7 +300,7 @@ public class TrajectoryDriveCmd extends Command {
     // if (autoalign){
     //   return false;
     // }
-    System.out.println("vision: " +tracker.getDEstimatedPose().getTranslation().getNorm() );
+    // System.out.println("vision: " +tracker.getDEstimatedPose().getTranslation().getNorm() );
     if (autoalign && tracker.getDEstimatedPose().getTranslation().getNorm() > ALLOWABLE_VISION_ADJUST){
       return false;
     }
@@ -309,10 +310,10 @@ public class TrajectoryDriveCmd extends Command {
       return true;
     }
 
-    return isAtTarget();
+    return isWithinThreshold(ALLOWABLE_POSE_ERROR);
   }
 
-  public boolean isAtTarget() {
+  public boolean isWithinThreshold(double poseError) {
     // Check if the robot is near goal (and if robot velocity is zero if goal velocity is zero)
     PathPlannerTrajectoryState endState = trajectory.getEndState();
 
@@ -345,9 +346,9 @@ public class TrajectoryDriveCmd extends Command {
         (desiredMPS == 0 || (currentMPS < ALLOWABLE_VEL_ERROR && currentRPS < ALLOWABLE_OMEGA_ERROR));
     } else {
       return
-        xError < ALLOWABLE_POSE_ERROR_PID &&
-        yError < ALLOWABLE_POSE_ERROR_PID &&
-        rotationError < ALLOWABLE_ROTATION_ERROR_PID &&
+        xError < poseError &&
+        yError < poseError &&
+        rotationError < ALLOWABLE_OMEGA_ERROR &&
         (desiredMPS == 0 || (currentMPS < ALLOWABLE_VEL_ERROR && currentRPS < ALLOWABLE_OMEGA_ERROR));
     }
   }

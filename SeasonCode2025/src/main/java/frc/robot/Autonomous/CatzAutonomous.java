@@ -151,6 +151,12 @@ public class CatzAutonomous extends SubsystemBase {
     chooseYourOwnScoringTOP.put("Do Nothing", new PrintCommand("Skipped"));
     dashboardCmds.put("TopScoringChooser", new DashboardCmd("Score Where?", chooseYourOwnScoringTOP));
 
+    HashMap<String, Command> L1orL4 = new HashMap<>();
+    L1orL4.put("Score L1", NamedCommands.getCommand("L1Ccoral"));
+    L1orL4.put("Score L2", NamedCommands.getCommand("L1Ccoral"));
+    L1orL4.put("Score L3", NamedCommands.getCommand("L1Ccoral"));
+    L1orL4.put("Score L4", NamedCommands.getCommand("L4Coral"));
+    dashboardCmds.put("CoralScoringChooser", new DashboardCmd("Score Where?", L1orL4));
 
     for (String question : dashboardCmds.keySet()) {
       NamedCommands.registerCommand(question, dashboardCmds.get(question));

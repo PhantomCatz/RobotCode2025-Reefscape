@@ -13,25 +13,7 @@
         {
           "type": "named",
           "data": {
-            "name": "TopAlgae"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "L4Coral"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "L4 E 2"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "IntakeCoralStation"
+            "name": "L1Coral"
           }
         }
       ]
