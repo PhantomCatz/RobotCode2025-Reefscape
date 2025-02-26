@@ -83,10 +83,14 @@ public class TrajectoryDriveCmd extends Command {
   // Swerve Drive Variables
   private ChassisSpeeds adjustedSpeeds = new ChassisSpeeds();
 
-
   // Event Command variables
   private final EventScheduler eventScheduler;
   private boolean isEventCommandRunning = false;
+
+  private ChassisSpeeds applyCusp(ChassisSpeeds speeds, double distance){
+    // graph 1 / (1+x) on desmos
+    return speeds.times(distance / (1 + distance));
+  }
 
   // ---------------------------------------------------------------------------------------------
   //
@@ -179,8 +183,8 @@ public class TrajectoryDriveCmd extends Command {
     PathPlannerLogging.logActivePath(usePath);
     PPLibTelemetry.setCurrentPath(usePath);
 
-    this.timer.reset();
-    this.timer.start();
+    timer.reset();
+    timer.start();
   } // end of initialize()
 
   // ---------------------------------------------------------------------------------------------
@@ -191,19 +195,17 @@ public class TrajectoryDriveCmd extends Command {
   @Override
   public void execute() {
     // Collect instananous variables
-    double currentTime = this.timer.get();
+    double currentTime = timer.get();
     Pose2d currentPose              = tracker.getEstimatedPose();
     ChassisSpeeds currentSpeeds     = DriveConstants.SWERVE_KINEMATICS.toChassisSpeeds(m_driveTrain.getModuleStates());
     double currentVel               = Math.hypot(currentSpeeds.vxMetersPerSecond, currentSpeeds.vyMetersPerSecond);
-
 
     // Simple PID aim
     if(isPIDAimEnabled) {
       double pidSpeedX = XadjustController.calculate(currentPose.getX(), goalPIDAimPose.getX());
       double pidSpeedY = YadjustController.calculate(currentPose.getY(), goalPIDAimPose.getY());
       double thethaSpeed = thethaController.calculate(currentPose.getRotation().getDegrees(), goalPIDAimPose.getRotation().getDegrees());
-      System.out.println(thethaSpeed);
-      PIDaimSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(pidSpeedX, pidSpeedY, thethaSpeed, tracker.getEstimatedPose().getRotation());
+      PIDaimSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(pidSpeedX, pidSpeedY, thethaSpeed, currentPose.getRotation());
       adjustedSpeeds = PIDaimSpeeds;
 
     // Trajectory Aim
@@ -235,7 +237,7 @@ public class TrajectoryDriveCmd extends Command {
       if(Double.isNaN(adjustedSpeeds.vxMetersPerSecond) || Double.isNaN(adjustedSpeeds.vyMetersPerSecond) || Double.isNaN(adjustedSpeeds.omegaRadiansPerSecond)){
         adjustedSpeeds = new ChassisSpeeds();
       }
-
+      
       // Logging
       Logger.recordOutput("CatzRobotTracker/Desired Auto Pose", goal.pose);
 
@@ -298,7 +300,7 @@ public class TrajectoryDriveCmd extends Command {
     // if (autoalign){
     //   return false;
     // }
-    System.out.println("vision: " +tracker.getDEstimatedPose().getTranslation().getNorm() );
+    // System.out.println("vision: " +tracker.getDEstimatedPose().getTranslation().getNorm() );
     if (autoalign && tracker.getDEstimatedPose().getTranslation().getNorm() > ALLOWABLE_VISION_ADJUST){
       return false;
     }

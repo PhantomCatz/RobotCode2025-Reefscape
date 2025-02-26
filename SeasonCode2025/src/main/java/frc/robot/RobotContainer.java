@@ -146,7 +146,7 @@ public class RobotContainer {
 
     // Left Right
     xboxDrv.leftBumper().onTrue(new InstantCommand(() -> selector.runLeftRightCommand(LeftRight.LEFT).schedule()));
-    xboxDrv.rightBumper().onTrue(new InstantCommand(() -> selector.runLeftRightCommand(LeftRight.RIGHT).schedule()));
+    xboxDrv.leftBumper().onFalse(selector.cancelCurrentRunningCommand());
 
     xboxDrv.leftTrigger().onTrue(new InstantCommand(() -> selector.runLeftRightShiftCommand(LeftRight.LEFT).schedule()));
     xboxDrv.leftTrigger().onFalse(selector.cancelCurrentRunningCommand());

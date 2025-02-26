@@ -21,6 +21,7 @@ import edu.wpi.first.math.Pair;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
@@ -285,17 +286,49 @@ public class TeleopPosSelector extends SubsystemBase {
     }
   }
 
+  // public Command runLeftRightCommand(LeftRight leftRight) {
+  //   if(currentPathfindingPair == null) return new InstantCommand(); //means it is in AQUA
+  //   currentRunningCommand.cancel();
+
+  //   Pose2d goal = calculateReefPose(new Pair<Integer, LeftRight>(currentPathfindingPair.getFirst(), leftRight));
+  //   Pose2d currentPose = tracker.getEstimatedPose();
+
+  //   Translation2d goalPos = goal.getTranslation();
+  //   Translation2d currentPos = currentPose.getTranslation();
+  //   Translation2d direction = goalPos.minus(currentPos).div(2.0);
+
+  //   if (currentPose.getTranslation().getDistance(goal.getTranslation()) > Reef.leftRightDistance * 3
+  //       || direction.getNorm() <= 1e-3) {
+  //     return new InstantCommand();
+  //   }
+
+  //   PathPlannerPath path = new PathPlannerPath(
+  //     Arrays.asList(new Waypoint[] {
+  //         new Waypoint(null, currentPos, currentPos.plus(direction)),
+  //         new Waypoint(goalPos.minus(direction), goalPos, null)
+  //     }),
+  //     DriveConstants.PATHFINDING_CONSTRAINTS,
+  //     null,
+  //     new GoalEndState(0, goal.getRotation()));
+
+  //     if (AllianceFlipUtil.shouldFlipToRed()) {
+  //       path = path.flipPath();
+  //     }
+
+  //   return new TrajectoryDriveCmd(path, drivetrain, true);
+  // }
+
   public Command runLeftRightCommand(LeftRight leftRight) {
     if (currentPathfindingPair == null)
       return new InstantCommand(); // means it is in AQUA
     currentRunningCommand.cancel();
 
-    Pose2d goal = calculateReefPose(new Pair<Integer, LeftRight>(currentPathfindingPair.getFirst(), leftRight));
-    Pose2d currentPose = tracker.getEstimatedPose();
+      Pose2d goal = calculateReefPose(new Pair<Integer, LeftRight>(currentPathfindingPair.getFirst(), leftRight));
+      Pose2d currentPose = tracker.getEstimatedPose();
 
-    Translation2d goalPos = goal.getTranslation();
-    Translation2d currentPos = currentPose.getTranslation();
-    Translation2d direction = goalPos.minus(currentPos).div(2.0);
+      Translation2d goalPos = goal.getTranslation();
+      Translation2d currentPos = currentPose.getTranslation();
+      Translation2d direction = goalPos.minus(currentPos).div(2.0);
 
     if (currentPose.getTranslation().getDistance(goal.getTranslation()) > Reef.leftRightDistance * 3
         || direction.getNorm() <= 1e-3) {
