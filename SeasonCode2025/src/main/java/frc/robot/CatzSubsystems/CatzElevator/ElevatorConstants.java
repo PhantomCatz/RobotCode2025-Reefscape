@@ -56,6 +56,7 @@ public class ElevatorConstants {
     public static final boolean IS_LEADER_INVERTED = false;
     public static final Translation2d elevatorOrigin = new Translation2d(-0.238, 0.298);
     public static final double MANUAL_SCALE = 0.5;
+
     // Initial PIDF and motion magic assignment
     public static final Gains gains =
         switch (CatzConstants.getRobotType()) {

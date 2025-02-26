@@ -16,16 +16,16 @@
     },
     {
       "anchor": {
-        "x": 3.9799180327868857,
-        "y": 5.229764344262294
+        "x": 3.692213114754098,
+        "y": 5.085911885245901
       },
       "prevControl": {
-        "x": 3.9067131147540994,
-        "y": 5.497569672131147
+        "x": 3.6190081967213117,
+        "y": 5.353717213114754
       },
       "nextControl": {
-        "x": 4.060820120527673,
-        "y": 4.933800483979125
+        "x": 3.7731152024948855,
+        "y": 4.789948024962732
       },
       "isLocked": false,
       "linkedName": "Coral-K"
@@ -90,13 +90,13 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": -52.125016348901795
+    "rotation": -59.99999999999999
   },
   "reversed": false,
   "folder": "Chooser Paths",
   "idealStartingState": {
     "velocity": 0,
-    "rotation": -52.125016348901795
+    "rotation": -59.99999999999999
   },
   "useDefaultConstraints": true
 }

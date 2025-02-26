@@ -218,7 +218,7 @@ public class CatzRobotTracker {
 
     // Recalculate current estimate by applying scaled transform to old estimate
     // then replaying odometry data
-    scaledTransform = new Transform2d(scaledTransform.getTranslation(), new Rotation2d());
+    scaledTransform = new Transform2d(scaledTransform.getTranslation(), new Rotation2d()); //remove rotation input
     lastEstimatedPose = estimatedPose;
     estimatedPose = estimateAtTime.plus(scaledTransform).plus(sampleToOdometryTransform);
 

@@ -110,7 +110,7 @@ public class CatzVision extends SubsystemBase {
             ((observation.tagCount() == 0) // Must have at least one tag
                 // || (observation.tagCount() == 1  && observation.ambiguity() > maxAmbiguity) //
                 // Cannot be high ambiguity // TODO add back in
-                || inputs[cameraIndex].ta < 2 //TODO add scalar for distance to the ta for standard devs
+                // || inputs[cameraIndex].ta < 2 //TODO add scalar for distance to the ta for standard devs
                 || (Math.abs(observation.pose().getZ())
                     >= maxZError) // Must have realistic Z coordinate
                 // Must be within the field boundaries
@@ -136,8 +136,8 @@ public class CatzVision extends SubsystemBase {
         //------------------------------------------------------------------------------------------------------------------------------------
         // Calculate standard deviations
         //------------------------------------------------------------------------------------------------------------------------------------
-        double stdDevFactor = Math.pow(observation.averageTagDistance(), 2.0) / observation.tagCount();
-        double linearStdDev = LINEAR_STD_DEV_BASELINE * stdDevFactor;
+        double stdDevFactor = Math.pow(observation.averageTagDistance(), 2.0) / observation.tagCount(); //TODO tune
+      double linearStdDev = LINEAR_STD_DEV_BASELINE * stdDevFactor;
         double angularStdDev = ANGULAR_STD_DEV_BASELINE * stdDevFactor;
         if (observation.type() == PoseObservationType.MEGATAG_2) {
           linearStdDev *= LINEAR_STD_DEV_MEGATAG2_SCALE_FACTOR;

@@ -165,7 +165,7 @@ public class CatzDrivetrain extends SubsystemBase {
     CatzRobotTracker.getInstance().addOdometryObservation(observation);
 
     // Update current velocities use gyro when possible
-    Twist2d robotRelativeVelocity = getTwist2dSpeeds();
+  Twist2d robotRelativeVelocity = getTwist2dSpeeds();
     robotRelativeVelocity.dtheta =
         gyroInputs.gyroConnected
             ? Math.toRadians(gyroInputs.gyroYawVel)
@@ -348,8 +348,7 @@ public class CatzDrivetrain extends SubsystemBase {
    * @return The Heading of the robot dependant on where it's been instantiated
    */
   private double getGyroHeading() {
-    return -gyroInputs
-        .gyroAngle; // Negative on Forte due to instalation, gyro's left is not robot left
+    return gyroInputs.gyroAngle; // Negative on Forte due to instalation, gyro's left is not robot left
   }
 
   /** Get the Rotation2d object based on the gyro angle */

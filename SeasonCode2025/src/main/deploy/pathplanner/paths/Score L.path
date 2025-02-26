@@ -16,16 +16,16 @@
     },
     {
       "anchor": {
-        "x": 3.7161885245901636,
-        "y": 5.097899590163934
+        "x": 3.692213114754098,
+        "y": 5.085911885245901
       },
       "prevControl": {
-        "x": 3.5211885245901633,
-        "y": 5.322149590163933
+        "x": 3.4972131147540977,
+        "y": 5.3101618852459005
       },
       "nextControl": {
-        "x": 3.9175186059910083,
-        "y": 4.866369996552964
+        "x": 3.8935431961549427,
+        "y": 4.8543822916349315
       },
       "isLocked": false,
       "linkedName": "Reef-L"
@@ -90,13 +90,13 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": -52.125016348901795
+    "rotation": -59.99999999999999
   },
   "reversed": false,
   "folder": "Chooser Paths",
   "idealStartingState": {
     "velocity": 0,
-    "rotation": -52.125016348901795
+    "rotation": -59.99999999999999
   },
   "useDefaultConstraints": true
 }
