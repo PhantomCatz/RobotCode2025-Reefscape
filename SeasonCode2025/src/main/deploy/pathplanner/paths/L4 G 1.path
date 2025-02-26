@@ -33,16 +33,22 @@
   "pointTowardsZones": [],
   "eventMarkers": [
     {
-      "name": "L4Coral",
-      "waypointRelativePos": 0,
+      "name": "L4CoralMarker",
+      "waypointRelativePos": 0.7507122507122468,
       "endWaypointRelativePos": null,
-      "command": null
-    },
-    {
-      "name": "",
-      "waypointRelativePos": 0,
-      "endWaypointRelativePos": null,
-      "command": null
+      "command": {
+        "type": "sequential",
+        "data": {
+          "commands": [
+            {
+              "type": "named",
+              "data": {
+                "name": "L4Coral"
+              }
+            }
+          ]
+        }
+      }
     }
   ],
   "globalConstraints": {

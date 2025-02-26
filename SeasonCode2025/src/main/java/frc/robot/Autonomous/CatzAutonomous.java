@@ -72,6 +72,55 @@ public class CatzAutonomous extends SubsystemBase {
     // ORDER MATTERS! Register named commands first, AutoBuilder second, Trajectories and add autos
     // to dashboard last
     // ------------------------------------------------------------------------------------------------------------
+    NamedCommands.registerCommand("Stow", CatzStateCommands.stow(container));
+    NamedCommands.registerCommand("IntakeCoralGround", CatzStateCommands.intakeCoralGround(container));
+    NamedCommands.registerCommand("IntakeCoralStation", CatzStateCommands.intakeCoralStation(container));
+    NamedCommands.registerCommand("IntakeAlgae", CatzStateCommands.intakeAlgae(container));
+    NamedCommands.registerCommand("L1Coral", CatzStateCommands.L1Coral(container));
+    NamedCommands.registerCommand("L2Coral", CatzStateCommands.L2Coral(container));
+    NamedCommands.registerCommand("L3Coral", CatzStateCommands.L3Coral(container));
+    NamedCommands.registerCommand("L4Coral", CatzStateCommands.L4Coral(container));
+    NamedCommands.registerCommand("Processor", CatzStateCommands.processor(container));
+    NamedCommands.registerCommand("BotAlgae", CatzStateCommands.intakeCoralGround(container));
+    NamedCommands.registerCommand("TopAlgae", CatzStateCommands.topAlgae(container));
+    NamedCommands.registerCommand("Climb", CatzStateCommands.climb(container));
+    NamedCommands.registerCommand("RestPose", Commands.runOnce(()->tracker.resetPose(new Pose2d())));
+    NamedCommands.registerCommand("WheelCharacterization", new WheelRadiusCharacterization(m_container.getCatzDrivetrain(), Direction.CLOCKWISE));
+
+    //----------------------------------------------------------------------------------------------------
+    //
+    //----------------------------------------------------------------------------------------------------
+    HashMap<String, Command> chooseYourOwnScoringBOT = new HashMap<>();
+    chooseYourOwnScoringBOT.put("Score A", NamedCommands.getCommand("Score L"));
+    chooseYourOwnScoringBOT.put("Score B", NamedCommands.getCommand("CollectGP1"));
+    chooseYourOwnScoringBOT.put("Score C", NamedCommands.getCommand("CollectGP1"));
+    chooseYourOwnScoringBOT.put("Score D", NamedCommands.getCommand("CollectGP1"));
+    chooseYourOwnScoringBOT.put("Score E", NamedCommands.getCommand("CollectGP1"));
+    chooseYourOwnScoringBOT.put("Score F", NamedCommands.getCommand("CollectGP1"));
+    chooseYourOwnScoringBOT.put("Do Nothing", new PrintCommand("Skipped"));
+    dashboardCmds.put("BotScoringChooser", new DashboardCmd("Score Where?", chooseYourOwnScoringBOT));
+
+    HashMap<String, Command> chooseYourOwnScoringTOP = new HashMap<>();
+    chooseYourOwnScoringTOP.put("Score A", NamedCommands.getCommand("Score A"));
+    chooseYourOwnScoringTOP.put("Score H", NamedCommands.getCommand("Score H"));
+    chooseYourOwnScoringTOP.put("Score I", NamedCommands.getCommand("Score I"));
+    chooseYourOwnScoringTOP.put("Score J", NamedCommands.getCommand("Score J"));
+    chooseYourOwnScoringTOP.put("Score K", NamedCommands.getCommand("Score K"));
+    chooseYourOwnScoringTOP.put("Score L", NamedCommands.getCommand("Score L"));
+    chooseYourOwnScoringTOP.put("Do Nothing", new PrintCommand("Skipped"));
+    dashboardCmds.put("TopScoringChooser", new DashboardCmd("Score Where?", chooseYourOwnScoringTOP));
+
+    HashMap<String, Command> L1orL4 = new HashMap<>();
+    L1orL4.put("Score L1", NamedCommands.getCommand("L1Coral"));
+    L1orL4.put("Score L2", NamedCommands.getCommand("L2Coral"));
+    L1orL4.put("Score L3", NamedCommands.getCommand("L3Coral"));
+    L1orL4.put("Score L4", NamedCommands.getCommand("L4Coral"));
+    dashboardCmds.put("CoralScoringChooser", new DashboardCmd("Score Where?", L1orL4));
+
+    for (String question : dashboardCmds.keySet()) {
+      NamedCommands.registerCommand(question, dashboardCmds.get(question));
+    }
+
 
     BooleanSupplier shouldFlip = () -> AllianceFlipUtil.shouldFlipToRed();
     AutoBuilder.configure(
@@ -113,54 +162,6 @@ public class CatzAutonomous extends SubsystemBase {
       }
     }
 
-    NamedCommands.registerCommand("Stow", CatzStateCommands.stow(container));
-    NamedCommands.registerCommand("IntakeCoralGround", CatzStateCommands.intakeCoralGround(container));
-    NamedCommands.registerCommand("IntakeCoralStation", CatzStateCommands.intakeCoralStation(container));
-    NamedCommands.registerCommand("IntakeAlgae", CatzStateCommands.intakeAlgae(container));
-    NamedCommands.registerCommand("L1Coral", CatzStateCommands.L1Coral(container));
-    NamedCommands.registerCommand("L2Coral", CatzStateCommands.L2Coral(container));
-    NamedCommands.registerCommand("L3Coral", CatzStateCommands.L3Coral(container));
-    NamedCommands.registerCommand("L4Coral", CatzStateCommands.L4Coral(container));
-    NamedCommands.registerCommand("Processor", CatzStateCommands.processor(container));
-    NamedCommands.registerCommand("BotAlgae", CatzStateCommands.intakeCoralGround(container));
-    NamedCommands.registerCommand("TopAlgae", CatzStateCommands.topAlgae(container));
-    NamedCommands.registerCommand("Climb", CatzStateCommands.climb(container));
-    NamedCommands.registerCommand("RestPose", Commands.runOnce(()->tracker.resetPose(new Pose2d())));
-    NamedCommands.registerCommand("WheelCharacterization", new WheelRadiusCharacterization(m_container.getCatzDrivetrain(), Direction.CLOCKWISE));
-
-    //----------------------------------------------------------------------------------------------------
-    //
-    //----------------------------------------------------------------------------------------------------
-    HashMap<String, Command> chooseYourOwnScoringBOT = new HashMap<>();
-    chooseYourOwnScoringBOT.put("Score A", NamedCommands.getCommand("Score L"));
-    chooseYourOwnScoringBOT.put("Score B", NamedCommands.getCommand("CollectGP1"));
-    chooseYourOwnScoringBOT.put("Score C", NamedCommands.getCommand("CollectGP1"));
-    chooseYourOwnScoringBOT.put("Score D", NamedCommands.getCommand("CollectGP1"));
-    chooseYourOwnScoringBOT.put("Score E", NamedCommands.getCommand("CollectGP1"));
-    chooseYourOwnScoringBOT.put("Score F", NamedCommands.getCommand("CollectGP1"));
-    chooseYourOwnScoringBOT.put("Do Nothing", new PrintCommand("Skipped"));
-    dashboardCmds.put("BotScoringChooser", new DashboardCmd("Score Where?", chooseYourOwnScoringBOT));
-
-    HashMap<String, Command> chooseYourOwnScoringTOP = new HashMap<>();
-    chooseYourOwnScoringTOP.put("Score A", NamedCommands.getCommand("Score A"));
-    chooseYourOwnScoringTOP.put("Score H", NamedCommands.getCommand("Score H"));
-    chooseYourOwnScoringTOP.put("Score I", NamedCommands.getCommand("Score I"));
-    chooseYourOwnScoringTOP.put("Score J", NamedCommands.getCommand("Score J"));
-    chooseYourOwnScoringTOP.put("Score K", NamedCommands.getCommand("Score K"));
-    chooseYourOwnScoringTOP.put("Score L", NamedCommands.getCommand("Score L"));
-    chooseYourOwnScoringTOP.put("Do Nothing", new PrintCommand("Skipped"));
-    dashboardCmds.put("TopScoringChooser", new DashboardCmd("Score Where?", chooseYourOwnScoringTOP));
-
-    HashMap<String, Command> L1orL4 = new HashMap<>();
-    L1orL4.put("Score L1", NamedCommands.getCommand("L1Ccoral"));
-    L1orL4.put("Score L2", NamedCommands.getCommand("L1Ccoral"));
-    L1orL4.put("Score L3", NamedCommands.getCommand("L1Ccoral"));
-    L1orL4.put("Score L4", NamedCommands.getCommand("L4Coral"));
-    dashboardCmds.put("CoralScoringChooser", new DashboardCmd("Score Where?", L1orL4));
-
-    for (String question : dashboardCmds.keySet()) {
-      NamedCommands.registerCommand(question, dashboardCmds.get(question));
-    }
 
     for (File autoFile : autosDirectory.listFiles()) {
       String autoName = autoFile.getName().replaceFirst("[.][^.]+$", "");

@@ -134,14 +134,22 @@ public class CatzElevator extends SubsystemBase {
     //    Control Mode setting
     //---------------------------------------------------------------------------------------------------------------------------
     if(DriverStation.isDisabled()) {
+      // Disabled
       io.stop();
       targetPosition = ElevatorPosition.PosNull;
     } else if(targetPosition != ElevatorPosition.PosManual){
-        io.runSetpoint(targetPosition.getTargetPositionRads(), elevatorFeedForward);
-    } else if(getElevatorPositionRads() < 30.0) {
-      io.runMotor(0.0);
+      // Semi Manual
+      io.runSetpoint(targetPosition.getTargetPositionRads(), elevatorFeedForward);
     } else if(targetPosition != ElevatorPosition.PosNull){
-      io.runSetpoint(targetManualPosition, elevatorFeedForward);
+      // Setpoint PID
+      if(getElevatorPositionRads() < 30.0) {
+        io.runMotor(elevatorFeedForward - 0.1);
+      } else {
+        io.runSetpoint(targetManualPosition, elevatorFeedForward);
+      }
+    } else {
+      // Nothing happening
+      io.runMotor(0.0);
     }
 
     //----------------------------------------------------------------------------------------------------------------------------

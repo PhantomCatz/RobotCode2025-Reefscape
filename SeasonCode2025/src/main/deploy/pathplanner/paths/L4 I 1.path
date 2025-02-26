@@ -37,9 +37,16 @@
       "waypointRelativePos": 0.919753086419744,
       "endWaypointRelativePos": null,
       "command": {
-        "type": "named",
+        "type": "sequential",
         "data": {
-          "name": "L4Coral"
+          "commands": [
+            {
+              "type": "named",
+              "data": {
+                "name": "L4Coral"
+              }
+            }
+          ]
         }
       }
     }

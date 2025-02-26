@@ -181,6 +181,10 @@ public class TrajectoryDriveCmd extends Command {
 
     this.timer.reset();
     this.timer.start();
+
+    if(trajectory == null) {
+      isPIDAimEnabled = true;
+    }
   } // end of initialize()
 
   // ---------------------------------------------------------------------------------------------
