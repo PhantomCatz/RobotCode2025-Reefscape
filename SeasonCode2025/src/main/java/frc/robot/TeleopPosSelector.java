@@ -245,6 +245,7 @@ public class TeleopPosSelector extends SubsystemBase {
     Translation2d unitLeftRight = unitRadius.rotateBy(Rotation2d.fromDegrees(90));
 
     Translation2d radius = unitRadius.times(Reef.reefOrthogonalRadius + Reef.scoringDistance);
+
     // radius = radius.plus(unitLeftRight.times(-Units.inchesToMeters(0)));
 
     Translation2d leftRight = unitLeftRight.times(leftRightPos.NUM * Reef.leftRightDistance);
@@ -329,7 +330,6 @@ public class TeleopPosSelector extends SubsystemBase {
       Translation2d goalPos = goal.getTranslation();
       Translation2d currentPos = currentPose.getTranslation();
       Translation2d direction = goalPos.minus(currentPos).div(2.0);
-
     if (currentPose.getTranslation().getDistance(goal.getTranslation()) > Reef.leftRightDistance * 3
         || direction.getNorm() <= 1e-3) {
       return new InstantCommand();
