@@ -39,12 +39,12 @@ public class CatzLED extends VirtualSubsystem {
   // Robot state LED tracking
   // ----------------------------------------------------------------------------------------------
   @Getter @Setter @AutoLogOutput (key = "CatzLED/ledState")
-  public ControllerLEDState ledState = ControllerLEDState.nuhuh;
+  public railingState RailingState = railingState.nuhthing;
 
   @Getter @Setter @AutoLogOutput (key = "CatzLED/ledScoringState")
-  public ScoringLEDLocation ledScoringState = ScoringLEDLocation.A;
+  public crossbarState CrossbarState = crossbarState.nuhthing;
 
-  public enum ControllerLEDState {
+  public enum railingState {
     LEDmanual_none,
     LEDmanual_one,
     LEDaqua_empty,
@@ -58,10 +58,11 @@ public class CatzLED extends VirtualSubsystem {
     sameBattery,
     autoFinished,
     lowBatteryAlert,
-    nuhuh
+    aqua,
+    nuhthing
   }
 
-  public enum ScoringLEDLocation {
+  public enum crossbarState {
     A,
     B,
     C,
@@ -95,7 +96,7 @@ public class CatzLED extends VirtualSubsystem {
   private final Notifier loadingNotifier;
 
   // LED PWM IDs
-  private final int LEADER_LED_PWM_PORT = 2;
+  private final int LEADER_LED_PWM_PORT = 1;
 
   // Constants
   private static final boolean paradeLeds = false;
@@ -183,6 +184,8 @@ public class CatzLED extends VirtualSubsystem {
     // Set LED mode
     // ----------------------------------------------------------
     setSolidElevatorColor(Color.kBlack); // Default to off
+    setSolidCrossbarColor(Color.kBlack);
+
     if (estopped) {
       setSolidElevatorColor(Color.kRed);
       // MODE DISABLED
@@ -197,8 +200,9 @@ public class CatzLED extends VirtualSubsystem {
       wave(Color.kGold, Color.kDarkBlue, waveFastCycleLength, waveFastDuration);
       // MODE ENABLED
     } else {
-
-      switch(ledState) {
+      System.out.println(RailingState);
+      RailingState = railingState.climb;
+      switch(RailingState) {
         case LEDmanual_none:
           strobe(Color.kRed, breathDuration);
         break;
@@ -208,15 +212,6 @@ public class CatzLED extends VirtualSubsystem {
         case LEDaqua_empty:
           strobe(Color.kBlue, breathDuration);
         break;
-        case LEDaqua_full:
-          setSolidElevatorColor(Color.kBlue);
-        break;
-        case NBA_empty:
-          strobe(Color.kYellow, breathDuration);
-        break;
-        case NBA_full:
-          setSolidElevatorColor(Color.kYellow);
-        break;
         case BALLS:
           strobe(Color.kWhite, breathDuration);
         break;
@@ -224,7 +219,7 @@ public class CatzLED extends VirtualSubsystem {
           setSolidElevatorColor(Color.kWhite);
         break;
         case climb:
-          rainbow(rainbowCycleLength, rainbowDuration);
+          rainbowCrossbar(rainbowCycleLength, rainbowDuration);
         break;
         case sameBattery:
           setSolidElevatorColor(Color.kDarkOrange);
@@ -235,11 +230,16 @@ public class CatzLED extends VirtualSubsystem {
         case lowBatteryAlert:
           setSolidElevatorColor(Color.kOrange);
         break;
+        case aqua:
+          setSolidElevatorColor(Color.kAqua);
+          setSolidCrossbarColor(Color.kAqua);
+          System.out.println("Aqua");
+        break;
         default:
           break;
       }
 
-      switch(ledScoringState) {
+      switch(CrossbarState) {
         case A, G:
           setSolidElevatorColor(Color.kPurple);
           setSolidCrossbarColor(Color.kRed);
@@ -280,9 +280,6 @@ public class CatzLED extends VirtualSubsystem {
           buffer.setLED(i, color);
         }
       }
-      // for (int j = LED_Sidebar_Start_RT; j < LED_Sidebar_End_RT; j++) {
-      //   buffer.setLED(j, color);
-      // }
     }
   }
 
@@ -322,13 +319,25 @@ public class CatzLED extends VirtualSubsystem {
     setSolidElevatorColor(new Color(red, green, blue));
   }
 
-  private void rainbow(double cycleLength, double duration) {
+  private void rainbowElevator(double cycleLength, double duration) {
     double x = (1 - ((Timer.getFPGATimestamp() / duration) % 1.0)) * 180.0;
     double xDiffPerLed = 180.0 / cycleLength;
     for (int i = 0; i < length; i++) {
-      x += xDiffPerLed;
-      x %= 180.0;
-      buffer.setHSV(i, (int) x, 255, 255);
+      if(!(LED_Sidebar_End_LT<i && i<LED_Sidebar_Start_RT)) {
+        x += xDiffPerLed;
+        x %= 180.0;
+        buffer.setHSV(i, (int) x, 255, 255);
+      }
+    }
+  }
+
+  private void rainbowCrossbar(double cycleLength, double duration) {
+    double x = (1 - ((Timer.getFPGATimestamp() / duration) % 1.0)) * 180.0;
+    double xDiffPerLed = 180.0 / cycleLength;
+    for (int i = LED_Crossbar_Start; i < LED_Crossbar_End; i++) {
+        x += xDiffPerLed;
+        x %= 180.0;
+        buffer.setHSV(i, (int) x, 255, 255);
     }
   }
 

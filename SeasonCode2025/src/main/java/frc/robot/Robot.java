@@ -18,7 +18,8 @@ import frc.robot.CatzConstants.RobotHardwareMode;
 import frc.robot.CatzConstants.RobotID;
 import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.CatzRobotTracker;
 import frc.robot.CatzSubsystems.CatzLEDs.CatzLED;
-import frc.robot.CatzSubsystems.CatzLEDs.CatzLED.ControllerLEDState;
+import frc.robot.CatzSubsystems.CatzLEDs.CatzLED.crossbarState;
+import frc.robot.CatzSubsystems.CatzLEDs.CatzLED.railingState;
 import frc.robot.Utilities.Alert;
 import frc.robot.Utilities.Alert.AlertType;
 import frc.robot.Utilities.VirtualSubsystem;
@@ -242,7 +243,7 @@ public class Robot extends LoggedRobot {
               "*** Auto cancelled in %.2f secs ***%n", Timer.getFPGATimestamp() - autoStart);
         }
         autoMessagePrinted = true;
-        CatzLED.getInstance().ledState = ControllerLEDState.autoFinished;
+        CatzLED.getInstance().setRailingState(railingState.autoFinished);
         CatzLED.getInstance().autoFinishedTime = Timer.getFPGATimestamp();
       }
     }
@@ -279,7 +280,7 @@ public class Robot extends LoggedRobot {
     if (RobotController.getBatteryVoltage() <= LOW_BATTERY_VOLTAGE
         && DISABLED_TIMER.hasElapsed(LOW_BATTERY_DISABLED_TIME)) {
       LOW_BATTERY_ALERT.set(true);
-      CatzLED.getInstance().ledState = ControllerLEDState.lowBatteryAlert;
+      CatzLED.getInstance().setRailingState(railingState.lowBatteryAlert);
     }
   }
 
