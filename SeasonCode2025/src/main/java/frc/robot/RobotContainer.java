@@ -175,12 +175,12 @@ public class RobotContainer {
     //   () -> Math.abs(xboxTest.getLeftY()) > 0.1);
     // leftJoystickTrigger.onTrue(elevator.elevatorFullManual(() -> xboxTest.getLeftY()).alongWith(Commands.print("Using manual elevator")));
     // leftJoystickTrigger.onFalse(elevator.elevatorFullManual(() -> xboxTest.getLeftY()));
-    
+
     // Manual Ramp Pivot Control
     Trigger leftJoystickTrigger = new Trigger(
       () -> Math.abs(xboxTest.getLeftY()) > 0.1);
-    leftJoystickTrigger.onTrue(rampPivot.rampPivotFullManual(() -> xboxTest.getLeftY()).alongWith(Commands.print("Using manual elevator")));
-    leftJoystickTrigger.onFalse(rampPivot.rampPivotFullManual(()-> 0.0));
+    leftJoystickTrigger.onTrue(rampPivot.rampPivotFullManual(() -> xboxTest.getLeftY()).alongWith(Commands.print("Using manual ramp pivot")));
+    leftJoystickTrigger.onFalse(rampPivot.rampPivotFullManual(()-> 0.0).alongWith(Commands.print("Nah - pivot motor")));
 
     // Climb SetPosition Control
     xboxDrv.y().toggleOnTrue(climb.Climb_Retract().alongWith(Commands.print("pressed y")));

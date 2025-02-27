@@ -244,7 +244,7 @@ public class CatzElevator extends SubsystemBase {
 
   public void elevatorManual(Supplier<Double> manualSupplier) {
     targetManualPosition += manualSupplier.get() * MANUAL_SCALE;
-    System.out.println(targetManualPosition);
+    // System.out.println(targetManualPosition);
     targetPosition = ElevatorPosition.PosManual;
   }
 

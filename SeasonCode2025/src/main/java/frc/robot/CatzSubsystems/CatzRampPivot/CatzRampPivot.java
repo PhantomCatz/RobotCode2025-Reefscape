@@ -7,12 +7,10 @@
 
 package frc.robot.CatzSubsystems.CatzRampPivot;
 
-import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.CatzConstants;
-import frc.robot.CatzSubsystems.CatzElevator.CatzElevator.ElevatorPosition;
 import frc.robot.Utilities.LoggedTunableNumber;
 import lombok.RequiredArgsConstructor;
 
@@ -71,18 +69,18 @@ public class CatzRampPivot extends SubsystemBase {
     io.updateInputs(inputs);
     Logger.processInputs("RealInputs/RampPivot", inputs);
 
-    if(DriverStation.isDisabled()) {
-      // Disabled
-      io.stop();
-      targetPos = RampPivotPositions.PosStow;
-    } else if(targetPos != RampPivotPositions.PosNull){
-      // Semi Manual
-      io.stop();
-    } else if(targetPos != RampPivotPositions.PosNull){
-      io.setPosition(targetPos.getTargetPositionRot(), 0);
-    } else {
-      io.runMotor(0.0);
-    }
+    // if(DriverStation.isDisabled()) {
+    //   // Disabled
+    //   io.stop();
+    //   targetPos = RampPivotPositions.PosStow;
+    // } else if(targetPos != RampPivotPositions.PosNull){
+    //   // Semi Manual
+    //   io.stop();
+    // } else if(targetPos != RampPivotPositions.PosNull){
+    //   io.setPosition(targetPos.getTargetPositionRot(), 0);
+    // } else {
+    //   io.runMotor(0.0);
+    // }
   }
 
   public Command rampPivotFullManual(Supplier<Double> manualSupplier) {

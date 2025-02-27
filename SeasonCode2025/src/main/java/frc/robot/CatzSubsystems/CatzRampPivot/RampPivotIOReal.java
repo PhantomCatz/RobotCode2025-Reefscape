@@ -9,11 +9,10 @@ package frc.robot.CatzSubsystems.CatzRampPivot;
 
 import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.StatusSignal;
-import com.ctre.phoenix6.configs.TalonFXSConfiguration;
+import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.DutyCycleOut;
 import com.ctre.phoenix6.controls.MotionMagicVoltage;
-import com.ctre.phoenix6.hardware.TalonFXS;
-import com.ctre.phoenix6.signals.MotorArrangementValue;
+import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 
 import edu.wpi.first.units.measure.Angle;
@@ -27,8 +26,8 @@ import static frc.robot.CatzSubsystems.CatzRampPivot.RampPivotConstants.*;
 /** Add your docs here. */
 public class RampPivotIOReal implements RampPivotIO{
 
-    private final TalonFXS rampPivotMotor;
-    private final TalonFXSConfiguration config = new TalonFXSConfiguration();
+    private final TalonFX rampPivotMotor;
+    private final TalonFXConfiguration config = new TalonFXConfiguration();
     private final MotionMagicVoltage positionControl = new MotionMagicVoltage(0.0).withUpdateFreqHz(0.0);
 
     private final StatusSignal<Voltage> rampPivotAppliedVolts;
@@ -38,12 +37,11 @@ public class RampPivotIOReal implements RampPivotIO{
     private final StatusSignal<Angle> rampPivotPosition;
 
     public RampPivotIOReal() {
-        rampPivotMotor = new TalonFXS(RAMP_PIVOT_MTR_ID);
+        rampPivotMotor = new TalonFX(RAMP_PIVOT_MTR_ID);
 
         config.CurrentLimits.SupplyCurrentLimit = 100;
         config.CurrentLimits.SupplyCurrentLimitEnable = true;
         config.MotorOutput.NeutralMode = NeutralModeValue.Brake;
-        config.Commutation.MotorArrangement = MotorArrangementValue.Minion_JST;
 
         rampPivotPosition = rampPivotMotor.getPosition();
         rampPivotAppliedVolts = rampPivotMotor.getMotorVoltage();
@@ -80,6 +78,7 @@ public class RampPivotIOReal implements RampPivotIO{
 
     @Override
     public void runMotor(double speed) {
+        System.out.println("i am running - pivot motor");
         rampPivotMotor.set(speed);
     }
 
