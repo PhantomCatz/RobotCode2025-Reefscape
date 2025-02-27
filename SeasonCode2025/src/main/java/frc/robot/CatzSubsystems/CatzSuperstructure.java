@@ -104,7 +104,7 @@ public class CatzSuperstructure extends VirtualSubsystem {
         switch(currentRobotAction) {
             // Outtaking Algae or Coral
             case OUTTAKE:
-
+                System.out.println("Outtake Coral at L"+level);
                 if(chosenGamepiece == Gamepiece.CORAL) {
                     switch (level) {
                         case 1:

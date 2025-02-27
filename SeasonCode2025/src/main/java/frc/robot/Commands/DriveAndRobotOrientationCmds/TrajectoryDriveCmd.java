@@ -55,12 +55,7 @@ public class TrajectoryDriveCmd extends Command {
   private static final double TIMEOUT_SCALAR = 5.0;
   private static final double CONVERGE_DISTANCE = 1.0;
   private static final double DIVERGE_TIME = 1.0;
-<<<<<<< Updated upstream
-  private final double ALLOWABLE_VISION_ADJUST = 9e-4; //TODO tune
-
-=======
   private final double ALLOWABLE_VISION_ADJUST = 9e-4; // TODO tune
->>>>>>> Stashed changes
   // Subsystems
   private CatzDrivetrain m_driveTrain;
   private CatzRobotTracker tracker = CatzRobotTracker.getInstance();
@@ -81,10 +76,6 @@ public class TrajectoryDriveCmd extends Command {
   // Event Command variables
   private final EventScheduler eventScheduler;
   private boolean isEventCommandRunning = false;
-<<<<<<< Updated upstream
-=======
-
->>>>>>> Stashed changes
   private ChassisSpeeds applyCusp(ChassisSpeeds speeds, double distance) {
     // graph 1 / (1+x) on desmos
     return speeds.times(2 * distance / (1 + distance));
@@ -204,7 +195,6 @@ public class TrajectoryDriveCmd extends Command {
     // construct chassisspeeds
     adjustedSpeeds = hocontroller.calculate(currentPose, state, goal.pose.getRotation());
 
-<<<<<<< Updated upstream
       // construct chassisspeeds
       adjustedSpeeds = hocontroller.calculate(currentPose, state, goal.pose.getRotation());
 
@@ -234,8 +224,6 @@ public class TrajectoryDriveCmd extends Command {
           currentSpeeds.omegaRadiansPerSecond,
           goal.heading.getRadians()
       );
-=======
->>>>>>> Stashed changes
     // Cusps x/(1+x) Lower speed for closer distances to prevent jittering
     if (currentTime <= 1.0) {
       adjustedSpeeds = applyCusp(adjustedSpeeds, currentTime * DIVERGE_TIME);
@@ -312,7 +300,7 @@ public class TrajectoryDriveCmd extends Command {
     }
 
     if (autoalign && tracker.getDEstimatedPose().getTranslation().getNorm() > ALLOWABLE_VISION_ADJUST) {
-      // System.out.println("vision is not true!@!@!)@(!)@()(!@)");
+      System.out.println("vision is not true!@!@!)@(!)@()(!@)");
       return false;
     }
     // Finish command if the total time the path takes is over
@@ -355,9 +343,9 @@ public class TrajectoryDriveCmd extends Command {
     // System.out.println("rotait: " + (rotationError < ALLOWABLE_OMEGA_ERROR));
     // System.out.println(
     //     "speed: " + (desiredMPS == 0.0 || (currentMPS < ALLOWABLE_VEL_ERROR && currentRPS < ALLOWABLE_OMEGA_ERROR)));
-
-    return xError < poseError &&
-        yError < poseError &&
+    // System.out.println("poseerr:" + ((xError < poseError) &&(yError < poseError)));
+    System.out.println("transerr: " + translationError);
+    return translationError < poseError &&
         rotationError < ALLOWABLE_OMEGA_ERROR &&
         (desiredMPS == 0.0 || (currentMPS < ALLOWABLE_VEL_ERROR && currentRPS < ALLOWABLE_OMEGA_ERROR));
   }

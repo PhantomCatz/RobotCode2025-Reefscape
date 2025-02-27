@@ -26,7 +26,7 @@ public class ElevatorConstants {
     public static final double ELEVATOR_RATIO_STAGE_ONE  = ELEVATOR_DRIVING_PULLEY/ELEVATOR_DRIVEN_PULLEY;
     public static final double FINAL_REDUCATION          = MAXPLANETARY_GEAR_RATIO * ELEVATOR_RATIO_STAGE_ONE;
     public static final double ELEVATOR_SPROCKET_RADIUS  = 0.86; //inches
-    
+
     // Elevator Limits
     public static final double UPPER_LIMIT_RAD = 162.0;
     public static final double LOWER_LIMIT_RAD = 0.0;

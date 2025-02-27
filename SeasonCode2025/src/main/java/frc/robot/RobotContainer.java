@@ -197,10 +197,10 @@ public class RobotContainer {
     //TODO add coral station toggle buttons
 
     // Scoring Level Determination
-    xboxAux.rightTrigger().onTrue(Commands.runOnce(() -> selector.pathQueueAddBack(selector.getXBoxReefPos(), superstructure.getLevel())).alongWith(Commands.runOnce(() -> led.setRailingState(CatzLED.railingState.aqua))));
-    xboxAux.leftBumper().onTrue(Commands.runOnce(() -> selector.pathQueuePopFront()).alongWith(Commands.runOnce(() -> led.setRailingState(CatzLED.railingState.aqua))));
-    xboxAux.rightBumper().onTrue(Commands.runOnce(() -> selector.pathQueuePopBack()).alongWith(Commands.runOnce(() -> led.setRailingState(CatzLED.railingState.aqua))));
-    xboxAux.rightStick().onTrue(Commands.runOnce(() -> selector.pathQueueClear()).alongWith(Commands.runOnce(() -> led.setRailingState(CatzLED.railingState.aqua))));
+    // xboxAux.rightTrigger().onTrue(Commands.runOnce(() -> selector.pathQueueAddBack(selector.getXBoxReefPos(), superstructure.getLevel())).alongWith(Commands.runOnce(() -> led.setRailingState(CatzLED.railingState.aqua))));
+    // xboxAux.leftBumper().onTrue(Commands.runOnce(() -> selector.pathQueuePopFront()).alongWith(Commands.runOnce(() -> led.setRailingState(CatzLED.railingState.aqua))));
+    // xboxAux.rightBumper().onTrue(Commands.runOnce(() -> selector.pathQueuePopBack()).alongWith(Commands.runOnce(() -> led.setRailingState(CatzLED.railingState.aqua))));
+    // xboxAux.rightStick().onTrue(Commands.runOnce(() -> selector.pathQueueClear()).alongWith(Commands.runOnce(() -> led.setRailingState(CatzLED.railingState.aqua))));
 
     xboxAux.povRight().onTrue(Commands.runOnce(()->{superstructure.setLevel(1); SmartDashboard.putNumber("Reef Level", 1);}));
     xboxAux.povUp().onTrue(Commands.runOnce(() -> {superstructure.setLevel(2); SmartDashboard.putNumber("Reef Level", 2);}));

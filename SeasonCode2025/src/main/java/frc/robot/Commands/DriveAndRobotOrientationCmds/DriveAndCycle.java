@@ -46,6 +46,7 @@ public class DriveAndCycle extends TrajectoryDriveCmd{
     @Override
     public void initialize(){
         super.initialize();
+        selector.hasCoralSIM = true;
     }
 
     @Override
@@ -53,9 +54,11 @@ public class DriveAndCycle extends TrajectoryDriveCmd{
         super.execute();
         if (super.isWithinThreshold(PREDICT_DISTANCE) && !super.isFinished()){
             if(action == RobotAction.OUTTAKE){
+                System.out.println("raised elevator!!!!!!!");
                 superstructure.setCurrentRobotAction(RobotAction.AIMING);
             }
             if(action == RobotAction.INTAKE){
+                System.out.println("intaking!!!!!!");
                 superstructure.setCurrentRobotAction(RobotAction.INTAKE);
             }
         }
