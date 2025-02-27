@@ -110,7 +110,7 @@ public class AlgaePivotIOReal implements AlgaePivotIO {
   public void runSetpoint(double setpointRotations, double feedforward) {
     algaePivotMotor.setControl(positionControl.withPosition(setpointRotations)
                                               .withFeedForward(feedforward));
-    System.out.println(setpointRotations);
+    // System.out.println(setpointRotations);
   }
 
   @Override

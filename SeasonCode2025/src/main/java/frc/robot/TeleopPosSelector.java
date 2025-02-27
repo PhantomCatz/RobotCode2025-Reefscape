@@ -11,7 +11,6 @@ import java.util.Arrays;
 import java.util.Deque;
 import java.util.HashMap;
 import java.util.LinkedList;
-import java.util.function.Supplier;
 
 import com.pathplanner.lib.path.GoalEndState;
 import com.pathplanner.lib.path.PathConstraints;
@@ -24,9 +23,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.FieldConstants.Reef;
 import frc.robot.Utilities.AllianceFlipUtil;
@@ -38,10 +35,11 @@ import frc.robot.CatzSubsystems.CatzSuperstructure;
 import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.CatzRobotTracker;
 import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.Drivetrain.CatzDrivetrain;
 import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.Drivetrain.DriveConstants;
+import frc.robot.Commands.DriveAndRobotOrientationCmds.DriveAndCycle;
 import frc.robot.Commands.DriveAndRobotOrientationCmds.TrajectoryDriveCmd;
 
 @SuppressWarnings({ "rawtypes", "unchecked" })
-public class TeleopPosSelector extends SubsystemBase {
+public class TeleopPosSelector {
   private final RobotContainer m_container;
 
   private final CommandXboxController xboxAux;
@@ -63,19 +61,19 @@ public class TeleopPosSelector extends SubsystemBase {
   private Deque<Pair<Pair<Integer, LeftRight>, Integer>> queuedPaths = new LinkedList<>();
   private HashMap<String, String> poseToLetter = new HashMap<>();
 
-  private final boolean doFakeCoral = true; //if the real robot doesn't have mechanisms to hold real coral, simulate one
+  private final boolean manualOverrideUseFakeCoral = false; //if the real robot doesn't have mechanisms to hold real coral, simulate one
+  public final boolean useFakeCoral = manualOverrideUseFakeCoral || Robot.isSimulation();
 
   private boolean leftCoralStation = true;
   private boolean rightCoralStation = true;
 
-  private boolean hasCoralSIM = true;
+  public boolean hasCoralSIM = true;
 
   public TeleopPosSelector(CommandXboxController aux, RobotContainer container) {
     this.xboxAux = aux;
     this.m_container = container;
     this.currentDrivetrainCommand.addRequirements(container.getCatzDrivetrain());
     //this.currentAutoplayCommand.addRequirements(container.getCatzDrivetrain());
-    this.currentAutoplayCommand.addRequirements(this);
 
     superstructure = m_container.getSuperstructure();
     drivetrain = m_container.getCatzDrivetrain();
@@ -271,25 +269,24 @@ public class TeleopPosSelector extends SubsystemBase {
     }
   }
 
-  public void runPathfinding(Pose2d goal) {
+  public PathPlannerPath getPathfindingPath(Pose2d goal) {
     if (goal == null) {
       System.out.println("The goal is null");
-      return;
+      return null;
     }
 
     Translation2d robotPos = tracker.getEstimatedPose().getTranslation();
-
     PathPlannerPath path = pathfinder.getPath(robotPos, goal.getTranslation(),
         new GoalEndState(0.0, goal.getRotation()));
 
     if (path == null) {
       System.out.println("The path is null: " + robotPos + goal.getTranslation());
-      return;
+      return null;
     } else {
       if (AllianceFlipUtil.shouldFlipToRed()) {
         path = path.flipPath();
       }
-      new TrajectoryDriveCmd(path, drivetrain, true).schedule();
+      return path;
     }
   }
 
@@ -388,20 +385,15 @@ public class TeleopPosSelector extends SubsystemBase {
         @Override
         public void initialize() {
           currentDrivetrainCommand.cancel();
-
           currentDrivetrainCommand = runNextCommand();
-
-          currentDrivetrainCommand.initialize();
+          currentDrivetrainCommand.schedule();
         }
 
         @Override
         public void execute() {
-          currentDrivetrainCommand.execute();
-
           if (currentDrivetrainCommand.isFinished()) {
-            currentDrivetrainCommand.end(false);
             currentDrivetrainCommand = runNextCommand();
-            currentDrivetrainCommand.initialize();
+            currentDrivetrainCommand.schedule();
           }
         }
 
@@ -423,26 +415,28 @@ public class TeleopPosSelector extends SubsystemBase {
   private Command runNextCommand() {
     Pair<Pair<Integer, LeftRight>, Integer> pair = pathQueuePeekFront();
 
-    if (Robot.isSimulation() || doFakeCoral) {
+    if (useFakeCoral) {
       if (hasCoralSIM) {
-        if (queuedPaths.isEmpty())
+        if (queuedPaths.isEmpty()){
           return new InstantCommand();
-        return runReefScoreCommand(pair).andThen(new InstantCommand(() -> pathQueuePopFront()));
+        }
+        return getReefScoreCommand(pair).andThen(new InstantCommand(() -> pathQueuePopFront()));
       } else {
-        return runCoralStationCommand(getBestCoralStation());
+        return getCoralStationCommand();
       }
     } else {
       if (CatzSuperstructure.getCurrentCoralState() == CoralState.IN_OUTTAKE) {
         if (queuedPaths.isEmpty())
           return new InstantCommand();
-        return runReefScoreCommand(pair).andThen(new InstantCommand(() -> pathQueuePopFront()));
+        return getReefScoreCommand(pair).andThen(new InstantCommand(() -> pathQueuePopFront()));
       } else {
-        return runCoralStationCommand(getBestCoralStation());
+        return getCoralStationCommand();
       }
     }
 
   }
 
+<<<<<<< Updated upstream
   public Command runReefScoreCommand(Pair<Pair<Integer, LeftRight>, Integer> pair) {
     return new Command() {
       @Override
@@ -502,59 +496,33 @@ public class TeleopPosSelector extends SubsystemBase {
   }
 
   public Command runOnlyCoralStationCommand(Pose2d pose) {
+=======
+  public Command runToNearestBranch() {
+>>>>>>> Stashed changes
     return new InstantCommand(() -> {
+      currentPathfindingPair = getClosestReefPos().getFirst();
       currentDrivetrainCommand.cancel();
-      currentDrivetrainCommand = runCoralStationCommand(pose);
+      currentDrivetrainCommand = new TrajectoryDriveCmd(getPathfindingPath(calculateReefPose(currentPathfindingPair, true)), drivetrain, true);
       currentDrivetrainCommand.schedule();
     });
   }
 
-  private Command runCoralStationCommand(Pose2d goalPose) {
-    return new Command() {
-      private Command pathfindingCommand;
+  public Command runCoralStationCommand() {
+    return new InstantCommand(() -> {
+      currentPathfindingPair = null;
+      currentDrivetrainCommand.cancel();
+      currentDrivetrainCommand = getCoralStationCommand();
+      currentDrivetrainCommand.schedule();
+    });
+  }
 
-      @Override
-      public void initialize() {
-        runPathfinding(goalPose);
-        // CommandScheduler.getInstance().registerComposedCommands(pathfindingCommand);
-        // addRequirements(pathfindingCommand.getRequirements());
-        pathfindingCommand.initialize();
-        System.out.println("coral station start!!@!@!@!@!@");
-      }
+  public Command getCoralStationCommand() {
+    return new DriveAndCycle(getPathfindingPath(getBestCoralStation()), m_container, RobotAction.INTAKE);
+  }
 
-      @Override
-      public void execute() {
-        Translation2d robotPos = tracker.getEstimatedPose().getTranslation();
-
-        if (pathfindingCommand.isFinished()) {
-          pathfindingCommand.end(false);
-          hasCoralSIM = true;
-        } else {
-          System.out.println("coral stationOIN!IONION!ONO!NIOIn");
-          pathfindingCommand.execute();
-        }
-
-        // if you are within 2 meters of coral station and don't already have intake on
-        if (robotPos.getDistance(goalPose.getTranslation()) < 2.0
-            && !superstructure.getCurrentRobotAction().equals(RobotAction.INTAKE)) {
-          // superstructure.setCurrentRobotAction(RobotAction.INTAKE);
-        }
-      }
-
-      @Override
-      public boolean isFinished() {
-        if (Robot.isSimulation() || doFakeCoral) {
-          return hasCoralSIM;
-        } else {
-          return (CatzSuperstructure.getCurrentCoralState() == CoralState.IN_OUTTAKE);
-        }
-      }
-
-      @Override
-      public void end(boolean interrupted) {
-        pathfindingCommand.end(interrupted);
-      }
-    };
+  public Command getReefScoreCommand(Pair<Pair<Integer, LeftRight>, Integer> pair) {
+    currentPathfindingPair = null;
+    return new DriveAndCycle(getPathfindingPath(calculateReefPose(pair.getFirst(), false)), m_container, RobotAction.OUTTAKE, pair.getSecond());
   }
 
   public Command cancelCurrentDrivetrainCommand() {

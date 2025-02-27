@@ -30,7 +30,11 @@ public class DriveConstants {
   // ---------------------------------------------------------------------------------------------------------------
   // Disabled flag for testing
   // ---------------------------------------------------------------------------------------------------------------
+<<<<<<< Updated upstream
   public static final boolean IS_DRIVE_DISABLED = false;
+=======
+  public static final boolean IS_DRIVE_DISABLED = false; //bruh
+>>>>>>> Stashed changes
 
   // ---------------------------------------------------------------------------------------------------------------
   // Module organizations

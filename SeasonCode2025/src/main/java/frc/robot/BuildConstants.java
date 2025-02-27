@@ -7,12 +7,21 @@ public final class BuildConstants {
   public static final String MAVEN_GROUP = "";
   public static final String MAVEN_NAME = "SeasonCode2025";
   public static final String VERSION = "unspecified";
+<<<<<<< Updated upstream
   public static final int GIT_REVISION = 260;
   public static final String GIT_SHA = "28b801ec8d717cf3fae879fa119e96b661a9bd7a";
   public static final String GIT_DATE = "2025-02-25 17:36:48 EST";
   public static final String GIT_BRANCH = "Bugfix/TelopPosSelector-Refactor";
   public static final String BUILD_DATE = "2025-02-25 21:13:31 EST";
   public static final long BUILD_UNIX_TIME = 1740536011891L;
+=======
+  public static final int GIT_REVISION = 284;
+  public static final String GIT_SHA = "2cd99d18b2edb9a38821776f9fbb6b56ec9f3a4f";
+  public static final String GIT_DATE = "2025-02-26 18:45:47 EST";
+  public static final String GIT_BRANCH = "main";
+  public static final String BUILD_DATE = "2025-02-26 20:55:18 EST";
+  public static final long BUILD_UNIX_TIME = 1740621318659L;
+>>>>>>> Stashed changes
   public static final int DIRTY = 1;
 
   private BuildConstants(){}

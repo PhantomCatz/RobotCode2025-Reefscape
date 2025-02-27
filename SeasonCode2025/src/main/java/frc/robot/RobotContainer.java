@@ -53,7 +53,7 @@ public class RobotContainer {
   private CatzRobotTracker robotTracker = CatzRobotTracker.getInstance();
   private CatzVision vision = new CatzVision(new VisionIOLimelight("limelight-tempura"),
                                              new VisionIOLimelight("limelight-gyoza"));
-  private CatzOuttake outtake = new CatzOuttake();
+  private CatzOuttake outtake;
   private CatzElevator elevator = new CatzElevator();
   private CatzClimb climb = new CatzClimb();
   private CatzAlgaeRemover algaeRemover = new CatzAlgaeRemover();
@@ -66,8 +66,8 @@ public class RobotContainer {
   private CommandXboxController xboxDrv = new CommandXboxController(0);
   private CommandXboxController xboxAux = new CommandXboxController(1);
   private CommandXboxController xboxTest = new CommandXboxController(2);
-
   private TeleopPosSelector selector = new TeleopPosSelector(xboxAux, this);
+
 
   // -------------------------------------------------------------------------------------------------------------------
   // Alert Declaration
@@ -80,9 +80,12 @@ public class RobotContainer {
   // -------------------------------------------------------------------------------------------------------------------
   // Auto Declaration
   // ---------------------------------------------------------------------------------------------------------------------
-  private CatzAutonomous auto = new CatzAutonomous(this);
+  private CatzAutonomous auto;
 
   public RobotContainer() {
+    outtake = new CatzOuttake(this);
+    auto = new CatzAutonomous(this);
+
     // Drive And Aux Command Mapping
     configureBindings();
 
@@ -119,27 +122,23 @@ public class RobotContainer {
     //---------------------------------------------------------------------------------------------------------------------
     // XBOX Drive
     //---------------------------------------------------------------------------------------------------------------------
-    // NBA
-    xboxDrv.button(8).onTrue(new InstantCommand(() -> {
+
+    // Reset odometry
+    xboxDrv.button(8).and(xboxDrv.button(7)).onTrue(new InstantCommand(() -> {
       if(AllianceFlipUtil.shouldFlipToRed()){
         robotTracker.resetPose(new Pose2d(robotTracker.getEstimatedPose().getTranslation(), Rotation2d.k180deg));
       }else{
         robotTracker.resetPose(new Pose2d(robotTracker.getEstimatedPose().getTranslation(), new Rotation2d()));
-
       }
     }));
 
-    //xboxDrv.b().onTrue(new InstantCommand(() -> selector.runToNearestBranch().schedule()).alongWith(new PrintCommand("NBA!!!!!!!!!!!!  !!!!!")));
-    xboxDrv.b().onTrue(selector.runToNearestBranch2(()->selector.calculateReefPose(selector.getClosestReefPos().getFirst(), true)));
+    // NBA
+    xboxDrv.b().onTrue(selector.runToNearestBranch());
     xboxDrv.b().onFalse(selector.cancelCurrentDrivetrainCommand());
 
     // BALLS
-    xboxDrv.y().onTrue(new InstantCommand(() -> selector.runOnlyCoralStationCommand(selector.getBestCoralStation()).schedule()));
+    xboxDrv.y().onTrue(selector.runCoralStationCommand());
     xboxDrv.y().onFalse(selector.cancelCurrentDrivetrainCommand());
-
-    // Pop Queue
-    // xboxDrv.y().onTrue(selector.runQueuedCommand());
-    // xboxDrv.y().onFalse(selector.cancelPathfindingCommand()); //TODO is this needed?
 
     // AQUA
     xboxDrv.a().onTrue(new InstantCommand(() -> selector.runAutoCommand().schedule()));
@@ -148,7 +147,6 @@ public class RobotContainer {
     // Left Right
     xboxDrv.leftBumper().onTrue(new InstantCommand(() -> selector.runLeftRight(LeftRight.LEFT)));
     xboxDrv.rightBumper().onTrue(new InstantCommand(() -> selector.runLeftRight(LeftRight.RIGHT)));
-
 
     xboxDrv.leftTrigger().onTrue(new InstantCommand(() -> selector.runLeftRightShift(LeftRight.LEFT)));
     xboxDrv.leftTrigger().onFalse(selector.cancelCurrentDrivetrainCommand());
@@ -199,11 +197,18 @@ public class RobotContainer {
     //TODO add coral station toggle buttons
 
     // Scoring Level Determination
+<<<<<<< Updated upstream
     xboxAux.rightTrigger().onTrue(Commands.runOnce(() -> selector.pathQueueAddBack(selector.getXBoxReefPos(), superstructure.getLevel())));
     xboxAux.leftBumper().onTrue(Commands.runOnce(() -> selector.pathQueuePopFront()));
     xboxAux.rightBumper().onTrue(Commands.runOnce(() -> selector.pathQueuePopBack()));
     xboxAux.rightStick().onTrue(Commands.runOnce(() -> selector.pathQueueClear()));
 
+=======
+    xboxAux.rightTrigger().onTrue(Commands.runOnce(() -> selector.pathQueueAddBack(selector.getXBoxReefPos(), superstructure.getLevel())).alongWith(Commands.runOnce(() -> led.setRailingState(CatzLED.railingState.aqua))));
+    xboxAux.leftBumper().onTrue(Commands.runOnce(() -> selector.pathQueuePopFront()).alongWith(Commands.runOnce(() -> led.setRailingState(CatzLED.railingState.aqua))));
+    xboxAux.rightBumper().onTrue(Commands.runOnce(() -> selector.pathQueuePopBack()).alongWith(Commands.runOnce(() -> led.setRailingState(CatzLED.railingState.aqua))));
+    xboxAux.rightStick().onTrue(Commands.runOnce(() -> selector.pathQueueClear()).alongWith(Commands.runOnce(() -> led.setRailingState(CatzLED.railingState.aqua))));
+>>>>>>> Stashed changes
 
     xboxAux.povRight().onTrue(Commands.runOnce(()->{superstructure.setLevel(1); SmartDashboard.putNumber("Reef Level", 1);}));
     xboxAux.povUp().onTrue(Commands.runOnce(() -> {superstructure.setLevel(2); SmartDashboard.putNumber("Reef Level", 2);}));

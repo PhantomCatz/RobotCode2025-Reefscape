@@ -20,26 +20,27 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.PrintCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.CatzSubsystems.CatzStateCommands;
+import frc.robot.CatzSubsystems.CatzSuperstructure.RobotAction;
 import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.*;
 import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.Drivetrain.DriveConstants;
 import frc.robot.Commands.CharacterizationCmds.WheelRadiusCharacterization;
 import frc.robot.Commands.CharacterizationCmds.WheelRadiusCharacterization.Direction;
+import frc.robot.Commands.DriveAndRobotOrientationCmds.DriveAndCycle;
 import frc.robot.Commands.DriveAndRobotOrientationCmds.TrajectoryDriveCmd;
 import frc.robot.RobotContainer;
 import frc.robot.Utilities.AllianceFlipUtil;
 import frc.robot.Utilities.JSONUtil;
 
 import java.io.File;
-import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.function.BooleanSupplier;
 
-import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
@@ -100,6 +101,7 @@ public class CatzAutonomous extends SubsystemBase {
       }
     }
 
+<<<<<<< Updated upstream
     for (File pathFile : pathplannerPathsDirectory.listFiles()) {
       // to get rid of the extensions trailing the path names
       String pathName = pathFile.getName().replaceFirst("[.][^.]+$", "");
@@ -162,8 +164,41 @@ public class CatzAutonomous extends SubsystemBase {
       NamedCommands.registerCommand(question, dashboardCmds.get(question));
     }
 
+=======
+>>>>>>> Stashed changes
     for (File autoFile : autosDirectory.listFiles()) {
       String autoName = autoFile.getName().replaceFirst("[.][^.]+$", "");
+      ArrayList<Object> commands = JSONUtil.getCommandsFromAuton(autoName);
+      System.out.println("autoname: " + autoName);
+      for (Object o : commands) {
+        String pathName = JSONUtil.getCommandName(o);
+        try {
+          String[] components = pathName.split("\\+");
+          Command command = new InstantCommand();
+          System.out.println("name: " + pathName);
+
+
+          if(components.length == 1){
+            command = new TrajectoryDriveCmd(PathPlannerPath.fromPathFile(pathName), m_container.getCatzDrivetrain(), true);
+          } else if(components.length == 2){
+            System.out.println("legnth 2222222222222222");
+            String name = components[0];
+            String action = components[1];
+
+            if(action == "CoralStation"){
+              command = new DriveAndCycle(PathPlannerPath.fromPathFile(name), m_container, RobotAction.INTAKE);
+            } else if(action.contains("ReefL")){
+              System.out.println("reeeetftftfgtgtgytgygg");
+              System.out.println("lebeleelvlevlevlel: " + Integer.parseInt(action.substring("ReefL".length())));
+              command = new DriveAndCycle(PathPlannerPath.fromPathFile(name), m_container, RobotAction.OUTTAKE, Integer.parseInt(action.substring("ReefL".length())));
+            }
+          }
+          NamedCommands.registerCommand(pathName, command);
+        } catch (FileVersionException | IOException | ParseException e) {
+          e.printStackTrace();
+        }
+      }
+
       autoProgramChooser.addDefaultOption(autoName, new PathPlannerAuto(autoName));
     }
     autoProgramChooser.addOption("Wheel Characterization", new PathPlannerAuto("Wheel Characterization"));
@@ -188,11 +223,7 @@ public class CatzAutonomous extends SubsystemBase {
         SmartDashboard.putData(questionName + " Response", new SendableChooser<Command>());
       }
 
-      JSONObject json =
-          (JSONObject)
-              parser.parse(
-                  new FileReader(autosDirectory + "/" + selectedProgram.getName() + ".auto"));
-      ArrayList<Object> commands = JSONUtil.getCommandsFromPath(json);
+      ArrayList<Object> commands = JSONUtil.getCommandsFromAuton(selectedProgram.getName());
       int questionCounter = 1;
 
       for (Object o : commands) {

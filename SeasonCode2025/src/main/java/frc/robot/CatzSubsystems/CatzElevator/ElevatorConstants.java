@@ -27,6 +27,13 @@ public class ElevatorConstants {
     public static final double FINAL_REDUCATION          = MAXPLANETARY_GEAR_RATIO * ELEVATOR_RATIO_STAGE_ONE;
     public static final double ELEVATOR_SPROCKET_RADIUS  = 0.86; //inches
 
+<<<<<<< Updated upstream
+=======
+    // Elevator Limits
+    public static final double UPPER_LIMIT_RAD = 162.0;
+    public static final double LOWER_LIMIT_RAD = 0.0;
+
+>>>>>>> Stashed changes
     // Elevator Heights:(Rotations)
     public static final double STOW_HEIGHT = 0.0;  // /ELEVATOR_SPROCKET_RADIUS;
     public static final double L1_HEIGHT   = 10.0; // 8.6    / ELEVATOR_SPROCKET_RADIUS;
