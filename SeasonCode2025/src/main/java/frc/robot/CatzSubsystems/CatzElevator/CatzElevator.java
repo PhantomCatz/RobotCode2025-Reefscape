@@ -25,6 +25,8 @@ import org.littletonrobotics.junction.Logger;
 
 
 public class CatzElevator extends SubsystemBase {
+
+
   private final ElevatorIO io;
   private final ElevatorIOInputsAutoLogged inputs = new ElevatorIOInputsAutoLogged();
 
@@ -58,8 +60,7 @@ public class CatzElevator extends SubsystemBase {
       PosL3(() -> L3_HEIGHT),
       PosL4(() -> L4_HEIGHT),
       PosL4Adj(() -> L4_CORAL_ADJ),
-      PosManual(new LoggedTunableNumber("Elevator/ScoreSourceSetpoint",0.0)),
-      PosNull(() -> -1.0);
+      PosManual(new LoggedTunableNumber("Elevator/ScoreSourceSetpoint",0.0));
 
     private final DoubleSupplier elevatorSetpointSupplier;
 
@@ -126,30 +127,21 @@ public class CatzElevator extends SubsystemBase {
     // if(targetPosition == ElevatorPosition.PosL4) {
 
     //   elevatorFeedForward =  gains.kG() + 0.1;
-    //} else {
+    // } else {
       elevatorFeedForward =  gains.kG();
-    //}
+    // }
 
     //---------------------------------------------------------------------------------------------------------------------------
     //    Control Mode setting
     //---------------------------------------------------------------------------------------------------------------------------
     if(DriverStation.isDisabled()) {
-      // Disabled
       io.stop();
-      targetPosition = ElevatorPosition.PosNull;
     } else if(targetPosition != ElevatorPosition.PosManual){
-      // Semi Manual
-      io.runSetpoint(targetPosition.getTargetPositionRads(), elevatorFeedForward);
-    } else if(targetPosition != ElevatorPosition.PosNull){
-      // Setpoint PID
-      if(getElevatorPositionRads() < 30.0) {
-        io.runMotor(elevatorFeedForward - 0.1);
-      } else {
-        io.runSetpoint(targetManualPosition, elevatorFeedForward);
-      }
-    } else {
-      // Nothing happening
+        io.runSetpoint(targetPosition.getTargetPositionRads(), elevatorFeedForward);
+    } else if(getElevatorPositionRads() < 15.0) {
       io.runMotor(0.0);
+    } else {
+      io.runSetpoint(targetManualPosition, elevatorFeedForward);
     }
 
     //----------------------------------------------------------------------------------------------------------------------------

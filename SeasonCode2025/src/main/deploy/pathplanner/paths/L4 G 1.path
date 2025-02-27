@@ -33,22 +33,16 @@
   "pointTowardsZones": [],
   "eventMarkers": [
     {
-      "name": "L4CoralMarker",
-      "waypointRelativePos": 0.7507122507122468,
+      "name": "L4Coral",
+      "waypointRelativePos": 0,
       "endWaypointRelativePos": null,
-      "command": {
-        "type": "sequential",
-        "data": {
-          "commands": [
-            {
-              "type": "named",
-              "data": {
-                "name": "L4Coral"
-              }
-            }
-          ]
-        }
-      }
+      "command": null
+    },
+    {
+      "name": "",
+      "waypointRelativePos": 0,
+      "endWaypointRelativePos": null,
+      "command": null
     }
   ],
   "globalConstraints": {
@@ -67,7 +61,7 @@
   "folder": "L4 G Paths",
   "idealStartingState": {
     "velocity": 0,
-    "rotation": 0.0
+    "rotation": 180.0
   },
   "useDefaultConstraints": true
 }

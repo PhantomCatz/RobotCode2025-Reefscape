@@ -17,7 +17,7 @@ import frc.robot.Utilities.MotorUtil.MotionMagicParameters;
 /** Add your docs here. */
 public class ElevatorConstants {
 
-    public static final boolean isElevatorDisabled = true;
+    public static final boolean isElevatorDisabled = false;
 
     // Gearbox definitions
     public static final double MAXPLANETARY_GEAR_RATIO   = 4.0 * 4.0;
@@ -26,11 +26,11 @@ public class ElevatorConstants {
     public static final double ELEVATOR_RATIO_STAGE_ONE  = ELEVATOR_DRIVING_PULLEY/ELEVATOR_DRIVEN_PULLEY;
     public static final double FINAL_REDUCATION          = MAXPLANETARY_GEAR_RATIO * ELEVATOR_RATIO_STAGE_ONE;
     public static final double ELEVATOR_SPROCKET_RADIUS  = 0.86; //inches
-
+    
     // Elevator Limits
     public static final double UPPER_LIMIT_RAD = 162.0;
     public static final double LOWER_LIMIT_RAD = 0.0;
-  
+
     // Elevator Heights:(Rotations)
     public static final double STOW_HEIGHT = 0.0;  // /ELEVATOR_SPROCKET_RADIUS;
     public static final double L1_HEIGHT   = 10.0; // 8.6    / ELEVATOR_SPROCKET_RADIUS;
@@ -54,9 +54,10 @@ public class ElevatorConstants {
 
     // Misc constants
     public static final boolean IS_LEADER_INVERTED = false;
+    public static final double  MIN_ROTATIONS = 0.0;
+    public static final double  MAX_ROTATIONS = 117.0;
     public static final Translation2d elevatorOrigin = new Translation2d(-0.238, 0.298);
     public static final double MANUAL_SCALE = 0.5;
-
     // Initial PIDF and motion magic assignment
     public static final Gains gains =
         switch (CatzConstants.getRobotType()) {
@@ -81,5 +82,7 @@ public class ElevatorConstants {
     public static final LoggedTunableNumber mmCruiseVelocity = new LoggedTunableNumber("Elevator/Gains/kV", motionMagicParameters.mmCruiseVelocity());
     public static final LoggedTunableNumber mmAcceleration = new LoggedTunableNumber("Elevator/Gains/kA", motionMagicParameters.mmAcceleration());
     public static final LoggedTunableNumber mmJerk = new LoggedTunableNumber("Elevator/Gains/kG", motionMagicParameters.mmJerk());
+    public static final LoggedTunableNumber lowerLimitRotations = new LoggedTunableNumber("Elevator/LowerLimitDegrees", MIN_ROTATIONS);
+    public static final LoggedTunableNumber upperLimitRotations = new LoggedTunableNumber("Elevator/UpperLimitDegrees", MAX_ROTATIONS);
 
 }
