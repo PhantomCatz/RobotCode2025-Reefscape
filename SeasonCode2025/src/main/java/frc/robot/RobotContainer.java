@@ -32,6 +32,7 @@ import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.Vision.VisionIOLime
 import frc.robot.CatzSubsystems.CatzElevator.*;
 import frc.robot.CatzSubsystems.CatzLEDs.CatzLED;
 import frc.robot.CatzSubsystems.CatzOuttake.CatzOuttake;
+import frc.robot.CatzSubsystems.CatzRampPivot.CatzRampPivot;
 import frc.robot.Commands.DriveAndRobotOrientationCmds.TeleopDriveCmd;
 import frc.robot.Utilities.Alert;
 import frc.robot.Utilities.AllianceFlipUtil;
@@ -58,6 +59,7 @@ public class RobotContainer {
   private CatzClimb climb = new CatzClimb();
   private CatzAlgaeRemover algaeRemover = new CatzAlgaeRemover();
   private CatzAlgaePivot algaePivot = new CatzAlgaePivot();
+  private CatzRampPivot rampPivot = new CatzRampPivot();
   private CatzSuperstructure superstructure = new CatzSuperstructure(this);
 
   // ------------------------------------------------------------------------------------------------------------------
@@ -310,6 +312,10 @@ public class RobotContainer {
 
   public CatzVision getCatzVision() {
     return vision;
+  }
+
+  public CatzRampPivot getCatzRampPivot() {
+    return rampPivot;
   }
 
   public CatzSuperstructure getSuperstructure(){

@@ -242,7 +242,7 @@ public class TrajectoryDriveCmd extends Command {
       if(Double.isNaN(adjustedSpeeds.vxMetersPerSecond) || Double.isNaN(adjustedSpeeds.vyMetersPerSecond) || Double.isNaN(adjustedSpeeds.omegaRadiansPerSecond)){
         adjustedSpeeds = new ChassisSpeeds();
       }
-      
+
       // Logging
       Logger.recordOutput("CatzRobotTracker/Desired Auto Pose", goal.pose);
 
