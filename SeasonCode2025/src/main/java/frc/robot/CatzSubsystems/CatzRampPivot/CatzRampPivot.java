@@ -9,6 +9,7 @@ package frc.robot.CatzSubsystems.CatzRampPivot;
 
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.CatzConstants;
 import frc.robot.CatzSubsystems.CatzElevator.CatzElevator.ElevatorPosition;
@@ -18,6 +19,7 @@ import lombok.RequiredArgsConstructor;
 import static frc.robot.CatzSubsystems.CatzRampPivot.RampPivotConstants.*;
 
 import java.util.function.DoubleSupplier;
+import java.util.function.Supplier;
 
 import org.littletonrobotics.junction.Logger;
 
@@ -81,6 +83,10 @@ public class CatzRampPivot extends SubsystemBase {
     } else {
       io.runMotor(0.0);
     }
+  }
+
+  public Command rampPivotFullManual(Supplier<Double> manualSupplier) {
+    return run(()->io.runMotor(manualSupplier.get())).alongWith(Commands.print("full manual"));
   }
 
   public Command Ramp_Stow() {
