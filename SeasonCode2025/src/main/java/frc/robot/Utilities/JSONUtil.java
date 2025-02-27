@@ -7,12 +7,20 @@
 
 package frc.robot.Utilities;
 
+import java.io.File;
+import java.io.FileReader;
 import java.util.ArrayList;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+
+import edu.wpi.first.wpilibj.Filesystem;
 
 /** Add your docs here. */
 public class JSONUtil {
+  private static File autosDirectory = new File(Filesystem.getDeployDirectory(), "pathplanner/autos");
+  private static JSONParser parser = new JSONParser();
+
   public static ArrayList<Object> getCommandsFromPath(JSONObject json) {
     return JSONUtil.getCommandsFromCommandGroup((Object) json.get("command"));
   }
@@ -43,6 +51,19 @@ public class JSONUtil {
     }
 
     return commandsList;
+  }
+
+  public static ArrayList<Object> getCommandsFromAuton(String name){
+    try {
+      JSONObject json =
+          (JSONObject)
+              parser.parse(
+                  new FileReader(autosDirectory + "/" + name + ".auto"));
+      return JSONUtil.getCommandsFromPath(json);
+    } catch(Exception e) {
+      e.printStackTrace();
+      return null;
+    }
   }
 
   public static String getCommandName(Object o) {

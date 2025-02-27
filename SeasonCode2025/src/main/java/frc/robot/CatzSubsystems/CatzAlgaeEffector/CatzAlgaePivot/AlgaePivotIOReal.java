@@ -10,11 +10,9 @@ package frc.robot.CatzSubsystems.CatzAlgaeEffector.CatzAlgaePivot;
 import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
-import com.ctre.phoenix6.controls.DutyCycleOut;
 import com.ctre.phoenix6.controls.PositionVoltage;
 import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.TalonFX;
-import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 
 import edu.wpi.first.units.measure.Angle;
@@ -30,6 +28,7 @@ import static frc.robot.CatzSubsystems.CatzAlgaeEffector.CatzAlgaePivot.AlgaePiv
 public class AlgaePivotIOReal implements AlgaePivotIO {
 
   private TalonFX algaePivotMotor = new TalonFX(ALGAE_PIVOT_MOTOR_ID);
+
 
   private final PositionVoltage positionControl = new PositionVoltage(0).withUpdateFreqHz(0.0);
   private final VoltageOut voltageControl = new VoltageOut(0).withUpdateFreqHz(0.0);
@@ -69,8 +68,6 @@ public class AlgaePivotIOReal implements AlgaePivotIO {
 
     config.CurrentLimits.SupplyCurrentLimit = 80.0;
     config.CurrentLimits.SupplyCurrentLimitEnable = true;
-    config.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
-
 
     config.MotorOutput.NeutralMode = NeutralModeValue.Brake;
 
@@ -81,7 +78,7 @@ public class AlgaePivotIOReal implements AlgaePivotIO {
 
     algaePivotMotor.getConfigurator().apply(config, 1.0);
 
-    algaePivotMotor.setPosition(PIVOT_INITIAL_POS);
+    algaePivotMotor.setPosition(0);
   }
 
   @Override
@@ -95,7 +92,7 @@ public class AlgaePivotIOReal implements AlgaePivotIO {
                 algaePivotTorqueCurrent,
                 algaePivotTempCelsius)
             .isOK();
-    inputs.positionMechs     = (algaePivotPosition.getValueAsDouble()/ALGAE_PIVOT_GEAR_REDUCTION) * (360.0);
+    inputs.positionMechs     = algaePivotPosition.getValueAsDouble();
     inputs.velocityRpm       = algaePivotVelocity.getValueAsDouble() * 60.0;
     inputs.appliedVolts      = algaePivotAppliedVolts.getValueAsDouble();
     inputs.supplyCurrentAmps = algaePivotSupplyCurrent.getValueAsDouble();
@@ -110,11 +107,10 @@ public class AlgaePivotIOReal implements AlgaePivotIO {
   }
 
   @Override
-  public void runSetpoint(double targetDegrees, double feedforward) {
-    double setpointRotations = ((targetDegrees / 360) * ALGAE_PIVOT_GEAR_REDUCTION);
+  public void runSetpoint(double setpointRotations, double feedforward) {
     algaePivotMotor.setControl(positionControl.withPosition(setpointRotations)
                                               .withFeedForward(feedforward));
-    System.out.println(setpointRotations);
+    // System.out.println(setpointRotations);
   }
 
   @Override
@@ -138,11 +134,6 @@ public class AlgaePivotIOReal implements AlgaePivotIO {
     config.Slot0.kA = kA;
     System.out.println("kS: " + kS + " kV: " + kV + " kA: " + kA);
     algaePivotMotor.getConfigurator().apply(config);
-  }
-
-  @Override
-  public void setPercentOutput(double percentOutput) {
-    algaePivotMotor.setControl(new DutyCycleOut(percentOutput));
   }
 
 }

@@ -30,7 +30,7 @@ public class DriveConstants {
   // ---------------------------------------------------------------------------------------------------------------
   // Disabled flag for testing
   // ---------------------------------------------------------------------------------------------------------------
-  public static final boolean IS_DRIVE_DISABLED = true;
+  public static final boolean IS_DRIVE_DISABLED = false; //bruh
 
   // ---------------------------------------------------------------------------------------------------------------
   // Module organizations
@@ -213,10 +213,10 @@ public class DriveConstants {
   // -----------------------------------------------------------------------------------------------------------------------------
   public static HolonomicDriveController getNewHolController() {
     return new HolonomicDriveController(
-        new PIDController(4.0, 0.0, 0.0),
-        new PIDController(4.0, 0.0, 0.0),
+        new PIDController(10.0, 0.0, 0.0),
+        new PIDController(10.0, 0.0, 0.0),
         new ProfiledPIDController(
-            4.0,
+            10.0,
             0,
             0,
             new TrapezoidProfile.Constraints(

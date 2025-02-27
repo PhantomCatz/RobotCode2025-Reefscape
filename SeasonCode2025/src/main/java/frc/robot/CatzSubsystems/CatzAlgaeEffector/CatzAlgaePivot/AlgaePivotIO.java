@@ -28,8 +28,6 @@ public interface AlgaePivotIO {
 
   public default void setPosition(double pos) {}
 
-  public default void setPercentOutput(double percentOutput) {}
-
   public default void runSetpointTicks(double setpointTicks) {}
 
   public default void setPID(double kP, double kI, double kD) {}
@@ -37,6 +35,8 @@ public interface AlgaePivotIO {
   public default void setFF(double kS, double kV, double kA) {}
 
   public default void runCharacterizationMotor(double input) {}
+
+  //   public default void updateInputs(AlgaePivotIOInputs inputs) {}
 
   public default void runSetpoint(double setpointRotations, double feedforward) {}
 

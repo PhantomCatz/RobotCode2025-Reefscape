@@ -135,11 +135,11 @@ public class FeedForwardCharacterization extends Command {
                 voltageData.stream().mapToDouble(Double::doubleValue).toArray(),
                 1);
 
-        System.out.println("FF Characterization Results:");
-        System.out.println("\tCount=" + Integer.toString(velocityData.size()) + "");
-        System.out.println(String.format("\tR2=%.5f", regression.R2()));
-        System.out.println(String.format("\tkS=%.5f", regression.beta(0)));
-        System.out.println(String.format("\tkV=%.5f", regression.beta(1)));
+        // System.out.println("FF Characterization Results:");
+        // System.out.println("\tCount=" + Integer.toString(velocityData.size()) + "");
+        // System.out.println(String.format("\tR2=%.5f", regression.R2()));
+        // System.out.println(String.format("\tkS=%.5f", regression.beta(0)));
+        // System.out.println(String.format("\tkV=%.5f", regression.beta(1)));
       }
     }
   } // end of FeedForwardCharacterizationData
