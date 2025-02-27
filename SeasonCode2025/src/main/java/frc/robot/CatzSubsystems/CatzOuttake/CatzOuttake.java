@@ -8,6 +8,7 @@
 package frc.robot.CatzSubsystems.CatzOuttake;
 import static frc.robot.CatzSubsystems.CatzOuttake.OuttakeConstants.*;
 
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -82,6 +83,12 @@ public class CatzOuttake extends SubsystemBase {
   public void periodic() {
     io.updateInputs(inputs);
     Logger.processInputs("RealInputs/Outtake", inputs);
+
+    if(DriverStation.isDisabled()) {
+      currentState = outtakeStates.STOP;
+      io.runMotor(0.0, 0.0);
+      io.runIntakesIntakeMotor(0.0);
+    }
 
     if(currentState != previousState) {
       interationCounter = 0;

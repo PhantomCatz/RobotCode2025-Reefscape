@@ -157,6 +157,11 @@ public class ElevatorIOReal implements ElevatorIO {
   }
 
   @Override
+  public void stop() {
+    leaderTalon.setControl(new DutyCycleOut(0.0));
+  }
+
+  @Override
   public void setPID(double kP, double kI, double kD) {
     config.Slot0.kP = kP;
     config.Slot0.kI = kI;
