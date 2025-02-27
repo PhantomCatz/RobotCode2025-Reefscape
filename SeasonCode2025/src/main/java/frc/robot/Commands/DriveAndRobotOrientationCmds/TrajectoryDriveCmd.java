@@ -55,7 +55,8 @@ public class TrajectoryDriveCmd extends Command {
   private static final double TIMEOUT_SCALAR = 5.0;
   private static final double CONVERGE_DISTANCE = 1.0;
   private static final double DIVERGE_TIME = 1.0;
-  private final double ALLOWABLE_VISION_ADJUST = 9e-4; // TODO tune
+  private final double ALLOWABLE_VISION_ADJUST = 9e-4; //TODO tune
+
   // Subsystems
   private CatzDrivetrain m_driveTrain;
   private CatzRobotTracker tracker = CatzRobotTracker.getInstance();
@@ -76,10 +77,6 @@ public class TrajectoryDriveCmd extends Command {
   // Event Command variables
   private final EventScheduler eventScheduler;
   private boolean isEventCommandRunning = false;
-  private ChassisSpeeds applyCusp(ChassisSpeeds speeds, double distance) {
-    // graph 1 / (1+x) on desmos
-    return speeds.times(2 * distance / (1 + distance));
-  }
 
   // ---------------------------------------------------------------------------------------------
   //
@@ -116,6 +113,7 @@ public class TrajectoryDriveCmd extends Command {
       usePath = path.flipPath();
     }
 
+
     // Pose Reseting
     if (Robot.isFirstPath && DriverStation.isAutonomous()) {
       try {
@@ -126,8 +124,10 @@ public class TrajectoryDriveCmd extends Command {
       }
     }
 
+
     // Collect current drive state
     ChassisSpeeds currentSpeeds = DriveConstants.SWERVE_KINEMATICS.toChassisSpeeds(tracker.getCurrentModuleStates());
+
 
     // If we provide an initial speed of zero the trajectory will take an infinite
     // time to finish
@@ -135,8 +135,6 @@ public class TrajectoryDriveCmd extends Command {
     if (Math.hypot(currentSpeeds.vxMetersPerSecond, currentSpeeds.vxMetersPerSecond) < 1e-6) {
       currentSpeeds = DriveConstants.NON_ZERO_CHASSIS_SPEED;
     }
-
-    // Determine Trajectory vs Simple PID path following
 
     // Construct trajectory
     this.trajectory = new PathPlannerTrajectory(
@@ -148,6 +146,7 @@ public class TrajectoryDriveCmd extends Command {
     hocontroller = DriveConstants.getNewHolController();
     pathTimeOut = trajectory.getTotalTimeSeconds() * TIMEOUT_SCALAR;
 
+    // Event marker initialize
     eventScheduler.initialize(trajectory);
 
     // System.out.println("current " + tracker.getEstimatedPose());
@@ -162,6 +161,8 @@ public class TrajectoryDriveCmd extends Command {
     this.timer.start();
   } // end of initialize()
 
+
+
   // ---------------------------------------------------------------------------------------------
   //
   // Execute
@@ -174,6 +175,7 @@ public class TrajectoryDriveCmd extends Command {
     Pose2d currentPose = tracker.getEstimatedPose();
     ChassisSpeeds currentSpeeds = DriveConstants.SWERVE_KINEMATICS.toChassisSpeeds(m_driveTrain.getModuleStates());
     double currentVel = Math.hypot(currentSpeeds.vxMetersPerSecond, currentSpeeds.vyMetersPerSecond);
+
 
     // -------------------------------------------------------------------------------------
     // Convert PP trajectory into a wpilib trajectory type
@@ -190,51 +192,24 @@ public class TrajectoryDriveCmd extends Command {
         goal.linearVelocity * DriveConstants.TRAJECTORY_FF_SCALAR,
         0.0,
         new Pose2d(goal.pose.getTranslation(), goal.heading),
-        0.0);
+        0.0
+    );
+
 
     // construct chassisspeeds
     adjustedSpeeds = hocontroller.calculate(currentPose, state, goal.pose.getRotation());
 
-      // construct chassisspeeds
-      adjustedSpeeds = hocontroller.calculate(currentPose, state, goal.pose.getRotation());
-
-      // Cusps x/(1+x) Lower speed for closer distances to prevent jittering //TODO tune
-      if(currentTime <= 1.5){
-        adjustedSpeeds = adjustedSpeeds.times(DIVERGE_TIME * currentTime / (DIVERGE_TIME * currentTime + 1));
-      }
-      if(autoalign && translationError < 1.0){
-        adjustedSpeeds = adjustedSpeeds.times(CONVERGE_DISTANCE * translationError / (CONVERGE_DISTANCE * translationError + 1));
-      }
-      if(Double.isNaN(adjustedSpeeds.vxMetersPerSecond) || Double.isNaN(adjustedSpeeds.vyMetersPerSecond) || Double.isNaN(adjustedSpeeds.omegaRadiansPerSecond)){
-        adjustedSpeeds = new ChassisSpeeds();
-      }
-
-      // Logging
-      Logger.recordOutput("CatzRobotTracker/Desired Auto Pose", goal.pose);
-
-      PPLibTelemetry.setCurrentPose(currentPose);
-      PathPlannerLogging.logCurrentPose(currentPose);
-
-      PPLibTelemetry.setTargetPose(goal.pose);
-      PathPlannerLogging.logTargetPose(goal.pose);
-
-      PPLibTelemetry.setVelocities(
-          currentVel,
-          goal.linearVelocity,
-          currentSpeeds.omegaRadiansPerSecond,
-          goal.heading.getRadians()
-      );
     // Cusps x/(1+x) Lower speed for closer distances to prevent jittering
-    if (currentTime <= 1.0) {
-      adjustedSpeeds = applyCusp(adjustedSpeeds, currentTime * DIVERGE_TIME);
+    if(currentTime <= 1.5){
+      adjustedSpeeds = adjustedSpeeds.times(DIVERGE_TIME * currentTime / (DIVERGE_TIME * currentTime + 1));
     }
-    if (autoalign && translationError < 1.5) {
-      adjustedSpeeds = applyCusp(adjustedSpeeds, translationError * CONVERGE_DISTANCE);
+    if(autoalign && translationError < 1.0){
+      adjustedSpeeds = adjustedSpeeds.times(CONVERGE_DISTANCE * translationError / (CONVERGE_DISTANCE * translationError + 1));
     }
-    if (Double.isNaN(adjustedSpeeds.vxMetersPerSecond) || Double.isNaN(adjustedSpeeds.vyMetersPerSecond)
-        || Double.isNaN(adjustedSpeeds.omegaRadiansPerSecond)) {
+    if(Double.isNaN(adjustedSpeeds.vxMetersPerSecond) || Double.isNaN(adjustedSpeeds.vyMetersPerSecond) || Double.isNaN(adjustedSpeeds.omegaRadiansPerSecond)){
       adjustedSpeeds = new ChassisSpeeds();
     }
+
 
     // Logging
     Logger.recordOutput("CatzRobotTracker/Desired Auto Pose", goal.pose);
@@ -249,13 +224,17 @@ public class TrajectoryDriveCmd extends Command {
         currentVel,
         goal.linearVelocity,
         currentSpeeds.omegaRadiansPerSecond,
-        goal.heading.getRadians());
+        goal.heading.getRadians()
+    );
+
 
     // send to drivetrain
     m_driveTrain.drive(adjustedSpeeds);
 
+
     // Named Commands
     eventScheduler.execute(currentTime);
+
 
     // Logging
     debugLogsTrajectory();
@@ -267,7 +246,6 @@ public class TrajectoryDriveCmd extends Command {
   //
   // ---------------------------------------------------------------------------------------------
   public void debugLogsTrajectory() {
-    // Logger.recordOutput("Trajectory/PID aim pose", goalPIDAimPose);
   }
 
   @Override
@@ -294,17 +272,20 @@ public class TrajectoryDriveCmd extends Command {
     // System.out
     //     .println("vision: " + (tracker.getDEstimatedPose().getTranslation().getNorm()) + " pose: " + translationError);
 
+    // Event Command or timeout
     if (timer.hasElapsed(pathTimeOut) && !isEventCommandRunning) {
       System.out.println("timed out!!@)!*()*!)(#*)");
       return true;
     }
 
     if (autoalign && tracker.getDEstimatedPose().getTranslation().getNorm() > ALLOWABLE_VISION_ADJUST) {
-      System.out.println("vision is not true!@!@!)@(!)@()(!@)");
+      // If trailing pose is within margin
+      // System.out.println("vision is not true!@!@!)@(!)@()(!@)");
       return false;
     }
     // Finish command if the total time the path takes is over
 
+    // Autonomous vs Autoalign margins
     if (autoalign) {
       // System.out.println("passed vision check!!!@)*)(*)(@*#()*@)#(*)");
       return isWithinThreshold(ALLOWABLE_AUTOAIM_ERROR);
@@ -313,6 +294,12 @@ public class TrajectoryDriveCmd extends Command {
       return isWithinThreshold(ALLOWABLE_POSE_ERROR);
     }
   }
+
+  private ChassisSpeeds applyCusp(ChassisSpeeds speeds, double distance) {
+    // graph 1 / (1+x) on desmos
+    return speeds.times(distance / (1 + distance));
+  }
+
 
   public boolean isWithinThreshold(double poseError) {
     // Check if the robot is near goal (and if robot velocity is zero if goal

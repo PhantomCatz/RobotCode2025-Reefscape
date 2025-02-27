@@ -242,7 +242,14 @@ public class CatzAutonomous extends SubsystemBase {
 
   /** Getter for final autonomous Program */
   public Command getCommand() {
-    return lastProgram;
+    PathPlannerPath path = null;
+    try{
+      path = PathPlannerPath.fromPathFile("L4 I 1");
+    } catch (Exception e){
+      e.printStackTrace();
+    }
+
+    return new DriveAndCycle(path, m_container, RobotAction.OUTTAKE, 4);
   }
 
   // ---------------------------------------------------------------------------------------------------------

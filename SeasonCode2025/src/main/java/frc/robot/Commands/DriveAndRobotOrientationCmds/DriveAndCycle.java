@@ -51,7 +51,10 @@ public class DriveAndCycle extends TrajectoryDriveCmd{
 
     @Override
     public void execute(){
+        // Run Trajectory
         super.execute();
+
+        // Run Scoring or Intaking
         if (super.isWithinThreshold(PREDICT_DISTANCE) && !super.isFinished()){
             if(action == RobotAction.OUTTAKE){
                 System.out.println("raised elevator!!!!!!!");
@@ -62,8 +65,10 @@ public class DriveAndCycle extends TrajectoryDriveCmd{
                 superstructure.setCurrentRobotAction(RobotAction.INTAKE);
             }
         }
+
+        // If we reached the target Destination
         if (super.isFinished()){
-            superstructure.setCurrentRobotAction(action, level);
+            superstructure.setCurrentRobotAction(action, this.level);
             if (selector.useFakeCoral){
                 selector.hasCoralSIM = action == RobotAction.INTAKE;
             }

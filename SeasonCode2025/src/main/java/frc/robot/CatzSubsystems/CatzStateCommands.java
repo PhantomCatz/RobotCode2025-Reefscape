@@ -165,7 +165,8 @@ public class CatzStateCommands {
             climb.Climb_Retract(),
             algae.stopAlgae(),
             elevator.Elevator_L1()
-        )//.onlyIf(() -> CatzSuperstructure.getCurrentCoralState() == CoralState.IN_OUTTAKE)
+        ).withTimeout(1.0)
+        //.onlyIf(() -> CatzSuperstructure.getCurrentCoralState() == CoralState.IN_OUTTAKE)
          .unless(()-> Robot.isSimulation()).alongWith(Commands.print("L1 Elevator")).unless(()-> Robot.isSimulation());
     }
 
@@ -179,7 +180,8 @@ public class CatzStateCommands {
             climb.Climb_Retract(),
             algae.stopAlgae(),
             elevator.Elevator_L2()
-        )//.onlyIf(() -> CatzSuperstructure.getCurrentCoralState() == CoralState.IN_OUTTAKE)
+        ).withTimeout(1.0)
+        //.onlyIf(() -> CatzSuperstructure.getCurrentCoralState() == CoralState.IN_OUTTAKE)
          .unless(()-> Robot.isSimulation()).alongWith(Commands.print("L2 Scoring State")).unless(()-> Robot.isSimulation());
     }
 
@@ -193,7 +195,8 @@ public class CatzStateCommands {
             climb.Climb_Retract(),
             algae.stopAlgae(),
             elevator.Elevator_L3()
-        )//.onlyIf(() -> CatzSuperstructure.getCurrentCoralState() == CoralState.IN_OUTTAKE)
+        ).withTimeout(1.0)
+        //.onlyIf(() -> CatzSuperstructure.getCurrentCoralState() == CoralState.IN_OUTTAKE)
          .unless(()-> Robot.isSimulation()).alongWith(Commands.print("L3 Scoring State")).unless(()-> Robot.isSimulation());
     }
 
@@ -207,7 +210,8 @@ public class CatzStateCommands {
             climb.Climb_Retract(),
             algae.stopAlgae(),
             elevator.Elevator_L4()
-        )//.onlyIf(() -> CatzSuperstructure.getCurrentCoralState() == CoralState.IN_OUTTAKE)
+        ).withTimeout(1.0)
+        //.onlyIf(() -> CatzSuperstructure.getCurrentCoralState() == CoralState.IN_OUTTAKE)
          .unless(()-> Robot.isSimulation()).alongWith(Commands.print("L4 Scoring State")).unless(()-> Robot.isSimulation());
     }
 

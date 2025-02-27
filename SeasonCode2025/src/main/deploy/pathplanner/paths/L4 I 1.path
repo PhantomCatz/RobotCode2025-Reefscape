@@ -4,24 +4,24 @@
     {
       "anchor": {
         "x": 7.204610655737704,
-        "y": 2.978
+        "y": 5.072
       },
       "prevControl": null,
       "nextControl": {
         "x": 6.017827868852459,
-        "y": 3.1458278688524586
+        "y": 5.239827868852458
       },
       "isLocked": false,
       "linkedName": "Start3"
     },
     {
       "anchor": {
-        "x": 5.286577868852459,
-        "y": 5.085911885245901
+        "x": 5.3,
+        "y": 5.072
       },
       "prevControl": {
-        "x": 6.052292520491803,
-        "y": 5.854623463114755
+        "x": 6.065714651639344,
+        "y": 5.840711577868854
       },
       "nextControl": null,
       "isLocked": false,
@@ -42,7 +42,7 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": -119.53878225955806
+    "rotation": -119.99999999999999
   },
   "reversed": false,
   "folder": "L4 I Paths",

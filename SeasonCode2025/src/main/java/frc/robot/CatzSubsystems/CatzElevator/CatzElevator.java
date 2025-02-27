@@ -117,9 +117,9 @@ public class CatzElevator extends SubsystemBase {
     //---------------------------------------------------------------------------------------------------------------------------
     //    Limit switch position setting
     //---------------------------------------------------------------------------------------------------------------------------
-    // if(inputs.isBotLimitSwitched) {
-    //   io.setPosition(ElevatorPosition.PosL4.getTargetPositionRads());
-    // }
+    if(inputs.isBotLimitSwitched) {
+      io.setPosition(ElevatorPosition.PosL4.getTargetPositionRads());
+    }
 
     //---------------------------------------------------------------------------------------------------------------------------
     //    Feed Foward
