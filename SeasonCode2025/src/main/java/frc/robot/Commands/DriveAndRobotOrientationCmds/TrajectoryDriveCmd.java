@@ -55,12 +55,8 @@ public class TrajectoryDriveCmd extends Command {
   private static final double TIMEOUT_SCALAR = 5.0;
   private static final double CONVERGE_DISTANCE = 1.0;
   private static final double DIVERGE_TIME = 1.0;
-<<<<<<< Updated upstream
   private final double ALLOWABLE_VISION_ADJUST = 9e-4; //TODO tune
 
-=======
-  private final double ALLOWABLE_VISION_ADJUST = 9e-4; // TODO tune
->>>>>>> Stashed changes
   // Subsystems
   private CatzDrivetrain m_driveTrain;
   private CatzRobotTracker tracker = CatzRobotTracker.getInstance();
@@ -81,13 +77,9 @@ public class TrajectoryDriveCmd extends Command {
   // Event Command variables
   private final EventScheduler eventScheduler;
   private boolean isEventCommandRunning = false;
-<<<<<<< Updated upstream
-=======
-
->>>>>>> Stashed changes
   private ChassisSpeeds applyCusp(ChassisSpeeds speeds, double distance) {
     // graph 1 / (1+x) on desmos
-    return speeds.times(2 * distance / (1 + distance));
+    return speeds.times(distance / (1 + distance));
   }
 
   // ---------------------------------------------------------------------------------------------
@@ -204,47 +196,14 @@ public class TrajectoryDriveCmd extends Command {
     // construct chassisspeeds
     adjustedSpeeds = hocontroller.calculate(currentPose, state, goal.pose.getRotation());
 
-<<<<<<< Updated upstream
-      // construct chassisspeeds
-      adjustedSpeeds = hocontroller.calculate(currentPose, state, goal.pose.getRotation());
-
-      // Cusps x/(1+x) Lower speed for closer distances to prevent jittering //TODO tune
-      if(currentTime <= 1.5){
-        adjustedSpeeds = adjustedSpeeds.times(DIVERGE_TIME * currentTime / (DIVERGE_TIME * currentTime + 1));
-      }
-      if(autoalign && translationError < 1.0){
-        adjustedSpeeds = adjustedSpeeds.times(CONVERGE_DISTANCE * translationError / (CONVERGE_DISTANCE * translationError + 1));
-      }
-      if(Double.isNaN(adjustedSpeeds.vxMetersPerSecond) || Double.isNaN(adjustedSpeeds.vyMetersPerSecond) || Double.isNaN(adjustedSpeeds.omegaRadiansPerSecond)){
-        adjustedSpeeds = new ChassisSpeeds();
-      }
-
-      // Logging
-      Logger.recordOutput("CatzRobotTracker/Desired Auto Pose", goal.pose);
-
-      PPLibTelemetry.setCurrentPose(currentPose);
-      PathPlannerLogging.logCurrentPose(currentPose);
-
-      PPLibTelemetry.setTargetPose(goal.pose);
-      PathPlannerLogging.logTargetPose(goal.pose);
-
-      PPLibTelemetry.setVelocities(
-          currentVel,
-          goal.linearVelocity,
-          currentSpeeds.omegaRadiansPerSecond,
-          goal.heading.getRadians()
-      );
-=======
->>>>>>> Stashed changes
     // Cusps x/(1+x) Lower speed for closer distances to prevent jittering
-    if (currentTime <= 1.0) {
-      adjustedSpeeds = applyCusp(adjustedSpeeds, currentTime * DIVERGE_TIME);
+    if(currentTime <= 1.5){
+      adjustedSpeeds = adjustedSpeeds.times(DIVERGE_TIME * currentTime / (DIVERGE_TIME * currentTime + 1));
     }
-    if (autoalign && translationError < 1.5) {
-      adjustedSpeeds = applyCusp(adjustedSpeeds, translationError * CONVERGE_DISTANCE);
+    if(autoalign && translationError < 1.0){
+      adjustedSpeeds = adjustedSpeeds.times(CONVERGE_DISTANCE * translationError / (CONVERGE_DISTANCE * translationError + 1));
     }
-    if (Double.isNaN(adjustedSpeeds.vxMetersPerSecond) || Double.isNaN(adjustedSpeeds.vyMetersPerSecond)
-        || Double.isNaN(adjustedSpeeds.omegaRadiansPerSecond)) {
+    if(Double.isNaN(adjustedSpeeds.vxMetersPerSecond) || Double.isNaN(adjustedSpeeds.vyMetersPerSecond) || Double.isNaN(adjustedSpeeds.omegaRadiansPerSecond)){
       adjustedSpeeds = new ChassisSpeeds();
     }
 
@@ -261,7 +220,8 @@ public class TrajectoryDriveCmd extends Command {
         currentVel,
         goal.linearVelocity,
         currentSpeeds.omegaRadiansPerSecond,
-        goal.heading.getRadians());
+        goal.heading.getRadians()
+    );
 
     // send to drivetrain
     m_driveTrain.drive(adjustedSpeeds);
