@@ -56,12 +56,12 @@ public class DriveAndCycle extends TrajectoryDriveCmd{
         super.execute();
 
         // Run Scoring or Intaking
-        if (super.isWithinThreshold(PREDICT_DISTANCE) && !super.isFinished()){
+        if (super.isPoseWithinThreshold(PREDICT_DISTANCE) && !super.isFinished()){
             if(action == RobotAction.OUTTAKE){
                 System.out.println("raised elevator!!!!!!!");
-                superstructure.setCurrentRobotAction(RobotAction.AIMING);
+                superstructure.setCurrentRobotAction(RobotAction.AIMING, level);
             }
-            if(action == RobotAction.INTAKE){
+            else if(action == RobotAction.INTAKE){
                 System.out.println("intaking!!!!!!");
                 superstructure.setCurrentRobotAction(RobotAction.INTAKE);
             }
@@ -70,7 +70,7 @@ public class DriveAndCycle extends TrajectoryDriveCmd{
         // If we reached the target Destination
         if (super.isFinished()){
             superstructure.setCurrentRobotAction(action, this.level);
-            System.out.println(action.toString());
+            System.out.println("action: " + action.toString());
             if (selector.useFakeCoral){
                 selector.hasCoralSIM = action == RobotAction.INTAKE;
             }
@@ -88,9 +88,16 @@ public class DriveAndCycle extends TrajectoryDriveCmd{
     @Override
     public boolean isFinished(){
         if(action == RobotAction.OUTTAKE){
-            return (CatzSuperstructure.getCurrentCoralState() == CoralState.NOT_IN_OUTTAKE);
+            if(selector.useFakeCoral){
+                return !selector.hasCoralSIM;
+            }else{
+                return (CatzSuperstructure.getCurrentCoralState() == CoralState.NOT_IN_OUTTAKE);
+            }
         }
         if(action == RobotAction.INTAKE){
+            if(selector.useFakeCoral){
+                return selector.hasCoralSIM;
+            }
             return (CatzSuperstructure.getCurrentCoralState() == CoralState.IN_OUTTAKE);
         }
         return false;

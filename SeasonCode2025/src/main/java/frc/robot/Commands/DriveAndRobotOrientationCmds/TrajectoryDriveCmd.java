@@ -288,10 +288,10 @@ public class TrajectoryDriveCmd extends Command {
     // Autonomous vs Autoalign margins
     if (autoalign) {
       // System.out.println("passed vision check!!!@)*)(*)(@*#()*@)#(*)");
-      return isWithinThreshold(ALLOWABLE_AUTOAIM_ERROR);
+      return isAtGoalState(ALLOWABLE_AUTOAIM_ERROR);
     } else {
       // System.out.println("not auto align!@!@!");
-      return isWithinThreshold(ALLOWABLE_POSE_ERROR);
+      return isAtGoalState(ALLOWABLE_POSE_ERROR);
     }
   }
 
@@ -300,18 +300,10 @@ public class TrajectoryDriveCmd extends Command {
     return speeds.times(distance / (1 + distance));
   }
 
-
-  public boolean isWithinThreshold(double poseError) {
-    // Check if the robot is near goal (and if robot velocity is zero if goal
-    // velocity is zero)
+  public boolean isAtGoalState(double poseError){
     PathPlannerTrajectoryState endState = trajectory.getEndState();
 
-    double currentPosX = tracker.getEstimatedPose().getX();
-    double currentPosY = tracker.getEstimatedPose().getY();
     double currentRotation = tracker.getEstimatedPose().getRotation().getDegrees();
-
-    double desiredPosX = endState.pose.getX();
-    double desiredPosY = endState.pose.getY();
     double desiredRotation = endState.pose.getRotation().getDegrees();
 
     ChassisSpeeds currentChassisSpeeds = tracker.getRobotChassisSpeeds();
@@ -319,22 +311,36 @@ public class TrajectoryDriveCmd extends Command {
     double currentMPS = Math.hypot(currentChassisSpeeds.vxMetersPerSecond, currentChassisSpeeds.vyMetersPerSecond);
     double currentRPS = currentChassisSpeeds.omegaRadiansPerSecond;
 
-    double xError = Math.abs(desiredPosX - currentPosX);
-    double yError = Math.abs(desiredPosY - currentPosY);
     double rotationError = Math.abs(desiredRotation - currentRotation);
     if (rotationError > 180) {
       rotationError = 360 - rotationError;
     }
+
+    return isPoseWithinThreshold(poseError) && rotationError < ALLOWABLE_OMEGA_ERROR &&
+    (desiredMPS == 0.0 || (currentMPS < ALLOWABLE_VEL_ERROR && currentRPS < ALLOWABLE_OMEGA_ERROR));
+  }
+
+  public boolean isPoseWithinThreshold(double poseError) {
+    // Check if the robot is near goal (and if robot velocity is zero if goal
+    // velocity is zero)
+    PathPlannerTrajectoryState endState = trajectory.getEndState();
+
+    double currentPosX = tracker.getEstimatedPose().getX();
+    double currentPosY = tracker.getEstimatedPose().getY();
+
+    double desiredPosX = endState.pose.getX();
+    double desiredPosY = endState.pose.getY();
+
+
+    double xError = Math.abs(desiredPosX - currentPosX);
+    double yError = Math.abs(desiredPosY - currentPosY);
+
     translationError = Math.hypot(xError, yError);
 
-    // System.out.println("rotait: " + (rotationError < ALLOWABLE_OMEGA_ERROR));
-    // System.out.println(
-    //     "speed: " + (desiredMPS == 0.0 || (currentMPS < ALLOWABLE_VEL_ERROR && currentRPS < ALLOWABLE_OMEGA_ERROR)));
+
     // System.out.println("poseerr:" + ((xError < poseError) &&(yError < poseError)));
     System.out.println("transerr: " + translationError);
-    System.out.println("pose errr: " + poseError);
-    return translationError < poseError &&
-        rotationError < ALLOWABLE_OMEGA_ERROR &&
-        (desiredMPS == 0.0 || (currentMPS < ALLOWABLE_VEL_ERROR && currentRPS < ALLOWABLE_OMEGA_ERROR));
+    // System.out.println("pose errr: " + poseError);
+    return translationError < poseError;
   }
 }
