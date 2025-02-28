@@ -111,6 +111,7 @@ public class TrajectoryDriveCmd extends Command {
     PathPlannerPath usePath = path;
     if (AllianceFlipUtil.shouldFlipToRed()) {
       usePath = path.flipPath();
+      System.out.println("Path flipped!!!!!");
     }
 
 
