@@ -50,27 +50,33 @@ public class DriveAndCycle extends TrajectoryDriveCmd{
         selector.hasCoralSIM = true;
     }
 
+    private boolean isAiming = false;
+
     @Override
     public void execute(){
         // Run Trajectory
-        super.execute();
+        if(!super.isFinished()){
+            super.execute();
+        }
 
         // Run Scoring or Intaking
-        if (super.isPoseWithinThreshold(PREDICT_DISTANCE) && !super.isFinished()){
+        if (super.isPoseWithinThreshold(PREDICT_DISTANCE) && !super.isFinished() && !isAiming){
             if(action == RobotAction.OUTTAKE){
                 System.out.println("raised elevator!!!!!!!");
                 superstructure.setCurrentRobotAction(RobotAction.AIMING, level);
+                isAiming = true;
             }
             else if(action == RobotAction.INTAKE){
-                System.out.println("intaking!!!!!!");
+                // System.out.println("intaking!!!!!!");
                 superstructure.setCurrentRobotAction(RobotAction.INTAKE);
             }
         }
 
         // If we reached the target Destination
-        if (super.isFinished()){
+        if (super.isFinished() && isAiming){
+            super.end(false);
             superstructure.setCurrentRobotAction(action, this.level);
-            System.out.println("action: " + action.toString());
+            // System.out.println("action: " + action.toString());
             if (selector.useFakeCoral){
                 selector.hasCoralSIM = action == RobotAction.INTAKE;
             }

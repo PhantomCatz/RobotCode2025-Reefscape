@@ -195,8 +195,8 @@ public class TrajectoryDriveCmd extends Command {
         new Pose2d(goal.pose.getTranslation(), goal.heading),
         0.0
     );
-
-
+    // System.out.println("speeeed: " + state.velocityMetersPerSecond);
+    
     // construct chassisspeeds
     adjustedSpeeds = hocontroller.calculate(currentPose, state, goal.pose.getRotation());
 
@@ -281,7 +281,7 @@ public class TrajectoryDriveCmd extends Command {
 
     if (autoalign && tracker.getDEstimatedPose().getTranslation().getNorm() > ALLOWABLE_VISION_ADJUST) {
       // If trailing pose is within margin
-      // System.out.println("vision is not true!@!@!)@(!)@()(!@)");
+      System.out.println("vision is not true");
       return false;
     }
     // Finish command if the total time the path takes is over
@@ -316,6 +316,8 @@ public class TrajectoryDriveCmd extends Command {
     if (rotationError > 180) {
       rotationError = 360 - rotationError;
     }
+    System.out.println("rotationerr: " + (rotationError < ALLOWABLE_OMEGA_ERROR));
+    System.out.println("speederr: " + (desiredMPS == 0.0 || (currentMPS < ALLOWABLE_VEL_ERROR && currentRPS < ALLOWABLE_OMEGA_ERROR)));
 
     return isPoseWithinThreshold(poseError) && rotationError < ALLOWABLE_OMEGA_ERROR &&
     (desiredMPS == 0.0 || (currentMPS < ALLOWABLE_VEL_ERROR && currentRPS < ALLOWABLE_OMEGA_ERROR));
