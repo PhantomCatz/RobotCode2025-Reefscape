@@ -18,7 +18,6 @@ import frc.robot.CatzConstants.RobotHardwareMode;
 import frc.robot.CatzConstants.RobotID;
 import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.CatzRobotTracker;
 import frc.robot.CatzSubsystems.CatzLEDs.CatzLED;
-import frc.robot.CatzSubsystems.CatzLEDs.CatzLED.crossbarState;
 import frc.robot.CatzSubsystems.CatzLEDs.CatzLED.railingState;
 import frc.robot.Utilities.Alert;
 import frc.robot.Utilities.Alert.AlertType;

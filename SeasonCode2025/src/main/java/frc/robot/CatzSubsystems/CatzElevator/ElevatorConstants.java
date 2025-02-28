@@ -32,7 +32,7 @@ public class ElevatorConstants {
     public static final double LOWER_LIMIT_RAD = 0.0;
 
     // Elevator Heights:(Rotations)
-    public static final double STOW_HEIGHT = 0.0;  // /ELEVATOR_SPROCKET_RADIUS;
+    public static final double STOW_HEIGHT = 8.0; // Raised to prevent boxtube crashing // /ELEVATOR_SPROCKET_RADIUS;
     public static final double L1_HEIGHT   = 10.0; // 8.6    / ELEVATOR_SPROCKET_RADIUS;
     public static final double L2_HEIGHT   = 34.7; //(25.77-5)/* 29.842*/ / ELEVATOR_SPROCKET_RADIUS; //25.77
     public static final double L3_HEIGHT   = 72.2; //(70.1-8) /*68.8 */  / ELEVATOR_SPROCKET_RADIUS; //70.1

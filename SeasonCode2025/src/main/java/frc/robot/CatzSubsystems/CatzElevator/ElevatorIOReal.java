@@ -152,13 +152,13 @@ public class ElevatorIOReal implements ElevatorIO {
   }
 
   @Override
-  public void setPosition(double pos) {
-    leaderTalon.setPosition(pos);
+  public void stop() {
+    leaderTalon.setControl(new DutyCycleOut(0.0));
   }
 
   @Override
-  public void stop() {
-    leaderTalon.setControl(new DutyCycleOut(0.0));
+  public void setPosition(double pos) {
+    leaderTalon.setPosition(pos);
   }
 
   @Override

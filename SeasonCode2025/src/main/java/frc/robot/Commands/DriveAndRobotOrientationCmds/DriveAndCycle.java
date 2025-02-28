@@ -9,6 +9,7 @@ package frc.robot.Commands.DriveAndRobotOrientationCmds;
 
 import com.pathplanner.lib.path.PathPlannerPath;
 
+import frc.robot.CatzSubsystems.CatzSuperstructure.CoralState;
 import frc.robot.CatzSubsystems.CatzSuperstructure.RobotAction;
 import frc.robot.RobotContainer;
 import frc.robot.TeleopPosSelector;
@@ -69,6 +70,7 @@ public class DriveAndCycle extends TrajectoryDriveCmd{
         // If we reached the target Destination
         if (super.isFinished()){
             superstructure.setCurrentRobotAction(action, this.level);
+            System.out.println(action.toString());
             if (selector.useFakeCoral){
                 selector.hasCoralSIM = action == RobotAction.INTAKE;
             }
@@ -86,10 +88,10 @@ public class DriveAndCycle extends TrajectoryDriveCmd{
     @Override
     public boolean isFinished(){
         if(action == RobotAction.OUTTAKE){
-            return !outtake.hasCoral();
+            return (CatzSuperstructure.getCurrentCoralState() == CoralState.NOT_IN_OUTTAKE);
         }
         if(action == RobotAction.INTAKE){
-            return outtake.hasCoral();
+            return (CatzSuperstructure.getCurrentCoralState() == CoralState.IN_OUTTAKE);
         }
         return false;
     }

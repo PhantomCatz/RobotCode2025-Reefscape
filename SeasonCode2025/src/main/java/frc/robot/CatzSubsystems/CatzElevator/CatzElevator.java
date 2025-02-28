@@ -25,8 +25,6 @@ import org.littletonrobotics.junction.Logger;
 
 
 public class CatzElevator extends SubsystemBase {
-
-
   private final ElevatorIO io;
   private final ElevatorIOInputsAutoLogged inputs = new ElevatorIOInputsAutoLogged();
 
@@ -50,6 +48,8 @@ public class CatzElevator extends SubsystemBase {
   private ElevatorFeedforward ff = new ElevatorFeedforward(gains.kS(), gains.kG(), gains.kV(), gains.kA());
 
   private ElevatorPosition targetPosition = ElevatorPosition.PosStow;
+  private ElevatorPosition prevTargetPositon = ElevatorPosition.PosNull;
+  private ElevatorPosition previousLoggedPosition = ElevatorPosition.PosNull;
 
   @RequiredArgsConstructor
   public static enum ElevatorPosition {
@@ -60,7 +60,8 @@ public class CatzElevator extends SubsystemBase {
       PosL3(() -> L3_HEIGHT),
       PosL4(() -> L4_HEIGHT),
       PosL4Adj(() -> L4_CORAL_ADJ),
-      PosManual(new LoggedTunableNumber("Elevator/ScoreSourceSetpoint",0.0));
+      PosManual(new LoggedTunableNumber("Elevator/ScoreSourceSetpoint",0.0)),
+      PosNull(() -> -1.0);
 
     private final DoubleSupplier elevatorSetpointSupplier;
 
@@ -114,12 +115,16 @@ public class CatzElevator extends SubsystemBase {
         mmAcceleration,
         mmJerk);
 
+    if(previousLoggedPosition != targetPosition) {
+      prevTargetPositon = targetPosition;
+    }
+
     //---------------------------------------------------------------------------------------------------------------------------
     //    Limit switch position setting
     //---------------------------------------------------------------------------------------------------------------------------
-    if(inputs.isBotLimitSwitched) {
-      io.setPosition(ElevatorPosition.PosL4.getTargetPositionRads());
-    }
+    // if(inputs.isBotLimitSwitched) {
+    //   io.setPosition(ElevatorPosition.PosL4.getTargetPositionRads());
+    // }
 
     //---------------------------------------------------------------------------------------------------------------------------
     //    Feed Foward
@@ -127,30 +132,47 @@ public class CatzElevator extends SubsystemBase {
     // if(targetPosition == ElevatorPosition.PosL4) {
 
     //   elevatorFeedForward =  gains.kG() + 0.1;
-    // } else {
+    //} else {
       elevatorFeedForward =  gains.kG();
-    // }
+    //}
 
     //---------------------------------------------------------------------------------------------------------------------------
     //    Control Mode setting
     //---------------------------------------------------------------------------------------------------------------------------
     if(DriverStation.isDisabled()) {
+      // Disabled
       io.stop();
-    } else if(targetPosition != ElevatorPosition.PosManual){
+      targetPosition = ElevatorPosition.PosNull;
+    } else if(targetPosition != ElevatorPosition.PosNull &&
+              targetPosition != ElevatorPosition.PosManual){
+      // Setpoint PID
+      if(targetPosition == ElevatorPosition.PosStow) {
+        // Safety Stow
+        if(getElevatorPositionRads() < 9.5) {
+          io.stop();
+        } else {
+          io.runSetpoint(targetPosition.getTargetPositionRads(), elevatorFeedForward);
+        }
+      } else {
+        //Setpoint PID
         io.runSetpoint(targetPosition.getTargetPositionRads(), elevatorFeedForward);
-    } else if(getElevatorPositionRads() < 15.0) {
-      io.runMotor(0.0);
+      }
     } else {
-      io.runSetpoint(targetManualPosition, elevatorFeedForward);
+      // Nothing happening
+      io.runMotor(0.0);
     }
 
     //----------------------------------------------------------------------------------------------------------------------------
     // Logging
     //----------------------------------------------------------------------------------------------------------------------------
-    Logger.recordOutput("Elevator/CurrentRotations", getElevatorPositionRads());
+    Logger.recordOutput("Elevator/CurrentRadians", getElevatorPositionRads());
+    Logger.recordOutput("Elevator/prevtargetPosition", prevTargetPositon.getTargetPositionRads());
+    Logger.recordOutput("Elevator/logged prev targetPosition", previousLoggedPosition.getTargetPositionRads());
     Logger.recordOutput("Elevator/isElevatorInPos", isElevatorInPosition());
     Logger.recordOutput("Elevator/targetPosition", targetPosition.getTargetPositionRads());
 
+    // Target Postioin Logging
+    previousLoggedPosition = targetPosition;
   }
   //--------------------------------------------------------------------------------------------------------------------------
   //

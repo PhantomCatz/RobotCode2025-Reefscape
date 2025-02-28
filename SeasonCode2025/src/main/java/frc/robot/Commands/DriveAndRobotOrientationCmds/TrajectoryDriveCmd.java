@@ -332,6 +332,7 @@ public class TrajectoryDriveCmd extends Command {
     //     "speed: " + (desiredMPS == 0.0 || (currentMPS < ALLOWABLE_VEL_ERROR && currentRPS < ALLOWABLE_OMEGA_ERROR)));
     // System.out.println("poseerr:" + ((xError < poseError) &&(yError < poseError)));
     System.out.println("transerr: " + translationError);
+    System.out.println("pose errr: " + poseError);
     return translationError < poseError &&
         rotationError < ALLOWABLE_OMEGA_ERROR &&
         (desiredMPS == 0.0 || (currentMPS < ALLOWABLE_VEL_ERROR && currentRPS < ALLOWABLE_OMEGA_ERROR));

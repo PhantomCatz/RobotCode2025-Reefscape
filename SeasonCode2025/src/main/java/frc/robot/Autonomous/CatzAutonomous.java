@@ -157,33 +157,28 @@ public class CatzAutonomous extends SubsystemBase {
     for (File autoFile : autosDirectory.listFiles()) {
       String autoName = autoFile.getName().replaceFirst("[.][^.]+$", "");
       ArrayList<Object> commands = JSONUtil.getCommandsFromAuton(autoName);
-      System.out.println("autoname: " + autoName);
       for (Object o : commands) {
         String pathName = JSONUtil.getCommandName(o);
         try {
           String[] components = pathName.split("\\+");
           Command command = new InstantCommand();
-          System.out.println("name: " + pathName);
 
 
           if(components.length == 1){
             command = new TrajectoryDriveCmd(PathPlannerPath.fromPathFile(pathName), m_container.getCatzDrivetrain(), true);
           } else if(components.length == 2){
-            System.out.println("legnth 2222222222222222");
             String name = components[0];
             String action = components[1];
 
-            if(action == "CoralStation"){
+            if(action == "CS"){
               command = new DriveAndCycle(PathPlannerPath.fromPathFile(name), m_container, RobotAction.INTAKE);
             } else if(action.contains("ReefL")){
-              System.out.println("reeeetftftfgtgtgytgygg");
-              System.out.println("lebeleelvlevlevlel: " + Integer.parseInt(action.substring("ReefL".length())));
               command = new DriveAndCycle(PathPlannerPath.fromPathFile(name), m_container, RobotAction.OUTTAKE, Integer.parseInt(action.substring("ReefL".length())));
             }
           }
           NamedCommands.registerCommand(pathName, command);
         } catch (FileVersionException | IOException | ParseException e) {
-          e.printStackTrace();
+          // e.printStackTrace();
         }
       }
 
@@ -242,14 +237,8 @@ public class CatzAutonomous extends SubsystemBase {
 
   /** Getter for final autonomous Program */
   public Command getCommand() {
-    PathPlannerPath path = null;
-    try{
-      path = PathPlannerPath.fromPathFile("L4 I 1");
-    } catch (Exception e){
-      e.printStackTrace();
-    }
 
-    return new DriveAndCycle(path, m_container, RobotAction.OUTTAKE, 4);
+    return lastProgram;
   }
 
   // ---------------------------------------------------------------------------------------------------------
