@@ -3,13 +3,13 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 5.358504098360656,
-        "y": 5.193801229508197
+        "x": 5.3,
+        "y": 5.072
       },
       "prevControl": null,
       "nextControl": {
-        "x": 4.327561475409837,
-        "y": 5.601383196721312
+        "x": 4.639241803278688,
+        "y": 5.996977459016393
       },
       "isLocked": false,
       "linkedName": "Reef-I"
@@ -42,13 +42,13 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": -59.99999999999999
+    "rotation": -53.67317404787977
   },
   "reversed": false,
   "folder": "L4 I Paths",
   "idealStartingState": {
     "velocity": 0,
-    "rotation": -119.53878225955806
+    "rotation": -119.99999999999999
   },
   "useDefaultConstraints": true
 }

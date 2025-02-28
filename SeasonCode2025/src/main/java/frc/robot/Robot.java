@@ -242,7 +242,7 @@ public class Robot extends LoggedRobot {
               "*** Auto cancelled in %.2f secs ***%n", Timer.getFPGATimestamp() - autoStart);
         }
         autoMessagePrinted = true;
-        CatzLED.getInstance().RailingState = railingState.autoFinished;
+        CatzLED.getInstance().setRailingState(railingState.autoFinished);
         CatzLED.getInstance().autoFinishedTime = Timer.getFPGATimestamp();
       }
     }
@@ -279,7 +279,7 @@ public class Robot extends LoggedRobot {
     if (RobotController.getBatteryVoltage() <= LOW_BATTERY_VOLTAGE
         && DISABLED_TIMER.hasElapsed(LOW_BATTERY_DISABLED_TIME)) {
       LOW_BATTERY_ALERT.set(true);
-      CatzLED.getInstance().RailingState = railingState.lowBatteryAlert;
+      CatzLED.getInstance().setRailingState(railingState.lowBatteryAlert);
     }
   }
 

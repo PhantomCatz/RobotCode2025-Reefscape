@@ -146,8 +146,8 @@ public class CatzStateCommands {
 
             new SequentialCommandGroup(
                 elevator.Elevator_L4(),
-                Commands.waitUntil(() -> elevator.isElevatorInPosition()),
-                outtake.outtakeL4(),
+                Commands.waitUntil(() -> elevator.isElevatorInPosition()).withTimeout(0.8).alongWith(Commands.print("/////////L4?////////")),
+                outtake.outtakeL4().alongWith(Commands.print("/????????????outake???????????")),
                 Commands.waitSeconds(0.5),
                 elevator.Elevator_L4_Adj()
             )
@@ -165,7 +165,8 @@ public class CatzStateCommands {
             climb.Climb_Retract(),
             algae.stopAlgae(),
             elevator.Elevator_L1()
-        )//.onlyIf(() -> CatzSuperstructure.getCurrentCoralState() == CoralState.IN_OUTTAKE)
+        ).withTimeout(1.0)
+        //.onlyIf(() -> CatzSuperstructure.getCurrentCoralState() == CoralState.IN_OUTTAKE)
          .unless(()-> Robot.isSimulation()).alongWith(Commands.print("L1 Elevator")).unless(()-> Robot.isSimulation());
     }
 
@@ -179,7 +180,8 @@ public class CatzStateCommands {
             climb.Climb_Retract(),
             algae.stopAlgae(),
             elevator.Elevator_L2()
-        )//.onlyIf(() -> CatzSuperstructure.getCurrentCoralState() == CoralState.IN_OUTTAKE)
+        ).withTimeout(1.0)
+        //.onlyIf(() -> CatzSuperstructure.getCurrentCoralState() == CoralState.IN_OUTTAKE)
          .unless(()-> Robot.isSimulation()).alongWith(Commands.print("L2 Scoring State")).unless(()-> Robot.isSimulation());
     }
 
@@ -193,7 +195,8 @@ public class CatzStateCommands {
             climb.Climb_Retract(),
             algae.stopAlgae(),
             elevator.Elevator_L3()
-        )//.onlyIf(() -> CatzSuperstructure.getCurrentCoralState() == CoralState.IN_OUTTAKE)
+        ).withTimeout(1.0)
+        //.onlyIf(() -> CatzSuperstructure.getCurrentCoralState() == CoralState.IN_OUTTAKE)
          .unless(()-> Robot.isSimulation()).alongWith(Commands.print("L3 Scoring State")).unless(()-> Robot.isSimulation());
     }
 
@@ -204,10 +207,11 @@ public class CatzStateCommands {
         CatzElevator elevator = robotContainer.getCatzElevator();
 
         return new ParallelCommandGroup(
+            elevator.Elevator_L4(),
             climb.Climb_Retract(),
-            algae.stopAlgae(),
-            elevator.Elevator_L4()
-        )//.onlyIf(() -> CatzSuperstructure.getCurrentCoralState() == CoralState.IN_OUTTAKE)
+            algae.stopAlgae()
+        ).withTimeout(1.0)
+        //.onlyIf(() -> CatzSuperstructure.getCurrentCoralState() == CoralState.IN_OUTTAKE)
          .unless(()-> Robot.isSimulation()).alongWith(Commands.print("L4 Scoring State")).unless(()-> Robot.isSimulation());
     }
 

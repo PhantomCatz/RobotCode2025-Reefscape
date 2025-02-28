@@ -48,6 +48,8 @@ public class CatzElevator extends SubsystemBase {
   private ElevatorFeedforward ff = new ElevatorFeedforward(gains.kS(), gains.kG(), gains.kV(), gains.kA());
 
   private ElevatorPosition targetPosition = ElevatorPosition.PosStow;
+  private ElevatorPosition prevTargetPositon = ElevatorPosition.PosNull;
+  private ElevatorPosition previousLoggedPosition = ElevatorPosition.PosNull;
 
   @RequiredArgsConstructor
   public static enum ElevatorPosition {
@@ -113,6 +115,10 @@ public class CatzElevator extends SubsystemBase {
         mmAcceleration,
         mmJerk);
 
+    if(previousLoggedPosition != targetPosition) {
+      prevTargetPositon = targetPosition;
+    }
+
     //---------------------------------------------------------------------------------------------------------------------------
     //    Limit switch position setting
     //---------------------------------------------------------------------------------------------------------------------------
@@ -137,15 +143,19 @@ public class CatzElevator extends SubsystemBase {
       // Disabled
       io.stop();
       targetPosition = ElevatorPosition.PosNull;
-    } else if(targetPosition != ElevatorPosition.PosManual){
-      // Semi Manual
-      io.runSetpoint(targetPosition.getTargetPositionRads(), elevatorFeedForward);
-    } else if(targetPosition != ElevatorPosition.PosNull){
+    } else if(targetPosition != ElevatorPosition.PosNull &&
+              targetPosition != ElevatorPosition.PosManual){
       // Setpoint PID
-      if(getElevatorPositionRads() < 30.0) {
-        io.runMotor(elevatorFeedForward - 0.1);
+      if(targetPosition == ElevatorPosition.PosStow) {
+        // Safety Stow
+        if(getElevatorPositionRads() < 9.5) {
+          io.stop();
+        } else {
+          io.runSetpoint(targetPosition.getTargetPositionRads(), elevatorFeedForward);
+        }
       } else {
-        io.runSetpoint(targetManualPosition, elevatorFeedForward);
+        //Setpoint PID
+        io.runSetpoint(targetPosition.getTargetPositionRads(), elevatorFeedForward);
       }
     } else {
       // Nothing happening
@@ -155,10 +165,14 @@ public class CatzElevator extends SubsystemBase {
     //----------------------------------------------------------------------------------------------------------------------------
     // Logging
     //----------------------------------------------------------------------------------------------------------------------------
-    Logger.recordOutput("Elevator/CurrentRotations", getElevatorPositionRads());
+    Logger.recordOutput("Elevator/CurrentRadians", getElevatorPositionRads());
+    Logger.recordOutput("Elevator/prevtargetPosition", prevTargetPositon.getTargetPositionRads());
+    Logger.recordOutput("Elevator/logged prev targetPosition", previousLoggedPosition.getTargetPositionRads());
     Logger.recordOutput("Elevator/isElevatorInPos", isElevatorInPosition());
     Logger.recordOutput("Elevator/targetPosition", targetPosition.getTargetPositionRads());
 
+    // Target Postioin Logging
+    previousLoggedPosition = targetPosition;
   }
   //--------------------------------------------------------------------------------------------------------------------------
   //

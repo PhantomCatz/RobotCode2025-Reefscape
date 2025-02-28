@@ -24,13 +24,14 @@ import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
 import frc.robot.CatzConstants;
 import frc.robot.Utilities.LoggedTunableNumber;
+import frc.robot.Utilities.Swerve.ModuleLimits;
 import lombok.Builder;
 
 public class DriveConstants {
   // ---------------------------------------------------------------------------------------------------------------
   // Disabled flag for testing
   // ---------------------------------------------------------------------------------------------------------------
-  public static final boolean IS_DRIVE_DISABLED = true;
+  public static final boolean IS_DRIVE_DISABLED = false; //bruh
 
   // ---------------------------------------------------------------------------------------------------------------
   // Module organizations
@@ -126,6 +127,11 @@ public class DriveConstants {
                 Mk4iReductions.steer.reduction);
       };
 
+    public static final double maxLinearSpeed = 4.69;
+    public static final double maxAngularSpeed = 4.69 / Math.hypot(24.2, 24.2);
+    public static final ModuleLimits moduleLimitsFree =
+      new ModuleLimits(maxLinearSpeed, 120.0, Units.degreesToRadians(1080.0));
+
   // -------------------------------------------------------------------------------
   // Odometry Constants
   // -------------------------------------------------------------------------------
@@ -213,10 +219,10 @@ public class DriveConstants {
   // -----------------------------------------------------------------------------------------------------------------------------
   public static HolonomicDriveController getNewHolController() {
     return new HolonomicDriveController(
-        new PIDController(4.0, 0.0, 0.0),
-        new PIDController(4.0, 0.0, 0.0),
+        new PIDController(8.0, 0.0, 0.0),
+        new PIDController(8.0, 0.0, 0.0),
         new ProfiledPIDController(
-            4.0,
+            10.0,
             0,
             0,
             new TrapezoidProfile.Constraints(

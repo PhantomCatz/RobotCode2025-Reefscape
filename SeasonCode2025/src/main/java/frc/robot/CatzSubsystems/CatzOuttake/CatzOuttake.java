@@ -8,10 +8,13 @@
 package frc.robot.CatzSubsystems.CatzOuttake;
 import static frc.robot.CatzSubsystems.CatzOuttake.OuttakeConstants.*;
 
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.CatzConstants;
+import frc.robot.RobotContainer;
+import frc.robot.TeleopPosSelector;
 import frc.robot.CatzSubsystems.CatzSuperstructure;
 import frc.robot.CatzSubsystems.CatzSuperstructure.CoralState;
 import lombok.Setter;
@@ -22,6 +25,8 @@ public class CatzOuttake extends SubsystemBase {
 
   private final OuttakeIO io;
   private final OuttakeIOInputsAutoLogged inputs = new OuttakeIOInputsAutoLogged();
+  private RobotContainer container;
+  private TeleopPosSelector selector;
   private int interationCounter = 0;
   private int intakeIterationCoutner = 0;
 
@@ -42,11 +47,9 @@ public class CatzOuttake extends SubsystemBase {
   @Setter
   private boolean coral = true;
 
-  public boolean hasCoral(){
-    return coral;
-  }
-
-  public CatzOuttake() {
+  public CatzOuttake(RobotContainer container) {
+    this.container = container;
+    this.selector = container.getSelector();
     if(isOuttakeDisabled) {
       io = new OuttakeIONull();
       System.out.println("Outtake Unconfigured");
@@ -68,10 +71,24 @@ public class CatzOuttake extends SubsystemBase {
     }
   }
 
+  public boolean hasCoral(){
+    if (selector.useFakeCoral){
+      return container.getSelector().hasCoralSIM;
+    } else {
+      return coral;
+    }
+  }
+
   @Override
   public void periodic() {
     io.updateInputs(inputs);
     Logger.processInputs("RealInputs/Outtake", inputs);
+
+    if(DriverStation.isDisabled()) {
+      currentState = outtakeStates.STOP;
+      io.runMotor(0.0, 0.0);
+      io.runIntakesIntakeMotor(0.0);
+    }
 
     if(currentState != previousState) {
       interationCounter = 0;

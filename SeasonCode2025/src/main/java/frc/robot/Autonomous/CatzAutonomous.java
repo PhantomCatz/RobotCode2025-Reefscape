@@ -20,26 +20,27 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.PrintCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.CatzSubsystems.CatzStateCommands;
+import frc.robot.CatzSubsystems.CatzSuperstructure.RobotAction;
 import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.*;
 import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.Drivetrain.DriveConstants;
 import frc.robot.Commands.CharacterizationCmds.WheelRadiusCharacterization;
 import frc.robot.Commands.CharacterizationCmds.WheelRadiusCharacterization.Direction;
+import frc.robot.Commands.DriveAndRobotOrientationCmds.DriveAndCycle;
 import frc.robot.Commands.DriveAndRobotOrientationCmds.TrajectoryDriveCmd;
 import frc.robot.RobotContainer;
 import frc.robot.Utilities.AllianceFlipUtil;
 import frc.robot.Utilities.JSONUtil;
 
 import java.io.File;
-import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.function.BooleanSupplier;
 
-import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
@@ -72,6 +73,23 @@ public class CatzAutonomous extends SubsystemBase {
     // ORDER MATTERS! Register named commands first, AutoBuilder second, Trajectories and add autos
     // to dashboard last
     // ------------------------------------------------------------------------------------------------------------
+
+    // ------------------------------------------------------------------------------------------------------------
+    // Path Configuration
+    // ------------------------------------------------------------------------------------------------------------
+    for (File pathFile : choreoPathsDirectory.listFiles()) {
+      // to get rid of the extensions trailing the path names
+      String pathName = pathFile.getName().replaceFirst("[.][^.]+$", "");
+      try {
+        NamedCommands.registerCommand(
+            pathName,
+            new TrajectoryDriveCmd(
+                PathPlannerPath.fromChoreoTrajectory(pathName), m_container.getCatzDrivetrain(), true));
+      } catch (FileVersionException | IOException | ParseException e) {
+        e.printStackTrace();
+      }
+    }
+
     NamedCommands.registerCommand("Stow", CatzStateCommands.stow(container));
     NamedCommands.registerCommand("IntakeCoralGround", CatzStateCommands.intakeCoralGround(container));
     NamedCommands.registerCommand("IntakeCoralStation", CatzStateCommands.intakeCoralStation(container));
@@ -111,16 +129,15 @@ public class CatzAutonomous extends SubsystemBase {
     dashboardCmds.put("TopScoringChooser", new DashboardCmd("Score Where?", chooseYourOwnScoringTOP));
 
     HashMap<String, Command> L1orL4 = new HashMap<>();
-    L1orL4.put("Score L1", NamedCommands.getCommand("L1Coral"));
-    L1orL4.put("Score L2", NamedCommands.getCommand("L2Coral"));
-    L1orL4.put("Score L3", NamedCommands.getCommand("L3Coral"));
+    L1orL4.put("Score L1", NamedCommands.getCommand("L1Ccoral"));
+    L1orL4.put("Score L2", NamedCommands.getCommand("L1Ccoral"));
+    L1orL4.put("Score L3", NamedCommands.getCommand("L1Ccoral"));
     L1orL4.put("Score L4", NamedCommands.getCommand("L4Coral"));
     dashboardCmds.put("CoralScoringChooser", new DashboardCmd("Score Where?", L1orL4));
 
     for (String question : dashboardCmds.keySet()) {
       NamedCommands.registerCommand(question, dashboardCmds.get(question));
     }
-
 
     BooleanSupplier shouldFlip = () -> AllianceFlipUtil.shouldFlipToRed();
     AutoBuilder.configure(
@@ -136,35 +153,36 @@ public class CatzAutonomous extends SubsystemBase {
     // ------------------------------------------------------------------------------------------------------------
     // Path Configuration
     // ------------------------------------------------------------------------------------------------------------
-    for (File pathFile : choreoPathsDirectory.listFiles()) {
-      // to get rid of the extensions trailing the path names
-      String pathName = pathFile.getName().replaceFirst("[.][^.]+$", "");
-      try {
-        NamedCommands.registerCommand(
-            pathName,
-            new TrajectoryDriveCmd(
-                PathPlannerPath.fromChoreoTrajectory(pathName), m_container.getCatzDrivetrain(), true));
-      } catch (FileVersionException | IOException | ParseException e) {
-        e.printStackTrace();
-      }
-    }
-
-    for (File pathFile : pathplannerPathsDirectory.listFiles()) {
-      // to get rid of the extensions trailing the path names
-      String pathName = pathFile.getName().replaceFirst("[.][^.]+$", "");
-      try {
-        NamedCommands.registerCommand(
-            pathName,
-            new TrajectoryDriveCmd(
-                PathPlannerPath.fromPathFile(pathName), m_container.getCatzDrivetrain(), true));
-      } catch (FileVersionException | IOException | ParseException e) {
-        e.printStackTrace();
-      }
-    }
-
 
     for (File autoFile : autosDirectory.listFiles()) {
       String autoName = autoFile.getName().replaceFirst("[.][^.]+$", "");
+      ArrayList<Object> commands = JSONUtil.getCommandsFromAuton(autoName);
+      for (Object o : commands) {
+        String commandName = JSONUtil.getCommandName(o);
+        System.out.println("nameeee: " + commandName);
+        try {
+          String[] components = commandName.split("\\+");
+          Command command = new InstantCommand();
+
+          if(components.length == 1){
+            command = new TrajectoryDriveCmd(PathPlannerPath.fromPathFile(commandName), m_container.getCatzDrivetrain(), true);
+          } else if(components.length == 2){
+            String name = components[0];
+            String action = components[1];
+
+            if(action.equalsIgnoreCase("CS")){
+
+              command = new DriveAndCycle(PathPlannerPath.fromPathFile(name), m_container, RobotAction.INTAKE);
+            } else if(action.contains("ReefL")){
+              command = new DriveAndCycle(PathPlannerPath.fromPathFile(name), m_container, RobotAction.OUTTAKE, Integer.parseInt(action.substring("ReefL".length())));
+            }
+          }
+          NamedCommands.registerCommand(commandName, command);
+        } catch (FileVersionException | IOException | ParseException e) {
+          // e.printStackTrace();
+        }
+      }
+
       autoProgramChooser.addDefaultOption(autoName, new PathPlannerAuto(autoName));
     }
     autoProgramChooser.addOption("Wheel Characterization", new PathPlannerAuto("Wheel Characterization"));
@@ -189,11 +207,7 @@ public class CatzAutonomous extends SubsystemBase {
         SmartDashboard.putData(questionName + " Response", new SendableChooser<Command>());
       }
 
-      JSONObject json =
-          (JSONObject)
-              parser.parse(
-                  new FileReader(autosDirectory + "/" + selectedProgram.getName() + ".auto"));
-      ArrayList<Object> commands = JSONUtil.getCommandsFromPath(json);
+      ArrayList<Object> commands = JSONUtil.getCommandsFromAuton(selectedProgram.getName());
       int questionCounter = 1;
 
       for (Object o : commands) {
@@ -224,6 +238,7 @@ public class CatzAutonomous extends SubsystemBase {
 
   /** Getter for final autonomous Program */
   public Command getCommand() {
+
     return lastProgram;
   }
 

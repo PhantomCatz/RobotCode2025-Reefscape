@@ -200,7 +200,7 @@ public class CatzLED extends VirtualSubsystem {
       wave(Color.kGold, Color.kDarkBlue, waveFastCycleLength, waveFastDuration);
       // MODE ENABLED
     } else {
-      System.out.println(RailingState);
+      //System.out.println(RailingState);
       RailingState = railingState.climb;
       switch(RailingState) {
         case LEDmanual_none:
