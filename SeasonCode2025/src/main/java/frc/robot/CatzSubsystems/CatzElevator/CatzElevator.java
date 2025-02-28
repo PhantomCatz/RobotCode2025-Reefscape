@@ -54,6 +54,7 @@ public class CatzElevator extends SubsystemBase {
   @RequiredArgsConstructor
   public static enum ElevatorPosition {
       //TO CHANGE HEIGHT GO TO ElevatorConstants.java
+      PosTrueStow(() -> 0.0),
       PosStow(() -> STOW_HEIGHT),
       PosL1(() -> L1_HEIGHT),
       PosL2(() -> L2_HEIGHT),
@@ -122,9 +123,9 @@ public class CatzElevator extends SubsystemBase {
     //---------------------------------------------------------------------------------------------------------------------------
     //    Limit switch position setting
     //---------------------------------------------------------------------------------------------------------------------------
-    // if(inputs.isBotLimitSwitched) {
-    //   io.setPosition(ElevatorPosition.PosL4.getTargetPositionRads());
-    // }
+    if(inputs.isBotLimitSwitched) {
+      io.setPosition(ElevatorPosition.PosTrueStow.getTargetPositionRads());
+    }
 
     //---------------------------------------------------------------------------------------------------------------------------
     //    Feed Foward

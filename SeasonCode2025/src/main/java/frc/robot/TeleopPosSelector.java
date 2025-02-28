@@ -35,6 +35,8 @@ import frc.robot.CatzSubsystems.CatzSuperstructure;
 import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.CatzRobotTracker;
 import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.Drivetrain.CatzDrivetrain;
 import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.Drivetrain.DriveConstants;
+import frc.robot.CatzSubsystems.CatzLEDs.CatzLED;
+import frc.robot.CatzSubsystems.CatzLEDs.CatzLED.QueueLEDState;
 import frc.robot.Commands.DriveAndRobotOrientationCmds.DriveAndCycle;
 import frc.robot.Commands.DriveAndRobotOrientationCmds.TrajectoryDriveCmd;
 
@@ -192,6 +194,23 @@ public class TeleopPosSelector {
       i++;
     }
 
+    int ledQueue = 0;
+    for (Pair<Pair<Integer, LeftRight>, Integer> pair : queuedPaths) {
+      ledQueue++;
+    }
+
+    if(ledQueue == 1) {
+      CatzLED.getInstance().setQueueLEDState(QueueLEDState.ONE_CORAL);
+    } else if(ledQueue == 2) {
+      CatzLED.getInstance().setQueueLEDState(QueueLEDState.TWO_CORAL);
+    } else if(ledQueue == 3) {
+      CatzLED.getInstance().setQueueLEDState(QueueLEDState.THREE_CORAL);
+    } else if(ledQueue == 4) {
+      CatzLED.getInstance().setQueueLEDState(QueueLEDState.FOUR_CORAL);
+    } else {
+      CatzLED.getInstance().setQueueLEDState(QueueLEDState.EMPTY);
+    }
+
   }
 
   public Pair<Integer, LeftRight> getXBoxReefPos() {
@@ -276,7 +295,7 @@ public class TeleopPosSelector {
     }
 
     Translation2d robotPos = tracker.getEstimatedPose().getTranslation();
-    PathPlannerPath path = pathfinder.getPath(robotPos, goal.getTranslation(),
+    PathPlannerPath path   = pathfinder.getPath(robotPos, goal.getTranslation(),
         new GoalEndState(0.0, goal.getRotation()));
 
     if (path == null) {
