@@ -170,7 +170,8 @@ public class CatzAutonomous extends SubsystemBase {
             String name = components[0];
             String action = components[1];
 
-            if(action == "CS"){
+            if(action.equalsIgnoreCase("CS")){
+
               command = new DriveAndCycle(PathPlannerPath.fromPathFile(name), m_container, RobotAction.INTAKE);
             } else if(action.contains("ReefL")){
               command = new DriveAndCycle(PathPlannerPath.fromPathFile(name), m_container, RobotAction.OUTTAKE, Integer.parseInt(action.substring("ReefL".length())));
