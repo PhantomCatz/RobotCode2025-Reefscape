@@ -9,6 +9,18 @@
           "data": {
             "name": "L4 I 1+ReefL4"
           }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "L4 I 2+CS"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "L4 I 3+ReefL4"
+          }
         }
       ]
     }

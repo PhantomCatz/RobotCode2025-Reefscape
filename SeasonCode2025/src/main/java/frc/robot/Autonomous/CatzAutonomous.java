@@ -158,14 +158,14 @@ public class CatzAutonomous extends SubsystemBase {
       String autoName = autoFile.getName().replaceFirst("[.][^.]+$", "");
       ArrayList<Object> commands = JSONUtil.getCommandsFromAuton(autoName);
       for (Object o : commands) {
-        String pathName = JSONUtil.getCommandName(o);
+        String commandName = JSONUtil.getCommandName(o);
+        System.out.println("nameeee: " + commandName);
         try {
-          String[] components = pathName.split("\\+");
+          String[] components = commandName.split("\\+");
           Command command = new InstantCommand();
 
-
           if(components.length == 1){
-            command = new TrajectoryDriveCmd(PathPlannerPath.fromPathFile(pathName), m_container.getCatzDrivetrain(), true);
+            command = new TrajectoryDriveCmd(PathPlannerPath.fromPathFile(commandName), m_container.getCatzDrivetrain(), true);
           } else if(components.length == 2){
             String name = components[0];
             String action = components[1];
@@ -176,7 +176,7 @@ public class CatzAutonomous extends SubsystemBase {
               command = new DriveAndCycle(PathPlannerPath.fromPathFile(name), m_container, RobotAction.OUTTAKE, Integer.parseInt(action.substring("ReefL".length())));
             }
           }
-          NamedCommands.registerCommand(pathName, command);
+          NamedCommands.registerCommand(commandName, command);
         } catch (FileVersionException | IOException | ParseException e) {
           // e.printStackTrace();
         }

@@ -52,7 +52,7 @@ public class TrajectoryDriveCmd extends Command {
   public static final double ALLOWABLE_ROTATION_ERROR_PID = 0.5;
   public static final double ALLOWABLE_VEL_ERROR = 0.2;
   public static final double ALLOWABLE_OMEGA_ERROR = 3.0;
-  private static final double TIMEOUT_SCALAR = 5.0;
+  private static final double TIMEOUT_SCALAR = 50.0;
   private static final double CONVERGE_DISTANCE = 1.0;
   private static final double DIVERGE_TIME = 1.0;
   private final double ALLOWABLE_VISION_ADJUST = 9e-4; //TODO tune
