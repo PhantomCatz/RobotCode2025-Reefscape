@@ -29,11 +29,11 @@ import edu.wpi.first.wpilibj.DigitalInput;
 
 
 public class ElevatorIOReal implements ElevatorIO {
-
-
+  // Motor Instantiation
   TalonFX leaderTalon = new TalonFX(LEFT_LEADER_ID);
   TalonFX followerTalon = new TalonFX(RIGHT_FOLLOWER_ID);
 
+  // Motor configuration
   private final TalonFXConfiguration config = new TalonFXConfiguration();
   private final MotionMagicVoltage positionControl = new MotionMagicVoltage(0.0).withUpdateFreqHz(0.0);
 
@@ -45,6 +45,7 @@ public class ElevatorIOReal implements ElevatorIO {
   private final List<StatusSignal<Current>> torqueCurrent;
   private final List<StatusSignal<Temperature>> tempCelsius;
 
+  // External Sensors
   final DigitalInput m_elevatorLimitBot = new DigitalInput(BOT_LIMIT_SWITCH);
 
   public ElevatorIOReal() {
@@ -89,6 +90,12 @@ public class ElevatorIOReal implements ElevatorIO {
     config.MotionMagic.MotionMagicAcceleration = motionMagicParameters.mmAcceleration();
     config.MotionMagic.MotionMagicJerk = motionMagicParameters.mmJerk();
     config.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
+
+    // Software Limits
+    config.SoftwareLimitSwitch.ForwardSoftLimitEnable = true;
+    config.SoftwareLimitSwitch.ForwardSoftLimitThreshold = Units.radiansToRotations(UPPER_LIMIT_RAD);
+    config.SoftwareLimitSwitch.ReverseSoftLimitEnable = true;
+    config.SoftwareLimitSwitch.ReverseSoftLimitThreshold = Units.radiansToRotations(LOWER_LIMIT_RAD);
 
     // Encoder Resetting
     leaderTalon.setPosition(0);
