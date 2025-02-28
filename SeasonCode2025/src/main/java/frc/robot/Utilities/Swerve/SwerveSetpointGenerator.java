@@ -17,6 +17,8 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import frc.robot.Utilities.GeomUtil;
+import frc.robot.Utilities.EqualsUtil;
+
 
 import java.util.ArrayList;
 import java.util.List;
@@ -117,10 +119,7 @@ public class SwerveSetpointGenerator {
         }
       }
 
-      private boolean epsilonEquals(double f_0, double f_1) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'epsilonEquals'");
-    }
+
 
     protected double findSteeringMaxS(
       double x_0,

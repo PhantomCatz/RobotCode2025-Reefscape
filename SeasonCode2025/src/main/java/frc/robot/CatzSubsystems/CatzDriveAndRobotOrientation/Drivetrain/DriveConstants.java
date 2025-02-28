@@ -130,7 +130,7 @@ public class DriveConstants {
     public static final double maxLinearSpeed = 4.69;
     public static final double maxAngularSpeed = 4.69 / Math.hypot(24.2, 24.2);
     public static final ModuleLimits moduleLimitsFree =
-      new ModuleLimits(maxLinearSpeed, maxAngularSpeed, Units.degreesToRadians(1080.0));
+      new ModuleLimits(maxLinearSpeed, 120.0, Units.degreesToRadians(1080.0));
 
   // -------------------------------------------------------------------------------
   // Odometry Constants

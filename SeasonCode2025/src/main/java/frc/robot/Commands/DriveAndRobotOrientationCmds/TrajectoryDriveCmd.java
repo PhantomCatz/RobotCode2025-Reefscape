@@ -200,15 +200,15 @@ public class TrajectoryDriveCmd extends Command {
     adjustedSpeeds = hocontroller.calculate(currentPose, state, goal.pose.getRotation());
 
     // Cusps x/(1+x) Lower speed for closer distances to prevent jittering
-    if(currentTime <= 1.5){
-      adjustedSpeeds = adjustedSpeeds.times(DIVERGE_TIME * currentTime / (DIVERGE_TIME * currentTime + 1));
-    }
-    if(autoalign && translationError < 1.0){
-      adjustedSpeeds = adjustedSpeeds.times(CONVERGE_DISTANCE * translationError / (CONVERGE_DISTANCE * translationError + 1));
-    }
-    if(Double.isNaN(adjustedSpeeds.vxMetersPerSecond) || Double.isNaN(adjustedSpeeds.vyMetersPerSecond) || Double.isNaN(adjustedSpeeds.omegaRadiansPerSecond)){
-      adjustedSpeeds = new ChassisSpeeds();
-    }
+    // if(currentTime <= 1.5){
+    //   adjustedSpeeds = adjustedSpeeds.times(DIVERGE_TIME * currentTime / (DIVERGE_TIME * currentTime + 1));
+    // }
+    // if(autoalign && translationError < 1.0){
+    //   adjustedSpeeds = adjustedSpeeds.times(CONVERGE_DISTANCE * translationError / (CONVERGE_DISTANCE * translationError + 1));
+    // }
+    // if(Double.isNaN(adjustedSpeeds.vxMetersPerSecond) || Double.isNaN(adjustedSpeeds.vyMetersPerSecond) || Double.isNaN(adjustedSpeeds.omegaRadiansPerSecond)){
+    //   adjustedSpeeds = new ChassisSpeeds();
+    // }
 
 
     // Logging
