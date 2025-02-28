@@ -207,7 +207,7 @@ public class CatzStateCommands {
         CatzElevator elevator = robotContainer.getCatzElevator();
 
         return new ParallelCommandGroup(
-            elevator.Elevator_L4().alongWith(new PrintCommand("ELevetaor UPPP!")),
+            elevator.Elevator_L4(),
             climb.Climb_Retract(),
             algae.stopAlgae()
         ).withTimeout(1.0)

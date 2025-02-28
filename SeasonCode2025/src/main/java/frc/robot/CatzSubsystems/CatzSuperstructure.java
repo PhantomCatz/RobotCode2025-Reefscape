@@ -217,6 +217,7 @@ public class CatzSuperstructure extends VirtualSubsystem {
         }
 
         if(prevRobotState != currentRobotState){
+            System.out.println("scheudled: " + currentRobotState.toString());
             robotActionCommand.schedule();
         }
     }
