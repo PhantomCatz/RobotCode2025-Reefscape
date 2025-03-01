@@ -84,8 +84,10 @@ public class OuttakeIOReal implements OuttakeIO {
   public void updateInputs(OuttakeIOInputs inputs) {
     inputs.bbreakFrntTriggered = !beamBreakFrnt.get();
     inputs.bbreakBackTriggered = !beamBreakBck.get();
-    inputs.appliedVolts        = OuttakeLeftMtr.getBusVoltage();
+    inputs.leftAppliedVolts        = OuttakeLeftMtr.getBusVoltage();
     inputs.rightAppliedVolts   = OuttakeRightMtr.getBusVoltage();
+    inputs.leftCurrentAmps = OuttakeLeftMtr.getOutputCurrent();
+    inputs.rightAppliedVolts = OuttakeRightMtr.getOutputCurrent();
   }
 
   @Override

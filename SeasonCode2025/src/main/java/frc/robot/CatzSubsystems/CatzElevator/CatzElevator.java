@@ -13,7 +13,6 @@ import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
 
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.CatzConstants;
 import frc.robot.Utilities.LoggedTunableNumber;
@@ -123,9 +122,9 @@ public class CatzElevator extends SubsystemBase {
     //---------------------------------------------------------------------------------------------------------------------------
     //    Limit switch position setting
     //---------------------------------------------------------------------------------------------------------------------------
-    if(inputs.isBotLimitSwitched) {
-      io.setPosition(ElevatorPosition.PosTrueStow.getTargetPositionRads());
-    }
+    // if(inputs.isBotLimitSwitched) {
+    //   io.setPosition(ElevatorPosition.PosTrueStow.getTargetPositionRads());
+    // }
 
     //---------------------------------------------------------------------------------------------------------------------------
     //    Feed Foward
@@ -158,9 +157,13 @@ public class CatzElevator extends SubsystemBase {
         //Setpoint PID
         io.runSetpoint(targetPosition.getTargetPositionRads(), elevatorFeedForward);
       }
+    } else if (targetPosition == ElevatorPosition.PosManual) {
+      io.runMotor(elevatorSpeed);
+      // System.out.println("Running Elevator Motor");
     } else {
       // Nothing happening
-      io.runMotor(0.0);
+      // System.out.println("Stopping running motor");
+      io.stop();
     }
 
     //----------------------------------------------------------------------------------------------------------------------------
@@ -218,8 +221,6 @@ public class CatzElevator extends SubsystemBase {
     return inputs.positionRads;
   }
 
-
-
   public boolean isElevatorInPosition() {
     boolean isElevatorSettled = false;
     boolean isElevatorInPos = (Math.abs((getElevatorPositionRads() - targetPosition.getTargetPositionRads())) < 1.5);
@@ -256,18 +257,23 @@ public class CatzElevator extends SubsystemBase {
     isCharacterizing = false;
   }
 
+  // public void elevatorManual(Supplier<Double> manualSupplier) {
+  //   targetManualPosition += manualSupplier.get() * MANUAL_SCALE;
+  //   // System.out.println(targetManualPosition);
+  //   targetPosition = ElevatorPosition.PosManual;
+  // }
 
-  public void elevatorManual(Supplier<Double> manualSupplier) {
-    targetManualPosition += manualSupplier.get() * MANUAL_SCALE;
-    System.out.println(targetManualPosition);
+  // public Command elevatorManualMode(Supplier<Double> manualSupplier) {
+  //   return run(() -> elevatorManual(manualSupplier)).alongWith(Commands.print("hi"));
+  // }
+
+  public void elevatorFullManual(double manualPower) {
+    this.elevatorSpeed = manualPower;
     targetPosition = ElevatorPosition.PosManual;
   }
 
-  public Command elevatorManualMode(Supplier<Double> manualSupplier) {
-    return run(() -> elevatorManual(manualSupplier)).alongWith(Commands.print("hi"));
-  }
-
   public Command elevatorFullManual(Supplier<Double> manuaSupplier) {
-    return run(()->io.runMotor(manuaSupplier.get())).alongWith(Commands.print("full manual"));
+
+    return run(() -> elevatorFullManual(manuaSupplier.get()));
   }
 }

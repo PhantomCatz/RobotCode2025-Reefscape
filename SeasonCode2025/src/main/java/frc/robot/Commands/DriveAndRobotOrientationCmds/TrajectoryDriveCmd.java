@@ -196,7 +196,7 @@ public class TrajectoryDriveCmd extends Command {
         0.0
     );
     // System.out.println("speeeed: " + state.velocityMetersPerSecond);
-    
+
     // construct chassisspeeds
     adjustedSpeeds = hocontroller.calculate(currentPose, state, goal.pose.getRotation());
 

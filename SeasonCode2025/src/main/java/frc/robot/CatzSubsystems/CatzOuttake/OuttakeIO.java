@@ -18,10 +18,10 @@ public interface OuttakeIO {
 
     public double positionMechs = 0.0;
     public double velocityRpm = 0.0;
-    public double appliedVolts = 0.0;
+    public double leftAppliedVolts = 0.0;
     public double rightAppliedVolts = 0.0;
-    public double supplyCurrentAmps = 0.0;
-    public double torqueCurrentAmps = 0.0;
+    public double leftCurrentAmps = 0.0;
+    public double rightCurrentAmps = 0.0;
     public double tempCelsius = 0.0;
 
     public boolean bbreakFrntTriggered;

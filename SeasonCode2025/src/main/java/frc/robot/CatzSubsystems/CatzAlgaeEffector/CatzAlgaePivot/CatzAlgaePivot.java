@@ -57,6 +57,7 @@ public class CatzAlgaePivot extends SubsystemBase {
     private double getTargetMotionPosition() {
       return motionType.getAsDouble();
     }
+
   }
 
   public CatzAlgaePivot() {
@@ -95,8 +96,14 @@ public class CatzAlgaePivot extends SubsystemBase {
         io.runSetpoint(position, 0.0);
       }
     }
+    Logger.recordOutput("AlgaePivot/currentPosition", getAlgaePivotPositionRads());
+
     Logger.recordOutput("AlgaePivot/targetPosition", position);
 
+  }
+
+  public double getAlgaePivotPositionRads() {
+    return inputs.positionMechs;
   }
 
   public Command AlgaePivot_Stow() {
@@ -125,6 +132,7 @@ public class CatzAlgaePivot extends SubsystemBase {
     position += manualSupplier.get() * MANUAL_SCALE;
     System.out.println("algae:" +position);
   }
+
 
   public Command AlgaePivotFullManual(Supplier<Double> manualSupplier) {
     return run(() -> algaePivotManual(manualSupplier));
