@@ -63,7 +63,7 @@ public class TeleopPosSelector {
   private Deque<Pair<Pair<Integer, LeftRight>, Integer>> queuedPaths = new LinkedList<>();
   private HashMap<String, String> poseToLetter = new HashMap<>();
 
-  private final boolean manualOverrideUseFakeCoral = false; //if the real robot doesn't have mechanisms to hold real coral, simulate one
+  private final boolean manualOverrideUseFakeCoral = true; //if the real robot doesn't have mechanisms to hold real coral, simulate one
   public final boolean useFakeCoral = manualOverrideUseFakeCoral || Robot.isSimulation();
 
   private boolean leftCoralStation = true;

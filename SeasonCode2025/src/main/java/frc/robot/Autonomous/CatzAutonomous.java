@@ -14,18 +14,19 @@ import com.pathplanner.lib.path.PathPlannerPath;
 import com.pathplanner.lib.util.FileVersionException;
 
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
-import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.PrintCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.CatzSubsystems.CatzStateCommands;
 import frc.robot.CatzSubsystems.CatzSuperstructure.RobotAction;
 import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.*;
+import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.Drivetrain.CatzDrivetrain;
 import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.Drivetrain.DriveConstants;
 import frc.robot.Commands.CharacterizationCmds.WheelRadiusCharacterization;
 import frc.robot.Commands.CharacterizationCmds.WheelRadiusCharacterization.Direction;
@@ -63,10 +64,12 @@ public class CatzAutonomous extends SubsystemBase {
   private HashMap<String, DashboardCmd> dashboardCmds = new HashMap<>();
   private PathPlannerAuto lastProgram;
 
-  CatzRobotTracker tracker = CatzRobotTracker.getInstance();
+  private CatzRobotTracker tracker = CatzRobotTracker.getInstance();
+  private CatzDrivetrain drivetrain;
 
   public CatzAutonomous(RobotContainer container) {
     this.m_container = container;
+    this.drivetrain = container.getCatzDrivetrain();
 
     // ------------------------------------------------------------------------------------------------------------
     // Autonmous questionaire gui configurations
@@ -84,7 +87,7 @@ public class CatzAutonomous extends SubsystemBase {
         NamedCommands.registerCommand(
             pathName,
             new TrajectoryDriveCmd(
-                PathPlannerPath.fromChoreoTrajectory(pathName), m_container.getCatzDrivetrain(), true));
+                PathPlannerPath.fromChoreoTrajectory(pathName), drivetrain, true));
       } catch (FileVersionException | IOException | ParseException e) {
         e.printStackTrace();
       }
@@ -103,7 +106,7 @@ public class CatzAutonomous extends SubsystemBase {
     NamedCommands.registerCommand("TopAlgae", CatzStateCommands.topAlgae(container));
     NamedCommands.registerCommand("Climb", CatzStateCommands.climb(container));
     NamedCommands.registerCommand("RestPose", Commands.runOnce(()->tracker.resetPose(new Pose2d())));
-    NamedCommands.registerCommand("WheelCharacterization", new WheelRadiusCharacterization(m_container.getCatzDrivetrain(), Direction.CLOCKWISE));
+    NamedCommands.registerCommand("WheelCharacterization", new WheelRadiusCharacterization(drivetrain, Direction.CLOCKWISE));
 
     //----------------------------------------------------------------------------------------------------
     //
@@ -144,7 +147,7 @@ public class CatzAutonomous extends SubsystemBase {
         tracker::getEstimatedPose,
         tracker::resetPose,
         tracker::getRobotChassisSpeeds,
-        container.getCatzDrivetrain()::drive,
+        container.getCatzDrivetrain()::d,
         DriveConstants.PATH_FOLLOWING_CONTROLLER,
         DriveConstants.TRAJECTORY_CONFIG,
         shouldFlip,
@@ -162,20 +165,24 @@ public class CatzAutonomous extends SubsystemBase {
         System.out.println("nameeee: " + commandName);
         try {
           String[] components = commandName.split("\\+");
-          Command command = new InstantCommand();
+          Command command = null;
 
           if(components.length == 1){
-            command = new TrajectoryDriveCmd(PathPlannerPath.fromPathFile(commandName), m_container.getCatzDrivetrain(), true);
+            command = new TrajectoryDriveCmd(PathPlannerPath.fromPathFile(commandName), drivetrain, true);
           } else if(components.length == 2){
             String name = components[0];
             String action = components[1];
 
             if(action.equalsIgnoreCase("CS")){
-
               command = new DriveAndCycle(PathPlannerPath.fromPathFile(name), m_container, RobotAction.INTAKE);
             } else if(action.contains("ReefL")){
               command = new DriveAndCycle(PathPlannerPath.fromPathFile(name), m_container, RobotAction.OUTTAKE, Integer.parseInt(action.substring("ReefL".length())));
             }
+          }
+
+          if(command == null){
+            System.out.println("****** typotypotypotypotypotypotypotypotypotypotypotypotypo       \n\n\n\n\nn\n\n\n\n \n\n\n typo in pathplanner reverting to drvive forward auto ********** ");
+            command = Commands.run(() -> drivetrain.drive(new ChassisSpeeds(0.5, 0.0, 0.0), DriveConstants.moduleLimitsTrajectory), drivetrain).withTimeout(5.0);
           }
           NamedCommands.registerCommand(commandName, command);
         } catch (FileVersionException | IOException | ParseException e) {
@@ -233,7 +240,7 @@ public class CatzAutonomous extends SubsystemBase {
   //
   //----------------------------------------------------------------------------------------------------------
   public Command wheelRadiusCharacterization() {
-    return new WheelRadiusCharacterization(m_container.getCatzDrivetrain(), Direction.COUNTER_CLOCKWISE);
+    return new WheelRadiusCharacterization(drivetrain, Direction.COUNTER_CLOCKWISE);
   }
 
   /** Getter for final autonomous Program */

@@ -55,7 +55,7 @@ public class TrajectoryDriveCmd extends Command {
   private static final double TIMEOUT_SCALAR = 50.0;
   private static final double CONVERGE_DISTANCE = 1.0;
   private static final double DIVERGE_TIME = 1.0;
-  private final double ALLOWABLE_VISION_ADJUST = 9e-4; //TODO tune
+  private final double ALLOWABLE_VISION_ADJUST = 5e-3; //TODO tune
 
   // Subsystems
   private CatzDrivetrain m_driveTrain;
@@ -137,10 +137,14 @@ public class TrajectoryDriveCmd extends Command {
       currentSpeeds = DriveConstants.NON_ZERO_CHASSIS_SPEED;
     }
 
+    System.out.println("path: " + usePath);
+    System.out.println("speed;" + currentSpeeds);
+    System.out.println("rototat:" + tracker.getEstimatedPose().getRotation());
+
     // Construct trajectory
     this.trajectory = new PathPlannerTrajectory(
         usePath,
-        currentSpeeds,
+        DriveConstants.NON_ZERO_CHASSIS_SPEED, //TODO make it not zero if its a thing thingy y esdpoifi
         tracker.getEstimatedPose().getRotation(),
         DriveConstants.TRAJECTORY_CONFIG);
 
@@ -188,6 +192,7 @@ public class TrajectoryDriveCmd extends Command {
     // target velocity is used as a ff
     // -------------------------------------------------------------------------------------
     PathPlannerTrajectoryState goal = trajectory.sample(Math.min(currentTime, trajectory.getTotalTimeSeconds()));
+    System.out.println("goallspeed:" + goal.linearVelocity);
     Trajectory.State state = new Trajectory.State(
         currentTime,
         goal.linearVelocity * DriveConstants.TRAJECTORY_FF_SCALAR,
@@ -196,7 +201,7 @@ public class TrajectoryDriveCmd extends Command {
         0.0
     );
     // System.out.println("speeeed: " + state.velocityMetersPerSecond);
-    
+
     // construct chassisspeeds
     adjustedSpeeds = hocontroller.calculate(currentPose, state, goal.pose.getRotation());
 
@@ -230,7 +235,7 @@ public class TrajectoryDriveCmd extends Command {
 
 
     // send to drivetrain
-    m_driveTrain.drive(adjustedSpeeds);
+    m_driveTrain.drive(adjustedSpeeds, DriveConstants.moduleLimitsTrajectory);
 
 
     // Named Commands
@@ -281,7 +286,7 @@ public class TrajectoryDriveCmd extends Command {
 
     if (autoalign && tracker.getDEstimatedPose().getTranslation().getNorm() > ALLOWABLE_VISION_ADJUST) {
       // If trailing pose is within margin
-      System.out.println("vision is not true");
+      // System.out.println("vision is not true");
       return false;
     }
     // Finish command if the total time the path takes is over
@@ -316,8 +321,8 @@ public class TrajectoryDriveCmd extends Command {
     if (rotationError > 180) {
       rotationError = 360 - rotationError;
     }
-    System.out.println("rotationerr: " + (rotationError < ALLOWABLE_OMEGA_ERROR));
-    System.out.println("speederr: " + (desiredMPS == 0.0 || (currentMPS < ALLOWABLE_VEL_ERROR && currentRPS < ALLOWABLE_OMEGA_ERROR)));
+    // System.out.println("rotationerr: " + (rotationError < ALLOWABLE_OMEGA_ERROR));
+    // System.out.println("speederr: " + (desiredMPS == 0.0 || (currentMPS < ALLOWABLE_VEL_ERROR && currentRPS < ALLOWABLE_OMEGA_ERROR)));
 
     return isPoseWithinThreshold(poseError) && rotationError < ALLOWABLE_OMEGA_ERROR &&
     (desiredMPS == 0.0 || (currentMPS < ALLOWABLE_VEL_ERROR && currentRPS < ALLOWABLE_OMEGA_ERROR));
@@ -342,7 +347,7 @@ public class TrajectoryDriveCmd extends Command {
 
 
     // System.out.println("poseerr:" + ((xError < poseError) &&(yError < poseError)));
-    System.out.println("transerr: " + translationError);
+    // System.out.println("transerr: " + translationError);
     // System.out.println("pose errr: " + poseError);
     return translationError < poseError;
   }

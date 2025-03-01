@@ -45,13 +45,12 @@ public class VisionConstants {
         // new VisionIOLimeLight("limelight-ramen", RAMEN_TRANSFORM)    //index 2 turret)
       };
 
-
   // Standard deviation multipliers for each camera
   // (Adjust to trust some cameras more than others)
   public static double[] cameraStdDevFactors =
       new double[] {
-        0.05, // Camera 0
-        0.05 // Camera 1
+        0.15, // Camera 0
+        0.15 // Camera 1
       };
 
   public static final boolean USE_MEGATAG1 = true; // megatag 1 3d solve allows robot to fly

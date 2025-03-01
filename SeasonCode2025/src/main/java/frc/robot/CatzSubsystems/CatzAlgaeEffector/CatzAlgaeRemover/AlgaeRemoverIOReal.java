@@ -13,7 +13,6 @@ import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.TalonFXSConfiguration;
 import com.ctre.phoenix6.controls.DutyCycleOut;
 import com.ctre.phoenix6.hardware.TalonFXS;
-import com.ctre.phoenix6.signals.AdvancedHallSupportValue;
 import com.ctre.phoenix6.signals.MotorArrangementValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 

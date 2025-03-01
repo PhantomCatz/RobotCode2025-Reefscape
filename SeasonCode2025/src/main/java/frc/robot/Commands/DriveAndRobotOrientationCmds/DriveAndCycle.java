@@ -17,7 +17,7 @@ import frc.robot.CatzSubsystems.CatzSuperstructure;
 import frc.robot.CatzSubsystems.CatzOuttake.CatzOuttake;
 
 public class DriveAndCycle extends TrajectoryDriveCmd{
-    private double PREDICT_DISTANCE = 1.0; // meters
+    private final double PREDICT_DISTANCE = 1.0; // meters
 
     private RobotAction action;
     private TeleopPosSelector selector;
@@ -47,24 +47,21 @@ public class DriveAndCycle extends TrajectoryDriveCmd{
     @Override
     public void initialize(){
         super.initialize();
-        selector.hasCoralSIM = true;
+        // selector.hasCoralSIM = true;
     }
-
-    private boolean isAiming = false;
 
     @Override
     public void execute(){
         // Run Trajectory
-        if(!super.isFinished()){
+        if( super.isFinished() == false){
             super.execute();
         }
 
         // Run Scoring or Intaking
-        if (super.isPoseWithinThreshold(PREDICT_DISTANCE) && !super.isFinished() && !isAiming){
-            if(action == RobotAction.OUTTAKE){
+        if (super.isPoseWithinThreshold(PREDICT_DISTANCE) && !super.isFinished()){
+            if(action == RobotAction.OUTTAKE && superstructure.getCurrentRobotAction() != RobotAction.OUTTAKE){
                 System.out.println("raised elevator!!!!!!!");
                 superstructure.setCurrentRobotAction(RobotAction.AIMING, level);
-                isAiming = true;
             }
             else if(action == RobotAction.INTAKE){
                 // System.out.println("intaking!!!!!!");
@@ -73,12 +70,13 @@ public class DriveAndCycle extends TrajectoryDriveCmd{
         }
 
         // If we reached the target Destination
-        if (super.isFinished() && isAiming){
+        if (super.isFinished()){
             super.end(false);
             superstructure.setCurrentRobotAction(action, this.level);
             // System.out.println("action: " + action.toString());
             if (selector.useFakeCoral){
                 selector.hasCoralSIM = action == RobotAction.INTAKE;
+                System.out.println("ac:" + action + "cor: " + selector.hasCoralSIM);
             }
         }
     }
@@ -89,6 +87,7 @@ public class DriveAndCycle extends TrajectoryDriveCmd{
         if(action == RobotAction.OUTTAKE){
             superstructure.setCurrentRobotAction(RobotAction.STOW);
         }
+        System.out.println("finisheddddddddd");
     }
 
     @Override
@@ -96,12 +95,12 @@ public class DriveAndCycle extends TrajectoryDriveCmd{
         if(action == RobotAction.OUTTAKE){
             if(selector.useFakeCoral){
                 return !selector.hasCoralSIM;
-            }else{
-                return (CatzSuperstructure.getCurrentCoralState() == CoralState.NOT_IN_OUTTAKE);
             }
+            return (CatzSuperstructure.getCurrentCoralState() == CoralState.NOT_IN_OUTTAKE);
         }
         if(action == RobotAction.INTAKE){
             if(selector.useFakeCoral){
+                System.out.println("coral intakee:" + selector.hasCoralSIM);
                 return selector.hasCoralSIM;
             }
             return (CatzSuperstructure.getCurrentCoralState() == CoralState.IN_OUTTAKE);

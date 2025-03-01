@@ -5,7 +5,7 @@
 // license that can be found in the LICENSE file at
 // the root directory of this project.
 
-package frc.robot.Utilities.Swerve;
+package frc.robot.Utilities;
 
 public record ModuleLimits(
     double maxDriveVelocity, double maxDriveAcceleration, double maxSteeringVelocity) {}

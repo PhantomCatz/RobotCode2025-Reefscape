@@ -24,7 +24,7 @@ import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
 import frc.robot.CatzConstants;
 import frc.robot.Utilities.LoggedTunableNumber;
-import frc.robot.Utilities.Swerve.ModuleLimits;
+import frc.robot.Utilities.ModuleLimits;
 import lombok.Builder;
 
 public class DriveConstants {
@@ -54,6 +54,7 @@ public class DriveConstants {
   // ---------------------------------------------------------------------------------------------------------------
   public static final double DRIVE_CURRENT_LIMIT = 80.0;
   public static final double STEER_CURRENT_LIMIT = 40.0;
+  public static final double TELEOP_ACCELERATION = 120;
 
   // Velocity and Accerlation Constants
   private static final double kA_ANGULAR_ACCEL = 0.0;
@@ -83,8 +84,8 @@ public class DriveConstants {
                 .robotWidthY(Units.inchesToMeters(24.2))
                 .bumperWidthX(Units.inchesToMeters(32))
                 .bumperWidthY(Units.inchesToMeters(32))
-                .maxLinearVelocity(2) //TODO find optimal maximum
-                .maxLinearAcceleration(2) // TODO emperically calculate
+                .maxLinearVelocity(3) //TODO find optimal maximum
+                .maxLinearAcceleration(3) // TODO emperically calculate
                 .maxAngularVelocity(12.0) // Radians
                 .maxAngularAcceleration(30) // Radians // TODO verify angle constraints
                 .build();
@@ -127,10 +128,8 @@ public class DriveConstants {
                 Mk4iReductions.steer.reduction);
       };
 
-    public static final double maxLinearSpeed = 4.69;
-    public static final double maxAngularSpeed = 4.69 / Math.hypot(24.2, 24.2);
-    public static final ModuleLimits moduleLimitsFree =
-      new ModuleLimits(maxLinearSpeed, 120.0, Units.degreesToRadians(1080.0));
+    public static final ModuleLimits moduleLimitsTrajectory = new ModuleLimits(DRIVE_CONFIG.maxLinearVelocity, TELEOP_ACCELERATION, Units.degreesToRadians(1080.0));
+    public static final ModuleLimits moduleLimitsTeleop = new ModuleLimits(DRIVE_CONFIG.maxLinearVelocity, TELEOP_ACCELERATION, Units.degreesToRadians(1080.0));
 
   // -------------------------------------------------------------------------------
   // Odometry Constants
@@ -197,6 +196,8 @@ public class DriveConstants {
                                                                         DRIVE_CONFIG.maxAngularAcceleration
                                                                 );
 
+  public static final double DRIVE_VELOCITY_DEADBAND = 1e-9;
+
   public static final Translation2d[] MODULE_TRANSLATIONS = new Translation2d[4];
   static {
     MODULE_TRANSLATIONS[INDEX_FR] = new Translation2d( DRIVE_CONFIG.robotLengthX(), -DRIVE_CONFIG.robotWidthY()).div(2.0);
@@ -219,17 +220,17 @@ public class DriveConstants {
   // -----------------------------------------------------------------------------------------------------------------------------
   public static HolonomicDriveController getNewHolController() {
     return new HolonomicDriveController(
-        new PIDController(8.0, 0.0, 0.0),
-        new PIDController(8.0, 0.0, 0.0),
+        new PIDController(4.0, 0.0, 0.012),
+        new PIDController(4.0, 0.0, 0.012),
         new ProfiledPIDController(
-            10.0,
-            0,
-            0,
+            4.0,
+            0.0,
+            0.012,
             new TrapezoidProfile.Constraints(
                 DRIVE_CONFIG.maxAngularVelocity, DRIVE_CONFIG.maxAngularAcceleration)));
   }
 
-  public static final double TRAJECTORY_FF_SCALAR = 0.9;
+  public static final double TRAJECTORY_FF_SCALAR = 1.0;
 
   public static PathFollowingController getNewPathFollowingController() {
     return new PPHolonomicDriveController(
@@ -243,10 +244,10 @@ public class DriveConstants {
 
   public static final double ROBOT_MASS = 50.0;
   public static final double ROBOT_MOI =
-      (1.0 / 12.0) * ROBOT_MASS * (Math.pow(DRIVE_CONFIG.bumperWidthX(), 2) + Math.pow(DRIVE_CONFIG.bumperWidthY(),2)); // ROBOT_MASS * (2/2) * (kA_ANGULAR_ACCEL/kA_LINEAR_ACCEL); // TODO need to
+      (2.0 / 12.0) * ROBOT_MASS * (Math.pow(DRIVE_CONFIG.bumperWidthX(), 2)); // ROBOT_MASS * (2/2) * (kA_ANGULAR_ACCEL/kA_LINEAR_ACCEL); // TODO need to
   // TODO recaculate with formula on Pathplanner
 
-  public static final double TREAD_COEF_FRICTION = 1.542;
+  public static final double TREAD_COEF_FRICTION = 4.00;
 
   public static final ModuleConfig TRAJECTORY_MODULE_CONFIG =
       new ModuleConfig(

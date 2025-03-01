@@ -31,8 +31,9 @@ import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.CatzRobotTracker.Od
 import frc.robot.Robot;
 import frc.robot.Utilities.Alert;
 import frc.robot.Utilities.EqualsUtil;
-import frc.robot.Utilities.Swerve.SwerveSetpoint;
-import frc.robot.Utilities.Swerve.SwerveSetpointGenerator;
+import frc.robot.Utilities.ModuleLimits;
+import frc.robot.Utilities.SwerveSetpoint;
+import frc.robot.Utilities.SwerveSetpointGenerator;
 
 import java.util.Arrays;
 import org.littletonrobotics.junction.AutoLogOutput;
@@ -202,7 +203,7 @@ public class CatzDrivetrain extends SubsystemBase {
   //          Driving methods
   //
   // --------------------------------------------------------------------------------------------------------------------------
-  public void drive(ChassisSpeeds chassisSpeeds) {
+  public void drive(ChassisSpeeds chassisSpeeds, ModuleLimits limits) {
     ChassisSpeeds descreteSpeeds = chassisSpeeds;
 
     SwerveModuleState[] setpointStates = currentSetpoint.moduleStates();
@@ -212,7 +213,7 @@ public class CatzDrivetrain extends SubsystemBase {
 
     currentSetpoint =
         swerveSetpointGenerator.generateSetpoint(
-            DriveConstants.moduleLimitsFree,
+            limits,
             currentSetpoint,
             descreteSpeeds,
             CatzConstants.LOOP_TIME);
@@ -255,6 +256,9 @@ public class CatzDrivetrain extends SubsystemBase {
 
     Logger.recordOutput("Drive/chassispeeds", descreteSpeeds);
     Logger.recordOutput("Drive/modulestates", optimizedDesiredStates);
+  }
+  public void d(ChassisSpeeds s){
+    //nothing
   }
 
   public void simpleDrive(ChassisSpeeds speeds) {

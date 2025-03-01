@@ -123,9 +123,9 @@ public class CatzElevator extends SubsystemBase {
     //---------------------------------------------------------------------------------------------------------------------------
     //    Limit switch position setting
     //---------------------------------------------------------------------------------------------------------------------------
-    if(inputs.isBotLimitSwitched) {
-      io.setPosition(ElevatorPosition.PosTrueStow.getTargetPositionRads());
-    }
+    // if(inputs.isBotLimitSwitched) {
+    //   io.setPosition(ElevatorPosition.PosTrueStow.getTargetPositionRads());
+    // }
 
     //---------------------------------------------------------------------------------------------------------------------------
     //    Feed Foward
@@ -259,7 +259,7 @@ public class CatzElevator extends SubsystemBase {
 
   public void elevatorManual(Supplier<Double> manualSupplier) {
     targetManualPosition += manualSupplier.get() * MANUAL_SCALE;
-    System.out.println(targetManualPosition);
+    // System.out.println("put tags in print statement" + targetManualPosition);
     targetPosition = ElevatorPosition.PosManual;
   }
 

@@ -5,7 +5,7 @@
 // license that can be found in the LICENSE file at
 // the root directory of this project.
 
-package frc.robot.Utilities.Swerve;
+package frc.robot.Utilities;
 
 import static frc.robot.Utilities.EqualsUtil.*;
 
@@ -16,9 +16,7 @@ import edu.wpi.first.math.geometry.Twist2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
-import frc.robot.Utilities.GeomUtil;
-import frc.robot.Utilities.EqualsUtil;
-
+import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.Drivetrain.DriveConstants;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -217,7 +215,7 @@ public class SwerveSetpointGenerator {
     // Special case: desiredState is a complete stop. In this case, module angle is arbitrary, so
     // just use the previous angle.
     boolean need_to_steer = true;
-    if (desiredState.toTwist2d().epsilonEquals(new Twist2d())) {
+    if (desiredState.toTwist2d().epsilonEquals(new Twist2d(), DriveConstants.DRIVE_VELOCITY_DEADBAND)) {
       need_to_steer = false;
       for (int i = 0; i < modules.length; ++i) {
         desiredModuleState[i].angle = prevSetpoint.moduleStates()[i].angle;
