@@ -7,13 +7,19 @@
         {
           "type": "named",
           "data": {
-            "name": "L4 J 1"
+            "name": "L4 G 1+ReefL4"
           }
         },
         {
           "type": "named",
           "data": {
-            "name": "L1Coral"
+            "name": "L4 G 2+CS"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "L4 G 3+ReefL4"
           }
         }
       ]

@@ -15,6 +15,12 @@
           "data": {
             "name": "L4 H 2+CS"
           }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "L4 H 3+ReefL1"
+          }
         }
       ]
     }
