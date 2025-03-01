@@ -235,7 +235,7 @@ public class TrajectoryDriveCmd extends Command {
 
 
     // send to drivetrain
-    m_driveTrain.drive(adjustedSpeeds, DriveConstants.moduleLimitsTrajectory);
+    m_driveTrain.drive(adjustedSpeeds, true);
 
 
     // Named Commands
