@@ -30,7 +30,7 @@ public class AlgaePivotConstants {
         };
     public static final MotionMagicParameters motionMagicParameters =
         switch (CatzConstants.getRobotType()) {
-            case SN2, SN1 -> new MotionMagicParameters(400, 800, 1600);
+            case SN2, SN1 -> new MotionMagicParameters(20, 100, 800);
             case SN_TEST, SN1_2024 -> new MotionMagicParameters(0.0, 0.0, 0.0);
         };
 

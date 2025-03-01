@@ -34,6 +34,7 @@ import frc.robot.CatzSubsystems.CatzElevator.*;
 import frc.robot.CatzSubsystems.CatzLEDs.CatzLED;
 import frc.robot.CatzSubsystems.CatzLEDs.CatzLED.ControllerLEDState;
 import frc.robot.CatzSubsystems.CatzOuttake.CatzOuttake;
+import frc.robot.CatzSubsystems.CatzRampPivot.CatzRampPivot;
 import frc.robot.Commands.DriveAndRobotOrientationCmds.TeleopDriveCmd;
 import frc.robot.Utilities.Alert;
 import frc.robot.Utilities.AllianceFlipUtil;
@@ -60,6 +61,7 @@ public class RobotContainer {
   private CatzClimb climb = new CatzClimb();
   private CatzAlgaeRemover algaeRemover = new CatzAlgaeRemover();
   private CatzAlgaePivot algaePivot = new CatzAlgaePivot();
+  private CatzRampPivot rampPivot = new CatzRampPivot();
   private CatzSuperstructure superstructure = new CatzSuperstructure(this);
 
   // ------------------------------------------------------------------------------------------------------------------
@@ -169,9 +171,16 @@ public class RobotContainer {
     rightJoystickTrigger.onTrue(climb.ClimbManualMode(() -> xboxTest.getRightY()).alongWith(Commands.print("Using manual climb")));
 
     // Manual Elevator Control
+    // Trigger leftJoystickTrigger = new Trigger(
+    //   () -> Math.abs(xboxTest.getLeftY()) > 0.1);
+    // leftJoystickTrigger.onTrue(elevator.elevatorFullManual(() -> xboxTest.getLeftY()).alongWith(Commands.print("Using manual elevator")));
+    // leftJoystickTrigger.onFalse(elevator.elevatorFullManual(() -> xboxTest.getLeftY()));
+
+    // Manual Ramp Pivot Control
     Trigger leftJoystickTrigger = new Trigger(
       () -> Math.abs(xboxTest.getLeftY()) > 0.1);
-    leftJoystickTrigger.onTrue(elevator.elevatorFullManual(() -> xboxTest.getLeftY()).alongWith(Commands.print("Using manual elevator")));
+    leftJoystickTrigger.onTrue(rampPivot.rampPivotFullManual(() -> xboxTest.getLeftY()).alongWith(Commands.print("Using manual ramp pivot")));
+    leftJoystickTrigger.onFalse(rampPivot.rampPivotFullManual(()-> 0.0).alongWith(Commands.print("Nah - pivot motor")));
 
     // Climb SetPosition Control
     xboxDrv.y().toggleOnTrue(climb.Climb_Retract().alongWith(Commands.print("pressed y")));
@@ -303,6 +312,10 @@ public class RobotContainer {
 
   public CatzVision getCatzVision() {
     return vision;
+  }
+
+  public CatzRampPivot getCatzRampPivot() {
+    return rampPivot;
   }
 
   public CatzSuperstructure getSuperstructure(){

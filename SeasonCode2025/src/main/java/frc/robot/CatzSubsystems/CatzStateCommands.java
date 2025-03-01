@@ -20,6 +20,7 @@ import frc.robot.CatzSubsystems.CatzAlgaeEffector.CatzAlgaeRemover.CatzAlgaeRemo
 import frc.robot.CatzSubsystems.CatzClimb.CatzClimb;
 import frc.robot.CatzSubsystems.CatzElevator.CatzElevator;
 import frc.robot.CatzSubsystems.CatzOuttake.CatzOuttake;
+import frc.robot.CatzSubsystems.CatzRampPivot.CatzRampPivot;
 
 public class CatzStateCommands {
 
@@ -287,11 +288,13 @@ public class CatzStateCommands {
         CatzAlgaeRemover algae = robotContainer.getCatzAlgaeRemover();
         CatzOuttake outtake = robotContainer.getCatzOuttake();
         CatzElevator elevator = robotContainer.getCatzElevator();
+        CatzRampPivot rampPivot = robotContainer.getCatzRampPivot();
 
         return new SequentialCommandGroup(
             new ParallelCommandGroup(
                 outtake.stopOuttake(),
                 algae.stopAlgae(),
+                rampPivot.Ramp_Climb(),
                 elevator.Elevator_Stow()
             ),
             climb.Climb_Full()

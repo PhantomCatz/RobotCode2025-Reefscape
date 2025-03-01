@@ -10,15 +10,14 @@ package frc.robot.CatzSubsystems.CatzOuttake;
 
 import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkBase.ResetMode;
-import com.revrobotics.spark.SparkBase.PersistMode;
-import com.revrobotics.spark.SparkBase.ResetMode;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 
 import static frc.robot.CatzSubsystems.CatzOuttake.OuttakeConstants.*;
 
-import com.ctre.phoenix6.configs.TalonFXConfiguration;
+import com.ctre.phoenix6.configs.TalonFXSConfiguration;
 import com.ctre.phoenix6.controls.DutyCycleOut;
-import com.ctre.phoenix6.hardware.TalonFX;
+import com.ctre.phoenix6.hardware.TalonFXS;
+import com.ctre.phoenix6.signals.MotorArrangementValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
@@ -34,16 +33,16 @@ public class OuttakeIOReal implements OuttakeIO {
 
   private final SparkMax OuttakeLeftMtr;
   private final SparkMax OuttakeRightMtr;
-  private final TalonFX IntakeCoralMtr;
+  private final TalonFXS IntakeCoralMtr;
 
-  private final TalonFXConfiguration config = new TalonFXConfiguration();
+  private final TalonFXSConfiguration config = new TalonFXSConfiguration();
   private SparkMaxConfig globalConfig = new SparkMaxConfig();
 
   public OuttakeIOReal() {
 
     OuttakeLeftMtr = new SparkMax(LEFT_OUTTAKE_ID, MotorType.kBrushless);
     OuttakeRightMtr = new SparkMax(RIGHT_OUTTAKE_ID, MotorType.kBrushless);
-    IntakeCoralMtr = new TalonFX(INTAKE_CORAL_ID);
+    IntakeCoralMtr = new TalonFXS(INTAKE_CORAL_ID);
 
     // globalConfig.smartCurrentLimit(OUTTAKE_CURRENT_LIMIT);
     globalConfig.smartCurrentLimit(20);
@@ -57,9 +56,7 @@ public class OuttakeIOReal implements OuttakeIO {
     config.Slot0.kP = gains.kP();
     config.Slot0.kI = gains.kI();
     config.Slot0.kD = gains.kD();
-
-    config.TorqueCurrent.PeakForwardTorqueCurrent =  80.0;
-    config.TorqueCurrent.PeakReverseTorqueCurrent = -80.0;
+    config.Commutation.MotorArrangement = MotorArrangementValue.Minion_JST;
     config.MotorOutput.NeutralMode = NeutralModeValue.Brake;
 
     // config.MotionMagic.MotionMagicCruiseVelocity = motionMagicParameters.mmCruiseVelocity();
