@@ -49,6 +49,18 @@ public class RampPivotIOReal implements RampPivotIO{
         rampPivotTorqueCurrent = rampPivotMotor.getTorqueCurrent();
         rampPivotTempCelsius = rampPivotMotor.getDeviceTemp();
 
+        // PID configs
+        config.Slot0.kS = gains.kS();
+        config.Slot0.kV = gains.kV();
+        config.Slot0.kA = gains.kA();
+        config.Slot0.kP = gains.kP();
+        config.Slot0.kI = gains.kI();
+        config.Slot0.kD = gains.kD();
+
+        config.MotionMagic.MotionMagicCruiseVelocity = motionMagicParameters.mmCruiseVelocity();
+        config.MotionMagic.MotionMagicAcceleration = motionMagicParameters.mmAcceleration();
+        config.MotionMagic.MotionMagicJerk = motionMagicParameters.mmJerk();
+
         rampPivotMotor.getConfigurator().apply(config, 1.0);
 
         rampPivotMotor.setPosition(0.0);
@@ -84,6 +96,7 @@ public class RampPivotIOReal implements RampPivotIO{
 
     @Override
     public void setPosition(double setpointRotations, double feedforward) {
+        System.out.println(setpointRotations);
         rampPivotMotor.setControl(positionControl.withPosition(setpointRotations)
                                                  .withFeedForward(feedforward));
     }

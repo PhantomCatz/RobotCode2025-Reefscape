@@ -7,7 +7,6 @@
 
 package frc.robot.CatzSubsystems.CatzAlgaeEffector.CatzAlgaePivot;
 
-import edu.wpi.first.math.controller.ElevatorFeedforward;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -27,11 +26,10 @@ public class CatzAlgaePivot extends SubsystemBase {
   private final AlgaePivotIO io;
   private final AlgaePivotIOInputsAutoLogged inputs = new AlgaePivotIOInputsAutoLogged();
 
-  static double algaePivotFeedFoward = 0.0;
   static double manualPow = 0;
   static boolean isManual;
   static final double MANUAL_SCALE = 5;
-  static double position = Position.STOW.getTargetMotionPosition();
+  static double position = 0.0;
   static LoggedTunableNumber tunnablePos = new LoggedTunableNumber("AlgaePivot/TunnablePosition", 1);
   static LoggedTunableNumber kP = new LoggedTunableNumber("AlgaePivot/kP", 0.17);
   static LoggedTunableNumber kI = new LoggedTunableNumber("AlgaePivot/kI", 0.0);
@@ -40,8 +38,6 @@ public class CatzAlgaePivot extends SubsystemBase {
   static LoggedTunableNumber kS = new LoggedTunableNumber("AlgaePivot/kS", 0);
   static LoggedTunableNumber kV = new LoggedTunableNumber("AlgaePivot/kV", 0);
   static LoggedTunableNumber kA = new LoggedTunableNumber("AlgaePivot/kA", 0);
-
-  private ElevatorFeedforward ff = new ElevatorFeedforward(gains.kS(), gains.kG(), gains.kV(), gains.kA());
 
   /** Creates a new PositionSubsystem. */
 
@@ -53,9 +49,9 @@ public class CatzAlgaePivot extends SubsystemBase {
     STOW(() -> 109.0),
     HORIZONTAL(() -> -30.0), // TBD
     UNDISCLOSED(() -> 999), // TBD
-    BOTBOT(() -> -49.7),
-    BOTTOP(() -> -50.2),
     MANUAL(() -> manualPow),
+    BOTBOT(() -> -49.7),
+    BOTTOP(() -> -50.1),
     TUNNABLE(tunnablePos);
 
     private final DoubleSupplier motionType;
@@ -93,27 +89,22 @@ public class CatzAlgaePivot extends SubsystemBase {
     io.updateInputs(inputs);
     Logger.processInputs("RealInputs/AlgaePivot", inputs);
     // System.out.println(position);
-
-    algaePivotFeedFoward = gains.kG() * Math.cos((getAlgaePivotPositionDeg() * 2 * Math.PI) / 360) ;
-
     if (DriverStation.isDisabled()) {
 
     } else {
       if(isManual) {
 
       } else {
-        io.runSetpoint(position, algaePivotFeedFoward);
+        io.runSetpoint(position, 0.0);
       }
     }
-
-    Logger.recordOutput("AlgaePivot/currentPosition", getAlgaePivotPositionDeg());
+    Logger.recordOutput("AlgaePivot/currentPosition", getAlgaePivotPositionRads());
 
     Logger.recordOutput("AlgaePivot/targetPosition", position);
 
-    System.out.println("Algae Pivot FeedFowards(" + gains.kG() + " * cos(" + getAlgaePivotPositionDeg() + "): " + algaePivotFeedFoward * gains.kG());
   }
 
-  public double getAlgaePivotPositionDeg() {
+  public double getAlgaePivotPositionRads() {
     return inputs.positionMechs;
   }
 
@@ -143,26 +134,17 @@ public class CatzAlgaePivot extends SubsystemBase {
 
   public void setAlgaePivotPos(Position target) {
     position = target.getTargetMotionPosition();
-    // System.out.println(position);
     isManual = false;
   }
 
   public void algaePivotManual(Supplier<Double> manualSupplier) {
     position += manualSupplier.get() * MANUAL_SCALE;
+    isManual = true;
     System.out.println("algae:" +position);
   }
 
-
-  public Command AlgaePivotFullManual(Supplier<Double> manualSupplier) {
-    return run(() -> algaePivotManual(manualSupplier));
-  }
-
-  public void algaePivotFullManual(Supplier<Double> manualSupplier) {
-    io.setPercentOutput(manualSupplier.get()/10);
-  }
-
   public Command AlgaePivotFullManualCommand(Supplier<Double> manualSupplier) {
-    return run(() -> algaePivotFullManual(manualSupplier));
+    return run(() -> algaePivotManual(manualSupplier));
   }
 
 

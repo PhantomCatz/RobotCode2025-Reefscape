@@ -26,15 +26,15 @@ public class CatzRampPivot extends SubsystemBase {
   private final RampPivotIO io;
   private final RampPivotIOInputsAutoLogged inputs = new RampPivotIOInputsAutoLogged();
 
-  public RampPivotPositions targetPos = RampPivotPositions.PosStow;
+  public double targetPos = RampPivotPositions.PosStow.getTargetPositionRot();
   public double RampPivotFeedForward = 0.0;
-
+  public static boolean isManual = false;
   @RequiredArgsConstructor
   public static enum RampPivotPositions {
     PosStow(() -> RAMP_STOW),
     PosClimb(() -> RAMP_CLIMB),
     Pos3(() -> heightPlaceholder),
-    PosNull(() -> -1),
+    PosNull(() -> heightPlaceholder),
     PosManual(new LoggedTunableNumber("RampPivot/RampPivotManual",0.0));
 
     private final DoubleSupplier elevatorSetpointSupplier;
@@ -69,29 +69,36 @@ public class CatzRampPivot extends SubsystemBase {
     io.updateInputs(inputs);
     Logger.processInputs("RealInputs/RampPivot", inputs);
 
+    io.setPosition(targetPos, 0);
+    System.out.println("Target Pos: " + targetPos);
     // if(DriverStation.isDisabled()) {
     //   // Disabled
     //   io.stop();
-    //   targetPos = RampPivotPositions.PosStow;
-    // } else if(targetPos != RampPivotPositions.PosNull){
-    //   // Semi Manual
-    //   io.stop();
-    // } else if(targetPos != RampPivotPositions.PosNull){
-    //   io.setPosition(targetPos.getTargetPositionRot(), 0);
+    //   targetPos = RampPivotPositions.PosStow.getTargetPositionRot();
+
+    // } else if(targetPos != RampPivotPositions.PosNull.getTargetPositionRot()){
+    //   io.setPosition(targetPos, 0);
+
     // } else {
-    //   io.runMotor(0.0);
+    //   io.stop();
     // }
+    Logger.recordOutput("RampPivot/targetPos", targetPos);
   }
 
-  public Command rampPivotFullManual(Supplier<Double> manualSupplier) {
-    return run(()->io.runMotor(manualSupplier.get())).alongWith(Commands.print("full manual"));
+  public Command rampPivotManual(Supplier<Double> manualSupplier) {
+    return run(() -> rampPivotSetManual(manualSupplier.get())).alongWith(Commands.print("full manual"));
+  }
+
+  public void rampPivotSetManual(double manualSupplier) {
+    targetPos += manualSupplier * MANUAL_SCALE;
+
   }
 
   public Command Ramp_Stow() {
-    return runOnce(() -> this.targetPos = RampPivotPositions.PosStow);
+    return runOnce(() -> this.targetPos = RampPivotPositions.PosStow.getTargetPositionRot());
   }
 
   public Command Ramp_Climb() {
-    return runOnce(() -> this.targetPos = RampPivotPositions.PosClimb);
+    return runOnce(() -> this.targetPos = RampPivotPositions.PosClimb.getTargetPositionRot());
   }
 }

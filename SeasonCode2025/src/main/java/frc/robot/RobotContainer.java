@@ -178,14 +178,17 @@ public class RobotContainer {
 
     // Manual Ramp Pivot Control
     Trigger leftJoystickTrigger = new Trigger(
-      () -> Math.abs(xboxTest.getLeftY()) > 0.1);
-    leftJoystickTrigger.onTrue(rampPivot.rampPivotFullManual(() -> xboxTest.getLeftY()).alongWith(Commands.print("Using manual ramp pivot")));
-    leftJoystickTrigger.onFalse(rampPivot.rampPivotFullManual(()-> 0.0).alongWith(Commands.print("Nah - pivot motor")));
+      () -> Math.abs(xboxTest.getLeftY()) > 0.2);
+    leftJoystickTrigger.onTrue(rampPivot.rampPivotManual(() -> xboxTest.getLeftY()).alongWith(Commands.print("Using manual ramp pivot")));
+    leftJoystickTrigger.onFalse(rampPivot.rampPivotManual(()-> 0.0).alongWith(Commands.print("Nah - pivot motor")));
 
     // Climb SetPosition Control
-    xboxDrv.y().toggleOnTrue(climb.Climb_Retract().alongWith(Commands.print("pressed y")));
-    xboxDrv.x().toggleOnTrue(climb.Climb_Home().alongWith(Commands.print("pressed x")));
-    xboxDrv.b().toggleOnTrue(climb.Climb_Full().alongWith(Commands.print("pressed b")));
+    // xboxDrv.y().toggleOnTrue(climb.Climb_Retract().alongWith(Commands.print("pressed y")));
+    // xboxDrv.x().toggleOnTrue(climb.Climb_Home().alongWith(Commands.print("pressed x")));
+    // xboxDrv.b().toggleOnTrue(climb.Climb_Full().alongWith(Commands.print("pressed b")));
+
+    xboxTest.y().toggleOnTrue(rampPivot.Ramp_Climb().alongWith(Commands.print("pressed y")));
+    xboxTest.x().toggleOnTrue(rampPivot.Ramp_Stow().alongWith(Commands.print("pressed x")));
 
     xboxTest.rightBumper().toggleOnTrue(algaePivot.AlgaePivot_Stow().alongWith(Commands.print("stow")));
     xboxTest.leftBumper().toggleOnTrue(algaePivot.AlgaePivot_Horizontal().alongWith(Commands.print("eat")));
