@@ -54,7 +54,6 @@ public class DriveConstants {
   // ---------------------------------------------------------------------------------------------------------------
   public static final double DRIVE_CURRENT_LIMIT = 80.0;
   public static final double STEER_CURRENT_LIMIT = 40.0;
-  public static final double TELEOP_ACCELERATION = 120;
 
   // Velocity and Accerlation Constants
   private static final double kA_ANGULAR_ACCEL = 0.0;
@@ -78,18 +77,33 @@ public class DriveConstants {
                 .maxAngularAcceleration(30) // Radians // TODO verify angle constraints
                 .build();
         case SN1, SN2, SN1_2024 ->
-        DriveConfig.builder()
-                .wheelRadius(Units.inchesToMeters(1.91363711)) // TODO make these repeated numbers into constants
-                .robotLengthX(Units.inchesToMeters(24.2))
-                .robotWidthY(Units.inchesToMeters(24.2))
-                .bumperWidthX(Units.inchesToMeters(32))
-                .bumperWidthY(Units.inchesToMeters(32))
-                .maxLinearVelocity(3) //TODO find optimal maximum
-                .maxLinearAcceleration(3) // TODO emperically calculate
-                .maxAngularVelocity(12.0) // Radians
-                .maxAngularAcceleration(30) // Radians // TODO verify angle constraints
-                .build();
+          DriveConfig.builder()
+                  .wheelRadius(Units.inchesToMeters(1.91363711)) // TODO make these repeated numbers into constants
+                  .robotLengthX(Units.inchesToMeters(24.2))
+                  .robotWidthY(Units.inchesToMeters(24.2))
+                  .bumperWidthX(Units.inchesToMeters(32))
+                  .bumperWidthY(Units.inchesToMeters(32))
+                  .maxLinearVelocity(3) //TODO find optimal maximum
+                  .maxLinearAcceleration(3) // TODO emperically calculate
+                  .maxAngularVelocity(12.0) // Radians
+                  .maxAngularAcceleration(30) // Radians // TODO verify angle constraints
+                  .build();
       };
+
+  //Robot speed constraints for specifically following trajectories. 
+  //Velocity and acceleration for this should be effectively uncapped. 
+  //As long as there are reasonable constraints on the path generated, the high values here should not cause any issues.
+  public static final DriveConfig TRAJECTORY_FOLLOWING_CONFIG = DriveConfig.builder()
+      .wheelRadius(DRIVE_CONFIG.wheelRadius) // TODO make these repeated numbers into constants
+      .robotLengthX(DRIVE_CONFIG.robotLengthX) // Wheel positions
+      .robotWidthY(DRIVE_CONFIG.robotWidthY)
+      .bumperWidthX(DRIVE_CONFIG.bumperWidthX)
+      .bumperWidthY(DRIVE_CONFIG.bumperWidthY)
+      .maxLinearVelocity(Units.feetToMeters(17))
+      .maxLinearAcceleration(Units.feetToMeters(120)) // TODO emperically calculate
+      .maxAngularVelocity(120.0) // Radians
+      .maxAngularAcceleration(300) // Radians // TODO verify angle constraints
+      .build();
 
   public static final ModuleGainsAndRatios MODULE_GAINS_AND_RATIOS =
       switch (CatzConstants.getRobotType()) {
@@ -127,10 +141,6 @@ public class DriveConstants {
                 Mk4iReductions.L2_PLUS.reduction,
                 Mk4iReductions.steer.reduction);
       };
-
-    public static final ModuleLimits moduleLimitsTrajectory = new ModuleLimits(DRIVE_CONFIG.maxLinearVelocity, TELEOP_ACCELERATION, Units.degreesToRadians(1080.0));
-    public static final ModuleLimits moduleLimitsTeleop = new ModuleLimits(DRIVE_CONFIG.maxLinearVelocity, TELEOP_ACCELERATION, Units.degreesToRadians(1080.0));
-
   // -------------------------------------------------------------------------------
   // Odometry Constants
   // -------------------------------------------------------------------------------
@@ -189,6 +199,8 @@ public class DriveConstants {
   //      Drivebase controller/object definements
   //
   // -----------------------------------------------------------------------------------------------------------------------------
+
+  //used for constraining the paths created during pathfinding
   public static final PathConstraints PATHFINDING_CONSTRAINTS = new PathConstraints( // 540 // 720
                                                                         DRIVE_CONFIG.maxLinearVelocity,
                                                                         DRIVE_CONFIG.maxLinearAcceleration, // max vel causing messup
@@ -258,6 +270,7 @@ public class DriveConstants {
           DRIVE_CURRENT_LIMIT,
           1);
 
+  //used when generating trajectories
   public static final RobotConfig TRAJECTORY_CONFIG =
       new RobotConfig(
           ROBOT_MASS, ROBOT_MOI, TRAJECTORY_MODULE_CONFIG, MODULE_TRANSLATIONS);

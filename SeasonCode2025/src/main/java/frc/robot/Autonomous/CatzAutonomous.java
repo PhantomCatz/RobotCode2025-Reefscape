@@ -182,7 +182,7 @@ public class CatzAutonomous extends SubsystemBase {
 
           if(command == null){
             System.out.println("****** typotypotypotypotypotypotypotypotypotypotypotypotypo       \n\n\n\n\nn\n\n\n\n \n\n\n typo in pathplanner reverting to drvive forward auto ********** ");
-            command = Commands.run(() -> drivetrain.drive(new ChassisSpeeds(0.5, 0.0, 0.0), DriveConstants.moduleLimitsTrajectory), drivetrain).withTimeout(5.0);
+            command = Commands.run(() -> drivetrain.drive(new ChassisSpeeds(0.5, 0.0, 0.0), false), drivetrain).withTimeout(5.0);
           }
           NamedCommands.registerCommand(commandName, command);
         } catch (FileVersionException | IOException | ParseException e) {

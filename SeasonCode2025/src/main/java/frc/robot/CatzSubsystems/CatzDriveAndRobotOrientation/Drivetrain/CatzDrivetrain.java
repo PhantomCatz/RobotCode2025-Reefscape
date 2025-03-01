@@ -195,9 +195,10 @@ public class CatzDrivetrain extends SubsystemBase {
     // Scale down wheel speeds
     // --------------------------------------------------------
     if(trajectoryFollowing){
-
+      SwerveDriveKinematics.desaturateWheelSpeeds(unoptimizedModuleStates, DriveConstants.TRAJECTORY_FOLLOWING_CONFIG.maxLinearVelocity());
+    }else{
+      SwerveDriveKinematics.desaturateWheelSpeeds(unoptimizedModuleStates, DriveConstants.DRIVE_CONFIG.maxLinearVelocity());
     }
-    SwerveDriveKinematics.desaturateWheelSpeeds(unoptimizedModuleStates, DriveConstants.DRIVE_CONFIG.maxLinearVelocity());
     // --------------------------------------------------------
     // Optimize Wheel Angles
     // --------------------------------------------------------
