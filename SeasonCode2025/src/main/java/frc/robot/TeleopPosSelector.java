@@ -63,7 +63,7 @@ public class TeleopPosSelector {
   private Deque<Pair<Pair<Integer, LeftRight>, Integer>> queuedPaths = new LinkedList<>();
   private HashMap<String, String> poseToLetter = new HashMap<>();
 
-  private final boolean manualOverrideUseFakeCoral = true; //if the real robot doesn't have mechanisms to hold real coral, simulate one
+  private final boolean manualOverrideUseFakeCoral = false; //if the real robot doesn't have mechanisms to hold real coral, simulate one
   public final boolean useFakeCoral = manualOverrideUseFakeCoral || Robot.isSimulation();
 
   private boolean leftCoralStation = true;
@@ -367,11 +367,11 @@ public class TeleopPosSelector {
       Translation2d goalPos = currentPos.plus(direction.times(10));
 
       PathConstraints PATHFINDING_CONSTRAINTS = new PathConstraints( // 540 // 720
-                                                                        1.0,
-                                                                        DriveConstants.DRIVE_CONFIG.maxLinearAcceleration(), // max vel causing messup
-                                                                        DriveConstants.DRIVE_CONFIG.maxAngularVelocity(),
-                                                                        DriveConstants.DRIVE_CONFIG.maxAngularAcceleration()
-                                                                );
+        1.0,
+        DriveConstants.DRIVE_CONFIG.maxLinearAcceleration(), // max vel causing messup
+        DriveConstants.DRIVE_CONFIG.maxAngularVelocity(),
+        DriveConstants.DRIVE_CONFIG.maxAngularAcceleration()
+      );
 
       PathPlannerPath path = new PathPlannerPath(
         Arrays.asList(new Waypoint[] {
@@ -404,14 +404,14 @@ public class TeleopPosSelector {
         @Override
         public void initialize() {
           currentDrivetrainCommand.cancel();
-          currentDrivetrainCommand = runNextCommand();
+          currentDrivetrainCommand = getNextCommand();
           currentDrivetrainCommand.schedule();
         }
 
         @Override
         public void execute() {
-          if (currentDrivetrainCommand.isFinished()) {
-            currentDrivetrainCommand = runNextCommand();
+          if (!currentDrivetrainCommand.isScheduled() == true) { //haha L
+            currentDrivetrainCommand = getNextCommand();
             currentDrivetrainCommand.schedule();
           }
         }
@@ -423,7 +423,7 @@ public class TeleopPosSelector {
 
         @Override
         public void end(boolean interrupted) {
-          currentDrivetrainCommand.end(interrupted);
+          currentDrivetrainCommand.cancel();
         }
 
       };
@@ -431,7 +431,7 @@ public class TeleopPosSelector {
     });
   }
 
-  private Command runNextCommand() {
+  private Command getNextCommand() {
     Pair<Pair<Integer, LeftRight>, Integer> pair = pathQueuePeekFront();
 
     if (useFakeCoral) {

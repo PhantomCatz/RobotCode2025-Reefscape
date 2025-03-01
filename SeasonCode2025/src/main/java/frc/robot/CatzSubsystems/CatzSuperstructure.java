@@ -130,7 +130,7 @@ public class CatzSuperstructure extends VirtualSubsystem {
                 } else {
                     currentRobotState = RobotState.PROCESSOR;
                     robotActionCommand = CatzStateCommands.processor(container);
-                    System.out.println("Processor");
+                    // System.out.println("Processor");
 
                 }
                 break;
@@ -162,7 +162,7 @@ public class CatzSuperstructure extends VirtualSubsystem {
                 } else {
                     currentRobotState = RobotState.PROCESSOR;
                     robotActionCommand = CatzStateCommands.processor(container);
-                    System.out.println("Processor");
+                    // System.out.println("Processor");
 
                 }
                 break;

@@ -178,7 +178,7 @@ public class CatzOuttake extends SubsystemBase {
 
   private void case_adjustFwd() {
     io.runMotor(ADJ_SPD, ADJ_SPD);
-    if (!inputs.bbreakBackTriggered || inputs.bbreakFrntTriggered) {
+    if (!inputs.bbreakBackTriggered) {
       currentState = outtakeStates.STOP;
       CatzSuperstructure.setCurrentCoralState(CoralState.IN_OUTTAKE);
       System.out.println("stopping adjfwd");

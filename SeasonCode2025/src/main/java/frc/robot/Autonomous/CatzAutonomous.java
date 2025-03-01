@@ -142,16 +142,18 @@ public class CatzAutonomous extends SubsystemBase {
       NamedCommands.registerCommand(question, dashboardCmds.get(question));
     }
 
+    // This is not used anywhere but the library wants it
     BooleanSupplier shouldFlip = () -> AllianceFlipUtil.shouldFlipToRed();
     AutoBuilder.configure(
-        tracker::getEstimatedPose,
-        tracker::resetPose,
-        tracker::getRobotChassisSpeeds,
-        container.getCatzDrivetrain()::d,
-        DriveConstants.PATH_FOLLOWING_CONTROLLER,
-        DriveConstants.TRAJECTORY_CONFIG,
-        shouldFlip,
-        container.getCatzDrivetrain());
+      tracker::getEstimatedPose,
+      tracker::resetPose,
+      tracker::getRobotChassisSpeeds,
+      container.getCatzDrivetrain()::d,
+      null,
+      DriveConstants.ROBOT_CONFIG,
+      shouldFlip,
+      container.getCatzDrivetrain()
+    );
 
     // ------------------------------------------------------------------------------------------------------------
     // Path Configuration
@@ -182,7 +184,7 @@ public class CatzAutonomous extends SubsystemBase {
 
           if(command == null){
             System.out.println("****** typotypotypotypotypotypotypotypotypotypotypotypotypo       \n\n\n\n\nn\n\n\n\n \n\n\n typo in pathplanner reverting to drvive forward auto ********** ");
-            command = Commands.run(() -> drivetrain.drive(new ChassisSpeeds(0.5, 0.0, 0.0), DriveConstants.moduleLimitsTrajectory), drivetrain).withTimeout(5.0);
+            command = Commands.run(() -> drivetrain.drive(new ChassisSpeeds(0.5, 0.0, 0.0)), drivetrain).withTimeout(5.0);
           }
           NamedCommands.registerCommand(commandName, command);
         } catch (FileVersionException | IOException | ParseException e) {

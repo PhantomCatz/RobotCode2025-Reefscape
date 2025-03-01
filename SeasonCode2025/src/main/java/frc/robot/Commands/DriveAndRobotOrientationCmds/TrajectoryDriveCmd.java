@@ -146,7 +146,7 @@ public class TrajectoryDriveCmd extends Command {
         usePath,
         DriveConstants.NON_ZERO_CHASSIS_SPEED, //TODO make it not zero if its a thing thingy y esdpoifi
         tracker.getEstimatedPose().getRotation(),
-        DriveConstants.TRAJECTORY_CONFIG);
+        DriveConstants.ROBOT_CONFIG);
 
     hocontroller = DriveConstants.getNewHolController();
     pathTimeOut = trajectory.getTotalTimeSeconds() * TIMEOUT_SCALAR;
@@ -195,27 +195,14 @@ public class TrajectoryDriveCmd extends Command {
     // System.out.println("goallspeed:" + goal.linearVelocity);
     Trajectory.State state = new Trajectory.State(
         currentTime,
-        goal.linearVelocity * DriveConstants.TRAJECTORY_FF_SCALAR,
+        goal.linearVelocity,
         0.0,
         new Pose2d(goal.pose.getTranslation(), goal.heading),
         0.0
     );
-    System.out.println("speeeed: " + state.velocityMetersPerSecond);
 
     // construct chassisspeeds
     adjustedSpeeds = hocontroller.calculate(currentPose, state, goal.pose.getRotation());
-    System.out.println("cur:"+Math.hypot(adjustedSpeeds.vxMetersPerSecond,adjustedSpeeds.vyMetersPerSecond));
-    // Cusps x/(1+x) Lower speed for closer distances to prevent jittering
-    // if(currentTime <= 1.5){
-    //   adjustedSpeeds = adjustedSpeeds.times(DIVERGE_TIME * currentTime / (DIVERGE_TIME * currentTime + 1));
-    // }
-    // if(autoalign && translationError < 1.0){
-    //   adjustedSpeeds = adjustedSpeeds.times(CONVERGE_DISTANCE * translationError / (CONVERGE_DISTANCE * translationError + 1));
-    // }
-    // if(Double.isNaN(adjustedSpeeds.vxMetersPerSecond) || Double.isNaN(adjustedSpeeds.vyMetersPerSecond) || Double.isNaN(adjustedSpeeds.omegaRadiansPerSecond)){
-    //   adjustedSpeeds = new ChassisSpeeds();
-    // }
-
 
     // Logging
     Logger.recordOutput("CatzRobotTracker/Desired Auto Pose", goal.pose);
@@ -233,14 +220,11 @@ public class TrajectoryDriveCmd extends Command {
         goal.heading.getRadians()
     );
 
-
     // send to drivetrain
-    m_driveTrain.drive(adjustedSpeeds, DriveConstants.moduleLimitsTrajectory);
-
+    m_driveTrain.drive(adjustedSpeeds);
 
     // Named Commands
     eventScheduler.execute(currentTime);
-
 
     // Logging
     debugLogsTrajectory();

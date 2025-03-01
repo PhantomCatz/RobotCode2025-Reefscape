@@ -8,10 +8,7 @@
 package frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.Drivetrain;
 
 import com.pathplanner.lib.config.ModuleConfig;
-import com.pathplanner.lib.config.PIDConstants;
 import com.pathplanner.lib.config.RobotConfig;
-import com.pathplanner.lib.controllers.PPHolonomicDriveController;
-import com.pathplanner.lib.controllers.PathFollowingController;
 import com.pathplanner.lib.path.PathConstraints;
 import edu.wpi.first.math.controller.HolonomicDriveController;
 import edu.wpi.first.math.controller.PIDController;
@@ -24,7 +21,6 @@ import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
 import frc.robot.CatzConstants;
 import frc.robot.Utilities.LoggedTunableNumber;
-import frc.robot.Utilities.ModuleLimits;
 import lombok.Builder;
 
 public class DriveConstants {
@@ -52,44 +48,27 @@ public class DriveConstants {
   // ---------------------------------------------------------------------------------------------------------------
   // Drive Subsytem Config info
   // ---------------------------------------------------------------------------------------------------------------
-  public static final double DRIVE_CURRENT_LIMIT = 80.0;
-  public static final double STEER_CURRENT_LIMIT = 40.0;
-  public static final double TELEOP_ACCELERATION = 120;
-
-  // Velocity and Accerlation Constants
-  private static final double kA_ANGULAR_ACCEL = 0.0;
-  private static final double kA_LINEAR_ACCEL = 0.0;
-
-  // Common Constants
-  private static final double ROBOT_WIDTH = 29.0;
 
   public static final DriveConfig DRIVE_CONFIG =
-      switch (CatzConstants.getRobotType()) {
-        case SN_TEST ->//, SN2 ->
-            DriveConfig.builder()
-                .wheelRadius(Units.inchesToMeters(2.0)) // TODO make these repeated numbers into constants
-                .robotLengthX(Units.inchesToMeters(24.2)) // Wheel positions
-                .robotWidthY(Units.inchesToMeters(24.2))
-                .bumperWidthX(Units.inchesToMeters(32))
-                .bumperWidthY(Units.inchesToMeters(32))
-                .maxLinearVelocity(Units.feetToMeters(17))
-                .maxLinearAcceleration(Units.feetToMeters(120)) // TODO emperically calculate
-                .maxAngularVelocity(12.0) // Radians
-                .maxAngularAcceleration(30) // Radians // TODO verify angle constraints
-                .build();
-        case SN1, SN2, SN1_2024 ->
-        DriveConfig.builder()
-                .wheelRadius(Units.inchesToMeters(1.91363711)) // TODO make these repeated numbers into constants
-                .robotLengthX(Units.inchesToMeters(24.2))
-                .robotWidthY(Units.inchesToMeters(24.2))
-                .bumperWidthX(Units.inchesToMeters(32))
-                .bumperWidthY(Units.inchesToMeters(32))
-                .maxLinearVelocity(4) //TODO find optimal maximum
-                .maxLinearAcceleration(4) // TODO emperically calculate
-                .maxAngularVelocity(12.0) // Radians
-                .maxAngularAcceleration(30) // Radians // TODO verify angle constraints
-                .build();
-      };
+    DriveConfig.builder()
+        .wheelRadius(Units.inchesToMeters(1.9136))
+        .robotLengthX(Units.inchesToMeters(24.2))
+        .robotWidthY(Units.inchesToMeters(24.2))
+        .bumperWidthX(Units.inchesToMeters(32))
+        .bumperWidthY(Units.inchesToMeters(32))
+        .maxLinearVelocity(4)
+        .maxLinearAcceleration(120)
+        .maxAngularVelocity(Units.degreesToRadians(540))
+        .maxAngularAcceleration(Units.degreesToRadians(720))
+        .build();
+
+  public static final DriveConfig TRAJECTORY_CONFIG =
+    DriveConfig.builder()
+      .maxLinearVelocity(3.0)
+      .maxLinearAcceleration(3.0)
+      .maxAngularVelocity(Units.degreesToRadians(540))
+      .maxAngularAcceleration(Units.degreesToRadians(720))
+      .build();
 
   public static final ModuleGainsAndRatios MODULE_GAINS_AND_RATIOS =
       switch (CatzConstants.getRobotType()) {
@@ -98,7 +77,7 @@ public class DriveConstants {
                 5.0,
                 0.45,
                 1.0 / DCMotor.getKrakenX60Foc(1).KtNMPerAmp, // A/(N*m)
-                6.0,//6
+                6.0,
                 0.0,
                 0.50,
                 0.005,
@@ -127,13 +106,10 @@ public class DriveConstants {
                 Mk4iReductions.L2_PLUS.reduction,
                 Mk4iReductions.steer.reduction);
       };
-
-    public static final ModuleLimits moduleLimitsTrajectory = new ModuleLimits(3, TELEOP_ACCELERATION, Units.degreesToRadians(1080.0));
-    public static final ModuleLimits moduleLimitsTeleop = new ModuleLimits(DRIVE_CONFIG.maxLinearVelocity, TELEOP_ACCELERATION, Units.degreesToRadians(1080.0));
-
   // -------------------------------------------------------------------------------
   // Odometry Constants
   // -------------------------------------------------------------------------------
+
   public static final double GYRO_UPDATE_FREQUENCY =
       switch (CatzConstants.getRobotType()) {
         case SN_TEST -> 50.0;
@@ -190,13 +166,11 @@ public class DriveConstants {
   //
   // -----------------------------------------------------------------------------------------------------------------------------
   public static final PathConstraints PATHFINDING_CONSTRAINTS = new PathConstraints( // 540 // 720
-                                                                        DRIVE_CONFIG.maxLinearVelocity,
-                                                                        DRIVE_CONFIG.maxLinearAcceleration, // max vel causing messup
-                                                                        DRIVE_CONFIG.maxAngularVelocity,
-                                                                        DRIVE_CONFIG.maxAngularAcceleration
-                                                                );
-
-  public static final double DRIVE_VELOCITY_DEADBAND = 1e-9;
+    TRAJECTORY_CONFIG.maxLinearVelocity,
+    TRAJECTORY_CONFIG.maxLinearAcceleration,
+    TRAJECTORY_CONFIG.maxAngularVelocity,
+    TRAJECTORY_CONFIG.maxAngularAcceleration
+  );
 
   public static final Translation2d[] MODULE_TRANSLATIONS = new Translation2d[4];
   static {
@@ -206,12 +180,9 @@ public class DriveConstants {
     MODULE_TRANSLATIONS[INDEX_FL] = new Translation2d( DRIVE_CONFIG.robotLengthX(),  DRIVE_CONFIG.robotWidthY()).div(2.0);
   }
 
-
-
   // calculates the orientation and speed of individual swerve modules when given
   // the motion of the whole robot
-  public static final SwerveDriveKinematics SWERVE_KINEMATICS =
-      new SwerveDriveKinematics(MODULE_TRANSLATIONS);
+  public static final SwerveDriveKinematics SWERVE_KINEMATICS = new SwerveDriveKinematics(MODULE_TRANSLATIONS);
 
   // -----------------------------------------------------------------------------------------------------------------------------
   //
@@ -220,47 +191,37 @@ public class DriveConstants {
   // -----------------------------------------------------------------------------------------------------------------------------
   public static HolonomicDriveController getNewHolController() {
     return new HolonomicDriveController(
-        new PIDController(4.0, 0.0, 0.012),
-        new PIDController(4.0, 0.0, 0.012),
-        new ProfiledPIDController(
-            4.0,
-            0.0,
-            0.012,
-            new TrapezoidProfile.Constraints(
-                DRIVE_CONFIG.maxAngularVelocity, DRIVE_CONFIG.maxAngularAcceleration)));
+      new PIDController(3.0, 0.0, 0.012),
+      new PIDController(3.0, 0.0, 0.012),
+      new ProfiledPIDController(
+        4.0,
+        0.0,
+        0.012,
+        new TrapezoidProfile.Constraints(TRAJECTORY_CONFIG.maxAngularVelocity, TRAJECTORY_CONFIG.maxAngularAcceleration)
+      )
+    );
   }
 
-  public static final double TRAJECTORY_FF_SCALAR = 1.0;
-
-  public static PathFollowingController getNewPathFollowingController() {
-    return new PPHolonomicDriveController(
-        new PIDConstants(10.0, 0.0, 0.1), new PIDConstants(4.0, 0.0, 0.1), 0.02);
-  }
-
-  public static final PathFollowingController PATH_FOLLOWING_CONTROLLER =
-      getNewPathFollowingController();
-
+  public static final double DRIVE_VELOCITY_DEADBAND = 1e-9;
   public static final ChassisSpeeds NON_ZERO_CHASSIS_SPEED = new ChassisSpeeds(1, 1, 0); //TODO should this be smaller?
 
   public static final double ROBOT_MASS = 50.0;
   public static final double ROBOT_MOI =
       (2.0 / 12.0) * ROBOT_MASS * (Math.pow(DRIVE_CONFIG.bumperWidthX(), 2)); // ROBOT_MASS * (2/2) * (kA_ANGULAR_ACCEL/kA_LINEAR_ACCEL); // TODO need to
-  // TODO recaculate with formula on Pathplanner
 
-  public static final double TREAD_COEF_FRICTION = 4.00;
-
-  public static final ModuleConfig TRAJECTORY_MODULE_CONFIG =
-      new ModuleConfig(
-          DRIVE_CONFIG.wheelRadius(),
-          10,
-          TREAD_COEF_FRICTION,
-          DCMotor.getKrakenX60(1).withReduction(MODULE_GAINS_AND_RATIOS.driveReduction()),
-          200,
-          1);
-
-  public static final RobotConfig TRAJECTORY_CONFIG =
-      new RobotConfig(
-          ROBOT_MASS, ROBOT_MOI, TRAJECTORY_MODULE_CONFIG, MODULE_TRANSLATIONS);
+  public static final RobotConfig ROBOT_CONFIG = new RobotConfig(
+    ROBOT_MASS,
+    ROBOT_MOI,
+    new ModuleConfig(
+      DRIVE_CONFIG.wheelRadius(),
+      10.0,
+      10.0,
+      DCMotor.getKrakenX60(1).withReduction(MODULE_GAINS_AND_RATIOS.driveReduction()),
+      200.0,
+      1
+    ),
+    MODULE_TRANSLATIONS
+  );
 
   // -----------------------------------------------------------------------------------------------------------------------------
   //

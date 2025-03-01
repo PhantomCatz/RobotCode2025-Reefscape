@@ -7,6 +7,8 @@
 
 package frc.robot.Commands.DriveAndRobotOrientationCmds;
 
+import java.util.Deque;
+
 import com.pathplanner.lib.path.PathPlannerPath;
 
 import frc.robot.CatzSubsystems.CatzSuperstructure.CoralState;
@@ -19,11 +21,12 @@ import frc.robot.CatzSubsystems.CatzOuttake.CatzOuttake;
 public class DriveAndCycle extends TrajectoryDriveCmd{
     private final double PREDICT_DISTANCE = 0.5; // meters
 
-    private RobotAction action;
+    private final RobotAction action;
     private TeleopPosSelector selector;
     private CatzSuperstructure superstructure;
     private CatzOuttake outtake;
     private int level;
+    private Deque queue;
 
     public DriveAndCycle(PathPlannerPath newPath, RobotContainer container, RobotAction action){
         super(newPath, container.getCatzDrivetrain(), action != RobotAction.INTAKE);
@@ -60,7 +63,7 @@ public class DriveAndCycle extends TrajectoryDriveCmd{
         // Run Scoring or Intaking
         if (super.isPoseWithinThreshold(PREDICT_DISTANCE) && !super.isFinished()){
             if(action == RobotAction.OUTTAKE && superstructure.getCurrentRobotAction() != RobotAction.OUTTAKE){
-                System.out.println("raised elevator!!!!!!!");
+                // System.out.println("raised elevator!!!!!!!");
                 superstructure.setCurrentRobotAction(RobotAction.AIMING, level);
             }
             else if(action == RobotAction.INTAKE){
@@ -87,11 +90,12 @@ public class DriveAndCycle extends TrajectoryDriveCmd{
         if(action == RobotAction.OUTTAKE){
             superstructure.setCurrentRobotAction(RobotAction.STOW);
         }
-        System.out.println("finisheddddddddd");
+
     }
 
     @Override
     public boolean isFinished(){
+        System.out.println("ma actiona: " +action);
         if(action == RobotAction.OUTTAKE){
             if(selector.useFakeCoral){
                 return !selector.hasCoralSIM;
