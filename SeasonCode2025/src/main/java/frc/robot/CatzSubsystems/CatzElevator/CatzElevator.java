@@ -53,13 +53,15 @@ public class CatzElevator extends SubsystemBase {
   @RequiredArgsConstructor
   public static enum ElevatorPosition {
       //TO CHANGE HEIGHT GO TO ElevatorConstants.java
-      PosTrueStow(() -> 0.0),
+      PosLimitSwitchStow(() -> 0.0),
       PosStow(() -> STOW_HEIGHT),
       PosL1(() -> L1_HEIGHT),
       PosL2(() -> L2_HEIGHT),
       PosL3(() -> L3_HEIGHT),
       PosL4(() -> L4_HEIGHT),
       PosL4Adj(() -> L4_CORAL_ADJ),
+      PosBotBot(() -> BOT_BOT_ALGAE),
+      PosBotTop(() -> BOT_TOP_ALGAE),
       PosManual(new LoggedTunableNumber("Elevator/ScoreSourceSetpoint",0.0)),
       PosNull(() -> -1.0);
 
@@ -122,9 +124,9 @@ public class CatzElevator extends SubsystemBase {
     //---------------------------------------------------------------------------------------------------------------------------
     //    Limit switch position setting
     //---------------------------------------------------------------------------------------------------------------------------
-    // if(inputs.isBotLimitSwitched) {
-    //   io.setPosition(ElevatorPosition.PosTrueStow.getTargetPositionRads());
-    // }
+    if(inputs.isBotLimitSwitched) {
+      io.setPosition(ElevatorPosition.PosLimitSwitchStow.getTargetPositionRads());
+    }
 
     //---------------------------------------------------------------------------------------------------------------------------
     //    Feed Foward
@@ -207,6 +209,14 @@ public class CatzElevator extends SubsystemBase {
     return runOnce(() -> setElevatorPos(ElevatorPosition.PosL4Adj));
   }
 
+  public Command Elevator_BOT_BOT() {
+    return runOnce(() -> setElevatorPos(ElevatorPosition.PosBotBot));
+  }
+
+  public Command Elevator_BOT_TOP() {
+    return runOnce(() -> setElevatorPos(ElevatorPosition.PosBotTop));
+  }
+
   public void setElevatorPos(ElevatorPosition target) {
     this.targetPosition = target;
   }
@@ -229,11 +239,12 @@ public class CatzElevator extends SubsystemBase {
       if(settlingCounter >= 10) {
         isElevatorSettled = true;
         settlingCounter = 0;
-        // System.out.println("////////////ELEVATOR SETTLED FOR .2 SECONDS///////////////////");
+         System.out.println("////////////ELEVATOR SETTLED FOR .2 SECONDS///////////////////");
       }
     } else {
       // System.out.println("-----IN POSITION-----");
       isElevatorSettled = false;
+      settlingCounter = 0;
     }
     return isElevatorSettled;
   }

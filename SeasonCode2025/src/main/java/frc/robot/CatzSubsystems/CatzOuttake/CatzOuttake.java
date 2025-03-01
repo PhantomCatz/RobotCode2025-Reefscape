@@ -178,7 +178,7 @@ public class CatzOuttake extends SubsystemBase {
 
   private void case_adjustFwd() {
     io.runMotor(ADJ_SPD, ADJ_SPD);
-    if (!inputs.bbreakBackTriggered || inputs.bbreakFrntTriggered) {
+    if (!inputs.bbreakBackTriggered) {
       currentState = outtakeStates.STOP;
       CatzSuperstructure.setCurrentCoralState(CoralState.IN_OUTTAKE);
       System.out.println("stopping adjfwd");
@@ -212,7 +212,7 @@ public class CatzOuttake extends SubsystemBase {
     io.runMotor(OUTTAKE_L4, OUTTAKE_L4);
     System.out.println("L4 outakingggggg");
     interationCounter++;
-    if(!inputs.bbreakFrntTriggered && interationCounter >= 50) {
+    if(!inputs.bbreakFrntTriggered && interationCounter >= 100) {
         interationCounter = 0;
         CatzSuperstructure.setCurrentCoralState(CoralState.NOT_IN_OUTTAKE);
         currentState = outtakeStates.STOP;
