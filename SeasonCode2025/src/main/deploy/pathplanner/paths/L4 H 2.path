@@ -8,24 +8,24 @@
       },
       "prevControl": null,
       "nextControl": {
-        "x": 7.636168032786885,
-        "y": 3.659375
+        "x": 6.92889344262295,
+        "y": 4.714293032786885
       },
       "isLocked": false,
       "linkedName": "Reef-H"
     },
     {
       "anchor": {
-        "x": 1.2587090163934425,
-        "y": 1.046055327868852
+        "x": 1.3066598360655735,
+        "y": 6.991956967213114
       },
       "prevControl": {
-        "x": 3.296618852459016,
-        "y": 1.3457479508196706
+        "x": 4.423463114754098,
+        "y": 6.41654713114754
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": "Coral-Bottom"
+      "linkedName": "Coral-Top"
     }
   ],
   "rotationTargets": [],
@@ -42,7 +42,7 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 53.745999999999995
+    "rotation": -53.67317404787977
   },
   "reversed": false,
   "folder": "L4 H Paths",

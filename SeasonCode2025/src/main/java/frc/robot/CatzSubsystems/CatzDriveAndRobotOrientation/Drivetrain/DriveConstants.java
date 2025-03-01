@@ -84,8 +84,8 @@ public class DriveConstants {
                 .robotWidthY(Units.inchesToMeters(24.2))
                 .bumperWidthX(Units.inchesToMeters(32))
                 .bumperWidthY(Units.inchesToMeters(32))
-                .maxLinearVelocity(3) //TODO find optimal maximum
-                .maxLinearAcceleration(3) // TODO emperically calculate
+                .maxLinearVelocity(4) //TODO find optimal maximum
+                .maxLinearAcceleration(4) // TODO emperically calculate
                 .maxAngularVelocity(12.0) // Radians
                 .maxAngularAcceleration(30) // Radians // TODO verify angle constraints
                 .build();
@@ -128,7 +128,7 @@ public class DriveConstants {
                 Mk4iReductions.steer.reduction);
       };
 
-    public static final ModuleLimits moduleLimitsTrajectory = new ModuleLimits(DRIVE_CONFIG.maxLinearVelocity, TELEOP_ACCELERATION, Units.degreesToRadians(1080.0));
+    public static final ModuleLimits moduleLimitsTrajectory = new ModuleLimits(3, TELEOP_ACCELERATION, Units.degreesToRadians(1080.0));
     public static final ModuleLimits moduleLimitsTeleop = new ModuleLimits(DRIVE_CONFIG.maxLinearVelocity, TELEOP_ACCELERATION, Units.degreesToRadians(1080.0));
 
   // -------------------------------------------------------------------------------
@@ -252,10 +252,10 @@ public class DriveConstants {
   public static final ModuleConfig TRAJECTORY_MODULE_CONFIG =
       new ModuleConfig(
           DRIVE_CONFIG.wheelRadius(),
-          DRIVE_CONFIG.maxLinearVelocity(),
+          10,
           TREAD_COEF_FRICTION,
           DCMotor.getKrakenX60(1).withReduction(MODULE_GAINS_AND_RATIOS.driveReduction()),
-          DRIVE_CURRENT_LIMIT,
+          200,
           1);
 
   public static final RobotConfig TRAJECTORY_CONFIG =

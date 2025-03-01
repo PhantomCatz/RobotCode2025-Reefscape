@@ -7,7 +7,13 @@
         {
           "type": "named",
           "data": {
-            "name": "L4 H 1+ReefL4"
+            "name": "L4 H 1+ReefL1"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "L4 H 2+CS"
           }
         }
       ]

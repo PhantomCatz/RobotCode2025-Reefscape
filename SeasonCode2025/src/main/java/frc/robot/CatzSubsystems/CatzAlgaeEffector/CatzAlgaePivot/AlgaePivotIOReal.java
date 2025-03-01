@@ -114,7 +114,7 @@ public class AlgaePivotIOReal implements AlgaePivotIO {
     double setpointRotations = ((targetDegrees / 360) * ALGAE_PIVOT_GEAR_REDUCTION);
     algaePivotMotor.setControl(positionControl.withPosition(setpointRotations)
                                               .withFeedForward(feedforward));
-    System.out.println(setpointRotations);
+    // System.out.println(setpointRotations);
   }
 
   @Override

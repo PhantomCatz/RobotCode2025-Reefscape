@@ -192,7 +192,7 @@ public class TrajectoryDriveCmd extends Command {
     // target velocity is used as a ff
     // -------------------------------------------------------------------------------------
     PathPlannerTrajectoryState goal = trajectory.sample(Math.min(currentTime, trajectory.getTotalTimeSeconds()));
-    System.out.println("goallspeed:" + goal.linearVelocity);
+    // System.out.println("goallspeed:" + goal.linearVelocity);
     Trajectory.State state = new Trajectory.State(
         currentTime,
         goal.linearVelocity * DriveConstants.TRAJECTORY_FF_SCALAR,
@@ -200,11 +200,11 @@ public class TrajectoryDriveCmd extends Command {
         new Pose2d(goal.pose.getTranslation(), goal.heading),
         0.0
     );
-    // System.out.println("speeeed: " + state.velocityMetersPerSecond);
+    System.out.println("speeeed: " + state.velocityMetersPerSecond);
 
     // construct chassisspeeds
     adjustedSpeeds = hocontroller.calculate(currentPose, state, goal.pose.getRotation());
-
+    System.out.println("cur:"+Math.hypot(adjustedSpeeds.vxMetersPerSecond,adjustedSpeeds.vyMetersPerSecond));
     // Cusps x/(1+x) Lower speed for closer distances to prevent jittering
     // if(currentTime <= 1.5){
     //   adjustedSpeeds = adjustedSpeeds.times(DIVERGE_TIME * currentTime / (DIVERGE_TIME * currentTime + 1));
