@@ -31,11 +31,13 @@ public class CatzStateCommands {
         CatzAlgaeRemover algae = robotContainer.getCatzAlgaeRemover();
         CatzOuttake outtake = robotContainer.getCatzOuttake();
         CatzElevator elevator = robotContainer.getCatzElevator();
+        CatzAlgaePivot algaePivot = robotContainer.getAlgaePivot();
 
         return new ParallelCommandGroup(
             climb.Climb_Retract(),
             algae.stopAlgae(),
             outtake.stopOuttake(),
+            algaePivot.AlgaePivot_Stow(),
             elevator.Elevator_Stow()
         ).unless(()-> Robot.isSimulation()).alongWith(Commands.print("Stow"));
 
@@ -55,10 +57,12 @@ public class CatzStateCommands {
         CatzAlgaeRemover algae = robotContainer.getCatzAlgaeRemover();
         CatzOuttake outtake = robotContainer.getCatzOuttake();
         CatzElevator elevator = robotContainer.getCatzElevator();
+        CatzAlgaePivot algaePivot = robotContainer.getAlgaePivot();
 
         return new ParallelCommandGroup(
             // climb.Climb_Retract(),
             algae.stopAlgae(),
+            algaePivot.AlgaePivot_Stow(),
             outtake.startIntaking(),
             elevator.Elevator_Stow()
         ).unless(()-> Robot.isSimulation()).alongWith(Commands.print("Intake Coral Station"));
@@ -69,9 +73,11 @@ public class CatzStateCommands {
         CatzAlgaeRemover algae = robotContainer.getCatzAlgaeRemover();
         CatzOuttake outtake = robotContainer.getCatzOuttake();
         CatzElevator elevator = robotContainer.getCatzElevator();
+        CatzAlgaePivot algaePivot = robotContainer.getAlgaePivot();
 
         return new ParallelCommandGroup(
             climb.Climb_Retract(),
+            algaePivot.AlgaePivot_Horizontal(),
             algae.eatAlgae(),
             outtake.stopOuttake(),
             elevator.Elevator_Stow()
@@ -83,10 +89,12 @@ public class CatzStateCommands {
         CatzAlgaeRemover algae = robotContainer.getCatzAlgaeRemover();
         CatzOuttake outtake = robotContainer.getCatzOuttake();
         CatzElevator elevator = robotContainer.getCatzElevator();
+        CatzAlgaePivot algaePivot = robotContainer.getAlgaePivot();
 
         return new ParallelCommandGroup(
             climb.Climb_Home(),
             algae.stopAlgae(),
+            algaePivot.AlgaePivot_Stow(),
 
             new SequentialCommandGroup(
                 elevator.Elevator_L1(),
@@ -102,10 +110,12 @@ public class CatzStateCommands {
         CatzAlgaeRemover algae = robotContainer.getCatzAlgaeRemover();
         CatzOuttake outtake = robotContainer.getCatzOuttake();
         CatzElevator elevator = robotContainer.getCatzElevator();
+        CatzAlgaePivot algaePivot = robotContainer.getAlgaePivot();
 
         return new ParallelCommandGroup(
             climb.Climb_Retract(),
             algae.stopAlgae(),
+            algaePivot.AlgaePivot_Stow(),
 
             new SequentialCommandGroup(
                 elevator.Elevator_L2(),
@@ -121,10 +131,12 @@ public class CatzStateCommands {
         CatzAlgaeRemover algae = robotContainer.getCatzAlgaeRemover();
         CatzOuttake outtake = robotContainer.getCatzOuttake();
         CatzElevator elevator = robotContainer.getCatzElevator();
+        CatzAlgaePivot algaePivot = robotContainer.getAlgaePivot();
 
         return new ParallelCommandGroup(
             climb.Climb_Retract(),
             algae.stopAlgae(),
+            algaePivot.AlgaePivot_Horizontal(),
 
             new SequentialCommandGroup(
                 elevator.Elevator_L3(),
@@ -140,11 +152,13 @@ public class CatzStateCommands {
         CatzAlgaeRemover algae = robotContainer.getCatzAlgaeRemover();
         CatzOuttake outtake = robotContainer.getCatzOuttake();
         CatzElevator elevator = robotContainer.getCatzElevator();
+        CatzAlgaePivot algaePivot = robotContainer.getAlgaePivot();
 
         return new ParallelCommandGroup(
             new PrintCommand("L4 Score!!!!!"),
             climb.Climb_Retract(),
             algae.stopAlgae(),
+            algaePivot.AlgaePivot_Stow(),
 
             new SequentialCommandGroup(
                 elevator.Elevator_L4(),
@@ -257,8 +271,8 @@ public class CatzStateCommands {
             outtake.stopOuttake(),
 
             new SequentialCommandGroup(
-                elevator.Elevator_BOT_BOT(), //TODO real height
-                algaePivot.AlgaePivot_BotBot(),
+                // elevator.Elevator_BOT_BOT(), //TODO real height
+                algaePivot.AlgaePivot_Punch(),
                 algae.eatAlgae()
             )
         ).unless(()-> Robot.isSimulation()).alongWith(Commands.print("Bot Algae"));
@@ -276,7 +290,7 @@ public class CatzStateCommands {
             outtake.stopOuttake(),
 
             new SequentialCommandGroup(
-                elevator.Elevator_BOT_TOP(), //TODO real height
+                elevator.Elevator_BOT_TOP().withTimeout(2), //TODO real height
                 algaePivot.AlgaePivot_BotTop(),
                 algae.eatAlgae()
             )

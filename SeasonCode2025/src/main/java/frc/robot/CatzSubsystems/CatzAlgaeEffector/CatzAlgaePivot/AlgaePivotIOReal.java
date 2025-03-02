@@ -67,7 +67,7 @@ public class AlgaePivotIOReal implements AlgaePivotIO {
     config.Slot0.kV = gains.kV();
     config.Slot0.kA = gains.kA();
 
-    config.CurrentLimits.SupplyCurrentLimit = 80.0;
+    config.CurrentLimits.SupplyCurrentLimit = CURRENT_LIMIT;
     config.CurrentLimits.SupplyCurrentLimitEnable = true;
     config.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
 

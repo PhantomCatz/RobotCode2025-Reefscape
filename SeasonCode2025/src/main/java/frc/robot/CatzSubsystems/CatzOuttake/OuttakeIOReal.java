@@ -44,7 +44,6 @@ public class OuttakeIOReal implements OuttakeIO {
     OuttakeRightMtr = new SparkMax(RIGHT_OUTTAKE_ID, MotorType.kBrushless);
     IntakeCoralMtr = new TalonFXS(INTAKE_CORAL_ID);
 
-    // globalConfig.smartCurrentLimit(OUTTAKE_CURRENT_LIMIT);
     globalConfig.smartCurrentLimit(20);
     globalConfig.idleMode(IdleMode.kBrake);
     globalConfig.voltageCompensation(12);
@@ -58,11 +57,6 @@ public class OuttakeIOReal implements OuttakeIO {
     config.Slot0.kD = gains.kD();
     config.Commutation.MotorArrangement = MotorArrangementValue.Minion_JST;
     config.MotorOutput.NeutralMode = NeutralModeValue.Brake;
-
-    // config.MotionMagic.MotionMagicCruiseVelocity = motionMagicParameters.mmCruiseVelocity();
-    // config.MotionMagic.MotionMagicAcceleration = motionMagicParameters.mmAcceleration();
-    // config.MotionMagic.MotionMagicJerk = motionMagicParameters.mmJerk();
-    // config.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
 
     IntakeCoralMtr.setPosition(0);
 
@@ -89,7 +83,6 @@ public class OuttakeIOReal implements OuttakeIO {
 
   @Override
   public void runMotor(double speed, double speed2) {
-    // System.out.println(speed);
     OuttakeLeftMtr.set(speed);
     OuttakeRightMtr.set(-speed2);
   }

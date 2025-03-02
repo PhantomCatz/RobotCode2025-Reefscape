@@ -70,7 +70,6 @@ public class CatzRampPivot extends SubsystemBase {
     Logger.processInputs("RealInputs/RampPivot", inputs);
 
     io.setPosition(targetPos, 0);
-    System.out.println("Target Pos: " + targetPos);
     // if(DriverStation.isDisabled()) {
     //   // Disabled
     //   io.stop();

@@ -17,7 +17,6 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.CatzConstants;
 import frc.robot.Utilities.LoggedTunableNumber;
 import lombok.RequiredArgsConstructor;
-import edu.wpi.first.math.controller.ElevatorFeedforward;
 import edu.wpi.first.wpilibj.DriverStation;
 
 import org.littletonrobotics.junction.Logger;
@@ -38,13 +37,8 @@ public class CatzElevator extends SubsystemBase {
 
   private double elevatorSpeed = 0.0;
   private double elevatorFeedForward = 0.0;
-  private double targetManualPosition = 0.0;
   private int settlingCounter = 0;
   private boolean breakModeEnabled = true;
-  private boolean isCharacterizing = false;
-
-
-  private ElevatorFeedforward ff = new ElevatorFeedforward(gains.kS(), gains.kG(), gains.kV(), gains.kA());
 
   private ElevatorPosition targetPosition = ElevatorPosition.PosStow;
   private ElevatorPosition prevTargetPositon = ElevatorPosition.PosNull;
@@ -104,13 +98,6 @@ public class CatzElevator extends SubsystemBase {
     //--------------------------------------------------------------------------------------------------------
     LoggedTunableNumber.ifChanged(
         hashCode(), () -> io.setPID(kP.get(), kI.get(), kD.get()), kP, kI, kD);
-    LoggedTunableNumber.ifChanged(
-        hashCode(),
-        () -> ff = new ElevatorFeedforward(kS.get(), kG.get(), kV.get(), kA.get()),
-        kS,
-        kG,
-        kV,
-        kA);
     LoggedTunableNumber.ifChanged(hashCode(),
         ()-> io.setMotionMagicParameters(mmCruiseVelocity.get(), mmAcceleration.get(), mmJerk.get()),
         mmCruiseVelocity,
@@ -239,10 +226,8 @@ public class CatzElevator extends SubsystemBase {
       if(settlingCounter >= 10) {
         isElevatorSettled = true;
         settlingCounter = 0;
-         System.out.println("////////////ELEVATOR SETTLED FOR .2 SECONDS///////////////////");
       }
     } else {
-      // System.out.println("-----IN POSITION-----");
       isElevatorSettled = false;
       settlingCounter = 0;
     }
@@ -255,28 +240,9 @@ public class CatzElevator extends SubsystemBase {
     io.setBrakeMode(breakModeEnabled);
   }
 
-  public void runCharacterization(double amps) {
-    isCharacterizing = true;
-    io.runCurrent(amps);
-  }
-
   public double getCharacterizationVelocity() {
     return inputs.velocityRadsPerSec;
   }
-
-  public void endCharacterization() {
-    isCharacterizing = false;
-  }
-
-  // public void elevatorManual(Supplier<Double> manualSupplier) {
-  //   targetManualPosition += manualSupplier.get() * MANUAL_SCALE;
-  //   // System.out.println(targetManualPosition);
-  //   targetPosition = ElevatorPosition.PosManual;
-  // }
-
-  // public Command elevatorManualMode(Supplier<Double> manualSupplier) {
-  //   return run(() -> elevatorManual(manualSupplier)).alongWith(Commands.print("hi"));
-  // }
 
   public void elevatorFullManual(double manualPower) {
     this.elevatorSpeed = manualPower;

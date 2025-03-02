@@ -29,7 +29,7 @@ public class CatzAlgaePivot extends SubsystemBase {
   static double manualPow = 0;
   static boolean isManual;
   static final double MANUAL_SCALE = 5;
-  static double position = 0.0;
+  static double position = 109;
   static LoggedTunableNumber tunnablePos = new LoggedTunableNumber("AlgaePivot/TunnablePosition", 1);
   static LoggedTunableNumber kP = new LoggedTunableNumber("AlgaePivot/kP", 0.17);
   static LoggedTunableNumber kI = new LoggedTunableNumber("AlgaePivot/kI", 0.0);
@@ -47,11 +47,12 @@ public class CatzAlgaePivot extends SubsystemBase {
   @RequiredArgsConstructor
   public enum Position { //In degrees
     STOW(() -> 109.0),
-    HORIZONTAL(() -> -30.0), // TBD
+    HORIZONTAL(() -> -15.0), // TBD
     UNDISCLOSED(() -> 999), // TBD
     MANUAL(() -> manualPow),
     BOTBOT(() -> -49.7),
     BOTTOP(() -> -50.1),
+    PUNCH(() -> 70),
     TUNNABLE(tunnablePos);
 
     private final DoubleSupplier motionType;
@@ -102,6 +103,7 @@ public class CatzAlgaePivot extends SubsystemBase {
 
     Logger.recordOutput("AlgaePivot/targetPosition", position);
 
+    //System.out.println("Algae Pivot FeedFowards(" + gains.kG() + " * cos(" + getAlgaePivotPositionDeg() + "): " + algaePivotFeedFoward * gains.kG());
   }
 
   public double getAlgaePivotPositionRads() {
@@ -130,6 +132,10 @@ public class CatzAlgaePivot extends SubsystemBase {
 
   public Command AlgaePivot_BotTop() {
     return runOnce(() -> setAlgaePivotPos(Position.BOTTOP));
+  }
+
+  public Command AlgaePivot_Punch() {
+    return runOnce(() -> setAlgaePivotPos(Position.PUNCH));
   }
 
   public void setAlgaePivotPos(Position target) {

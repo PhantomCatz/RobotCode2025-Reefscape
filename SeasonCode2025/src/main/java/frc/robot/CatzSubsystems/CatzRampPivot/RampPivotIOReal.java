@@ -96,7 +96,6 @@ public class RampPivotIOReal implements RampPivotIO{
 
     @Override
     public void setPosition(double setpointRotations, double feedforward) {
-        System.out.println(setpointRotations);
         rampPivotMotor.setControl(positionControl.withPosition(setpointRotations)
                                                  .withFeedForward(feedforward));
     }

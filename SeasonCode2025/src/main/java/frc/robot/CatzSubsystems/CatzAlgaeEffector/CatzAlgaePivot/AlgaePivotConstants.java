@@ -12,19 +12,20 @@ import frc.robot.Utilities.MotorUtil.Gains;
 import frc.robot.Utilities.MotorUtil.MotionMagicParameters;
 
 public class AlgaePivotConstants {
-    public static final boolean isAlgaePivotDisabled = true;
+    public static final boolean isAlgaePivotDisabled = false;
 
     // Gearbox definitions
     public static final double ALGAE_PIVOT_GEAR_REDUCTION = 6.0;
     public static final double PIVOT_INITIAL_POS = (109.0 / 360.0) * ALGAE_PIVOT_GEAR_REDUCTION;
 
+    public static final double CURRENT_LIMIT = 40.0;
     // Motor ID
     public static final int ALGAE_PIVOT_MOTOR_ID = 25;
 
     // Initial PIDF and motion magic assignment
     public static final Gains gains =
         switch (CatzConstants.getRobotType()) {
-            case SN2 -> new Gains(2.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.1); //TODO fix gains
+            case SN2 -> new Gains(2.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0); //TODO fix gains
             case SN1 -> new Gains(4.0, 0.0, 0.0, 0.00, 0.06, 0.0, 0.0); //TODO need an kA for robot
             case SN_TEST, SN1_2024 -> new Gains(7000.0, 0.0, 250.0, 8.4, 0.2, 0.2, 22.9);
         };
