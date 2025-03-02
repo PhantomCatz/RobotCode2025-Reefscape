@@ -271,7 +271,7 @@ public class CatzStateCommands {
             outtake.stopOuttake(),
 
             new SequentialCommandGroup(
-                // elevator.Elevator_BOT_BOT(), //TODO real height
+                elevator.Elevator_BOT_BOT(), //TODO real height
                 algaePivot.AlgaePivot_Punch(),
                 algae.eatAlgae()
             )

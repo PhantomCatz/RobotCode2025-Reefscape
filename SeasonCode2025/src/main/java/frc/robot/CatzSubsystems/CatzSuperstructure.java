@@ -187,6 +187,7 @@ public class CatzSuperstructure extends VirtualSubsystem {
                             robotActionCommand = CatzStateCommands.botAlgae(container);
                             break;
                         default:
+                            robotActionCommand = CatzStateCommands.stow(container);
                             break;
                     }
                 }

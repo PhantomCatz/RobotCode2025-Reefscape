@@ -39,7 +39,7 @@ public class ElevatorConstants {
     public static final double L4_HEIGHT   = 155.0; //(141)/* 133.3*/  / ELEVATOR_SPROCKET_RADIUS; //143.12
     public static final double L4_CORAL_ADJ = 160.0;
     public static final double BOT_BOT_ALGAE = 58.6;
-    public static final double BOT_TOP_ALGAE = 106.7;
+    public static final double BOT_TOP_ALGAE = 80.7;
     // Motor ID
     public static final int LEFT_LEADER_ID  = 30;
     public static final int RIGHT_FOLLOWER_ID = 31;

@@ -22,6 +22,9 @@ public class AlgaePivotConstants {
     // Motor ID
     public static final int ALGAE_PIVOT_MOTOR_ID = 25;
 
+    public static final double MANUAL_SCALE = 5;
+    public static double INITIAL_POSITION = 109;
+
     // Initial PIDF and motion magic assignment
     public static final Gains gains =
         switch (CatzConstants.getRobotType()) {

@@ -26,10 +26,9 @@ public class CatzAlgaePivot extends SubsystemBase {
   private final AlgaePivotIO io;
   private final AlgaePivotIOInputsAutoLogged inputs = new AlgaePivotIOInputsAutoLogged();
 
-  static double manualPow = 0;
-  static boolean isManual;
-  static final double MANUAL_SCALE = 5;
-  static double position = 109;
+  private static double manualPow = 0;
+  private static boolean isManual = false;
+  private static int settlingCounter;
   static LoggedTunableNumber tunnablePos = new LoggedTunableNumber("AlgaePivot/TunnablePosition", 1);
   static LoggedTunableNumber kP = new LoggedTunableNumber("AlgaePivot/kP", 0.17);
   static LoggedTunableNumber kI = new LoggedTunableNumber("AlgaePivot/kI", 0.0);
@@ -51,7 +50,7 @@ public class CatzAlgaePivot extends SubsystemBase {
     UNDISCLOSED(() -> 999), // TBD
     MANUAL(() -> manualPow),
     BOTBOT(() -> -49.7),
-    BOTTOP(() -> -50.1),
+    BOTTOP(() -> -20.1),
     PUNCH(() -> 70),
     TUNNABLE(tunnablePos);
 
@@ -96,18 +95,35 @@ public class CatzAlgaePivot extends SubsystemBase {
       if(isManual) {
 
       } else {
-        io.runSetpoint(position, 0.0);
+        io.runSetpoint(INITIAL_POSITION, 0.0);
       }
     }
     Logger.recordOutput("AlgaePivot/currentPosition", getAlgaePivotPositionRads());
 
-    Logger.recordOutput("AlgaePivot/targetPosition", position);
+    Logger.recordOutput("AlgaePivot/targetPosition", INITIAL_POSITION);
 
     //System.out.println("Algae Pivot FeedFowards(" + gains.kG() + " * cos(" + getAlgaePivotPositionDeg() + "): " + algaePivotFeedFoward * gains.kG());
   }
 
   public double getAlgaePivotPositionRads() {
-    return inputs.positionMechs;
+    return inputs.positionDegrees;
+  }
+
+  public boolean isAlgaePivotInPosition() {
+    boolean isAlgaePivotSettled = false;
+    boolean isAlgaePivotInPos = (Math.abs(getAlgaePivotPositionRads() - INITIAL_POSITION) < 10);
+    if(isAlgaePivotInPos) {
+      settlingCounter++;
+      if(settlingCounter >= 10) {
+        isAlgaePivotSettled = true;
+        settlingCounter = 0;
+      }
+
+    } else {
+      isAlgaePivotSettled = false;
+      settlingCounter = 0;
+    }
+    return isAlgaePivotSettled;
   }
 
   public Command AlgaePivot_Stow() {
@@ -139,14 +155,14 @@ public class CatzAlgaePivot extends SubsystemBase {
   }
 
   public void setAlgaePivotPos(Position target) {
-    position = target.getTargetMotionPosition();
+    INITIAL_POSITION = target.getTargetMotionPosition();
     isManual = false;
   }
 
   public void algaePivotManual(Supplier<Double> manualSupplier) {
-    position += manualSupplier.get() * MANUAL_SCALE;
+    INITIAL_POSITION += manualSupplier.get() * MANUAL_SCALE;
     isManual = true;
-    System.out.println("algae:" +position);
+    System.out.println("algae:" +INITIAL_POSITION);
   }
 
   public Command AlgaePivotFullManualCommand(Supplier<Double> manualSupplier) {

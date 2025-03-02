@@ -235,6 +235,9 @@ public class RobotContainer {
     xboxAux.a().onTrue(Commands.runOnce(() -> superstructure.setCurrentRobotAction(RobotAction.STOW)).alongWith(Commands.print("STOWWW")));
 
     xboxAux.a().onTrue(Commands.runOnce(() -> System.out.println("L:"+superstructure.getLevel()+", "+superstructure.getChosenGamepiece())));
+
+
+    xboxAux.start().onTrue(algaePivot.AlgaePivot_Punch());
   }
 
   // ---------------------------------------------------------------------------

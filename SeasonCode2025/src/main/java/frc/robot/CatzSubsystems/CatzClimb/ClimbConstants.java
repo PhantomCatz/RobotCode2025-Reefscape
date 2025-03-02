@@ -15,6 +15,7 @@ import frc.robot.CatzConstants;
 public class ClimbConstants {
     public static final boolean isClimbDisabled = false;
 
+    public static final double CLIMB_GEAR_RATIO = 130.0 * 1.0;
     public static final int CLIMB_MOTOR_ID = 50;
 
     public static final Gains gains =
