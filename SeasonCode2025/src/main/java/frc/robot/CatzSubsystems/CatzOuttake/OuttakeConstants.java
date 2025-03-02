@@ -14,11 +14,11 @@ import frc.robot.Utilities.MotorUtil.Gains;
 public class OuttakeConstants {
 
     // Subsystem safety disable
-    public static final boolean isOuttakeDisabled = false;
+    public static final boolean isOuttakeDisabled = true;
 
     public static final int OUTTAKE_CURRENT_LIMIT = 30;
-    public static final int INTAKE_CORAL_ID= 40;
-    public static final int LEFT_OUTTAKE_ID = 61;
+    public static final int INTAKE_CORAL_ID= 26;
+    public static final int LEFT_OUTTAKE_ID = 21;
     public static final int RIGHT_OUTTAKE_ID = 20;
     public static final int FRONT_BEAM_BREAK_ID = 1;
     public static final int BACK_BEAM_BREAK_ID = 0;

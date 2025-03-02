@@ -33,6 +33,7 @@ import frc.robot.CatzSubsystems.CatzElevator.*;
 import frc.robot.CatzSubsystems.CatzLEDs.CatzLED;
 import frc.robot.CatzSubsystems.CatzLEDs.CatzLED.ControllerLEDState;
 import frc.robot.CatzSubsystems.CatzOuttake.CatzOuttake;
+import frc.robot.CatzSubsystems.CatzRampPivot.CatzRampPivot;
 import frc.robot.Commands.DriveAndRobotOrientationCmds.TeleopDriveCmd;
 import frc.robot.Utilities.Alert;
 import frc.robot.Utilities.AllianceFlipUtil;
@@ -69,6 +70,7 @@ public class RobotContainer {
   private CatzClimb climb = new CatzClimb();
   private CatzAlgaeRemover algaeRemover = new CatzAlgaeRemover();
   private CatzAlgaePivot algaePivot = new CatzAlgaePivot();
+  private CatzRampPivot rampPivot = new CatzRampPivot();
   private CatzSuperstructure superstructure = new CatzSuperstructure(this);
 
   // ------------------------------------------------------------------------------------------------------------------
@@ -173,31 +175,40 @@ public class RobotContainer {
     drive.setDefaultCommand(new TeleopDriveCmd(() -> xboxDrv.getLeftX(), () -> xboxDrv.getLeftY(), () -> xboxDrv.getRightX(), drive));
 
     // Manual Climb Control
-    Trigger rightJoystickTrigger = new Trigger(
-      () -> Math.abs(xboxTest.getRightY()) > 0.1);
-    rightJoystickTrigger.onTrue(climb.ClimbManualMode(() -> xboxTest.getRightY()).alongWith(Commands.print("Using manual climb")));
+    // Trigger rightJoystickTrigger = new Trigger(
+    //   () -> Math.abs(xboxTest.getRightY()) > 0.1);
+    // rightJoystickTrigger.onTrue(climb.ClimbManualMode(() -> xboxTest.getRightY()).alongWith(Commands.print("Using manual climb")));
 
     // Manual Elevator Control
     Trigger leftJoystickTrigger = new Trigger(
       () -> Math.abs(xboxTest.getLeftY()) > 0.1);
     leftJoystickTrigger.onTrue(elevator.elevatorFullManual(() -> xboxTest.getLeftY()).alongWith(Commands.print("Using manual elevator")));
+    leftJoystickTrigger.onFalse(elevator.elevatorFullManual(() -> xboxTest.getLeftY()));
+
+    // Manual Ramp Pivot Control
+    // Trigger leftJoystickTrigger = new Trigger(
+    //   () -> Math.abs(xboxTest.getLeftY()) > 0.1);
+    // leftJoystickTrigger.onTrue(rampPivot.rampPivotManual(() -> xboxTest.getLeftY()).alongWith(Commands.print("Using manual ramp pivot")));
+    // leftJoystickTrigger.onFalse(rampPivot.rampPivotManual(()-> 0.0).alongWith(Commands.print("Nah - pivot motor")));
 
     // Climb SetPosition Control
-    xboxDrv.y().toggleOnTrue(climb.Climb_Retract().alongWith(Commands.print("pressed y")));
-    xboxDrv.x().toggleOnTrue(climb.Climb_Home().alongWith(Commands.print("pressed x")));
-    xboxDrv.b().toggleOnTrue(climb.Climb_Full().alongWith(Commands.print("pressed b")));
+    xboxTest.y().toggleOnTrue(climb.Climb_Retract().alongWith(Commands.print("pressed y")));
+    xboxTest.x().toggleOnTrue(climb.Climb_Home().alongWith(Commands.print("pressed x")));
+    xboxTest.b().toggleOnTrue(climb.Climb_Full().alongWith(Commands.print("pressed b")));
+
+    xboxTest.x().toggleOnTrue(rampPivot.Ramp_Stow().alongWith(Commands.print("pressed x")));
+    xboxTest.b().toggleOnTrue(rampPivot.Ramp_Climb().alongWith(Commands.print("pressed b")));
 
     xboxTest.rightBumper().toggleOnTrue(algaePivot.AlgaePivot_Stow().alongWith(Commands.print("stow")));
-    xboxTest.leftBumper().toggleOnTrue(algaePivot.AlgaePivot_Horizontal().alongWith(Commands.print("stow")));
+    xboxTest.leftBumper().toggleOnTrue(algaePivot.AlgaePivot_Horizontal().alongWith(Commands.print("eat")));
+    xboxTest.rightTrigger().onTrue(algaeRemover.eatAlgae().alongWith(Commands.print("eating algae")));
+    xboxTest.leftTrigger().onTrue(algaeRemover.vomitAlgae().alongWith(Commands.print("vomiting algae")));
+    xboxTest.rightStick().onTrue(algaeRemover.stopAlgae().alongWith(Commands.print("stop algaeing")));
 
-    xboxTest.a().toggleOnTrue(elevator.Elevator_Stow().alongWith(Commands.print("L1")));
-    xboxTest.b().toggleOnTrue(elevator.Elevator_L2().alongWith(Commands.print("L2")));
-    xboxTest.x().toggleOnTrue(elevator.Elevator_L3().alongWith(Commands.print("L3")));
-    xboxTest.y().toggleOnTrue(elevator.Elevator_L4().alongWith(Commands.print("L4")));
-
-    xboxTest.leftTrigger().onTrue(outtake.startIntaking().alongWith(Commands.print("intake")));
-    xboxTest.rightTrigger().onTrue(outtake.startOuttake().alongWith(Commands.print("Outtaking")));
-    xboxTest.leftBumper().onTrue(outtake.outtakeL4().alongWith(Commands.print("Outtaking L4")));
+    // xboxTest.a().toggleOnTrue(elevator.Elevator_Stow().alongWith(Commands.print("L1")));
+    // xboxTest.b().toggleOnTrue(elevator.Elevator_L2().alongWith(Commands.print("L2")));
+    // xboxTest.x().toggleOnTrue(elevator.Elevator_L3().alongWith(Commands.print("L3")));
+    // xboxTest.y().toggleOnTrue(elevator.Elevator_L4().alongWith(Commands.print("L4")));
 
     xboxTest.rightStick().onTrue(elevator.elevatorFullManual(()->xboxTest.getRightY()));
 
@@ -217,7 +228,7 @@ public class RobotContainer {
     xboxAux.povUp().onTrue(Commands.runOnce(() -> {superstructure.setLevel(2); SmartDashboard.putNumber("Reef Level", 2);}));
     xboxAux.povLeft().onTrue(Commands.runOnce(() -> {superstructure.setLevel(3); SmartDashboard.putNumber("Reef Level", 3);}));
     xboxAux.povDown().onTrue(Commands.runOnce(() -> {superstructure.setLevel(4); SmartDashboard.putNumber("Reef Level", 4);}));
-    xboxAux.leftStick().onTrue(elevator.elevatorFullManual(()->-xboxAux.getLeftY()));
+    // xboxAux.leftStick().onTrue(elevator.elevatorFullManual(()->xboxAux.getLeftY()));
 
     xboxAux.button(7).onTrue(new InstantCommand(() -> selector.toggleLeftStation()).alongWith(Commands.runOnce(() -> led.setControllerState(ControllerLEDState.BALLS))));
     xboxAux.button(8).onTrue(new InstantCommand(() -> selector.toggleRightStation()).alongWith(Commands.runOnce(() -> led.setControllerState(ControllerLEDState.BALLS))));
@@ -233,6 +244,9 @@ public class RobotContainer {
     xboxAux.a().onTrue(Commands.runOnce(() -> superstructure.setCurrentRobotAction(RobotAction.STOW)).alongWith(Commands.print("STOWWW")));
 
     xboxAux.a().onTrue(Commands.runOnce(() -> System.out.println("L:"+superstructure.getLevel()+", "+superstructure.getChosenGamepiece())));
+
+
+    xboxAux.start().onTrue(algaePivot.AlgaePivot_Punch());
   }
 
   // ---------------------------------------------------------------------------
@@ -313,6 +327,10 @@ public class RobotContainer {
 
   public CatzVision getCatzVision() {
     return vision;
+  }
+
+  public CatzRampPivot getCatzRampPivot() {
+    return rampPivot;
   }
 
   public CatzSuperstructure getSuperstructure(){

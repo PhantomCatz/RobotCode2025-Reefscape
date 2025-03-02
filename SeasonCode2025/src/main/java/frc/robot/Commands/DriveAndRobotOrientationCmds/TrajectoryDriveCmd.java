@@ -268,7 +268,7 @@ public class TrajectoryDriveCmd extends Command {
       return true;
     }
 
-    if (false && RobotContainer.getInstance().getCatzVision().isSeeingApriltag() && autoalign && tracker.getVisionPoseShift().getNorm() > ALLOWABLE_VISION_ADJUST) {
+    if (RobotContainer.getInstance().getCatzVision().isSeeingApriltag() && autoalign && tracker.getVisionPoseShift().getNorm() > ALLOWABLE_VISION_ADJUST) {
       // If trailing pose is within margin
       // System.out.println("vision is not true");
       return false;

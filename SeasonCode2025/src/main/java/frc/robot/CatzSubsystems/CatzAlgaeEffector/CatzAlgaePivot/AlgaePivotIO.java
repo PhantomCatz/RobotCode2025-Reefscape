@@ -14,7 +14,7 @@ public interface AlgaePivotIO {
   public static class AlgaePivotIOInputs {
     public boolean isPositionIOMotorConnected = true;
 
-    public double positionMechs = 0.0;
+    public double positionDegrees = 0.0;
     public double sparkPosMechs;
     public double velocityRpm = 0.0;
     public double velocityRads = 0.0;

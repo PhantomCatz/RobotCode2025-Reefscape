@@ -423,7 +423,7 @@ public class CornerTrackingPathfinder{
   }
 
   /**
-   * @param position The current position during pathfinding.
+   * @param InitialPosition The current position during pathfinding.
    * @param corner   The corner that the position is associated with.
    * @param goal goal
    * @param cornerDistancesTraveled The sum of distances from each corners that the position traveled through.
