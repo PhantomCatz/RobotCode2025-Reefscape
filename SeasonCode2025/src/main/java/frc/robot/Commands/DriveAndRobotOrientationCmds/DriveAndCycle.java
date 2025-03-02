@@ -16,7 +16,7 @@ import frc.robot.CatzSubsystems.CatzSuperstructure;
 import frc.robot.CatzSubsystems.CatzOuttake.CatzOuttake;
 
 public class DriveAndCycle extends TrajectoryDriveCmd{
-    private final double PREDICT_DISTANCE = 1.2; // meters
+    private final double PREDICT_DISTANCE = 0.3; // meters
 
     private final RobotAction action;
     private TeleopPosSelector selector;
