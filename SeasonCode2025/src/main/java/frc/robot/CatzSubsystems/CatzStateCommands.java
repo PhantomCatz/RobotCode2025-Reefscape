@@ -259,6 +259,28 @@ public class CatzStateCommands {
         ).unless(()-> Robot.isSimulation()).alongWith(Commands.print("processor"));
     }
 
+    public static Command netAlgae(RobotContainer container) {
+        CatzClimb climb = container.getCatzClimb();
+        CatzAlgaeRemover algae = container.getCatzAlgaeRemover();
+        CatzOuttake outtake = container.getCatzOuttake();
+        CatzElevator elevator = container.getCatzElevator();
+        CatzAlgaePivot algaePivot = container.getAlgaePivot();
+
+        return new ParallelCommandGroup(
+            climb.Climb_Retract(),
+            outtake.stopOuttake(),
+
+            new SequentialCommandGroup(
+                elevator.Elevator_L4(),
+                Commands.waitUntil(() -> elevator.getElevatorPositionRads() > 140.0),
+                new ParallelCommandGroup(
+                    algaePivot.AlgaePivot_NetAlgae(),
+                    algae.vomitAlgae()
+                )
+            )
+        ).unless(()-> Robot.isSimulation()).alongWith(Commands.print("Net Algae"));
+    }
+
     public static Command botAlgae(RobotContainer robotContainer) {
         CatzClimb climb = robotContainer.getCatzClimb();
         CatzAlgaeRemover algae = robotContainer.getCatzAlgaeRemover();

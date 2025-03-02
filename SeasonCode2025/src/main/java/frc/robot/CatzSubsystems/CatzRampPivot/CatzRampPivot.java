@@ -7,6 +7,7 @@
 
 package frc.robot.CatzSubsystems.CatzRampPivot;
 
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -69,18 +70,17 @@ public class CatzRampPivot extends SubsystemBase {
     io.updateInputs(inputs);
     Logger.processInputs("RealInputs/RampPivot", inputs);
 
-    io.setPosition(targetPos, 0);
-    // if(DriverStation.isDisabled()) {
-    //   // Disabled
-    //   io.stop();
-    //   targetPos = RampPivotPositions.PosStow.getTargetPositionRot();
+    if(DriverStation.isDisabled()) {
+      // Disabled
+      io.stop();
+      targetPos = RampPivotPositions.PosStow.getTargetPositionRot();
 
-    // } else if(targetPos != RampPivotPositions.PosNull.getTargetPositionRot()){
-    //   io.setPosition(targetPos, 0);
+    } else if(targetPos != RampPivotPositions.PosNull.getTargetPositionRot()){
+      io.setPosition(targetPos, 0);
 
-    // } else {
-    //   io.stop();
-    // }
+    } else {
+      io.stop();
+    }
     Logger.recordOutput("RampPivot/targetPos", targetPos);
   }
 

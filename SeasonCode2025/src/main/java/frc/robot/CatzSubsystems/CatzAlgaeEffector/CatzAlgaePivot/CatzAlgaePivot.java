@@ -47,11 +47,11 @@ public class CatzAlgaePivot extends SubsystemBase {
   public enum Position { //In degrees
     STOW(() -> 109.0),
     HORIZONTAL(() -> -15.0), // TBD
-    UNDISCLOSED(() -> 999), // TBD
+    NetAlgae(() -> 100.0), // TBD
     MANUAL(() -> manualPow),
     BOTBOT(() -> -49.7),
     BOTTOP(() -> -20.1),
-    PUNCH(() -> 70),
+    PUNCH(() -> 30),
     TUNNABLE(tunnablePos);
 
     private final DoubleSupplier motionType;
@@ -134,8 +134,8 @@ public class CatzAlgaePivot extends SubsystemBase {
     return runOnce(() -> setAlgaePivotPos(Position.HORIZONTAL));
   }
 
-  public Command AlgaePivot_Undisclosed() {
-    return runOnce(() -> setAlgaePivotPos(Position.UNDISCLOSED));
+  public Command AlgaePivot_NetAlgae() {
+    return runOnce(() -> setAlgaePivotPos(Position.NetAlgae));
   }
 
   public Command AlgaePivot_Tunnable() {
