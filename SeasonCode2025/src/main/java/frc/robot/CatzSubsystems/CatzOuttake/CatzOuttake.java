@@ -17,7 +17,6 @@ import frc.robot.RobotContainer;
 import frc.robot.TeleopPosSelector;
 import frc.robot.CatzSubsystems.CatzSuperstructure;
 import frc.robot.CatzSubsystems.CatzSuperstructure.CoralState;
-import lombok.Setter;
 
 import org.littletonrobotics.junction.Logger;
 
@@ -43,9 +42,6 @@ public class CatzOuttake extends SubsystemBase {
 
   private outtakeStates currentState = outtakeStates.STOP;
   private outtakeStates previousState = outtakeStates.STOP;
-
-  @Setter
-  private boolean coral = true;
 
   public CatzOuttake(RobotContainer container) {
     this.container = container;
@@ -75,7 +71,7 @@ public class CatzOuttake extends SubsystemBase {
     if (selector.useFakeCoral){
       return container.getSelector().hasCoralSIM;
     } else {
-      return coral;
+      return inputs.bbreakBackTriggered || inputs.bbreakFrntTriggered;
     }
   }
 
@@ -179,9 +175,7 @@ public class CatzOuttake extends SubsystemBase {
   private void case_adjustFwd() {
     io.runMotor(ADJ_SPD, ADJ_SPD);
     if (!inputs.bbreakBackTriggered) {
-      currentState = outtakeStates.STOP;
-      CatzSuperstructure.setCurrentCoralState(CoralState.IN_OUTTAKE);
-      System.out.println("stopping adjfwd");
+      currentState = outtakeStates.ADJ_BACK;
     }
   }
 

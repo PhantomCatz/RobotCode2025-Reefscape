@@ -28,7 +28,6 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.FieldConstants.Reef;
 import frc.robot.Utilities.AllianceFlipUtil;
 import frc.robot.Utilities.CornerTrackingPathfinder;
-import frc.robot.CatzSubsystems.CatzSuperstructure.CoralState;
 import frc.robot.CatzSubsystems.CatzSuperstructure.LeftRight;
 import frc.robot.CatzSubsystems.CatzSuperstructure.RobotAction;
 import frc.robot.CatzSubsystems.CatzSuperstructure;
@@ -37,6 +36,7 @@ import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.Drivetrain.CatzDriv
 import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.Drivetrain.DriveConstants;
 import frc.robot.CatzSubsystems.CatzLEDs.CatzLED;
 import frc.robot.CatzSubsystems.CatzLEDs.CatzLED.QueueLEDState;
+import frc.robot.CatzSubsystems.CatzOuttake.CatzOuttake;
 import frc.robot.Commands.DriveAndRobotOrientationCmds.DriveAndCycle;
 import frc.robot.Commands.DriveAndRobotOrientationCmds.TrajectoryDriveCmd;
 
@@ -54,6 +54,7 @@ public class TeleopPosSelector {
 
   private CatzSuperstructure superstructure;
   private CatzDrivetrain drivetrain;
+  private CatzOuttake outtake;
   private CatzRobotTracker tracker = CatzRobotTracker.getInstance();
 
   private Command currentDrivetrainCommand = new InstantCommand();
@@ -74,6 +75,7 @@ public class TeleopPosSelector {
   public TeleopPosSelector(CommandXboxController aux, RobotContainer container) {
     this.xboxAux = aux;
     this.m_container = container;
+    this.outtake = container.getCatzOuttake();
     this.currentDrivetrainCommand.addRequirements(container.getCatzDrivetrain());
     //this.currentAutoplayCommand.addRequirements(container.getCatzDrivetrain());
 
@@ -444,7 +446,7 @@ public class TeleopPosSelector {
         return getCoralStationCommand();
       }
     } else {
-      if (CatzSuperstructure.getCurrentCoralState() == CoralState.IN_OUTTAKE) {
+      if (outtake.hasCoral()) {
         if (queuedPaths.isEmpty())
           return new InstantCommand();
         return getReefScoreCommand(pair).andThen(new InstantCommand(() -> pathQueuePopFront()));

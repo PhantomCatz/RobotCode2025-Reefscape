@@ -14,7 +14,6 @@ import com.pathplanner.lib.trajectory.PathPlannerTrajectory;
 import com.pathplanner.lib.trajectory.PathPlannerTrajectoryState;
 import com.pathplanner.lib.util.PPLibTelemetry;
 import com.pathplanner.lib.util.PathPlannerLogging;
-import edu.wpi.first.math.controller.HolonomicDriveController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.trajectory.Trajectory;
@@ -23,6 +22,7 @@ import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.FieldConstants;
 import frc.robot.Robot;
+import frc.robot.RobotContainer;
 import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.CatzRobotTracker;
 import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.Drivetrain.CatzDrivetrain;
 import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.Drivetrain.DriveConstants;
@@ -50,7 +50,7 @@ public class TrajectoryDriveCmd extends Command {
   public static final double ALLOWABLE_ROTATION_ERROR = 2.0;
   public static final double ALLOWABLE_POSE_ERROR_PID = 0.02;
   public static final double ALLOWABLE_ROTATION_ERROR_PID = 0.5;
-  public static final double ALLOWABLE_VEL_ERROR = 0.01;
+  public static final double ALLOWABLE_VEL_ERROR = 0.2;
   public static final double ALLOWABLE_OMEGA_ERROR = 3.0;
   private static final double TIMEOUT_SCALAR = 50.0;
   private static final double CONVERGE_DISTANCE = 1.0;
@@ -260,8 +260,7 @@ public class TrajectoryDriveCmd extends Command {
   public boolean isFinished() {
     // System.out.println("vision: "
     // +tracker.getDEstimatedPose().getTranslation().getNorm() );
-    // System.out
-    //     .println("vision: " + (tracker.getDEstimatedPose().getTranslation().getNorm()) + " pose: " + translationError);
+    System.out.println("vision: " + (tracker.getVisionPoseShift().getNorm()) + " pose: " + translationError);
 
     // Event Command or timeout
     if (timer.hasElapsed(pathTimeOut) && !isEventCommandRunning) {
@@ -269,7 +268,7 @@ public class TrajectoryDriveCmd extends Command {
       return true;
     }
 
-    if (autoalign && tracker.getDEstimatedPose().getTranslation().getNorm() > ALLOWABLE_VISION_ADJUST) {
+    if (false && RobotContainer.getInstance().getCatzVision().isSeeingApriltag() && autoalign && tracker.getVisionPoseShift().getNorm() > ALLOWABLE_VISION_ADJUST) {
       // If trailing pose is within margin
       // System.out.println("vision is not true");
       return false;
@@ -307,10 +306,10 @@ public class TrajectoryDriveCmd extends Command {
       rotationError = 360 - rotationError;
     }
     // System.out.println("rotationerr: " + (rotationError < ALLOWABLE_OMEGA_ERROR));
-    // System.out.println("speederr: " + (desiredMPS == 0.0 || (currentMPS < ALLOWABLE_VEL_ERROR && currentRPS < ALLOWABLE_OMEGA_ERROR)));
+    System.out.println("speederr: " + currentMPS);
 
     return isPoseWithinThreshold(poseError) && rotationError < ALLOWABLE_OMEGA_ERROR &&
-    (desiredMPS == 0.0 || (currentMPS < ALLOWABLE_VEL_ERROR && currentRPS < ALLOWABLE_OMEGA_ERROR));
+    (desiredMPS != 0.0 || (currentMPS < ALLOWABLE_VEL_ERROR && currentRPS < ALLOWABLE_OMEGA_ERROR));
   }
 
   public boolean isPoseWithinThreshold(double poseError) {

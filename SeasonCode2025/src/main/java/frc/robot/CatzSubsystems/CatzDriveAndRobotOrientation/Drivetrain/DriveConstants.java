@@ -10,7 +10,6 @@ package frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.Drivetrain;
 import com.pathplanner.lib.config.ModuleConfig;
 import com.pathplanner.lib.config.RobotConfig;
 import com.pathplanner.lib.path.PathConstraints;
-import edu.wpi.first.math.controller.HolonomicDriveController;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -20,6 +19,7 @@ import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
 import frc.robot.CatzConstants;
+import frc.robot.Commands.DriveAndRobotOrientationCmds.HolonomicDriveController;
 import frc.robot.Utilities.LoggedTunableNumber;
 import lombok.Builder;
 
@@ -64,8 +64,8 @@ public class DriveConstants {
 
   public static final DriveConfig TRAJECTORY_CONFIG =
     DriveConfig.builder()
-      .maxLinearVelocity(3.0)
-      .maxLinearAcceleration(3.0)
+      .maxLinearVelocity(3.5)
+      .maxLinearAcceleration(5.0)
       .maxAngularVelocity(Units.degreesToRadians(540))
       .maxAngularAcceleration(Units.degreesToRadians(720))
       .build();
@@ -191,8 +191,8 @@ public class DriveConstants {
   // -----------------------------------------------------------------------------------------------------------------------------
   public static HolonomicDriveController getNewHolController() {
     return new HolonomicDriveController(
-      new PIDController(3.0, 0.0, 0.024),
-      new PIDController(3.0, 0.0, 0.024),
+      new PIDController(5.0, 0.0, 0.2),
+      new PIDController(5.0, 0.0, 0.2),
       new ProfiledPIDController(
         4.0,
         0.0,
@@ -202,8 +202,8 @@ public class DriveConstants {
     );
   }
 
-  private static final double CARPET_COEF_FRICTION = 4.0;
-  private static final double DRIVE_CURRENT_LIMIT = 200.0;
+  private static final double CARPET_COEF_FRICTION = 8.0;
+  private static final double DRIVE_CURRENT_LIMIT = 400.0;
   public static final double DRIVE_VELOCITY_DEADBAND = 1e-9;
   public static final ChassisSpeeds NON_ZERO_CHASSIS_SPEED = new ChassisSpeeds(1, 1, 0); //TODO should this be smaller?
 

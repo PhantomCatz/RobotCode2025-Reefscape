@@ -9,7 +9,6 @@ package frc.robot.Commands.DriveAndRobotOrientationCmds;
 
 import com.pathplanner.lib.path.PathPlannerPath;
 
-import frc.robot.CatzSubsystems.CatzSuperstructure.CoralState;
 import frc.robot.CatzSubsystems.CatzSuperstructure.RobotAction;
 import frc.robot.RobotContainer;
 import frc.robot.TeleopPosSelector;
@@ -17,7 +16,7 @@ import frc.robot.CatzSubsystems.CatzSuperstructure;
 import frc.robot.CatzSubsystems.CatzOuttake.CatzOuttake;
 
 public class DriveAndCycle extends TrajectoryDriveCmd{
-    private final double PREDICT_DISTANCE = 0.5; // meters
+    private final double PREDICT_DISTANCE = 1.2; // meters
 
     private final RobotAction action;
     private TeleopPosSelector selector;
@@ -92,16 +91,10 @@ public class DriveAndCycle extends TrajectoryDriveCmd{
     @Override
     public boolean isFinished(){
         if(action == RobotAction.OUTTAKE){
-            if(selector.useFakeCoral){
-                return !selector.hasCoralSIM;
-            }
-            return (CatzSuperstructure.getCurrentCoralState() == CoralState.NOT_IN_OUTTAKE);
+            return !outtake.hasCoral();
         }
         if(action == RobotAction.INTAKE){
-            if(selector.useFakeCoral){
-                return selector.hasCoralSIM;
-            }
-            return (CatzSuperstructure.getCurrentCoralState() == CoralState.IN_OUTTAKE);
+            return outtake.hasCoral();
         }
         return false;
     }

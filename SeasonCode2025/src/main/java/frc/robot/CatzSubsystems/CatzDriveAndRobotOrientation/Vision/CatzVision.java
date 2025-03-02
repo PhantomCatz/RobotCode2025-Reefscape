@@ -203,4 +203,13 @@ public class CatzVision extends SubsystemBase {
     }
 
   }
+
+  public boolean isSeeingApriltag(){
+    for(int i = 0; i < inputs.length; i++){
+      if(inputs[i].tagIds.length > 0){
+        return true;
+      }
+    }
+    return false;
+  }
 }

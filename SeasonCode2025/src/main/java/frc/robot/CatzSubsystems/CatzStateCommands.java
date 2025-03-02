@@ -11,7 +11,6 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
-import edu.wpi.first.wpilibj2.command.PrintCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.Robot;
 import frc.robot.RobotContainer;
@@ -140,16 +139,15 @@ public class CatzStateCommands {
         CatzElevator elevator = robotContainer.getCatzElevator();
 
         return new ParallelCommandGroup(
-            new PrintCommand("L4 Score!!!!!"),
             climb.Climb_Retract(),
             algae.stopAlgae(),
 
             new SequentialCommandGroup(
                 elevator.Elevator_L4(),
                 Commands.waitUntil(() -> elevator.isElevatorInPosition()).withTimeout(0.8).alongWith(Commands.print("/////////L4?////////")),
-                outtake.outtakeL4().alongWith(Commands.print("/????????????outake???????????")),
-                Commands.waitSeconds(0.5),
-                elevator.Elevator_L4_Adj()
+                outtake.outtakeL4()
+                // Commands.waitSeconds(0.5),
+                // elevator.Elevator_L4_Adj()
             )
         )//.onlyIf(() -> CatzSuperstructure.getCurrentCoralState() == CoralState.IN_OUTTAKE)
          .unless(()-> Robot.isSimulation()).alongWith(Commands.print("L4 Scoring State"));
