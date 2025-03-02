@@ -7,8 +7,6 @@
 
 package frc.robot.Commands.DriveAndRobotOrientationCmds;
 
-import java.util.Deque;
-
 import com.pathplanner.lib.path.PathPlannerPath;
 
 import frc.robot.CatzSubsystems.CatzSuperstructure.CoralState;
@@ -26,7 +24,6 @@ public class DriveAndCycle extends TrajectoryDriveCmd{
     private CatzSuperstructure superstructure;
     private CatzOuttake outtake;
     private int level;
-    private Deque queue;
 
     public DriveAndCycle(PathPlannerPath newPath, RobotContainer container, RobotAction action){
         super(newPath, container.getCatzDrivetrain(), action != RobotAction.INTAKE);
@@ -79,7 +76,6 @@ public class DriveAndCycle extends TrajectoryDriveCmd{
             // System.out.println("action: " + action.toString());
             if (selector.useFakeCoral){
                 selector.hasCoralSIM = action == RobotAction.INTAKE;
-                System.out.println("ac:" + action + "cor: " + selector.hasCoralSIM);
             }
         }
     }
@@ -95,7 +91,6 @@ public class DriveAndCycle extends TrajectoryDriveCmd{
 
     @Override
     public boolean isFinished(){
-        System.out.println("ma actiona: " +action);
         if(action == RobotAction.OUTTAKE){
             if(selector.useFakeCoral){
                 return !selector.hasCoralSIM;
@@ -104,7 +99,6 @@ public class DriveAndCycle extends TrajectoryDriveCmd{
         }
         if(action == RobotAction.INTAKE){
             if(selector.useFakeCoral){
-                System.out.println("coral intakee:" + selector.hasCoralSIM);
                 return selector.hasCoralSIM;
             }
             return (CatzSuperstructure.getCurrentCoralState() == CoralState.IN_OUTTAKE);

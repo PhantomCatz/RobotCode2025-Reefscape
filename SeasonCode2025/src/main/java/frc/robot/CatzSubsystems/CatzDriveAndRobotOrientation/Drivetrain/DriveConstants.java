@@ -191,8 +191,8 @@ public class DriveConstants {
   // -----------------------------------------------------------------------------------------------------------------------------
   public static HolonomicDriveController getNewHolController() {
     return new HolonomicDriveController(
-      new PIDController(3.0, 0.0, 0.012),
-      new PIDController(3.0, 0.0, 0.012),
+      new PIDController(3.0, 0.0, 0.024),
+      new PIDController(3.0, 0.0, 0.024),
       new ProfiledPIDController(
         4.0,
         0.0,
@@ -202,22 +202,22 @@ public class DriveConstants {
     );
   }
 
+  private static final double CARPET_COEF_FRICTION = 4.0;
+  private static final double DRIVE_CURRENT_LIMIT = 200.0;
   public static final double DRIVE_VELOCITY_DEADBAND = 1e-9;
   public static final ChassisSpeeds NON_ZERO_CHASSIS_SPEED = new ChassisSpeeds(1, 1, 0); //TODO should this be smaller?
 
   public static final double ROBOT_MASS = 50.0;
-  public static final double ROBOT_MOI =
-      (2.0 / 12.0) * ROBOT_MASS * (Math.pow(DRIVE_CONFIG.bumperWidthX(), 2)); // ROBOT_MASS * (2/2) * (kA_ANGULAR_ACCEL/kA_LINEAR_ACCEL); // TODO need to
-
+  public static final double ROBOT_MOI = (2.0 / 12.0) * ROBOT_MASS * (Math.pow(DRIVE_CONFIG.bumperWidthX(), 2));
   public static final RobotConfig ROBOT_CONFIG = new RobotConfig(
     ROBOT_MASS,
     ROBOT_MOI,
     new ModuleConfig(
       DRIVE_CONFIG.wheelRadius(),
-      10.0,
-      10.0,
+      TRAJECTORY_CONFIG.maxLinearVelocity(),
+      CARPET_COEF_FRICTION,
       DCMotor.getKrakenX60(1).withReduction(MODULE_GAINS_AND_RATIOS.driveReduction()),
-      200.0,
+      DRIVE_CURRENT_LIMIT,
       1
     ),
     MODULE_TRANSLATIONS

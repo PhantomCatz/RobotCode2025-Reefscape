@@ -76,7 +76,7 @@ public class FieldConstants {
     public static final double faceToZoneLine =
         Units.inchesToMeters(12); // Side of the reef to the inside of the reef zone line
     public static final double scoringDistance =
-        Units.inchesToMeters(24); // Scoring distance from the side of the reef
+        Units.inchesToMeters(19); // Scoring distance from the side of the reef
     public static final double reefOrthogonalRadius =
         Units.inchesToMeters(32.305); // Distance from the center to the side of the reef
     public static final double leftRightDistance =

@@ -42,8 +42,6 @@ public class VisionIOLimelight implements VisionIO {
   private final DoubleArraySubscriber megatag1Subscriber;
   private final DoubleArraySubscriber megatag2Subscriber;
 
-
-
   /**
    * Creates a new VisionIOLimelight.
    *
@@ -98,6 +96,34 @@ public class VisionIOLimelight implements VisionIO {
           rawSample.value[2],
           (int) tagIDSubscriber.get(),
           cameraSpaceTranslation.getNorm())
+      );
+    }
+
+    //----------------------------------------------------------------------------------------------
+    // Megatag 1 estimation
+    //----------------------------------------------------------------------------------------------
+    for (var rawSample : megatag1Subscriber.readQueue()) {
+      // if sample is invalid, skip
+      if (rawSample.value.length == 0) continue;
+      poseObservations.add(
+          new PoseObservation(
+              // Timestamp, based on server timestamp of publish and latency
+              usedTimestamp - rawSample.value[6] * 1.0e-3,
+
+              // 3D pose estimate
+              parsePose(rawSample.value),
+
+              // Ambiguity, zeroed because the pose is already disambiguated
+              rawSample.value[8],
+
+              // Tag count
+              (int) rawSample.value[7],
+
+              // Average tag distance
+              rawSample.value[9], // Used to grab area at value 10 //TODO
+
+              // Observation type
+              PoseObservationType.MEGATAG_1)
       );
     }
 
