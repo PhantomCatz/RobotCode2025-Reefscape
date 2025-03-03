@@ -24,6 +24,8 @@ public class DriveAndCycle extends TrajectoryDriveCmd{
     private CatzOuttake outtake;
     private int level;
 
+    private boolean actionAlreadyTaken = false;
+
     public DriveAndCycle(PathPlannerPath newPath, RobotContainer container, RobotAction action){
         super(newPath, container.getCatzDrivetrain(), action != RobotAction.INTAKE, container);
         this.action = action;
@@ -57,21 +59,24 @@ public class DriveAndCycle extends TrajectoryDriveCmd{
         }
 
         // Run Scoring or Intaking
-        if (super.isPoseWithinThreshold(PREDICT_DISTANCE) && !super.isFinished()){
+        if (super.isPoseWithinThreshold(PREDICT_DISTANCE) && !super.isFinished() && !actionAlreadyTaken){
+            actionAlreadyTaken = true;
             if(action == RobotAction.OUTTAKE && superstructure.getCurrentRobotAction() != RobotAction.OUTTAKE){
-                // System.out.println("raised elevator!!!!!!!");
+                System.out.println("raised elevator!!!!!!!");
                 superstructure.setCurrentRobotAction(RobotAction.AIMING, level);
             }
             else if(action == RobotAction.INTAKE){
-                // System.out.println("intaking!!!!!!");
-                superstructure.setCurrentRobotAction(RobotAction.INTAKE);
+                System.out.println("intaking!!!!!!");
+                superstructure.setCurrentRobotAction(RobotAction.INTAKE, "intak");
             }
         }
 
         // If we reached the target Destination
         if (super.isFinished()){
             super.end(false);
-            superstructure.setCurrentRobotAction(action, this.level);
+            if(action == RobotAction.OUTTAKE){
+                superstructure.setCurrentRobotAction(action, this.level);
+            }
             // System.out.println("action: " + action.toString());
             if (selector.useFakeCoral){
                 selector.hasCoralSIM = action == RobotAction.INTAKE;
@@ -83,9 +88,9 @@ public class DriveAndCycle extends TrajectoryDriveCmd{
     public void end(boolean interrupted){
         super.end(interrupted);
         if(action == RobotAction.OUTTAKE){
-            superstructure.setCurrentRobotAction(RobotAction.STOW);
+            System.out.println("Auto Stowing");
+            superstructure.setCurrentRobotAction(RobotAction.STOW, "dnc end");
         }
-
     }
 
     @Override

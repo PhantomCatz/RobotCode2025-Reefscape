@@ -64,8 +64,8 @@ public class DriveConstants {
 
   public static final DriveConfig TRAJECTORY_CONFIG =
     DriveConfig.builder()
-      .maxLinearVelocity(3.0)
-      .maxLinearAcceleration(5.0)
+      .maxLinearVelocity(3.5)
+      .maxLinearAcceleration(3.5)
       .maxAngularVelocity(Units.degreesToRadians(540))
       .maxAngularAcceleration(Units.degreesToRadians(720))
       .build();
@@ -172,6 +172,13 @@ public class DriveConstants {
     TRAJECTORY_CONFIG.maxAngularAcceleration
   );
 
+  public static final PathConstraints LEFT_RIGHT_CONSTRAINTS = new PathConstraints( // 540 // 720
+    2,
+    2,
+    TRAJECTORY_CONFIG.maxAngularVelocity,
+    TRAJECTORY_CONFIG.maxAngularAcceleration
+  );
+
   public static final Translation2d[] MODULE_TRANSLATIONS = new Translation2d[4];
   static {
     MODULE_TRANSLATIONS[INDEX_FR] = new Translation2d( DRIVE_CONFIG.robotLengthX(), -DRIVE_CONFIG.robotWidthY()).div(2.0);
@@ -191,8 +198,8 @@ public class DriveConstants {
   // -----------------------------------------------------------------------------------------------------------------------------
   public static HolonomicDriveController getNewHolController() {
     return new HolonomicDriveController(
-      new PIDController(5.0, 0.0, 0.2),
-      new PIDController(5.0, 0.0, 0.2),
+      new PIDController(5.0, 0.0, 0.4),
+      new PIDController(5.0, 0.0, 0.4),
       new ProfiledPIDController(
         4.0,
         0.0,

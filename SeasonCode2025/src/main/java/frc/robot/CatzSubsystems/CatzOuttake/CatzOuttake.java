@@ -14,7 +14,6 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.CatzConstants;
 import frc.robot.RobotContainer;
-import frc.robot.TeleopPosSelector;
 import frc.robot.CatzSubsystems.CatzSuperstructure;
 import frc.robot.CatzSubsystems.CatzSuperstructure.CoralState;
 
@@ -25,7 +24,6 @@ public class CatzOuttake extends SubsystemBase {
   private final OuttakeIO io;
   private final OuttakeIOInputsAutoLogged inputs = new OuttakeIOInputsAutoLogged();
   private RobotContainer container;
-  private TeleopPosSelector selector;
   private int interationCounter = 0;
   private int intakeIterationCoutner = 0;
 
@@ -45,7 +43,6 @@ public class CatzOuttake extends SubsystemBase {
 
   public CatzOuttake(RobotContainer container) {
     this.container = container;
-    this.selector = container.getSelector();
     if(isOuttakeDisabled) {
       io = new OuttakeIONull();
       System.out.println("Outtake Unconfigured");
@@ -68,7 +65,7 @@ public class CatzOuttake extends SubsystemBase {
   }
 
   public boolean hasCoral(){
-    if (selector.useFakeCoral){
+    if (container.getSelector().useFakeCoral){
       return container.getSelector().hasCoralSIM;
     } else {
       return inputs.bbreakBackTriggered || inputs.bbreakFrntTriggered;

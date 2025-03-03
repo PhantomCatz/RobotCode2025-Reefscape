@@ -55,7 +55,7 @@ public class TrajectoryDriveCmd extends Command {
   private static final double TIMEOUT_SCALAR = 50.0;
   private static final double CONVERGE_DISTANCE = 1.0;
   private static final double DIVERGE_TIME = 1.0;
-  private final double ALLOWABLE_VISION_ADJUST = 5e-3; //TODO tune
+  private final double ALLOWABLE_VISION_ADJUST = 4e-3; //TODO tune
 
   // Subsystems
   private CatzDrivetrain m_driveTrain;
@@ -264,11 +264,11 @@ public class TrajectoryDriveCmd extends Command {
     // +tracker.getDEstimatedPose().getTranslation().getNorm() );
 
     // Event Command or timeout
-    if (timer.hasElapsed(pathTimeOut) && !isEventCommandRunning) {
+    if (timer.hasElapsed(pathTimeOut)) {
       System.out.println("timed out!!@)!*()*!)(#*)");
       return true;
     }
-    System.out.println("vision: " + (tracker.getVisionPoseShift().getNorm()) + " pose: " + translationError);
+    // System.out.println("vision: " + (tracker.getVisionPoseShift().getNorm()) + " pose: " + translationError);
 
     if (container.getCatzVision().isSeeingApriltag() && autoalign && tracker.getVisionPoseShift().getNorm() > ALLOWABLE_VISION_ADJUST) {
       // If trailing pose is within margin

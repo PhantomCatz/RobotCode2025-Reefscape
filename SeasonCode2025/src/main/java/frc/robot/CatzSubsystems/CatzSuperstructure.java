@@ -92,13 +92,13 @@ public class CatzSuperstructure extends VirtualSubsystem {
 
     }
 
-    public void setCurrentRobotAction(RobotAction action){
+    public void setCurrentRobotAction(RobotAction action, String from){
+        System.out.println("from: " + from + action);
         setCurrentRobotAction(action, level);
     }
 
     public void setCurrentRobotAction(RobotAction action, int level) {
         Command robotActionCommand = Commands.print("No robot Action Selected");
-        RobotState prevRobotState = currentRobotState;
         this.currentRobotAction = action;
 
         switch(currentRobotAction) {
@@ -169,57 +169,58 @@ public class CatzSuperstructure extends VirtualSubsystem {
 
             // Intake Algae From Reef or Coral from Coral Substation
             case INTAKE:
-
-                if(chosenGamepiece == Gamepiece.CORAL) {
-                        currentRobotState = RobotState.INTAKE_CORAL_STATION;
-                        System.out.println("Intake coral station");
-                        robotActionCommand = CatzStateCommands.intakeCoralStation(container);
-                } else {
-                    switch (level) {
-                        case 2:
-                            currentRobotState = RobotState.TOP_ALGAE;
-                            System.out.println("TOP algae");
-                            robotActionCommand = CatzStateCommands.topAlgae(container);
-                            break;
-                        case 4:
-                            currentRobotState = RobotState.BOT_ALGAE;
-                            System.out.println("BOT algae");
-                            robotActionCommand = CatzStateCommands.botAlgae(container);
-                            break;
-                        default:
-                            break;
-                    }
-                }
+                currentRobotState = RobotState.INTAKE_CORAL_STATION;
+                System.out.println("intaking coral is the way my child ");
+                robotActionCommand = CatzStateCommands.intakeCoralStation(container);
                 break;
+                // if(chosenGamepiece == Gamepiece.CORAL) {
+
+                // } else {
+                //     switch (level) {
+                //         case 2:
+                //             currentRobotState = RobotState.TOP_ALGAE;
+                //             System.out.println("TOP algae");
+                //             robotActionCommand = CatzStateCommands.topAlgae(container);
+                //             break;
+                //         case 4:
+                //             currentRobotState = RobotState.BOT_ALGAE;
+                //             System.out.println("BOT algae");
+                //             robotActionCommand = CatzStateCommands.botAlgae(container);
+                //             break;
+                //         default:
+                //             break;
+                //     }
+                // }
+                // break;
 
             // Intake Algae Ground or Coral Ground
-            case INTAKE_GROUND:
-                if(chosenGamepiece == Gamepiece.CORAL) {
-                        currentRobotState = RobotState.INTAKE_CORAL_GROUND;
-                        System.out.println("Intake coral ground");
-                        robotActionCommand = CatzStateCommands.intakeCoralGround(container);
+            // case INTAKE_GROUND:
+            //     if(chosenGamepiece == Gamepiece.CORAL) {
+            //             currentRobotState = RobotState.INTAKE_CORAL_GROUND;
+            //             System.out.println("Intake coral ground");
+            //             robotActionCommand = CatzStateCommands.intakeCoralGround(container);
 
 
-                } else {
-                    currentRobotState = RobotState.INTAKE_ALGAE_GROUND;
-                    System.out.println("Intake algae");
-                    robotActionCommand = CatzStateCommands.intakeAlgae(container);
+            //     } else {
+            //         currentRobotState = RobotState.INTAKE_ALGAE_GROUND;
+            //         System.out.println("Intake algae");
+            //         robotActionCommand = CatzStateCommands.intakeAlgae(container);
 
-                }
-                break;
+            //     }
+            //     break;
 
             // Sets All Mechanisms to Base Positions
             default:
             case STOW:
+                System.out.println("ah you wish to stow you naive child");
                 currentRobotState = RobotState.STOW;
                 robotActionCommand = CatzStateCommands.stow(container);
                 break;
         }
 
-        if(prevRobotState != currentRobotState){
-            System.out.println("scheudled: " + currentRobotState.toString());
-            robotActionCommand.schedule();
-        }
+        System.out.println("thou wish has been scheudled");
+        robotActionCommand.schedule();
+
     }
 
 
