@@ -136,6 +136,9 @@ public class RobotContainer {
       }
     }));
 
+    // STOWING INTAKE RAMP FOR WHATEVER REASON
+    xboxTest.start().toggleOnTrue(rampPivot.Ramp_Stow_Pos().alongWith(Commands.print("pressed start"))); //TBD
+
     // NBA
     xboxDrv.b().onTrue(selector.runToNearestBranch().alongWith(Commands.runOnce(()->led.setControllerState(ControllerLEDState.NBA))));
     xboxDrv.b().onFalse(selector.cancelCurrentDrivetrainCommand().alongWith(Commands.runOnce(()->led.setControllerState(ControllerLEDState.FULL_MANUAL))));
@@ -173,22 +176,31 @@ public class RobotContainer {
     // Manual Elevator Control
     Trigger leftJoystickTrigger = new Trigger(
       () -> Math.abs(xboxTest.getLeftY()) > 0.1);
-    leftJoystickTrigger.onTrue(elevator.elevatorFullManual(() -> xboxTest.getLeftY()).alongWith(Commands.print("Using manual elevator")));
-    leftJoystickTrigger.onFalse(elevator.elevatorFullManual(() -> xboxTest.getLeftY()));
+    Trigger rightJoystickTrigger = new Trigger(
+      () -> Math.abs(xboxTest.getRightY()) > 0.1);
 
-    // Manual Ramp Pivot Control
-    // Trigger leftJoystickTrigger = new Trigger(
-    //   () -> Math.abs(xboxTest.getLeftY()) > 0.1);
-    // leftJoystickTrigger.onTrue(rampPivot.rampPivotManual(() -> xboxTest.getLeftY()).alongWith(Commands.print("Using manual ramp pivot")));
-    // leftJoystickTrigger.onFalse(rampPivot.rampPivotManual(()-> 0.0).alongWith(Commands.print("Nah - pivot motor")));
+    // leftJoystickTrigger.onTrue(climb.ClimbManualMode(() -> xboxTest.getLeftY()).alongWith(Commands.print("Using manual ramp pivot")));
+    // leftJoystickTrigger.onFalse(climb.ClimbManualMode(()-> 0.0).alongWith(Commands.print("Nah - pivot motor")));
 
     // Climb SetPosition Control
-    xboxTest.y().toggleOnTrue(climb.Climb_Retract().alongWith(Commands.print("pressed y")));
-    xboxTest.x().toggleOnTrue(climb.Climb_Home().alongWith(Commands.print("pressed x")));
-    xboxTest.b().toggleOnTrue(climb.Climb_Full().alongWith(Commands.print("pressed b")));
+    // xboxTest.y().toggleOnTrue(climb.Climb_Retract().alongWith(Commands.print("pressed y")));
+    // xboxTest.x().toggleOnTrue(climb.Climb_Home().alongWith(Commands.print("pressed x")));
+    // xboxTest.b().toggleOnTrue(climb.Climb_Full().alongWith(Commands.print("pressed b")));
 
-    xboxTest.x().toggleOnTrue(rampPivot.Ramp_Stow().alongWith(Commands.print("pressed x")));
-    xboxTest.b().toggleOnTrue(rampPivot.Ramp_Climb().alongWith(Commands.print("pressed b")));
+    // xboxTest.x().toggleOnTrue(rampPivot.Ramp_Stow().alongWith(Commands.print("pressed x"))); //TBD
+    // xboxTest.b().toggleOnTrue(rampPivot.Ramp_Climb().alongWith(Commands.print("pressed b"))); //TBD
+    // xboxTest.a().toggleOnTrue(rampPivot.Ramp_Intake().alongWith(Commands.print("pressed a")));
+
+    leftJoystickTrigger.onTrue(rampPivot.rampPivotManual(() -> xboxTest.getLeftY()).alongWith(Commands.print("Using manual ramp pivot")));
+    leftJoystickTrigger.onFalse(rampPivot.rampPivotManual(()-> 0.0).alongWith(Commands.print("Nah - ramp motor")));
+
+    //climb.ClimbManualMode(
+    rightJoystickTrigger.onTrue(climb.ClimbManualMode(() -> xboxTest.getRightY()).alongWith(Commands.print("Using manual climb")));
+    rightJoystickTrigger.onFalse(climb.ClimbManualMode(()-> 0.0).alongWith(Commands.print("Nah - climb motor")));
+
+    xboxTest.povRight().toggleOnTrue(rampPivot.Ramp_Stow_Pos().alongWith(Commands.print("pressed POV Right"))); //TBD
+    xboxTest.povUp().toggleOnTrue(rampPivot.Ramp_Intake_Pos().alongWith(Commands.print("pressed POV Up"))); //TBD
+    xboxTest.povLeft().toggleOnTrue(rampPivot.Ramp_Climb_Pos().alongWith(Commands.print("pressed POV Left")));
 
     xboxTest.rightBumper().toggleOnTrue(algaePivot.AlgaePivot_Stow().alongWith(Commands.print("stow")));
     xboxTest.leftBumper().toggleOnTrue(algaePivot.AlgaePivot_Horizontal().alongWith(Commands.print("eat")));
@@ -201,7 +213,7 @@ public class RobotContainer {
     // xboxTest.x().toggleOnTrue(elevator.Elevator_L3().alongWith(Commands.print("L3")));
     // xboxTest.y().toggleOnTrue(elevator.Elevator_L4().alongWith(Commands.print("L4")));
 
-    xboxTest.rightStick().onTrue(elevator.elevatorFullManual(()->xboxTest.getRightY()));
+    // xboxTest.rightStick().onTrue(elevator.elevatorFullManual(()->xboxTest.getRightY()));
 
     //---------------------------------------------------------------------------------------------------------------------
     // XBOX AUX
@@ -223,7 +235,6 @@ public class RobotContainer {
 
     xboxAux.button(7).onTrue(new InstantCommand(() -> selector.toggleLeftStation()).alongWith(Commands.runOnce(() -> led.setControllerState(ControllerLEDState.BALLS))));
     xboxAux.button(8).onTrue(new InstantCommand(() -> selector.toggleRightStation()).alongWith(Commands.runOnce(() -> led.setControllerState(ControllerLEDState.BALLS))));
-
 
     // Gamepiece Selection
     xboxAux.leftTrigger().onTrue(Commands.runOnce(() -> superstructure.setChosenGamepiece(Gamepiece.CORAL)).alongWith(Commands.runOnce(() -> led.setControllerState(ControllerLEDState.FULL_MANUAL))));

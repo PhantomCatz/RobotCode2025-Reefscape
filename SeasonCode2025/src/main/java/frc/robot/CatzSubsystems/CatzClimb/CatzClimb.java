@@ -42,8 +42,8 @@ public class CatzClimb extends SubsystemBase {
 
 
   @RequiredArgsConstructor
-  public enum ClimbPosition { //In Rotations
-    RETRACT(() -> 332.0),
+  public enum ClimbPosition { //In Rotations //TBD
+    RETRACT(() -> -46),
     HOME(() -> 0.0),
     FULLTURN(() -> -648.0),
     MANUAL(() -> manualPow),
@@ -90,9 +90,12 @@ public class CatzClimb extends SubsystemBase {
     } else {
       if(targetPosition == ClimbPosition.FULL_MANUAL) {
         io.setPower(manualPow);
+        System.out.println("full");
       } else if(targetPosition == ClimbPosition.MANUAL) {
         io.setPosition(position);
+        System.out.println("semi");
       } else if(targetPosition != ClimbPosition.MANUAL && targetPosition != ClimbPosition.FULL_MANUAL) {
+        System.out.println("Target");
         io.setPosition(position);
       } else {
         io.setPower(0.0);
@@ -134,12 +137,11 @@ public class CatzClimb extends SubsystemBase {
   }
 
   public void climbFullManual(double joystickPower) {
-    manualPow = joystickPower;
+    manualPow = joystickPower * 0.5;
     targetPosition = ClimbPosition.FULL_MANUAL;
   }
 
-
   public Command ClimbManualMode(Supplier<Double> manualSupplier) {
-    return run(() -> climbSemiManual(manualSupplier.get())).alongWith(Commands.print("hi"));
+    return run(() -> climbFullManual(manualSupplier.get())).alongWith(Commands.print("hi"));
   }
 }

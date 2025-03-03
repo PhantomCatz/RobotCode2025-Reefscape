@@ -90,7 +90,7 @@ public class RampPivotIOReal implements RampPivotIO{
 
     @Override
     public void runMotor(double speed) {
-        System.out.println("i am running - pivot motor");
+        // System.out.println("pivot motor running at " + speed);
         rampPivotMotor.set(speed);
     }
 
