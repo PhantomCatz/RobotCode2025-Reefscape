@@ -223,8 +223,8 @@ public class CatzSuperstructure extends VirtualSubsystem {
                     System.out.println("Gob algae");
                     robotActionCommand = container.getAlgaePivot().AlgaePivot_Punch();
 
-            //     }
-            //     break;
+                 }
+                 break;
 
             // Sets All Mechanisms to Base Positions
             default:
