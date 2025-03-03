@@ -41,15 +41,6 @@ import frc.robot.Utilities.Alert.AlertType;
 import org.littletonrobotics.junction.networktables.LoggedNetworkNumber;
 
 public class RobotContainer {
-  private static RobotContainer instance = null;
-
-  //you cant stop me
-  public static RobotContainer getInstance(){
-    if(instance == null){
-      instance = new RobotContainer();
-    }
-    return instance;
-  }
 
   private double SCORE_TRIGGER_THRESHHOLD = 0.8;
 

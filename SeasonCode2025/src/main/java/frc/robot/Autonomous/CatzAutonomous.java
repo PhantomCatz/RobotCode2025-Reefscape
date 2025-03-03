@@ -87,7 +87,7 @@ public class CatzAutonomous extends SubsystemBase {
         NamedCommands.registerCommand(
             pathName,
             new TrajectoryDriveCmd(
-                PathPlannerPath.fromChoreoTrajectory(pathName), drivetrain, true));
+                PathPlannerPath.fromChoreoTrajectory(pathName), drivetrain, true, container));
       } catch (FileVersionException | IOException | ParseException e) {
         e.printStackTrace();
       }
@@ -170,7 +170,7 @@ public class CatzAutonomous extends SubsystemBase {
           Command command = null;
 
           if(components.length == 1){
-            command = new TrajectoryDriveCmd(PathPlannerPath.fromPathFile(commandName), drivetrain, true);
+            command = new TrajectoryDriveCmd(PathPlannerPath.fromPathFile(commandName), drivetrain, true, container);
           } else if(components.length == 2){
             String name = components[0];
             String action = components[1];

@@ -60,6 +60,7 @@ public class TrajectoryDriveCmd extends Command {
   // Subsystems
   private CatzDrivetrain m_driveTrain;
   private CatzRobotTracker tracker = CatzRobotTracker.getInstance();
+  private final RobotContainer container;
 
   // Trajectory variables
   private HolonomicDriveController hocontroller;
@@ -83,10 +84,11 @@ public class TrajectoryDriveCmd extends Command {
   // Trajectory Drive Command Constructor
   //
   // ---------------------------------------------------------------------------------------------
-  public TrajectoryDriveCmd(PathPlannerPath newPath, CatzDrivetrain drivetrain, boolean autoalign) {
+  public TrajectoryDriveCmd(PathPlannerPath newPath, CatzDrivetrain drivetrain, boolean autoalign, RobotContainer container) {
     this.path = newPath;
     this.m_driveTrain = drivetrain;
     this.autoalign = autoalign;
+    this.container = container;
     this.eventScheduler = new EventScheduler();
     addRequirements(m_driveTrain);
 
@@ -268,7 +270,7 @@ public class TrajectoryDriveCmd extends Command {
     }
     System.out.println("vision: " + (tracker.getVisionPoseShift().getNorm()) + " pose: " + translationError);
 
-    if (RobotContainer.getInstance().getCatzVision().isSeeingApriltag() && autoalign && tracker.getVisionPoseShift().getNorm() > ALLOWABLE_VISION_ADJUST) {
+    if (container.getCatzVision().isSeeingApriltag() && autoalign && tracker.getVisionPoseShift().getNorm() > ALLOWABLE_VISION_ADJUST) {
       // If trailing pose is within margin
       // System.out.println("vision is not true");
       return false;

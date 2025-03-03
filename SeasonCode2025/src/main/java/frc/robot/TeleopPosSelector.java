@@ -343,7 +343,7 @@ public class TeleopPosSelector {
       path = path.flipPath();
     }
 
-    currentDrivetrainCommand = new TrajectoryDriveCmd(path, drivetrain, true);
+    currentDrivetrainCommand = new TrajectoryDriveCmd(path, drivetrain, true, m_container);
     currentDrivetrainCommand.schedule();
   }
 
@@ -388,7 +388,7 @@ public class TeleopPosSelector {
         path = path.flipPath();
       }
 
-      currentDrivetrainCommand = new TrajectoryDriveCmd(path, drivetrain, true);
+      currentDrivetrainCommand = new TrajectoryDriveCmd(path, drivetrain, true, m_container);
       currentDrivetrainCommand.schedule();
   }
 
@@ -461,7 +461,7 @@ public class TeleopPosSelector {
     return new InstantCommand(() -> {
       currentPathfindingPair = getClosestReefPos().getFirst();
       currentDrivetrainCommand.cancel();
-      currentDrivetrainCommand = new TrajectoryDriveCmd(getPathfindingPath(calculateReefPose(currentPathfindingPair, true)), drivetrain, true);
+      currentDrivetrainCommand = new TrajectoryDriveCmd(getPathfindingPath(calculateReefPose(currentPathfindingPair, true)), drivetrain, true, m_container);
       currentDrivetrainCommand.schedule();
     });
   }

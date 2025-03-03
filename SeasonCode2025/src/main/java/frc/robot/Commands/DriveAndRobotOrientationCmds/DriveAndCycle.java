@@ -25,7 +25,7 @@ public class DriveAndCycle extends TrajectoryDriveCmd{
     private int level;
 
     public DriveAndCycle(PathPlannerPath newPath, RobotContainer container, RobotAction action){
-        super(newPath, container.getCatzDrivetrain(), action != RobotAction.INTAKE);
+        super(newPath, container.getCatzDrivetrain(), action != RobotAction.INTAKE, container);
         this.action = action;
         this.superstructure = container.getSuperstructure();
         this.outtake = container.getCatzOuttake();
@@ -34,7 +34,7 @@ public class DriveAndCycle extends TrajectoryDriveCmd{
     }
 
     public DriveAndCycle(PathPlannerPath newPath, RobotContainer container, RobotAction action, int level){
-        super(newPath, container.getCatzDrivetrain(), action != RobotAction.INTAKE);
+        super(newPath, container.getCatzDrivetrain(), action != RobotAction.INTAKE, container);
         this.level = level;
         this.action = action;
         this.superstructure = container.getSuperstructure();
