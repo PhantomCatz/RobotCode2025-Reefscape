@@ -13,12 +13,10 @@ import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
 
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.CatzConstants;
 import frc.robot.Utilities.LoggedTunableNumber;
 import lombok.RequiredArgsConstructor;
-import edu.wpi.first.math.controller.ElevatorFeedforward;
 import edu.wpi.first.wpilibj.DriverStation;
 
 import org.littletonrobotics.junction.Logger;
@@ -39,13 +37,8 @@ public class CatzElevator extends SubsystemBase {
 
   private double elevatorSpeed = 0.0;
   private double elevatorFeedForward = 0.0;
-  private double targetManualPosition = 0.0;
   private int settlingCounter = 0;
   private boolean breakModeEnabled = true;
-  private boolean isCharacterizing = false;
-
-
-  private ElevatorFeedforward ff = new ElevatorFeedforward(gains.kS(), gains.kG(), gains.kV(), gains.kA());
 
   private ElevatorPosition targetPosition = ElevatorPosition.PosStow;
   private ElevatorPosition prevTargetPositon = ElevatorPosition.PosNull;
@@ -54,13 +47,15 @@ public class CatzElevator extends SubsystemBase {
   @RequiredArgsConstructor
   public static enum ElevatorPosition {
       //TO CHANGE HEIGHT GO TO ElevatorConstants.java
-      PosTrueStow(() -> 0.0),
+      PosLimitSwitchStow(() -> 0.0),
       PosStow(() -> STOW_HEIGHT),
       PosL1(() -> L1_HEIGHT),
       PosL2(() -> L2_HEIGHT),
       PosL3(() -> L3_HEIGHT),
       PosL4(() -> L4_HEIGHT),
       PosL4Adj(() -> L4_CORAL_ADJ),
+      PosBotBot(() -> BOT_BOT_ALGAE),
+      PosBotTop(() -> BOT_TOP_ALGAE),
       PosManual(new LoggedTunableNumber("Elevator/ScoreSourceSetpoint",0.0)),
       PosNull(() -> -1.0);
 
@@ -103,13 +98,6 @@ public class CatzElevator extends SubsystemBase {
     //--------------------------------------------------------------------------------------------------------
     LoggedTunableNumber.ifChanged(
         hashCode(), () -> io.setPID(kP.get(), kI.get(), kD.get()), kP, kI, kD);
-    LoggedTunableNumber.ifChanged(
-        hashCode(),
-        () -> ff = new ElevatorFeedforward(kS.get(), kG.get(), kV.get(), kA.get()),
-        kS,
-        kG,
-        kV,
-        kA);
     LoggedTunableNumber.ifChanged(hashCode(),
         ()-> io.setMotionMagicParameters(mmCruiseVelocity.get(), mmAcceleration.get(), mmJerk.get()),
         mmCruiseVelocity,
@@ -124,7 +112,7 @@ public class CatzElevator extends SubsystemBase {
     //    Limit switch position setting
     //---------------------------------------------------------------------------------------------------------------------------
     if(inputs.isBotLimitSwitched) {
-      io.setPosition(ElevatorPosition.PosTrueStow.getTargetPositionRads());
+      io.setPosition(ElevatorPosition.PosLimitSwitchStow.getTargetPositionRads());
     }
 
     //---------------------------------------------------------------------------------------------------------------------------
@@ -158,9 +146,13 @@ public class CatzElevator extends SubsystemBase {
         //Setpoint PID
         io.runSetpoint(targetPosition.getTargetPositionRads(), elevatorFeedForward);
       }
+    } else if (targetPosition == ElevatorPosition.PosManual) {
+      io.runMotor(elevatorSpeed);
+      // System.out.println("Running Elevator Motor");
     } else {
       // Nothing happening
-      io.runMotor(0.0);
+      // System.out.println("Stopping running motor");
+      io.stop();
     }
 
     //----------------------------------------------------------------------------------------------------------------------------
@@ -204,6 +196,14 @@ public class CatzElevator extends SubsystemBase {
     return runOnce(() -> setElevatorPos(ElevatorPosition.PosL4Adj));
   }
 
+  public Command Elevator_BOT_BOT() {
+    return runOnce(() -> setElevatorPos(ElevatorPosition.PosBotBot));
+  }
+
+  public Command Elevator_BOT_TOP() {
+    return runOnce(() -> setElevatorPos(ElevatorPosition.PosBotTop));
+  }
+
   public void setElevatorPos(ElevatorPosition target) {
     this.targetPosition = target;
   }
@@ -218,8 +218,6 @@ public class CatzElevator extends SubsystemBase {
     return inputs.positionRads;
   }
 
-
-
   public boolean isElevatorInPosition() {
     boolean isElevatorSettled = false;
     boolean isElevatorInPos = (Math.abs((getElevatorPositionRads() - targetPosition.getTargetPositionRads())) < 1.5);
@@ -228,11 +226,11 @@ public class CatzElevator extends SubsystemBase {
       if(settlingCounter >= 10) {
         isElevatorSettled = true;
         settlingCounter = 0;
-        // System.out.println("////////////ELEVATOR SETTLED FOR .2 SECONDS///////////////////");
+         //System.out.println("////////////ELEVATOR SETTLED FOR .2 SECONDS///////////////////");
       }
     } else {
-      // System.out.println("-----IN POSITION-----");
       isElevatorSettled = false;
+      settlingCounter = 0;
     }
     return isElevatorSettled;
   }
@@ -243,31 +241,17 @@ public class CatzElevator extends SubsystemBase {
     io.setBrakeMode(breakModeEnabled);
   }
 
-  public void runCharacterization(double amps) {
-    isCharacterizing = true;
-    io.runCurrent(amps);
-  }
-
   public double getCharacterizationVelocity() {
     return inputs.velocityRadsPerSec;
   }
 
-  public void endCharacterization() {
-    isCharacterizing = false;
-  }
-
-
-  public void elevatorManual(Supplier<Double> manualSupplier) {
-    targetManualPosition += manualSupplier.get() * MANUAL_SCALE;
-    System.out.println(targetManualPosition);
+  public void elevatorFullManual(double manualPower) {
+    this.elevatorSpeed = manualPower;
     targetPosition = ElevatorPosition.PosManual;
   }
 
-  public Command elevatorManualMode(Supplier<Double> manualSupplier) {
-    return run(() -> elevatorManual(manualSupplier)).alongWith(Commands.print("hi"));
-  }
-
   public Command elevatorFullManual(Supplier<Double> manuaSupplier) {
-    return run(()->io.runMotor(manuaSupplier.get())).alongWith(Commands.print("full manual"));
+
+    return run(() -> elevatorFullManual(manuaSupplier.get()));
   }
 }

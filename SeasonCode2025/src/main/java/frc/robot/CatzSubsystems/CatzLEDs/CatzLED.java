@@ -223,7 +223,7 @@ public class CatzLED extends VirtualSubsystem {
       if (lastEnabledAuto && Timer.getFPGATimestamp() - lastEnabledTime < autoFadeMaxTime) {
         // Auto fade
         solid(1.0 - ((Timer.getFPGATimestamp() - lastEnabledTime) / autoFadeTime), Color.kGreen);
-      } 
+      }
       // MODE AUTON
     } else if (DriverStation.isAutonomous()) {
       wave(Color.kGold, Color.kDarkBlue, waveFastCycleLength, waveFastDuration);
@@ -270,7 +270,7 @@ public class CatzLED extends VirtualSubsystem {
             aquaColorONE   = Color.kRed;
             aquaColorONE   = Color.kGold;
             aquaColorTHREE = Color.kBeige;
-            aquaColorFOUR  = Color.kPurple;          
+            aquaColorFOUR  = Color.kPurple;
           } else {
             aquaColorONE = Color.kBlack;
           }
@@ -279,14 +279,14 @@ public class CatzLED extends VirtualSubsystem {
             buildElevator(aquaColorONE, aquaColorTWO, aquaColorTHREE, aquaColorFOUR);
           } else {
             strobeElevator(Color.kAqua, Color.kBlack, breathDuration);
-          }        
+          }
         break;
         case BALLS:
           if(CatzSuperstructure.getCurrentCoralState() == CoralState.IN_OUTTAKE) {
             setSolidElevatorColor(Color.kWhite);
           } else {
             strobeElevator(Color.kWhite, Color.kBlack, breathDuration);
-          }           
+          }
         break;
         case CLIMB:
           rainbowCrossbar(rainbowCycleLength, rainbowDuration);
@@ -336,7 +336,7 @@ public class CatzLED extends VirtualSubsystem {
   //-------------------------------------------------------------------------------------------------------
   //
   //    LED factory methods
-  //  
+  //
   //-------------------------------------------------------------------------------------------------------
   // LED SOLID
   private void setSolidElevatorColor(Color color) {

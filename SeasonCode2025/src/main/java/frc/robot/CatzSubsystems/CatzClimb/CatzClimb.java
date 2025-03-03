@@ -29,7 +29,7 @@ public class CatzClimb extends SubsystemBase {
 
   static double manualPow = 0;
   static boolean isManual;
-  static final double MANUAL_SCALE = 5;
+  static final double MANUAL_SCALE = 2.0;
   static double position;
   static LoggedTunableNumber tunnablePos = new LoggedTunableNumber("Climb/TunnablePosition", 1);
   static LoggedTunableNumber kP = new LoggedTunableNumber("Climb/kP", 0.17);
@@ -40,12 +40,14 @@ public class CatzClimb extends SubsystemBase {
   static LoggedTunableNumber kV = new LoggedTunableNumber("Climb/kV", 0);
   static LoggedTunableNumber kA = new LoggedTunableNumber("Climb/kA", 0);
 
+
   @RequiredArgsConstructor
-  public enum Position { //In degrees
+  public enum ClimbPosition { //In Rotations //TBD
     RETRACT(() -> -46),
     HOME(() -> 0.0),
-    FULLTURN(() -> 90),
+    FULLTURN(() -> -648.0),
     MANUAL(() -> manualPow),
+    FULL_MANUAL(() -> 0.0),
     TUNNABLE(tunnablePos);
 
     private final DoubleSupplier motionType;
@@ -54,6 +56,8 @@ public class CatzClimb extends SubsystemBase {
       return motionType.getAsDouble();
     }
   }
+
+  private ClimbPosition targetPosition = ClimbPosition.HOME;
 
   public CatzClimb() {
     if(isClimbDisabled) { //Comes from Climb Constants
@@ -84,45 +88,57 @@ public class CatzClimb extends SubsystemBase {
     if (DriverStation.isDisabled()) {
 
     } else {
-      if(isManual == false) {
+      if(targetPosition == ClimbPosition.FULL_MANUAL) {
+        io.setPower(manualPow);
+        System.out.println("full");
+      } else if(targetPosition == ClimbPosition.MANUAL) {
+        io.setPosition(position);
+        System.out.println("semi");
+      } else if(targetPosition != ClimbPosition.MANUAL && targetPosition != ClimbPosition.FULL_MANUAL) {
+        System.out.println("Target");
         io.setPosition(position);
       } else {
-
+        io.setPower(0.0);
       }
     }
+
     Logger.recordOutput("Position/targetPosition", position);
   }
 
   public Command Climb_Home() {
-    return runOnce(() -> setClimbPos(Position.HOME));
+    return runOnce(() -> setClimbPos(ClimbPosition.HOME));
   }
 
   public Command Climb_Retract() {
-    return runOnce(() -> setClimbPos(Position.RETRACT));
+    return runOnce(() -> setClimbPos(ClimbPosition.RETRACT));
   }
 
   public Command Climb_Full() {
-    return runOnce(() -> setClimbPos(Position.FULLTURN));
+    return runOnce(() -> setClimbPos(ClimbPosition.FULLTURN));
   }
 
   public Command Climb_Tunnable() {
-    return runOnce(() -> setClimbPos(Position.TUNNABLE));
+    return runOnce(() -> setClimbPos(ClimbPosition.TUNNABLE));
   }
 
-  public void setClimbPos(Position target) {
+  public void setClimbPos(ClimbPosition target) {
     position = target.getTargetMotionPosition();
-    isManual = false;
+    targetPosition = target;
   }
 
-  public void climbSemiManual(Supplier<Double> manualSupplier) {
-    position += manualSupplier.get() * MANUAL_SCALE;
+  public void climbSemiManual(double manualSemiPwr) {
+    double previousPos = position;
+    position += manualSemiPwr * MANUAL_SCALE;
+    if (Math.abs(manualSemiPwr) < 0.1) {
+      position = previousPos;
+    }
     // System.out.println(position);
-    isManual = false;
+    targetPosition = ClimbPosition.MANUAL;
   }
 
   public void climbFullManual(double joystickPower) {
-    io.setPower(joystickPower);
-    isManual = true;
+    manualPow = joystickPower * 0.5;
+    targetPosition = ClimbPosition.FULL_MANUAL;
   }
 
   public Command ClimbManualMode(Supplier<Double> manualSupplier) {

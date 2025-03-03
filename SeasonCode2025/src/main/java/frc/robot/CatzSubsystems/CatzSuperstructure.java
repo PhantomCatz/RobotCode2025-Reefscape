@@ -52,6 +52,7 @@ public class CatzSuperstructure extends VirtualSubsystem {
         INTAKE_CORAL_GROUND,
         INTAKE_CORAL_STATION,
         INTAKE_ALGAE_GROUND,
+        GOBBLE_ALGAE,
         L1_CORAL,
         L2_CORAL,
         L3_CORAL,
@@ -61,6 +62,7 @@ public class CatzSuperstructure extends VirtualSubsystem {
         L3_AIMING,
         L4_AIMING,
         PROCESSOR,
+        NET_ALGAE,
         BOT_ALGAE,
         TOP_ALGAE,
         CLIMB
@@ -128,6 +130,21 @@ public class CatzSuperstructure extends VirtualSubsystem {
                         break;
                     }
                 } else {
+                    switch(level) {
+                        case 2:
+                            currentRobotState = RobotState.PROCESSOR;
+                            System.out.println("Processor");
+                            robotActionCommand = CatzStateCommands.processor(container);
+                            break;
+                        case 4:
+                            currentRobotState = RobotState.NET_ALGAE;
+                            System.out.println("Net Algae");
+                            robotActionCommand = CatzStateCommands.netAlgae(container);
+                            break;
+                        default:
+                            robotActionCommand = Commands.none();
+                            break;
+                    }
                     currentRobotState = RobotState.PROCESSOR;
                     robotActionCommand = CatzStateCommands.processor(container);
                     System.out.println("Processor");
@@ -187,6 +204,7 @@ public class CatzSuperstructure extends VirtualSubsystem {
                             robotActionCommand = CatzStateCommands.botAlgae(container);
                             break;
                         default:
+                            robotActionCommand = CatzStateCommands.stow(container);
                             break;
                     }
                 }
@@ -195,15 +213,15 @@ public class CatzSuperstructure extends VirtualSubsystem {
             // Intake Algae Ground or Coral Ground
             case INTAKE_GROUND:
                 if(chosenGamepiece == Gamepiece.CORAL) {
-                        currentRobotState = RobotState.INTAKE_CORAL_GROUND;
-                        System.out.println("Intake coral ground");
-                        robotActionCommand = CatzStateCommands.intakeCoralGround(container);
+                    currentRobotState = RobotState.INTAKE_CORAL_GROUND;
+                    System.out.println("Intake coral ground");
+                    robotActionCommand = CatzStateCommands.intakeCoralGround(container);
 
 
                 } else {
-                    currentRobotState = RobotState.INTAKE_ALGAE_GROUND;
-                    System.out.println("Intake algae");
-                    robotActionCommand = CatzStateCommands.intakeAlgae(container);
+                    currentRobotState = RobotState.GOBBLE_ALGAE;
+                    System.out.println("Gob algae");
+                    robotActionCommand = container.getAlgaePivot().AlgaePivot_Punch();
 
                 }
                 break;

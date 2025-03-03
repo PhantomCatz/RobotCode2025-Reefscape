@@ -69,9 +69,9 @@ public class ClimbIOReal implements ClimbIO {
     config.MotorOutput.NeutralMode = NeutralModeValue.Brake;
 
 
-    config.MotionMagic.MotionMagicCruiseVelocity = 80;
-    config.MotionMagic.MotionMagicAcceleration = 400;
-    config.MotionMagic.MotionMagicJerk = 1600;
+    config.MotionMagic.MotionMagicCruiseVelocity = 100;
+    config.MotionMagic.MotionMagicAcceleration = 600;
+    config.MotionMagic.MotionMagicJerk = 2000;
 
     climbMotor.getConfigurator().apply(config, 1.0);
 
@@ -107,6 +107,7 @@ public class ClimbIOReal implements ClimbIO {
 
   @Override
   public void setPower(double power) {
+    System.out.println("climb set power: " + power);
     climbMotor.set(power);
   }
 
