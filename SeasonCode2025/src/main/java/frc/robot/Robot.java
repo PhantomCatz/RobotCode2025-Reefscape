@@ -228,11 +228,8 @@ public class Robot extends LoggedRobot {
     //------------------------------------------------------------------------------------------------
     VirtualSubsystem.periodicAll();
 
-    try{
-      CommandScheduler.getInstance().run();
-    }catch(Exception e){
-      e.printStackTrace();
-    }
+    CommandScheduler.getInstance().run();
+
 
     //-------------------------------------------------------------------------------------------------
     // Print auto duration

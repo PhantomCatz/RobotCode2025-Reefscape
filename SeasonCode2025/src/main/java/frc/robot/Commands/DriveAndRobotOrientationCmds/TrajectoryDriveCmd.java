@@ -260,15 +260,15 @@ public class TrajectoryDriveCmd extends Command {
   public boolean isFinished() {
     // System.out.println("vision: "
     // +tracker.getDEstimatedPose().getTranslation().getNorm() );
-    System.out.println("vision: " + (tracker.getVisionPoseShift().getNorm()) + " pose: " + translationError);
 
     // Event Command or timeout
     if (timer.hasElapsed(pathTimeOut) && !isEventCommandRunning) {
       System.out.println("timed out!!@)!*()*!)(#*)");
       return true;
     }
+    System.out.println("vision: " + (tracker.getVisionPoseShift().getNorm()) + " pose: " + translationError);
 
-    if (false && RobotContainer.getInstance().getCatzVision().isSeeingApriltag() && autoalign && tracker.getVisionPoseShift().getNorm() > ALLOWABLE_VISION_ADJUST) {
+    if (RobotContainer.getInstance().getCatzVision().isSeeingApriltag() && autoalign && tracker.getVisionPoseShift().getNorm() > ALLOWABLE_VISION_ADJUST) {
       // If trailing pose is within margin
       // System.out.println("vision is not true");
       return false;
@@ -306,7 +306,7 @@ public class TrajectoryDriveCmd extends Command {
       rotationError = 360 - rotationError;
     }
     // System.out.println("rotationerr: " + (rotationError < ALLOWABLE_OMEGA_ERROR));
-    System.out.println("speederr: " + currentMPS);
+    // System.out.println("speederr: " + currentMPS);
 
     return isPoseWithinThreshold(poseError) && rotationError < ALLOWABLE_OMEGA_ERROR &&
     (desiredMPS != 0.0 || (currentMPS < ALLOWABLE_VEL_ERROR && currentRPS < ALLOWABLE_OMEGA_ERROR));

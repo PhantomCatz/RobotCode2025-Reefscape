@@ -43,8 +43,7 @@ public class ElevatorConstants {
     public static final int LEFT_LEADER_ID  = 30;
     public static final int RIGHT_FOLLOWER_ID = 31;
 
-    public static final int BOT_LIMIT_SWITCH = 3;
-
+    public static final int BOT_LIMIT_SWITCH = 9;
 
     public static final double elevatorLength =
         switch (CatzConstants.getRobotType()) {
