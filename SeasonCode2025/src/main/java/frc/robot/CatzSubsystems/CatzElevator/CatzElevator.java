@@ -226,6 +226,7 @@ public class CatzElevator extends SubsystemBase {
       if(settlingCounter >= 10) {
         isElevatorSettled = true;
         settlingCounter = 0;
+         //System.out.println("////////////ELEVATOR SETTLED FOR .2 SECONDS///////////////////");
       }
     } else {
       isElevatorSettled = false;

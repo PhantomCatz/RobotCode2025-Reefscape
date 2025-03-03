@@ -27,18 +27,22 @@ public class CatzRampPivot extends SubsystemBase {
   private final RampPivotIO io;
   private final RampPivotIOInputsAutoLogged inputs = new RampPivotIOInputsAutoLogged();
 
+  private RampPivotPositions rampPivotPositions = RampPivotPositions.PosStow;
+  private double rampPower = 0.0;
   public double targetPos = RampPivotPositions.PosStow.getTargetPositionRot();
   public double RampPivotFeedForward = 0.0;
   public static boolean isManual = false;
+
   @RequiredArgsConstructor
   public static enum RampPivotPositions {
     PosStow(() -> RAMP_STOW),
     PosClimb(() -> RAMP_CLIMB),
-    Pos3(() -> heightPlaceholder),
+    PosIntake(() -> RAMP_INTAKE),
     PosNull(() -> heightPlaceholder),
     PosManual(new LoggedTunableNumber("RampPivot/RampPivotManual",0.0));
 
     private final DoubleSupplier elevatorSetpointSupplier;
+
     private double getTargetPositionRot() {
       return elevatorSetpointSupplier.getAsDouble();
     }
@@ -75,10 +79,15 @@ public class CatzRampPivot extends SubsystemBase {
       io.stop();
       targetPos = RampPivotPositions.PosStow.getTargetPositionRot();
 
-    } else if(targetPos != RampPivotPositions.PosNull.getTargetPositionRot()){
+    } else if(rampPivotPositions != RampPivotPositions.PosNull &&
+              rampPivotPositions != RampPivotPositions.PosManual){
+      System.out.println("RaMp_PiVoT TaRgEt: " + targetPos);
       io.setPosition(targetPos, 0);
 
+    } else if (rampPivotPositions == RampPivotPositions.PosManual) {
+      io.runMotor(rampPower);
     } else {
+      System.out.println("no power");
       io.stop();
     }
     Logger.recordOutput("RampPivot/targetPos", targetPos);
@@ -89,15 +98,27 @@ public class CatzRampPivot extends SubsystemBase {
   }
 
   public void rampPivotSetManual(double manualSupplier) {
-    targetPos += manualSupplier * MANUAL_SCALE;
-
+    this.rampPower = manualSupplier * 0.1;
+    rampPivotPositions = RampPivotPositions.PosManual;
   }
 
-  public Command Ramp_Stow() {
-    return runOnce(() -> this.targetPos = RampPivotPositions.PosStow.getTargetPositionRot());
+  // public void rampPivotSetManual(double manualSupplier) {
+  //   targetPos += manualSupplier * MANUAL_SCALE;
+  // }
+
+   public void setRampPos(RampPivotPositions target) {
+    this.targetPos = target.getTargetPositionRot();
   }
 
-  public Command Ramp_Climb() {
-    return runOnce(() -> this.targetPos = RampPivotPositions.PosClimb.getTargetPositionRot());
+  public Command Ramp_Stow_Pos() {
+    return runOnce(() -> setRampPos(RampPivotPositions.PosStow));
+  }
+
+  public Command Ramp_Intake_Pos() {
+    return runOnce(() -> setRampPos(RampPivotPositions.PosIntake));
+  }
+
+  public Command Ramp_Climb_Pos() {
+    return runOnce(() -> setRampPos(RampPivotPositions.PosClimb));
   }
 }

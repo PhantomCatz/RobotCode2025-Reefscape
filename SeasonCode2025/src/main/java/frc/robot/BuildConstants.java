@@ -13,6 +13,7 @@ public final class BuildConstants {
   public static final String GIT_BRANCH = "tune-auto-speeds";
   public static final String BUILD_DATE = "2025-03-03 18:11:33 EST";
   public static final long BUILD_UNIX_TIME = 1741043493468L;
+
   public static final int DIRTY = 1;
 
   private BuildConstants(){}

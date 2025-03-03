@@ -18,20 +18,19 @@ public class RampPivotConstants {
 
     public static final int RAMP_PIVOT_MTR_ID = 41;
 
-    public static final double MANUAL_SCALE = 5;
-
-
+    public static final double MANUAL_SCALE =  45 * 48 / 14;
     public static final int STALL_CURRENT_LIMIT = 30; //TODO
 
     public static final double RAMP_STOW = 0;
-    public static final double RAMP_CLIMB = 40;
-    public static final double heightPlaceholder = 30;
+    public static final double RAMP_INTAKE = -13.498535;
+    public static final double RAMP_CLIMB = -37.810546;
+    public static final double heightPlaceholder = -10;
 
     // Initial PIDF and motion magic assignment
     public static final Gains gains =
         switch (CatzConstants.getRobotType()) {
-            case SN2 -> new Gains(12.0, 0.0, 0.0, 0.0, 0.0, 0.13, 0.0);
-            case SN1 -> new Gains(12.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0);
+            case SN2 -> new Gains(1.75, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0);
+            case SN1 -> new Gains(0.015, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0);
             case SN_TEST, SN1_2024 -> new Gains(7000.0, 0.0, 250.0, 8.4, 0.2, 0.2, 22.9);
         };
 
