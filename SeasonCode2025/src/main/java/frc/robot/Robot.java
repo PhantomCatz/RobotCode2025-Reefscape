@@ -227,7 +227,9 @@ public class Robot extends LoggedRobot {
     // Run Subsystem Periodics
     //------------------------------------------------------------------------------------------------
     VirtualSubsystem.periodicAll();
+
     CommandScheduler.getInstance().run();
+
 
     //-------------------------------------------------------------------------------------------------
     // Print auto duration

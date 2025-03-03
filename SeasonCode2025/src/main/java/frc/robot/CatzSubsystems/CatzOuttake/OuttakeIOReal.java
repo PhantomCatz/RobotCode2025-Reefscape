@@ -59,7 +59,6 @@ public class OuttakeIOReal implements OuttakeIO {
     config.MotorOutput.NeutralMode = NeutralModeValue.Brake;
 
     IntakeCoralMtr.setPosition(0);
-
     IntakeCoralMtr.getConfigurator().apply(config, 1.0);
 
     beamBreakBck = new DigitalInput(BACK_BEAM_BREAK_ID);
@@ -75,10 +74,15 @@ public class OuttakeIOReal implements OuttakeIO {
   public void updateInputs(OuttakeIOInputs inputs) {
     inputs.bbreakFrntTriggered = !beamBreakFrnt.get();
     inputs.bbreakBackTriggered = !beamBreakBck.get();
-    inputs.leftAppliedVolts        = OuttakeLeftMtr.getBusVoltage();
-    inputs.rightAppliedVolts   = OuttakeRightMtr.getBusVoltage();
+
+    inputs.leftAppliedVolts = OuttakeLeftMtr.getBusVoltage();
+    inputs.rightAppliedVolts = OuttakeRightMtr.getBusVoltage();
+
+    inputs.velocityRpmLeft = OuttakeLeftMtr.getEncoder().getVelocity();
+    inputs.velocityRpmRight = OuttakeRightMtr.getEncoder().getVelocity();
+
     inputs.leftCurrentAmps = OuttakeLeftMtr.getOutputCurrent();
-    inputs.rightAppliedVolts = OuttakeRightMtr.getOutputCurrent();
+    inputs.rightCurrentAmps = OuttakeRightMtr.getOutputCurrent();
   }
 
   @Override

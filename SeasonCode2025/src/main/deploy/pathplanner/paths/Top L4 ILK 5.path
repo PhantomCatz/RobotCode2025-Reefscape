@@ -3,29 +3,29 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 1.3785860655737705,
-        "y": 7.003944672131147
+        "x": 1.1867827868852459,
+        "y": 7.027920081967213
       },
       "prevControl": null,
       "nextControl": {
-        "x": 2.229713114754098,
-        "y": 6.63232581967213
+        "x": 2.0379098360655736,
+        "y": 6.6563012295081965
       },
       "isLocked": false,
       "linkedName": "Coral-Top"
     },
     {
       "anchor": {
-        "x": 3.692213114754098,
-        "y": 5.085911885245901
+        "x": 3.9799180327868857,
+        "y": 5.313678278688524
       },
       "prevControl": {
-        "x": 3.1527663934426218,
-        "y": 5.637346311475408
+        "x": 3.4404713114754095,
+        "y": 5.865112704918031
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": "Coral-K"
+      "linkedName": "Reef-K"
     }
   ],
   "rotationTargets": [],
@@ -33,8 +33,8 @@
   "pointTowardsZones": [],
   "eventMarkers": [],
   "globalConstraints": {
-    "maxVelocity": 3.0,
-    "maxAcceleration": 3.0,
+    "maxVelocity": 3.5,
+    "maxAcceleration": 3.5,
     "maxAngularVelocity": 540.0,
     "maxAngularAcceleration": 720.0,
     "nominalVoltage": 12.0,

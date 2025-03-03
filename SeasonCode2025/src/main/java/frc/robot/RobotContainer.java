@@ -18,8 +18,10 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Autonomous.CatzAutonomous;
+
 import frc.robot.CatzConstants.XboxInterfaceConstants;
 import frc.robot.CatzSubsystems.CatzStateCommands;
+
 import frc.robot.CatzSubsystems.CatzSuperstructure;
 import frc.robot.CatzSubsystems.CatzAlgaeEffector.CatzAlgaePivot.CatzAlgaePivot;
 import frc.robot.CatzSubsystems.CatzAlgaeEffector.CatzAlgaeRemover.CatzAlgaeRemover;
@@ -44,6 +46,7 @@ import frc.robot.Utilities.Alert.AlertType;
 import org.littletonrobotics.junction.networktables.LoggedNetworkNumber;
 
 public class RobotContainer {
+
   private double SCORE_TRIGGER_THRESHHOLD = 0.8;
 
   // -------------------------------------------------------------------------------------------------------------------
@@ -71,7 +74,7 @@ public class RobotContainer {
   private CommandXboxController xboxDrv = new CommandXboxController(0);
   private CommandXboxController xboxAux = new CommandXboxController(1);
   private CommandXboxController xboxTest = new CommandXboxController(2);
-  private TeleopPosSelector selector = new TeleopPosSelector(xboxAux, this);
+  private TeleopPosSelector selector;
 
 
   // -------------------------------------------------------------------------------------------------------------------
@@ -90,6 +93,7 @@ public class RobotContainer {
   public RobotContainer() {
     outtake = new CatzOuttake(this);
     auto = new CatzAutonomous(this);
+    selector = new TeleopPosSelector(xboxAux, this);
 
     // Drive And Aux Command Mapping
     configureBindings();
@@ -166,8 +170,8 @@ public class RobotContainer {
     // xboxDrv.leftTrigger(SCORE_TRIGGER_THRESHHOLD).onTrue(new InstantCommand(() -> superstructure.setCurrentRobotAction(RobotAction.OUTTAKE)));
 
     // Default driving
-    Trigger escapeTrajectory = new Trigger(()->(xboxDrv.getLeftY() > XboxInterfaceConstants.kDeadband));
-    escapeTrajectory.onTrue(drive.cancelTrajectory());
+    Trigger escapeTrajectory = new Trigger(()->(xboxDrv.getLeftY() > 0.8));
+    escapeTrajectory.onTrue(selector.cancelCurrentDrivetrainCommand().alongWith(selector.cancelAutoCommand()));
     drive.setDefaultCommand(new TeleopDriveCmd(() -> xboxDrv.getLeftX(), () -> xboxDrv.getLeftY(), () -> xboxDrv.getRightX(), drive));
 
     // Manual Climb Control
@@ -195,13 +199,14 @@ public class RobotContainer {
     xboxAux.button(8).onTrue(new InstantCommand(() -> selector.toggleRightStation()).alongWith(Commands.runOnce(() -> led.setControllerState(ControllerLEDState.BALLS))));
 
     // Gamepiece Selection
-    xboxAux.start().onTrue(Commands.runOnce(() -> superstructure.setChosenGamepiece(Gamepiece.CORAL)).alongWith(Commands.runOnce(() -> led.setControllerState(ControllerLEDState.FULL_MANUAL))));
-    xboxAux.back().onTrue(Commands.runOnce(() -> superstructure.setChosenGamepiece(Gamepiece.ALGAE)).alongWith(Commands.runOnce(() -> led.setControllerState(ControllerLEDState.REMOVE_ALGAE))));
 
-    xboxAux.y().onTrue(Commands.runOnce(() -> superstructure.setCurrentRobotAction(RobotAction.OUTTAKE)).alongWith(Commands.print("OUTTAKE L" + superstructure.getLevel())));
-    xboxAux.x().onTrue(Commands.runOnce(() -> superstructure.setCurrentRobotAction(RobotAction.INTAKE)).alongWith(Commands.print("INTAKE")));
-    xboxAux.b().onTrue(Commands.runOnce(() -> superstructure.setCurrentRobotAction(RobotAction.INTAKE_GROUND)).alongWith(Commands.print("INTAKEGROUND")));
-    xboxAux.a().onTrue(Commands.runOnce(() -> superstructure.setCurrentRobotAction(RobotAction.STOW)).alongWith(Commands.print("STOWWW")));
+    xboxAux.leftTrigger().onTrue(Commands.runOnce(() -> superstructure.setChosenGamepiece(Gamepiece.CORAL)).alongWith(Commands.runOnce(() -> led.setControllerState(ControllerLEDState.FULL_MANUAL))));
+    // xboxAux.rightTrigger().onTrue(Commands.runOnce(() -> superstructure.setChosenGamepiece(Gamepiece.ALGAE)).alongWith(Commands.runOnce(() -> led.setControllerState(ControllerLEDState.REMOVE_ALGAE))));
+
+    xboxAux.y().onTrue(Commands.runOnce(() -> superstructure.setCurrentRobotAction(RobotAction.OUTTAKE, "container")).alongWith(Commands.print("OUTTAKE L" + superstructure.getLevel())));
+    xboxAux.x().onTrue(Commands.runOnce(() -> superstructure.setCurrentRobotAction(RobotAction.INTAKE, "container")).alongWith(Commands.print("INTAKE")));
+    xboxAux.b().onTrue(Commands.runOnce(() -> superstructure.setCurrentRobotAction(RobotAction.INTAKE_GROUND, "container")).alongWith(Commands.print("INTAKEGROUND")));
+    xboxAux.a().onTrue(Commands.runOnce(() -> superstructure.setCurrentRobotAction(RobotAction.STOW, "container")).alongWith(Commands.print("STOWWW")));
 
     xboxAux.a().onTrue(Commands.runOnce(() -> System.out.println("L:"+superstructure.getLevel()+", "+superstructure.getChosenGamepiece())));
 

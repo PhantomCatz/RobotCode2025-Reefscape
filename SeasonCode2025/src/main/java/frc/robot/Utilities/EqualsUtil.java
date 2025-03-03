@@ -25,5 +25,11 @@ public class EqualsUtil {
           && EqualsUtil.epsilonEquals(twist.dy, other.dy)
           && EqualsUtil.epsilonEquals(twist.dtheta, other.dtheta);
     }
+
+    public static boolean epsilonEquals(Twist2d twist, Twist2d other, double epsilon) {
+      return EqualsUtil.epsilonEquals(twist.dx, other.dx, epsilon)
+          && EqualsUtil.epsilonEquals(twist.dy, other.dy, epsilon)
+          && EqualsUtil.epsilonEquals(twist.dtheta, other.dtheta, epsilon);
+    }
   }
 }

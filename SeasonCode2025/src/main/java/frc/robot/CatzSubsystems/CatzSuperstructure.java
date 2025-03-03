@@ -94,13 +94,13 @@ public class CatzSuperstructure extends VirtualSubsystem {
 
     }
 
-    public void setCurrentRobotAction(RobotAction action){
+    public void setCurrentRobotAction(RobotAction action, String from){
+        System.out.println("from: " + from + action);
         setCurrentRobotAction(action, level);
     }
 
     public void setCurrentRobotAction(RobotAction action, int level) {
         Command robotActionCommand = Commands.print("No robot Action Selected");
-        RobotState prevRobotState = currentRobotState;
         this.currentRobotAction = action;
 
         switch(currentRobotAction) {
@@ -147,7 +147,7 @@ public class CatzSuperstructure extends VirtualSubsystem {
                     }
                     currentRobotState = RobotState.PROCESSOR;
                     robotActionCommand = CatzStateCommands.processor(container);
-                    System.out.println("Processor");
+                    // System.out.println("Processor");
 
                 }
                 break;
@@ -179,38 +179,38 @@ public class CatzSuperstructure extends VirtualSubsystem {
                 } else {
                     currentRobotState = RobotState.PROCESSOR;
                     robotActionCommand = CatzStateCommands.processor(container);
-                    System.out.println("Processor");
+                    // System.out.println("Processor");
 
                 }
                 break;
 
             // Intake Algae From Reef or Coral from Coral Substation
             case INTAKE:
-
-                if(chosenGamepiece == Gamepiece.CORAL) {
-                        currentRobotState = RobotState.INTAKE_CORAL_STATION;
-                        System.out.println("Intake coral station");
-                        robotActionCommand = CatzStateCommands.intakeCoralStation(container);
-                } else {
-                    switch (level) {
-                        case 2:
-                            currentRobotState = RobotState.TOP_ALGAE;
-                            System.out.println("TOP algae");
-                            robotActionCommand = CatzStateCommands.topAlgae(container);
-                            break;
-                        case 4:
-                            currentRobotState = RobotState.BOT_ALGAE;
-                            System.out.println("BOT algae");
-                            robotActionCommand = CatzStateCommands.botAlgae(container);
-                            break;
-                        default:
-                            robotActionCommand = CatzStateCommands.stow(container);
-                            break;
-                    }
-                }
+                currentRobotState = RobotState.INTAKE_CORAL_STATION;
+                robotActionCommand = CatzStateCommands.intakeCoralStation(container);
                 break;
+                // if(chosenGamepiece == Gamepiece.CORAL) {
+
+                // } else {
+                //     switch (level) {
+                //         case 2:
+                //             currentRobotState = RobotState.TOP_ALGAE;
+                //             System.out.println("TOP algae");
+                //             robotActionCommand = CatzStateCommands.topAlgae(container);
+                //             break;
+                //         case 4:
+                //             currentRobotState = RobotState.BOT_ALGAE;
+                //             System.out.println("BOT algae");
+                //             robotActionCommand = CatzStateCommands.botAlgae(container);
+                //             break;
+                //         default:
+                //             break;
+                //     }
+                // }
+                // break;
 
             // Intake Algae Ground or Coral Ground
+
             case INTAKE_GROUND:
                 if(chosenGamepiece == Gamepiece.CORAL) {
                     currentRobotState = RobotState.INTAKE_CORAL_GROUND;
@@ -223,8 +223,8 @@ public class CatzSuperstructure extends VirtualSubsystem {
                     System.out.println("Gob algae");
                     robotActionCommand = container.getAlgaePivot().AlgaePivot_Punch();
 
-                }
-                break;
+                 }
+                 break;
 
             // Sets All Mechanisms to Base Positions
             default:
@@ -233,11 +233,7 @@ public class CatzSuperstructure extends VirtualSubsystem {
                 robotActionCommand = CatzStateCommands.stow(container);
                 break;
         }
-
-        if(prevRobotState != currentRobotState){
-            System.out.println("scheudled: " + currentRobotState.toString());
-            robotActionCommand.schedule();
-        }
+        robotActionCommand.schedule();
     }
 
 

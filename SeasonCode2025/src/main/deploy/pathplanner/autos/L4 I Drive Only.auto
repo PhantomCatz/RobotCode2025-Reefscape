@@ -7,61 +7,43 @@
         {
           "type": "named",
           "data": {
-            "name": "Top L4 ILK 1"
+            "name": "L4 I 1"
           }
         },
         {
           "type": "named",
           "data": {
-            "name": "L4Coral"
+            "name": "L4 I 2"
           }
         },
         {
           "type": "named",
           "data": {
-            "name": "Top L4 ILK 2"
+            "name": "L4 I 3"
           }
         },
         {
           "type": "named",
           "data": {
-            "name": "IntakeCoralStation"
+            "name": "L4 I 4"
           }
         },
         {
           "type": "named",
           "data": {
-            "name": "Top L4 ILK 3"
+            "name": "L4 I 5"
           }
         },
         {
           "type": "named",
           "data": {
-            "name": "L3Coral"
+            "name": "L4 I 6"
           }
         },
         {
           "type": "named",
           "data": {
-            "name": "Top L4 ILK 4"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "IntakeCoralStation"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "Top L4 ILK 5"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "L2Coral"
+            "name": "L4 I 7"
           }
         }
       ]

@@ -17,7 +17,8 @@ public interface OuttakeIO {
     public boolean isIntakeIOMotorConnected = true;
 
     public double positionMechs = 0.0;
-    public double velocityRpm = 0.0;
+    public double velocityRpmLeft = 0.0;
+    public double velocityRpmRight = 0.0;
     public double leftAppliedVolts = 0.0;
     public double rightAppliedVolts = 0.0;
     public double leftCurrentAmps = 0.0;

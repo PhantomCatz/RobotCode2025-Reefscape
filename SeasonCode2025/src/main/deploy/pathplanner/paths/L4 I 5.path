@@ -3,29 +3,29 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 5.3,
-        "y": 5.072
-      },
-      "prevControl": null,
-      "nextControl": {
-        "x": 4.55061475409836,
-        "y": 5.925125
-      },
-      "isLocked": false,
-      "linkedName": "Reef-I"
-    },
-    {
-      "anchor": {
         "x": 1.1867827868852459,
         "y": 7.027920081967213
       },
+      "prevControl": null,
+      "nextControl": {
+        "x": 1.97797131147541,
+        "y": 6.584375
+      },
+      "isLocked": false,
+      "linkedName": "Coral-Top"
+    },
+    {
+      "anchor": {
+        "x": 3.9799180327868857,
+        "y": 5.313678278688524
+      },
       "prevControl": {
-        "x": 2.277663934426229,
-        "y": 6.548411885245901
+        "x": 3.2007172131147548,
+        "y": 5.8171618852459
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": "Coral-Top"
+      "linkedName": "Reef-K"
     }
   ],
   "rotationTargets": [],
@@ -42,13 +42,13 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": -53.67317404787977
+    "rotation": -59.99999999999999
   },
   "reversed": false,
-  "folder": "Top L4 ILK Paths",
+  "folder": "L4 I Paths",
   "idealStartingState": {
     "velocity": 0,
-    "rotation": -119.99999999999999
+    "rotation": -53.67317404787977
   },
   "useDefaultConstraints": true
 }

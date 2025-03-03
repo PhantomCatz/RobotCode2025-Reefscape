@@ -28,7 +28,6 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.FieldConstants.Reef;
 import frc.robot.Utilities.AllianceFlipUtil;
 import frc.robot.Utilities.CornerTrackingPathfinder;
-import frc.robot.CatzSubsystems.CatzSuperstructure.CoralState;
 import frc.robot.CatzSubsystems.CatzSuperstructure.LeftRight;
 import frc.robot.CatzSubsystems.CatzSuperstructure.RobotAction;
 import frc.robot.CatzSubsystems.CatzSuperstructure;
@@ -37,6 +36,7 @@ import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.Drivetrain.CatzDriv
 import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.Drivetrain.DriveConstants;
 import frc.robot.CatzSubsystems.CatzLEDs.CatzLED;
 import frc.robot.CatzSubsystems.CatzLEDs.CatzLED.QueueLEDState;
+import frc.robot.CatzSubsystems.CatzOuttake.CatzOuttake;
 import frc.robot.Commands.DriveAndRobotOrientationCmds.DriveAndCycle;
 import frc.robot.Commands.DriveAndRobotOrientationCmds.TrajectoryDriveCmd;
 
@@ -54,6 +54,7 @@ public class TeleopPosSelector {
 
   private CatzSuperstructure superstructure;
   private CatzDrivetrain drivetrain;
+  private CatzOuttake outtake;
   private CatzRobotTracker tracker = CatzRobotTracker.getInstance();
 
   private Command currentDrivetrainCommand = new InstantCommand();
@@ -74,6 +75,7 @@ public class TeleopPosSelector {
   public TeleopPosSelector(CommandXboxController aux, RobotContainer container) {
     this.xboxAux = aux;
     this.m_container = container;
+    this.outtake = container.getCatzOuttake();
     this.currentDrivetrainCommand.addRequirements(container.getCatzDrivetrain());
     //this.currentAutoplayCommand.addRequirements(container.getCatzDrivetrain());
 
@@ -341,7 +343,7 @@ public class TeleopPosSelector {
       path = path.flipPath();
     }
 
-    currentDrivetrainCommand = new TrajectoryDriveCmd(path, drivetrain, true);
+    currentDrivetrainCommand = new TrajectoryDriveCmd(path, drivetrain, true, m_container);
     currentDrivetrainCommand.schedule();
   }
 
@@ -360,25 +362,18 @@ public class TeleopPosSelector {
         direction = direction.times(-1);
       }
 
-      if(currentPathfindingPair.getFirst() == 5 ||currentPathfindingPair.getFirst() == 0 ||currentPathfindingPair.getFirst() == 0){
+      if(currentPathfindingPair.getFirst() == 5 ||currentPathfindingPair.getFirst() == 0 ||currentPathfindingPair.getFirst() == 1){
         direction = direction.times(-1);
       }
 
       Translation2d goalPos = currentPos.plus(direction.times(10));
-
-      PathConstraints PATHFINDING_CONSTRAINTS = new PathConstraints( // 540 // 720
-                                                                        1.0,
-                                                                        DriveConstants.DRIVE_CONFIG.maxLinearAcceleration(), // max vel causing messup
-                                                                        DriveConstants.DRIVE_CONFIG.maxAngularVelocity(),
-                                                                        DriveConstants.DRIVE_CONFIG.maxAngularAcceleration()
-                                                                );
 
       PathPlannerPath path = new PathPlannerPath(
         Arrays.asList(new Waypoint[] {
             new Waypoint(null, currentPos, currentPos.plus(direction)),
             new Waypoint(goalPos.minus(direction), goalPos, null)
         }),
-        PATHFINDING_CONSTRAINTS,
+        DriveConstants.LEFT_RIGHT_CONSTRAINTS,
         null,
         new GoalEndState(0, currentPos.getAngle()));
 
@@ -386,7 +381,7 @@ public class TeleopPosSelector {
         path = path.flipPath();
       }
 
-      currentDrivetrainCommand = new TrajectoryDriveCmd(path, drivetrain, true);
+      currentDrivetrainCommand = new TrajectoryDriveCmd(path, drivetrain, true, m_container);
       currentDrivetrainCommand.schedule();
   }
 
@@ -404,14 +399,14 @@ public class TeleopPosSelector {
         @Override
         public void initialize() {
           currentDrivetrainCommand.cancel();
-          currentDrivetrainCommand = runNextCommand();
+          currentDrivetrainCommand = getNextCommand();
           currentDrivetrainCommand.schedule();
         }
 
         @Override
         public void execute() {
-          if (currentDrivetrainCommand.isFinished()) {
-            currentDrivetrainCommand = runNextCommand();
+          if (!currentDrivetrainCommand.isScheduled() == true) { //haha L
+            currentDrivetrainCommand = getNextCommand();
             currentDrivetrainCommand.schedule();
           }
         }
@@ -423,7 +418,7 @@ public class TeleopPosSelector {
 
         @Override
         public void end(boolean interrupted) {
-          currentDrivetrainCommand.end(interrupted);
+          currentDrivetrainCommand.cancel();
         }
 
       };
@@ -431,7 +426,7 @@ public class TeleopPosSelector {
     });
   }
 
-  private Command runNextCommand() {
+  private Command getNextCommand() {
     Pair<Pair<Integer, LeftRight>, Integer> pair = pathQueuePeekFront();
 
     if (useFakeCoral) {
@@ -444,7 +439,7 @@ public class TeleopPosSelector {
         return getCoralStationCommand();
       }
     } else {
-      if (CatzSuperstructure.getCurrentCoralState() == CoralState.IN_OUTTAKE) {
+      if (outtake.hasCoral()) {
         if (queuedPaths.isEmpty())
           return new InstantCommand();
         return getReefScoreCommand(pair).andThen(new InstantCommand(() -> pathQueuePopFront()));
@@ -459,7 +454,7 @@ public class TeleopPosSelector {
     return new InstantCommand(() -> {
       currentPathfindingPair = getClosestReefPos().getFirst();
       currentDrivetrainCommand.cancel();
-      currentDrivetrainCommand = new TrajectoryDriveCmd(getPathfindingPath(calculateReefPose(currentPathfindingPair, true)), drivetrain, true);
+      currentDrivetrainCommand = new TrajectoryDriveCmd(getPathfindingPath(calculateReefPose(currentPathfindingPair, true)), drivetrain, true, m_container);
       currentDrivetrainCommand.schedule();
     });
   }

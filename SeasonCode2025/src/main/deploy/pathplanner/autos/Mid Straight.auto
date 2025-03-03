@@ -7,13 +7,13 @@
         {
           "type": "named",
           "data": {
-            "name": "left path"
+            "name": "mid path"
           }
         }
       ]
     }
   },
   "resetOdom": false,
-  "folder": null,
+  "folder": "Straight Auto",
   "choreoAuto": false
 }

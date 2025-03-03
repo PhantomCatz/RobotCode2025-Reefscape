@@ -21,11 +21,35 @@
           "data": {
             "name": "L4 I 3+ReefL4"
           }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "L4 I 4+CS"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "L4 I 5+ReefL4"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "L4 I 6+CS"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "L4 I 7+ReefL4"
+          }
         }
       ]
     }
   },
   "resetOdom": false,
-  "folder": null,
+  "folder": "4 Piece Auto",
   "choreoAuto": false
 }
