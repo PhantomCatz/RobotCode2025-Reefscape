@@ -186,7 +186,6 @@ public class CatzSuperstructure extends VirtualSubsystem {
             // Intake Algae From Reef or Coral from Coral Substation
             case INTAKE:
                 currentRobotState = RobotState.INTAKE_CORAL_STATION;
-                System.out.println("intaking coral is the way my child ");
                 robotActionCommand = CatzStateCommands.intakeCoralStation(container);
                 break;
                 // if(chosenGamepiece == Gamepiece.CORAL) {
@@ -228,15 +227,11 @@ public class CatzSuperstructure extends VirtualSubsystem {
             // Sets All Mechanisms to Base Positions
             default:
             case STOW:
-                System.out.println("ah you wish to stow you naive child");
                 currentRobotState = RobotState.STOW;
                 robotActionCommand = CatzStateCommands.stow(container);
                 break;
         }
-
-        System.out.println("thou wish has been scheudled");
         robotActionCommand.schedule();
-
     }
 
 

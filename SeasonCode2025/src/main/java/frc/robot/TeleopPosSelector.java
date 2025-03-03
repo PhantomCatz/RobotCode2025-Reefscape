@@ -362,25 +362,18 @@ public class TeleopPosSelector {
         direction = direction.times(-1);
       }
 
-      if(currentPathfindingPair.getFirst() == 5 ||currentPathfindingPair.getFirst() == 0 ||currentPathfindingPair.getFirst() == 0){
+      if(currentPathfindingPair.getFirst() == 5 ||currentPathfindingPair.getFirst() == 0 ||currentPathfindingPair.getFirst() == 1){
         direction = direction.times(-1);
       }
 
       Translation2d goalPos = currentPos.plus(direction.times(10));
-
-      PathConstraints PATHFINDING_CONSTRAINTS = new PathConstraints( // 540 // 720
-        1.0,
-        DriveConstants.DRIVE_CONFIG.maxLinearAcceleration(), // max vel causing messup
-        DriveConstants.DRIVE_CONFIG.maxAngularVelocity(),
-        DriveConstants.DRIVE_CONFIG.maxAngularAcceleration()
-      );
 
       PathPlannerPath path = new PathPlannerPath(
         Arrays.asList(new Waypoint[] {
             new Waypoint(null, currentPos, currentPos.plus(direction)),
             new Waypoint(goalPos.minus(direction), goalPos, null)
         }),
-        PATHFINDING_CONSTRAINTS,
+        DriveConstants.LEFT_RIGHT_CONSTRAINTS,
         null,
         new GoalEndState(0, currentPos.getAngle()));
 
