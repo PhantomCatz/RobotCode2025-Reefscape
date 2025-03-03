@@ -91,12 +91,6 @@ public class ElevatorIOReal implements ElevatorIO {
     config.MotionMagic.MotionMagicJerk = motionMagicParameters.mmJerk();
     config.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
 
-    // // Software Limits
-    // config.SoftwareLimitSwitch.ForwardSoftLimitEnable = true;
-    // config.SoftwareLimitSwitch.ForwardSoftLimitThreshold = Units.radiansToRotations(UPPER_LIMIT_RAD);
-    // config.SoftwareLimitSwitch.ReverseSoftLimitEnable = true;
-    // config.SoftwareLimitSwitch.ReverseSoftLimitThreshold = Units.radiansToRotations(LOWER_LIMIT_RAD);
-
     // Encoder Resetting
     leaderTalon.setPosition(0);
     followerTalon.setPosition(0);
@@ -154,8 +148,6 @@ public class ElevatorIOReal implements ElevatorIO {
     double setpointRotations = Units.radiansToRotations(setpointRads);
     leaderTalon.setControl(positionControl.withPosition(setpointRotations)
                                           .withFeedForward(feedforward));
-                                          // .withLimitForwardMotion(m_elevatorLimitTop.get())
-                                          // .withLimitReverseMotion(m_elevatorLimitBot.get()));
   }
 
   @Override
@@ -173,7 +165,6 @@ public class ElevatorIOReal implements ElevatorIO {
     config.Slot0.kP = kP;
     config.Slot0.kI = kI;
     config.Slot0.kD = kD;
-    System.out.println("kP: " + kP + " kI: " + kI + " kD: " + kD);
     leaderTalon.getConfigurator().apply(config);
   }
 
@@ -185,7 +176,7 @@ public class ElevatorIOReal implements ElevatorIO {
 
   @Override
   public void runMotor(double speed) {
-    // System.out.println(speed);
+    System.out.println(speed);
     leaderTalon.setControl(new DutyCycleOut(speed));
   }
 
@@ -194,7 +185,6 @@ public class ElevatorIOReal implements ElevatorIO {
     config.Slot0.kS = kS;
     config.Slot0.kV = kV;
     config.Slot0.kA = kA;
-    System.out.println("kS: " + kS + " kV: " + kV + " kA: " + kA);
     leaderTalon.getConfigurator().apply(config);
   }
 

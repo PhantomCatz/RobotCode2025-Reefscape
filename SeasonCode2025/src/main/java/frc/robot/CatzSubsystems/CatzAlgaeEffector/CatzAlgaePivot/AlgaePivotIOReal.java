@@ -67,7 +67,7 @@ public class AlgaePivotIOReal implements AlgaePivotIO {
     config.Slot0.kV = gains.kV();
     config.Slot0.kA = gains.kA();
 
-    config.CurrentLimits.SupplyCurrentLimit = 80.0;
+    config.CurrentLimits.SupplyCurrentLimit = CURRENT_LIMIT;
     config.CurrentLimits.SupplyCurrentLimitEnable = true;
     config.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
 
@@ -95,7 +95,7 @@ public class AlgaePivotIOReal implements AlgaePivotIO {
                 algaePivotTorqueCurrent,
                 algaePivotTempCelsius)
             .isOK();
-    inputs.positionMechs     = (algaePivotPosition.getValueAsDouble()/ALGAE_PIVOT_GEAR_REDUCTION) * (360.0);
+    inputs.positionDegrees     = (algaePivotPosition.getValueAsDouble()/ALGAE_PIVOT_GEAR_REDUCTION) * (360.0);
     inputs.velocityRpm       = algaePivotVelocity.getValueAsDouble() * 60.0;
     inputs.appliedVolts      = algaePivotAppliedVolts.getValueAsDouble();
     inputs.supplyCurrentAmps = algaePivotSupplyCurrent.getValueAsDouble();
@@ -105,7 +105,6 @@ public class AlgaePivotIOReal implements AlgaePivotIO {
 
   @Override
   public void setPosition(double pos) {// Set the motor position in mechanism rotations
-    CatzAlgaePivot.position = pos;
     algaePivotMotor.setPosition(pos);
   }
 

@@ -71,7 +71,7 @@ public class AlgaeRemoverIOReal implements AlgaeRemoverIO {
 
   @Override
   public void runPercentOutput(double speed) {
-    System.out.println(speed + " ");
+    // System.out.println(speed + " ");
     algaeRemoverMotor.setControl(new DutyCycleOut(speed));
   }
 }
