@@ -169,7 +169,6 @@ public class CatzStateCommands {
         CatzRampPivot rampPivot = robotContainer.getCatzRampPivot();
 
         return new ParallelCommandGroup(
-            new PrintCommand("L4 Score!!!!!"),
             rampPivot.Ramp_Intake_Pos(),
 
             climb.Climb_Retract(),

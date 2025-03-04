@@ -17,8 +17,11 @@ import com.pathplanner.lib.util.PathPlannerLogging;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.trajectory.Trajectory;
+import edu.wpi.first.units.measure.Time;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.FieldConstants;
 import frc.robot.Robot;
@@ -79,6 +82,8 @@ public class TrajectoryDriveCmd extends Command {
   private final EventScheduler eventScheduler;
   private boolean isEventCommandRunning = false;
 
+  private final XboxController xboxDrv;
+
   // ---------------------------------------------------------------------------------------------
   //
   // Trajectory Drive Command Constructor
@@ -90,6 +95,26 @@ public class TrajectoryDriveCmd extends Command {
     this.autoalign = autoalign;
     this.container = container;
     this.eventScheduler = new EventScheduler();
+    xboxDrv = null;
+    addRequirements(m_driveTrain);
+
+    // Add all event scheduler requirements to this command's requirements
+    var eventReqs = EventScheduler.getSchedulerRequirements(this.path);
+    if (!Collections.disjoint(Set.of(m_driveTrain), eventReqs)) {
+      throw new IllegalArgumentException(
+          "Events that are triggered during path following cannot require the drive subsystem");
+    }
+    addRequirements(eventReqs);
+  }
+
+  //For NBA. Used to rumble the controller when done driving
+  public TrajectoryDriveCmd(PathPlannerPath newPath, CatzDrivetrain drivetrain, boolean autoalign, RobotContainer container, XboxController xboxDrv) {
+    this.path = newPath;
+    this.m_driveTrain = drivetrain;
+    this.autoalign = autoalign;
+    this.container = container;
+    this.eventScheduler = new EventScheduler();
+    this.xboxDrv = xboxDrv;
     addRequirements(m_driveTrain);
 
     // Add all event scheduler requirements to this command's requirements
@@ -243,19 +268,26 @@ public class TrajectoryDriveCmd extends Command {
 
   @Override
   public void end(boolean interrupted) {
-    if (interrupted) {
-      System.out.println("OH NO I GOT INTERUPTED HOW RUDE");
-    }
     System.out.println("trajectory done");
-
+    
     timer.stop(); // Stop timer
     m_driveTrain.stopDriving();
-
+    
     PathPlannerAuto.currentPathName = "";
     PathPlannerAuto.setCurrentTrajectory(null);
     PathPlannerLogging.logActivePath(null);
-
+    
     eventScheduler.end();
+    if (interrupted) {
+      System.out.println("OH NO I WAS INTERRUPTED HOW RUDE");
+    }else{
+      //Rumble the controller for NBA when auto aiming is done
+      if(xboxDrv != null){
+        xboxDrv.setRumble(RumbleType.kBothRumble, 0.7);
+        Timer.delay(0.2);
+        xboxDrv.setRumble(RumbleType.kBothRumble, 0.0);
+      }
+    }
   }
 
   @Override
