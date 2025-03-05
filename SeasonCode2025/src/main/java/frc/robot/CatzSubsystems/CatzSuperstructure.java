@@ -99,6 +99,16 @@ public class CatzSuperstructure extends VirtualSubsystem {
         setCurrentRobotAction(action, level);
     }
 
+    public void cycleGamePieceSelection() {
+        if(chosenGamepiece == Gamepiece.CORAL) {
+            chosenGamepiece = Gamepiece.ALGAE;
+            System.out.println("Gamepiece: ALGAE");
+        } else {
+            chosenGamepiece = Gamepiece.CORAL;
+            System.out.println("Gamepiece: CORAL");
+        }
+    }
+
     public void setCurrentRobotAction(RobotAction action, int level) {
         Command robotActionCommand = Commands.print("No robot Action Selected");
         this.currentRobotAction = action;
