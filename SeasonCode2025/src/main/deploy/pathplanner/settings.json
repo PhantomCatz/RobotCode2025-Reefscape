@@ -11,7 +11,8 @@
     "L4 H Paths",
     "L4 I Paths",
     "L4 J Paths",
-    "New Folder",
+    "Test Paths",
+    "New New Folder",
     "Straight Paths",
     "Top L4 ILK Paths"
   ],
@@ -21,8 +22,8 @@
     "4 Piece Auto",
     "Straight Auto"
   ],
-  "defaultMaxVel": 3.5,
-  "defaultMaxAccel": 3.5,
+  "defaultMaxVel": 2.0,
+  "defaultMaxAccel": 1.0,
   "defaultMaxAngVel": 540.0,
   "defaultMaxAngAccel": 720.0,
   "defaultNominalVoltage": 12.0,

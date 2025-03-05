@@ -13,7 +13,6 @@ import java.util.HashMap;
 import java.util.LinkedList;
 
 import com.pathplanner.lib.path.GoalEndState;
-import com.pathplanner.lib.path.PathConstraints;
 import com.pathplanner.lib.path.PathPlannerPath;
 import com.pathplanner.lib.path.Waypoint;
 
@@ -21,6 +20,7 @@ import edu.wpi.first.math.Pair;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
@@ -49,7 +49,7 @@ public class TeleopPosSelector {
   private final String REEFSIDE = "Reefside ";
   private final String QUEUE = "PathQueue ";
   private final int NUM_QUEUE_DISPLAY = 4;
-  private final double SELECTION_THRESHOLD = 0.3;
+  private final double SELECTION_THRESHOLD = 0.7;
   private final double ELEVATOR_RAISE_DIST = 1.0; // meters
 
   private CatzSuperstructure superstructure;
@@ -61,6 +61,7 @@ public class TeleopPosSelector {
   private Command currentAutoplayCommand = new InstantCommand();
   private CornerTrackingPathfinder pathfinder = new CornerTrackingPathfinder();
   private Pair<Integer, LeftRight> currentPathfindingPair = new Pair<Integer, LeftRight>(0, LeftRight.LEFT);
+  private Pair<Integer, LeftRight> currentlySelected = new Pair<Integer, LeftRight>(0, LeftRight.LEFT);
   private Deque<Pair<Pair<Integer, LeftRight>, Integer>> queuedPaths = new LinkedList<>();
   private HashMap<String, String> poseToLetter = new HashMap<>();
 
@@ -170,12 +171,7 @@ public class TeleopPosSelector {
   }
 
   public void updateCurrentlySelected() {
-    Pair<Integer, LeftRight> currentlySelected = getXBoxReefPos();
-
-    // there was no joystick selection, so display NBA
-    if (currentlySelected == null) {
-      currentlySelected = getClosestReefPos().getFirst();
-    }
+    currentlySelected = getXBoxReefPos();
 
     for (int side = 0; side < 6; side++) {
       SmartDashboard.putBoolean(REEFSIDE + side + " L",
@@ -235,10 +231,10 @@ public class TeleopPosSelector {
       } else {
         leftRight = leftOrRight % 2 == 0 ? LeftRight.LEFT : LeftRight.RIGHT;
       }
+      return new Pair<Integer, LeftRight>(side, leftRight);
     } else {
-      return null;
+      return currentlySelected;
     }
-    return new Pair<Integer, LeftRight>(side, leftRight);
   }
 
   public Pair<Pair<Integer, LeftRight>, Integer> getClosestReefPos() {
@@ -347,44 +343,6 @@ public class TeleopPosSelector {
     currentDrivetrainCommand.schedule();
   }
 
-  public void runLeftRightShift(LeftRight leftRight) {
-      if (currentPathfindingPair == null)
-        return;
-
-      Pose2d currentPose = tracker.getEstimatedPose();
-      Rotation2d angle = Rotation2d.fromRotations(currentPathfindingPair.getFirst()/6.0);
-      Translation2d direction = new Translation2d(angle.getCos(),angle.getSin());
-      direction = direction.rotateBy(Rotation2d.fromDegrees(90));
-
-      Translation2d currentPos = currentPose.getTranslation();
-
-      if(leftRight == LeftRight.LEFT){
-        direction = direction.times(-1);
-      }
-
-      if(currentPathfindingPair.getFirst() == 5 ||currentPathfindingPair.getFirst() == 0 ||currentPathfindingPair.getFirst() == 1){
-        direction = direction.times(-1);
-      }
-
-      Translation2d goalPos = currentPos.plus(direction.times(10));
-
-      PathPlannerPath path = new PathPlannerPath(
-        Arrays.asList(new Waypoint[] {
-            new Waypoint(null, currentPos, currentPos.plus(direction)),
-            new Waypoint(goalPos.minus(direction), goalPos, null)
-        }),
-        DriveConstants.LEFT_RIGHT_CONSTRAINTS,
-        null,
-        new GoalEndState(0, currentPos.getAngle()));
-
-      if (AllianceFlipUtil.shouldFlipToRed()) {
-        path = path.flipPath();
-      }
-
-      currentDrivetrainCommand = new TrajectoryDriveCmd(path, drivetrain, true, m_container);
-      currentDrivetrainCommand.schedule();
-  }
-
   //------------------------------------------------------------------------------------
   //
   //  Xbox Commands
@@ -447,15 +405,20 @@ public class TeleopPosSelector {
         return getCoralStationCommand();
       }
     }
-
   }
 
   public Command runToNearestBranch() {
     return new InstantCommand(() -> {
+      double time = Timer.getFPGATimestamp();
       currentPathfindingPair = getClosestReefPos().getFirst();
       currentDrivetrainCommand.cancel();
-      currentDrivetrainCommand = new TrajectoryDriveCmd(getPathfindingPath(calculateReefPose(currentPathfindingPair, true)), drivetrain, true, m_container);
-      currentDrivetrainCommand.schedule();
+      try{
+        currentDrivetrainCommand = new TrajectoryDriveCmd(getPathfindingPath(calculateReefPose(currentPathfindingPair, true)), drivetrain, true, m_container);
+        currentDrivetrainCommand.schedule();
+      }catch(Exception e){
+        e.printStackTrace();
+      }
+      // System.out.println("sdfsdfdf     : " + (Timer.getFPGATimestamp()-time));
     });
   }
 

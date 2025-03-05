@@ -35,7 +35,7 @@ public class VisionConstants {
 
   // Standard deviation baselines, for 1 meter distance and 1 tag
   // (Adjusted automatically based on distance and # of tags)
-  public static final double LINEAR_STD_DEV_BASELINE = 0.0033; // Meters
+  public static final double LINEAR_STD_DEV_BASELINE = 0.015; // Meters
   public static final double ANGULAR_STD_DEV_BASELINE = 0.01; // Radians
 
   public static final VisionIO[] limelights =

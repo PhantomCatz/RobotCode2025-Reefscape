@@ -62,10 +62,10 @@ public class DriveConstants {
         .maxAngularAcceleration(Units.degreesToRadians(720))
         .build();
 
-  public static final DriveConfig TRAJECTORY_CONFIG =
+  public static final DriveConfig SCORING_TRAJECTORY_CONFIG =
     DriveConfig.builder()
-      .maxLinearVelocity(3.5)
-      .maxLinearAcceleration(3.5)
+      .maxLinearVelocity(2)
+      .maxLinearAcceleration(0.5)
       .maxAngularVelocity(Units.degreesToRadians(540))
       .maxAngularAcceleration(Units.degreesToRadians(720))
       .build();
@@ -166,17 +166,17 @@ public class DriveConstants {
   //
   // -----------------------------------------------------------------------------------------------------------------------------
   public static final PathConstraints PATHFINDING_CONSTRAINTS = new PathConstraints( // 540 // 720
-    TRAJECTORY_CONFIG.maxLinearVelocity,
-    TRAJECTORY_CONFIG.maxLinearAcceleration,
-    TRAJECTORY_CONFIG.maxAngularVelocity,
-    TRAJECTORY_CONFIG.maxAngularAcceleration
+    SCORING_TRAJECTORY_CONFIG.maxLinearVelocity,
+    SCORING_TRAJECTORY_CONFIG.maxLinearAcceleration,
+    SCORING_TRAJECTORY_CONFIG.maxAngularVelocity,
+    SCORING_TRAJECTORY_CONFIG.maxAngularAcceleration
   );
 
   public static final PathConstraints LEFT_RIGHT_CONSTRAINTS = new PathConstraints( // 540 // 720
     2,
     2,
-    TRAJECTORY_CONFIG.maxAngularVelocity,
-    TRAJECTORY_CONFIG.maxAngularAcceleration
+    SCORING_TRAJECTORY_CONFIG.maxAngularVelocity,
+    SCORING_TRAJECTORY_CONFIG.maxAngularAcceleration
   );
 
   public static final Translation2d[] MODULE_TRANSLATIONS = new Translation2d[4];
@@ -198,13 +198,13 @@ public class DriveConstants {
   // -----------------------------------------------------------------------------------------------------------------------------
   public static HolonomicDriveController getNewHolController() {
     return new HolonomicDriveController(
-      new PIDController(5.0, 0.0, 0.4),
-      new PIDController(5.0, 0.0, 0.4),
+      new PIDController(8.0, 0.0, 0.012),
+      new PIDController(8.0, 0.0, 0.012),
       new ProfiledPIDController(
         4.0,
         0.0,
         0.012,
-        new TrapezoidProfile.Constraints(TRAJECTORY_CONFIG.maxAngularVelocity, TRAJECTORY_CONFIG.maxAngularAcceleration)
+        new TrapezoidProfile.Constraints(SCORING_TRAJECTORY_CONFIG.maxAngularVelocity, SCORING_TRAJECTORY_CONFIG.maxAngularAcceleration)
       )
     );
   }
@@ -214,14 +214,28 @@ public class DriveConstants {
   public static final double DRIVE_VELOCITY_DEADBAND = 1e-9;
   public static final ChassisSpeeds NON_ZERO_CHASSIS_SPEED = new ChassisSpeeds(1, 1, 0); //TODO should this be smaller?
 
-  public static final double ROBOT_MASS = 50.0;
+  public static final double ROBOT_MASS = 60.0;
   public static final double ROBOT_MOI = (2.0 / 12.0) * ROBOT_MASS * (Math.pow(DRIVE_CONFIG.bumperWidthX(), 2));
-  public static final RobotConfig ROBOT_CONFIG = new RobotConfig(
+  public static final RobotConfig SCORING_ROBOT_CONFIG = new RobotConfig(
     ROBOT_MASS,
     ROBOT_MOI,
     new ModuleConfig(
       DRIVE_CONFIG.wheelRadius(),
-      TRAJECTORY_CONFIG.maxLinearVelocity(),
+      SCORING_TRAJECTORY_CONFIG.maxLinearVelocity(),
+      CARPET_COEF_FRICTION,
+      DCMotor.getKrakenX60(1).withReduction(MODULE_GAINS_AND_RATIOS.driveReduction()),
+      DRIVE_CURRENT_LIMIT,
+      1
+    ),
+    MODULE_TRANSLATIONS
+  );
+
+  public static final RobotConfig TRAJ_ROBOT_CONFIG = new RobotConfig(
+    ROBOT_MASS,
+    ROBOT_MOI,
+    new ModuleConfig(
+      DRIVE_CONFIG.wheelRadius(),
+      DRIVE_CONFIG.maxLinearVelocity,
       CARPET_COEF_FRICTION,
       DCMotor.getKrakenX60(1).withReduction(MODULE_GAINS_AND_RATIOS.driveReduction()),
       DRIVE_CURRENT_LIMIT,

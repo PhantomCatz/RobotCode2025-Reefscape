@@ -30,6 +30,7 @@ import lombok.Getter;
 import lombok.experimental.ExtensionMethod;
 import org.littletonrobotics.junction.AutoLogOutput;
 
+
 @ExtensionMethod({GeomUtil.class})
 public class CatzRobotTracker {
   private static final double POSE_BUFFER_SIZE_SEC = 2.0;
@@ -168,6 +169,7 @@ public class CatzRobotTracker {
       }
     } catch (NoSuchElementException e) {}
     // Get odometry based pose at timestamp
+    // System.out.println("latata:" + observation.timestamp());
     var sample = POSE_BUFFER.getSample(observation.timestamp());
     if (sample != null && sample.isEmpty()) {
       // exit if not there

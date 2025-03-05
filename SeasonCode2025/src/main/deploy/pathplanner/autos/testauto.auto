@@ -1,0 +1,43 @@
+{
+  "version": "2025.0",
+  "command": {
+    "type": "sequential",
+    "data": {
+      "commands": [
+        {
+          "type": "named",
+          "data": {
+            "name": "tp1+ReefL4"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "tp2+CS"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "tp3+ReefL4"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "tp4+CS"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "tp5+ReefL4"
+          }
+        }
+      ]
+    }
+  },
+  "resetOdom": false,
+  "folder": null,
+  "choreoAuto": false
+}

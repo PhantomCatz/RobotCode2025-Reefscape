@@ -169,6 +169,7 @@ public class CatzVision extends SubsystemBase {
         Logger.recordOutput("Vision/Camera" + cameraIndex + "/RobotPosesAccepted", robotPosesAccepted.toArray(new Pose3d[robotPosesAccepted.size()]));
         Logger.recordOutput("Vision/Camera" + cameraIndex + "/RobotPosesRejected", robotPosesRejected.toArray(new Pose3d[robotPosesRejected.size()]));
         allTagPoses.addAll(tagPoses);
+
         allRobotPoses.addAll(robotPoses);
         allRobotPosesAccepted.addAll(robotPosesAccepted);
         allRobotPosesRejected.addAll(robotPosesRejected);

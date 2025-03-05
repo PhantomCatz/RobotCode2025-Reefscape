@@ -19,7 +19,6 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Autonomous.CatzAutonomous;
 
-import frc.robot.CatzConstants.XboxInterfaceConstants;
 import frc.robot.CatzSubsystems.CatzStateCommands;
 
 import frc.robot.CatzSubsystems.CatzSuperstructure;
@@ -47,7 +46,7 @@ import org.littletonrobotics.junction.networktables.LoggedNetworkNumber;
 
 public class RobotContainer {
 
-  private double SCORE_TRIGGER_THRESHHOLD = 0.8;
+  private final double SCORE_TRIGGER_THRESHHOLD = 0.8;
 
   // -------------------------------------------------------------------------------------------------------------------
   // Subsystem Declaration
@@ -156,18 +155,11 @@ public class RobotContainer {
     xboxDrv.leftBumper().onTrue(new InstantCommand(() -> selector.runLeftRight(LeftRight.LEFT)));
     xboxDrv.rightBumper().onTrue(new InstantCommand(() -> selector.runLeftRight(LeftRight.RIGHT)));
 
-    xboxDrv.leftTrigger().onTrue(new InstantCommand(() -> selector.runLeftRightShift(LeftRight.LEFT)));
-    xboxDrv.leftTrigger().onFalse(selector.cancelCurrentDrivetrainCommand());
-
-    xboxDrv.rightTrigger().onTrue(new InstantCommand(() -> selector.runLeftRightShift(LeftRight.RIGHT)));
-    xboxDrv.rightTrigger().onFalse(selector.cancelCurrentDrivetrainCommand());
-
     xboxDrv.back().and(xboxDrv.b().onTrue(CatzStateCommands.climb(this))); // Setup Climb
     xboxDrv.back().and(xboxDrv.x().onTrue(climb.Climb_Retract()));
 
-
     //TODO Score
-    // xboxDrv.leftTrigger(SCORE_TRIGGER_THRESHHOLD).onTrue(new InstantCommand(() -> superstructure.setCurrentRobotAction(RobotAction.OUTTAKE)));
+    xboxDrv.leftTrigger(SCORE_TRIGGER_THRESHHOLD).onTrue(new InstantCommand(() -> superstructure.setCurrentRobotAction(RobotAction.OUTTAKE, superstructure.getLevel())));
 
     // Default driving
     Trigger escapeTrajectory = new Trigger(()->(xboxDrv.getLeftY() > 0.8));

@@ -11,7 +11,6 @@ import com.pathplanner.lib.path.PathPlannerPath;
 
 import frc.robot.CatzSubsystems.CatzSuperstructure.RobotAction;
 import frc.robot.RobotContainer;
-import frc.robot.TeleopPosSelector;
 import frc.robot.CatzSubsystems.CatzSuperstructure;
 import frc.robot.CatzSubsystems.CatzOuttake.CatzOuttake;
 
@@ -19,20 +18,21 @@ public class DriveAndCycle extends TrajectoryDriveCmd{
     private final double PREDICT_DISTANCE = 0.3; // meters
 
     private final RobotAction action;
-    private TeleopPosSelector selector;
     private CatzSuperstructure superstructure;
     private CatzOuttake outtake;
     private int level;
+    private RobotContainer container;
 
     private boolean actionAlreadyTaken = false;
+    private boolean alreadyOuttake = false;
 
     public DriveAndCycle(PathPlannerPath newPath, RobotContainer container, RobotAction action){
         super(newPath, container.getCatzDrivetrain(), action != RobotAction.INTAKE, container);
         this.action = action;
         this.superstructure = container.getSuperstructure();
         this.outtake = container.getCatzOuttake();
-        this.selector = container.getSelector();
         addRequirements(super.getRequirements());
+        this.container = container;
     }
 
     public DriveAndCycle(PathPlannerPath newPath, RobotContainer container, RobotAction action, int level){
@@ -41,14 +41,16 @@ public class DriveAndCycle extends TrajectoryDriveCmd{
         this.action = action;
         this.superstructure = container.getSuperstructure();
         this.outtake = container.getCatzOuttake();
-        this.selector = container.getSelector();
         addRequirements(super.getRequirements());
+        this.container = container;
     }
 
     @Override
     public void initialize(){
         super.initialize();
         // selector.hasCoralSIM = true;
+        actionAlreadyTaken = false;
+        alreadyOuttake = false;
     }
 
     @Override
@@ -74,12 +76,13 @@ public class DriveAndCycle extends TrajectoryDriveCmd{
         // If we reached the target Destination
         if (super.isFinished()){
             super.end(false);
-            if(action == RobotAction.OUTTAKE){
-                superstructure.setCurrentRobotAction(action, this.level);
+            if(action == RobotAction.OUTTAKE && !alreadyOuttake){
+                alreadyOuttake = true;
+                superstructure.setCurrentRobotAction(RobotAction.OUTTAKE, this.level);
             }
             // System.out.println("action: " + action.toString());
-            if (selector.useFakeCoral){
-                selector.hasCoralSIM = action == RobotAction.INTAKE;
+            if (container.getSelector().useFakeCoral){
+                container.getSelector().hasCoralSIM = action == RobotAction.INTAKE;
             }
         }
     }
