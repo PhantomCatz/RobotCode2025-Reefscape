@@ -69,6 +69,7 @@ public class CatzLED extends VirtualSubsystem {
     sameBattery,
     autoFinished,
     lowBatteryAlert,
+    ledChecked,
     nuhthing
   }
 
@@ -213,7 +214,6 @@ public class CatzLED extends VirtualSubsystem {
     // Set LED mode
     // ----------------------------------------------------------
     setSolidElevatorColor(Color.kBlack); // Default to off
-    setSolidCrossbarColor(Color.kBlack);
 
     if (estopped) {
       setSolidElevatorColor(Color.kRed);
@@ -223,6 +223,11 @@ public class CatzLED extends VirtualSubsystem {
       if (lastEnabledAuto && Timer.getFPGATimestamp() - lastEnabledTime < autoFadeMaxTime) {
         // Auto fade
         solid(1.0 - ((Timer.getFPGATimestamp() - lastEnabledTime) / autoFadeTime), Color.kGreen);
+      } else {
+        // APRILTAG CHECK
+        if(ControllerState == ControllerLEDState.ledChecked) {
+          setSolidElevatorColor(Color.kGreen);
+        } 
       }
       // MODE AUTON
     } else if (DriverStation.isAutonomous()) {

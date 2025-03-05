@@ -199,6 +199,7 @@ public class RobotContainer {
     xboxAux.button(8).onTrue(new InstantCommand(() -> selector.toggleRightStation()).alongWith(Commands.runOnce(() -> led.setControllerState(ControllerLEDState.BALLS))));
 
     // Gamepiece Selection
+    xboxAux.leftStick().onTrue(Commands.runOnce(()-> superstructure.cycleGamePieceSelection()));
 
     xboxAux.leftTrigger().onTrue(Commands.runOnce(() -> superstructure.setChosenGamepiece(Gamepiece.CORAL)).alongWith(Commands.runOnce(() -> led.setControllerState(ControllerLEDState.FULL_MANUAL))));
     // xboxAux.rightTrigger().onTrue(Commands.runOnce(() -> superstructure.setChosenGamepiece(Gamepiece.ALGAE)).alongWith(Commands.runOnce(() -> led.setControllerState(ControllerLEDState.REMOVE_ALGAE))));

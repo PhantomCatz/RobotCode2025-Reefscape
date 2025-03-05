@@ -64,6 +64,13 @@ public class CatzVision extends SubsystemBase {
     return poseObservations;
   }
 
+  public int getTagId(int cameraIndex) {
+    if (inputs[cameraIndex].latestTargetObservations.length > 0) {
+      return (int) inputs[cameraIndex].latestTargetObservations[0].tagID();
+    }
+    return -1;
+  }
+
   @Override
   public void periodic() {
     for (int i = 0; i < io.length; i++) {
