@@ -70,7 +70,6 @@ public class VisionIOLimelight implements VisionIO {
 
     // Update orientation for MegaTag 2
     orientationPublisher.accept(new double[] {rotationSupplier.get().getDegrees(), 0.0, 0.0, 0.0, 0.0, 0.0}); //TODO possible sync error
-    NetworkTableInstance.getDefault().flush(); // Increases network traffic but recommended by Limelight
 
     inputs.ta = taSubscriber.get();
     // Read new pose observations from NetworkTables
@@ -87,56 +86,58 @@ public class VisionIOLimelight implements VisionIO {
         rawSample.value[0],
         rawSample.value[1],
         rawSample.value[2]
-      );
-      targetObservations.add(
-        new TargetObservation(
-          usedTimestamp,
-          rawSample.value[0],
-          rawSample.value[1],
-          rawSample.value[2],
-          (int) tagIDSubscriber.get(),
-          cameraSpaceTranslation.getNorm())
-      );
-    }
+        );
+        targetObservations.add(
+          new TargetObservation(
+            usedTimestamp,
+            rawSample.value[0],
+            rawSample.value[1],
+            rawSample.value[2],
+            (int) tagIDSubscriber.get(),
+            cameraSpaceTranslation.getNorm())
+            );
+          }
 
-    //----------------------------------------------------------------------------------------------
-    // Megatag 1 estimation
-    //----------------------------------------------------------------------------------------------
-    for (var rawSample : megatag1Subscriber.readQueue()) {
-      // if sample is invalid, skip
-      if (rawSample.value.length == 0) continue;
-      poseObservations.add(
-          new PoseObservation(
-              // Timestamp, based on server timestamp of publish and latency
-              usedTimestamp - rawSample.value[6] * 1.0e-3,
+          //----------------------------------------------------------------------------------------------
+          // Megatag 1 estimation
+          //----------------------------------------------------------------------------------------------
+          // for (var rawSample : megatag1Subscriber.readQueue()) {
+          //   // if sample is invalid, skip
+          //   if (rawSample.value.length == 0) continue;
+          //   poseObservations.add(
+          //     new PoseObservation(
+          //       // Timestamp, based on server timestamp of publish and latency
+          //       usedTimestamp - rawSample.value[6] * 1.0e-3,
 
-              // 3D pose estimate
-              parsePose(rawSample.value),
+          //       // 3D pose estimate
+          //       parsePose(rawSample.value),
 
-              // Ambiguity, zeroed because the pose is already disambiguated
-              rawSample.value[8],
+          //       // Ambiguity, zeroed because the pose is already disambiguated
+          //     rawSample.value[8],
 
-              // Tag count
-              (int) rawSample.value[7],
+          //     // Tag count
+          //     (int) rawSample.value[7],
 
-              // Average tag distance
-              rawSample.value[9], // Used to grab area at value 10 //TODO
+          //     // Average tag distance
+          //     rawSample.value[9], // Used to grab area at value 10 //TODO
 
-              // Observation type
-              PoseObservationType.MEGATAG_1)
-      );
-    }
+          //     // Observation type
+          //     PoseObservationType.MEGATAG_1)
+          //     );
+          //   }
 
+            NetworkTableInstance.getDefault().flush(); // Increases network traffic but recommended by Limelight
     //----------------------------------------------------------------------------------------------
     // Megatag 2 estimation
     //----------------------------------------------------------------------------------------------
     for (var rawSample : megatag2Subscriber.readQueue()) {
+      // System.out.println("latency: " + rawSample.value[6]);
       // if sample is invalid, skip
       if (rawSample.value.length == 0) continue;
       poseObservations.add(
           new PoseObservation(
               // Timestamp, based on server timestamp of publish and latency
-              usedTimestamp - rawSample.value[6] * 1.0e-3,
+              usedTimestamp - (rawSample.value[6] * 1.0e-3),
 
               // 3D pose estimate
               parsePose(rawSample.value),

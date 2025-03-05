@@ -412,9 +412,13 @@ public class TeleopPosSelector {
       double time = Timer.getFPGATimestamp();
       currentPathfindingPair = getClosestReefPos().getFirst();
       currentDrivetrainCommand.cancel();
-      currentDrivetrainCommand = new TrajectoryDriveCmd(getPathfindingPath(calculateReefPose(currentPathfindingPair, true)), drivetrain, true, m_container);
-      currentDrivetrainCommand.schedule();
-      System.out.println("sdfsdfdf     : " + (Timer.getFPGATimestamp()-time));
+      try{
+        currentDrivetrainCommand = new TrajectoryDriveCmd(getPathfindingPath(calculateReefPose(currentPathfindingPair, true)), drivetrain, true, m_container);
+        currentDrivetrainCommand.schedule();
+      }catch(Exception e){
+        e.printStackTrace();
+      }
+      // System.out.println("sdfsdfdf     : " + (Timer.getFPGATimestamp()-time));
     });
   }
 

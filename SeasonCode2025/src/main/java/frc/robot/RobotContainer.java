@@ -46,7 +46,7 @@ import org.littletonrobotics.junction.networktables.LoggedNetworkNumber;
 
 public class RobotContainer {
 
-  private double SCORE_TRIGGER_THRESHHOLD = 0.8;
+  private final double SCORE_TRIGGER_THRESHHOLD = 0.8;
 
   // -------------------------------------------------------------------------------------------------------------------
   // Subsystem Declaration
