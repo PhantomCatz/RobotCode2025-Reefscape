@@ -40,6 +40,7 @@ import frc.robot.CatzSubsystems.CatzRampPivot.CatzRampPivot;
 import frc.robot.Commands.DriveAndRobotOrientationCmds.TeleopDriveCmd;
 import frc.robot.Utilities.Alert;
 import frc.robot.Utilities.AllianceFlipUtil;
+import frc.robot.Utilities.DoublePressTracker;
 import frc.robot.Utilities.Alert.AlertType;
 
 import org.littletonrobotics.junction.networktables.LoggedNetworkNumber;
@@ -155,8 +156,11 @@ public class RobotContainer {
     xboxDrv.leftBumper().onTrue(new InstantCommand(() -> selector.runLeftRight(LeftRight.LEFT)));
     xboxDrv.rightBumper().onTrue(new InstantCommand(() -> selector.runLeftRight(LeftRight.RIGHT)));
 
+    // Climb
     xboxDrv.back().and(xboxDrv.b().onTrue(CatzStateCommands.climb(this))); // Setup Climb
     xboxDrv.back().and(xboxDrv.x().onTrue(climb.Climb_Retract()));
+    // Manual Climb Control
+    xboxDrv.back().and(xboxDrv.rightStick().onTrue(climb.ClimbManualMode(() -> xboxDrv.getRightY()).alongWith(Commands.print("Using manual climb"))));
 
     //TODO Score
     xboxDrv.leftTrigger(SCORE_TRIGGER_THRESHHOLD).onTrue(new InstantCommand(() -> superstructure.setCurrentRobotAction(RobotAction.OUTTAKE, superstructure.getLevel())));
@@ -166,40 +170,49 @@ public class RobotContainer {
     escapeTrajectory.onTrue(selector.cancelCurrentDrivetrainCommand().alongWith(selector.cancelAutoCommand()));
     drive.setDefaultCommand(new TeleopDriveCmd(() -> xboxDrv.getLeftX(), () -> xboxDrv.getLeftY(), () -> xboxDrv.getRightX(), drive));
 
-    // Manual Climb Control
-    Trigger rightJoystickTrigger = new Trigger(
-      () -> Math.abs(xboxTest.getRightY()) > 0.1);
-    rightJoystickTrigger.onTrue(climb.ClimbManualMode(() -> xboxTest.getRightY()).alongWith(Commands.print("Using manual climb")));
-
     //---------------------------------------------------------------------------------------------------------------------
     // XBOX AUX
     //---------------------------------------------------------------------------------------------------------------------
 
-    // Scoring Level Determination
-    xboxAux.rightTrigger().onTrue(Commands.runOnce(() -> selector.pathQueueAddBack(selector.getXBoxReefPos(), superstructure.getLevel())).alongWith(Commands.runOnce(() -> led.setControllerState(ControllerLEDState.AQUA))));
-    xboxAux.leftBumper().onTrue(Commands.runOnce(() -> selector.pathQueuePopFront()).alongWith(Commands.runOnce(() -> led.setControllerState(ControllerLEDState.AQUA))));
-    xboxAux.rightBumper().onTrue(Commands.runOnce(() -> selector.pathQueuePopBack()).alongWith(Commands.runOnce(() -> led.setControllerState(ControllerLEDState.AQUA))));
-    xboxAux.rightStick().onTrue(Commands.runOnce(() -> selector.pathQueueClear()).alongWith(Commands.runOnce(() -> led.setControllerState(ControllerLEDState.AQUA))));
+    // Scoring Level Aqua determination
+    xboxAux.rightTrigger().onTrue(Commands.runOnce(() -> selector.pathQueueAddBack(selector.getXBoxReefPos(), superstructure.getLevel()))
+                                          .alongWith(Commands.runOnce(() -> led.setControllerState(ControllerLEDState.AQUA))));
+    xboxAux.leftBumper().onTrue(Commands.runOnce(() -> selector.pathQueuePopFront())
+                                        .alongWith(Commands.runOnce(() -> led.setControllerState(ControllerLEDState.AQUA))));
+    xboxAux.rightBumper().onTrue(Commands.runOnce(() -> selector.pathQueuePopBack())
+                                         .alongWith(Commands.runOnce(() -> led.setControllerState(ControllerLEDState.AQUA))));
+    xboxAux.rightStick().onTrue(Commands.runOnce(() -> selector.pathQueueClear())
+                                        .alongWith(Commands.runOnce(() -> led.setControllerState(ControllerLEDState.AQUA))));
 
-    xboxAux.povRight().onTrue(Commands.runOnce(()->{superstructure.setLevel(1); SmartDashboard.putNumber("Reef Level", 1);}));
-    xboxAux.povUp().onTrue(Commands.runOnce(() -> {superstructure.setLevel(2); SmartDashboard.putNumber("Reef Level", 2);}));
-    xboxAux.povLeft().onTrue(Commands.runOnce(() -> {superstructure.setLevel(3); SmartDashboard.putNumber("Reef Level", 3);}));
-    xboxAux.povDown().onTrue(Commands.runOnce(() -> {superstructure.setLevel(4); SmartDashboard.putNumber("Reef Level", 4);}));
-    xboxAux.leftStick().onTrue(elevator.elevatorFullManual(()->xboxAux.getLeftY()));
+    xboxAux.leftStick().and(xboxAux.rightStick()).onTrue(elevator.elevatorFullManual(()->xboxAux.getLeftY()));
+    xboxAux.leftStick().and(xboxAux.rightStick()).onTrue(algaePivot.AlgaePivotFullManualCommand(()->xboxAux.getRightY()));
 
+
+    // Coral Station Run Back
     xboxAux.button(7).onTrue(new InstantCommand(() -> selector.toggleLeftStation()).alongWith(Commands.runOnce(() -> led.setControllerState(ControllerLEDState.BALLS))));
     xboxAux.button(8).onTrue(new InstantCommand(() -> selector.toggleRightStation()).alongWith(Commands.runOnce(() -> led.setControllerState(ControllerLEDState.BALLS))));
 
     // Gamepiece Selection
-    xboxAux.leftStick().onTrue(Commands.runOnce(()-> superstructure.cycleGamePieceSelection()));
+    xboxAux.leftTrigger().onTrue(Commands.runOnce(()-> superstructure.cycleGamePieceSelection()));
 
-    xboxAux.leftTrigger().onTrue(Commands.runOnce(() -> superstructure.setChosenGamepiece(Gamepiece.CORAL)).alongWith(Commands.runOnce(() -> led.setControllerState(ControllerLEDState.FULL_MANUAL))));
-    // xboxAux.rightTrigger().onTrue(Commands.runOnce(() -> superstructure.setChosenGamepiece(Gamepiece.ALGAE)).alongWith(Commands.runOnce(() -> led.setControllerState(ControllerLEDState.REMOVE_ALGAE))));
-
+    // Scoring Action
     xboxAux.y().onTrue(Commands.runOnce(() -> superstructure.setCurrentRobotAction(RobotAction.OUTTAKE, "container")).alongWith(Commands.print("OUTTAKE L" + superstructure.getLevel())));
     xboxAux.x().onTrue(Commands.runOnce(() -> superstructure.setCurrentRobotAction(RobotAction.INTAKE, "container")).alongWith(Commands.print("INTAKE")));
     xboxAux.b().onTrue(Commands.runOnce(() -> superstructure.setCurrentRobotAction(RobotAction.INTAKE_GROUND, "container")).alongWith(Commands.print("INTAKEGROUND")));
     xboxAux.a().onTrue(Commands.runOnce(() -> superstructure.setCurrentRobotAction(RobotAction.STOW, "container")).alongWith(Commands.print("STOWWW")));
+
+    // algae punch
+    DoublePressTracker.createTrigger(xboxAux.x())
+                      .onTrue(algaePivot.AlgaePivot_Punch()
+                                        .onlyIf(()->superstructure.getChosenGamepiece() == Gamepiece.ALGAE)
+                                        .alongWith(Commands.print("Algae Punch"))
+    );
+
+    // Scoring Level
+    xboxAux.povRight().onTrue(Commands.runOnce(()-> {superstructure.setLevel(1); SmartDashboard.putNumber("Reef Level", 1);}));
+    xboxAux.povUp().onTrue(Commands.runOnce(() -> {superstructure.setLevel(2); SmartDashboard.putNumber("Reef Level", 2);}));
+    xboxAux.povLeft().onTrue(Commands.runOnce(() -> {superstructure.setLevel(3); SmartDashboard.putNumber("Reef Level", 3);}));
+    xboxAux.povDown().onTrue(Commands.runOnce(() -> {superstructure.setLevel(4); SmartDashboard.putNumber("Reef Level", 4);}));
 
     xboxAux.a().onTrue(Commands.runOnce(() -> System.out.println("L:"+superstructure.getLevel()+", "+superstructure.getChosenGamepiece())));
 
@@ -218,7 +231,7 @@ public class RobotContainer {
 
 
     // STOWING INTAKE RAMP FOR WHATEVER REASON
-    xboxTest.start().toggleOnTrue(rampPivot.Ramp_Stow_Pos().alongWith(Commands.print("pressed start"))); //TBD
+    //xboxTest.start().toggleOnTrue(rampPivot.Ramp_Stow_Pos().alongWith(Commands.print("pressed start"))); //TBD
     // xboxTest.a().toggleOnTrue(elevator.Elevator_Stow().alongWith(Commands.print("L1")));
     // xboxTest.b().toggleOnTrue(elevator.Elevator_L2().alongWith(Commands.print("L2")));
     // xboxTest.x().toggleOnTrue(elevator.Elevator_L3().alongWith(Commands.print("L3")));
