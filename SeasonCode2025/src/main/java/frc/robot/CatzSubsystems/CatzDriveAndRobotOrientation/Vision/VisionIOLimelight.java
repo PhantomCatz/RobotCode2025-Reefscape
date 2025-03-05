@@ -19,6 +19,7 @@ import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.Timer;
 import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.CatzRobotTracker;
 
+
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -127,6 +128,9 @@ public class VisionIOLimelight implements VisionIO {
           //   }
 
             NetworkTableInstance.getDefault().flush(); // Increases network traffic but recommended by Limelight
+
+    // System.out.println("lastchange: " + megatag2Subscriber.getLastChange() * 1e-6);
+    // System.out.println("cur: " + usedTimestamp);
     //----------------------------------------------------------------------------------------------
     // Megatag 2 estimation
     //----------------------------------------------------------------------------------------------

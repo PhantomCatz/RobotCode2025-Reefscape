@@ -227,7 +227,7 @@ public class CatzLED extends VirtualSubsystem {
         // APRILTAG CHECK
         if(ControllerState == ControllerLEDState.ledChecked) {
           setSolidElevatorColor(Color.kGreen);
-        } 
+        }
       }
       // MODE AUTON
     } else if (DriverStation.isAutonomous()) {
