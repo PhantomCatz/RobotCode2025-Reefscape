@@ -29,6 +29,7 @@ import java.util.NoSuchElementException;
 import lombok.Getter;
 import lombok.experimental.ExtensionMethod;
 import org.littletonrobotics.junction.AutoLogOutput;
+import org.littletonrobotics.junction.Logger;
 
 
 @ExtensionMethod({GeomUtil.class})
@@ -175,6 +176,7 @@ public class CatzRobotTracker {
       // exit if not there
       return;
     }
+    Logger.recordOutput("Buffer Pose", sample.get());
 
     // print out robot position relative to april tag
     // Translation2d aprilPos = AllianceFlipUtil.apply(Reef.center).plus(new Translation2d(Reef.reefOrthogonalRadius, 0).rotateBy(Rotation2d.fromDegrees(-60)));
@@ -185,7 +187,7 @@ public class CatzRobotTracker {
     var odometryToSampleTransform = new Transform2d(odometryPose, sample.get());
 
     // get old estimate by applying odometryToSample Transform
-    Pose2d estimateAtTime = estimatedPose.plus(odometryToSampleTransform);
+    Pose2d estimateAtTime = estimatedPose.plus(odometryToSampleTransform); //TODO isnt't this just sample.get()?
 
     // Calculate 3 x 3 vision matrix
     var r = new double[3];
@@ -205,7 +207,6 @@ public class CatzRobotTracker {
     }
     // difference between estimate and vision pose
     Transform2d transform = new Transform2d(estimateAtTime, observation.visionPose());
-    transform = new Transform2d(transform.getTranslation(), new Rotation2d());
     // scale transform by visionK
     var kTimesTransform =
         visionK.times(

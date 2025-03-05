@@ -315,7 +315,7 @@ public class Robot extends LoggedRobot {
     garbageCollectionCounter++;
 
     // Checked leds
-    if(m_robotContainer.getCatzVision().getTagId(1) == 263 || m_robotContainer.getCatzVision().getTagId(0) == 263) { 
+    if(m_robotContainer.getCatzVision().getTagId(1) == 263 || m_robotContainer.getCatzVision().getTagId(0) == 263) {
       CatzLED.getInstance().setControllerState(ControllerLEDState.ledChecked);
     }
   }
