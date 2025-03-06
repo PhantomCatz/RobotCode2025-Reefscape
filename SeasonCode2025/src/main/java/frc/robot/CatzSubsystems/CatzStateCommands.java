@@ -278,7 +278,7 @@ public class CatzStateCommands {
 
             new SequentialCommandGroup(
                 elevator.Elevator_Stow(),
-                algaePivot.AlgaePivot_Stow(),
+                algaePivot.AlgaePivot_Punch(),
                 algae.vomitAlgae()
 
             )

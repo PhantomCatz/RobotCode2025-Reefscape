@@ -157,10 +157,10 @@ public class RobotContainer {
     xboxDrv.rightBumper().onTrue(new InstantCommand(() -> selector.runLeftRight(LeftRight.RIGHT)));
 
     // Climb
-    xboxDrv.back().and(xboxDrv.b().onTrue(CatzStateCommands.climb(this))); // Setup Climb
-    xboxDrv.back().and(xboxDrv.x().onTrue(climb.Climb_Retract()));
+    xboxDrv.back().and(xboxDrv.b()).onTrue(CatzStateCommands.climb(this)); // Setup Climb
+    xboxDrv.back().and(xboxDrv.x()).onTrue(climb.Climb_Retract());
     // Manual Climb Control
-    xboxDrv.back().and(xboxDrv.rightStick().onTrue(climb.ClimbManualMode(() -> xboxDrv.getRightY()).alongWith(Commands.print("Using manual climb"))));
+    xboxDrv.back().and(xboxDrv.rightStick()).onTrue(climb.ClimbManualMode(() -> xboxDrv.getRightY()).alongWith(Commands.print("Using manual climb")));
 
     //TODO Score
     xboxDrv.leftTrigger(SCORE_TRIGGER_THRESHHOLD).onTrue(new InstantCommand(() -> superstructure.setCurrentRobotAction(RobotAction.OUTTAKE, superstructure.getLevel())));
@@ -228,6 +228,9 @@ public class RobotContainer {
     // xboxTest.leftTrigger().onTrue(algaeRemover.vomitAlgae().alongWith(Commands.print("vomiting algae")));
     // xboxTest.rightStick().onTrue(algaeRemover.stopAlgae().alongWith(Commands.print("stop algaeing")));
 
+    xboxTest.a().onTrue(outtake.startIntaking().alongWith(Commands.print("INTAKEKKKEEKKEKEKEING")));
+    xboxTest.b().onTrue(outtake.startOuttake().alongWith(Commands.print("INTAKEKKKEEKKEKEKEING")));
+    xboxTest.x().onTrue(outtake.stopOuttake().alongWith(Commands.print("INTAKEKKKEEKKEKEKEING")));
 
     // STOWING INTAKE RAMP FOR WHATEVER REASON
     //xboxTest.start().toggleOnTrue(rampPivot.Ramp_Stow_Pos().alongWith(Commands.print("pressed start"))); //TBD

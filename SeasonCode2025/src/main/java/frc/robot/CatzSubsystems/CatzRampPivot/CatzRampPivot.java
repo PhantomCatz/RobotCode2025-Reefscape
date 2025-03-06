@@ -77,11 +77,12 @@ public class CatzRampPivot extends SubsystemBase {
     if(DriverStation.isDisabled()) {
       // Disabled
       io.stop();
-      targetPos = RampPivotPositions.PosStow.getTargetPositionRot();
+      targetPos = RampPivotPositions.PosIntake.getTargetPositionRot();
 
     } else if(rampPivotPositions != RampPivotPositions.PosNull &&
               rampPivotPositions != RampPivotPositions.PosManual){
-      // System.out.println("RaMp_PiVoT TaRgEt: " + targetPos);
+
+      //System.out.println("RaMp_PiVoT TaRgEt: " + targetPos);
       io.setPosition(targetPos, 0);
 
     } else if (rampPivotPositions == RampPivotPositions.PosManual) {

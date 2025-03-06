@@ -18,6 +18,7 @@ import edu.wpi.first.wpilibj.util.Color;
 import frc.robot.CatzConstants;
 import frc.robot.CatzSubsystems.CatzSuperstructure;
 import frc.robot.CatzSubsystems.CatzSuperstructure.CoralState;
+import frc.robot.CatzSubsystems.CatzSuperstructure.Gamepiece;
 import frc.robot.Utilities.VirtualSubsystem;
 import lombok.Getter;
 import lombok.Setter;
@@ -40,13 +41,13 @@ public class CatzLED extends VirtualSubsystem {
   // ----------------------------------------------------------------------------------------------
   // Robot state LED tracking
   // ----------------------------------------------------------------------------------------------
-  @Getter @Setter @AutoLogOutput (key = "CatzLED/ledState")
+  @Getter @Setter @AutoLogOutput (key = "CatzLED/ElevatorLEDState")
   public ControllerLEDState ControllerState = ControllerLEDState.nuhthing;
 
   @Getter @Setter @AutoLogOutput (key = "CatzLED/QueueState")
   public QueueLEDState queueLEDState = QueueLEDState.EMPTY;
 
-  @Getter @Setter @AutoLogOutput (key = "CatzLED/ledScoringState")
+  @Getter @Setter @AutoLogOutput (key = "CatzLED/CrossbarLEDState")
   public LocationState CrossbarState = LocationState.nuhthing;
 
   public enum QueueLEDState {
@@ -309,27 +310,10 @@ public class CatzLED extends VirtualSubsystem {
           break;
       }
 
-      switch(CrossbarState) {
-        case A, G:
-          setSolidCrossbarColor(Color.kRed);
-          break;
-        case B, H:
-          setSolidCrossbarColor(Color.kBlue);
-          break;
-        case C, I:
-          setSolidCrossbarColor(Color.kRed);
-          break;
-        case D, J:
-          setSolidCrossbarColor(Color.kBlue);
-          break;
-        case E, K:
-          setSolidCrossbarColor(Color.kRed);
-          break;
-        case F, L:
-          setSolidCrossbarColor(Color.kBlue);
-          break;
-        default:
-          break;
+      if(CatzSuperstructure.getChosenGamepiece() == Gamepiece.ALGAE) {
+        setSolidCrossbarColor(Color.kAquamarine);
+      } else {
+        setSolidCrossbarColor(Color.kWhite);
       }
     }
 
