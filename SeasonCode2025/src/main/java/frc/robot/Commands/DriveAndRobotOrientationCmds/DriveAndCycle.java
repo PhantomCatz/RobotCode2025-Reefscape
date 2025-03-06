@@ -9,6 +9,7 @@ package frc.robot.Commands.DriveAndRobotOrientationCmds;
 
 import com.pathplanner.lib.path.PathPlannerPath;
 
+import edu.wpi.first.wpilibj.Timer;
 import frc.robot.CatzSubsystems.CatzSuperstructure.RobotAction;
 import frc.robot.RobotContainer;
 import frc.robot.CatzSubsystems.CatzSuperstructure;
@@ -91,7 +92,9 @@ public class DriveAndCycle extends TrajectoryDriveCmd{
     public void end(boolean interrupted){
         super.end(interrupted);
         if(action == RobotAction.OUTTAKE){
-            System.out.println("Auto Stowing");
+            if(level == 4){ //TODO not the best way to do it. eric already had code for it but i didnt have time to test so just ducttape fix
+                Timer.delay(0.5);
+            }
             superstructure.setCurrentRobotAction(RobotAction.STOW, "dnc end");
         }
     }
