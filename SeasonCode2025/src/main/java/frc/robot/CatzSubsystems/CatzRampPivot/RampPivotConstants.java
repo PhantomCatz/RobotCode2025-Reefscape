@@ -22,7 +22,7 @@ public class RampPivotConstants {
     public static final int STALL_CURRENT_LIMIT = 30; //TODO
 
     public static final double RAMP_STOW = 0;
-    public static final double RAMP_INTAKE = 8.498535;
+    public static final double RAMP_INTAKE = 9.5;
     public static final double RAMP_CLIMB = 47.810546;
     public static final double heightPlaceholder = 10;
 

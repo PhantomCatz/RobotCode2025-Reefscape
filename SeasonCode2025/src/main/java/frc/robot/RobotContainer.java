@@ -184,9 +184,8 @@ public class RobotContainer {
     xboxAux.rightStick().onTrue(Commands.runOnce(() -> selector.pathQueueClear())
                                         .alongWith(Commands.runOnce(() -> led.setControllerState(ControllerLEDState.AQUA))));
 
-    xboxAux.leftStick().and(xboxAux.rightStick()).onTrue(elevator.elevatorFullManual(()->xboxAux.getLeftY()));
+    xboxAux.leftStick().and(xboxAux.rightStick()).onTrue(elevator.elevatorFullManual(()->-xboxAux.getLeftY()));
     xboxAux.leftStick().and(xboxAux.rightStick()).onTrue(algaePivot.AlgaePivotFullManualCommand(()->xboxAux.getRightY()));
-
 
     // Coral Station Run Back
     xboxAux.button(7).onTrue(new InstantCommand(() -> selector.toggleLeftStation()).alongWith(Commands.runOnce(() -> led.setControllerState(ControllerLEDState.BALLS))));
@@ -252,13 +251,13 @@ public class RobotContainer {
     // xboxTest.a().toggleOnTrue(rampPivot.Ramp_Intake().alongWith(Commands.print("pressed a")));
 
     // Manual Elevator Control
-    // Trigger leftJoystickTrigger = new Trigger(
-    //   () -> Math.abs(xboxTest.getLeftY()) > 0.1);
-    // Trigger rightJoystickTrigger = new Trigger(
-    //   () -> Math.abs(xboxTest.getRightY()) > 0.1);
+    Trigger leftJoystickTrigger = new Trigger(
+      () -> Math.abs(xboxTest.getLeftY()) > 0.1);
+    Trigger rightJoystickTrigger = new Trigger(
+      () -> Math.abs(xboxTest.getRightY()) > 0.1);
 
-    // leftJoystickTrigger.onTrue(rampPivot.rampPivotManual(() -> xboxTest.getLeftY()).alongWith(Commands.print("Using manual ramp pivot")));
-    // leftJoystickTrigger.onFalse(rampPivot.rampPivotManual(()-> 0.0).alongWith(Commands.print("Nah - ramp motor")));
+    leftJoystickTrigger.onTrue(rampPivot.rampPivotManual(() -> xboxTest.getLeftY()).alongWith(Commands.print("Using manual ramp pivot")));
+    leftJoystickTrigger.onFalse(rampPivot.rampPivotManual(()-> 0.0).alongWith(Commands.print("Nah - ramp motor")));
 
     // //climb.ClimbManualMode(
     // rightJoystickTrigger.onTrue(climb.ClimbManualMode(() -> xboxTest.getRightY()).alongWith(Commands.print("Using manual climb")));

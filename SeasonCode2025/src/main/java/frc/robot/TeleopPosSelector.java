@@ -83,6 +83,10 @@ public class TeleopPosSelector {
     superstructure = m_container.getSuperstructure();
     drivetrain = m_container.getCatzDrivetrain();
 
+    //Internally, we define a "branch" as one of the 6 sides of the reef. The more specific side of the branch is selected with the LEFT and RIGHT
+    //The LEFT and RIGHT is always from the driverstation's POV
+
+    //The side is defined with numbers starting at 0 to 5. 0 is the farthest side from the driverstation and the number increases counter clockwise (makes calculation easier)
     poseToLetter.put("0 RIGHT", "G");
     poseToLetter.put("0 LEFT", "H");
     poseToLetter.put("1 RIGHT", "I");
@@ -110,6 +114,11 @@ public class TeleopPosSelector {
     SmartDashboard.putBoolean("Right Coral Station", rightCoralStation);
   }
 
+  /**
+   * When selecting the "best" coral station, the enabled coral station takes priority.
+   * If the coral stations are both enabled or disabled, then it selects the closest one.
+   * @return
+   */
   public Pose2d getBestCoralStation() {
     Pose2d right = FieldConstants.CoralStation.getRightStation();
     Pose2d left = FieldConstants.CoralStation.getLeftStation();
@@ -173,6 +182,7 @@ public class TeleopPosSelector {
   public void updateCurrentlySelected() {
     currentlySelected = getXBoxReefPos();
 
+    //Update the display to see which branch is currently being selected by the aux driver.
     for (int side = 0; side < 6; side++) {
       SmartDashboard.putBoolean(REEFSIDE + side + " L",
           side == currentlySelected.getFirst() && currentlySelected.getSecond().equals(LeftRight.LEFT));
@@ -180,10 +190,12 @@ public class TeleopPosSelector {
           side == currentlySelected.getFirst() && currentlySelected.getSecond().equals(LeftRight.RIGHT));
     }
 
-    for (int i = 0; i < NUM_QUEUE_DISPLAY; i++) {
-      SmartDashboard.putString(QUEUE + i, "");
-    }
 
+    // for (int i = 0; i < NUM_QUEUE_DISPLAY; i++) {
+    //   SmartDashboard.putString(QUEUE + i, "");
+    // } im pretty sure this thing isnt needed. uncomment if i messed up tho
+
+    //Update the queue display
     int i = 0;
     for (Pair<Pair<Integer, LeftRight>, Integer> pair : queuedPaths) {
       Pair<Integer, LeftRight> pose = pair.getFirst();
@@ -215,16 +227,16 @@ public class TeleopPosSelector {
     int side = 0;
     LeftRight leftRight = LeftRight.LEFT;
 
+    //The x and y are field relative with blue alliance origin.
     final double x = -xboxAux.getRightY();
     final double y = -xboxAux.getRightX();
 
     if (Math.hypot(x, y) > SELECTION_THRESHOLD) {
       // ensures angle is between 0-2pi (Dr. Eric Yuchen Lu (MD)'s idea)
       double angle = (Math.atan2(y, x) + 2 * Math.PI) % (2 * Math.PI);
-      side = (int) Math.round(angle * 3.0 / Math.PI) % 6;
+      side = (int) Math.round(angle * 3.0 / Math.PI) % 6; //mod 6 to keep the side between 0 and 5
 
-      // if angle is too close to 2pi, then it will return 12, but we want selected to
-      // be between 0-11 (Dr. Eric Yuchen Lu (MD)'s idea)
+      // Split the angle into twelveth and determine the left or right. Left and right changes when x is negative
       int leftOrRight = (int) Math.ceil(angle * 6.0 / Math.PI) % 12;
       if (x > 0) {
         leftRight = leftOrRight % 2 == 0 ? LeftRight.RIGHT : LeftRight.LEFT;
@@ -237,6 +249,10 @@ public class TeleopPosSelector {
     }
   }
 
+  /**
+   * Iterate through all reef positions and find the closest one.
+   * @return
+   */
   public Pair<Pair<Integer, LeftRight>, Integer> getClosestReefPos() {
     int closestSide = 0;
     LeftRight closestLeftRight = LeftRight.LEFT;
@@ -260,13 +276,18 @@ public class TeleopPosSelector {
   public Pose2d calculateReefPose(int reefAngle, LeftRight leftRightPos) {
     Rotation2d selectedAngle = Rotation2d.fromRotations(reefAngle / 6.0);
 
+    //A unit vector with its origin placed at the center of the reef pointing orthogonally to the selected side.
     Translation2d unitRadius = new Translation2d(selectedAngle.getCos(), selectedAngle.getSin());
+
+    //Rotate the unit vector 90 degrees to the left to account for branch distances
     Translation2d unitLeftRight = unitRadius.rotateBy(Rotation2d.fromDegrees(90));
 
+    //This vector is now pointing at the scoring position of the robot, but not accounting for the left right distances
     Translation2d radius = unitRadius.times(Reef.reefOrthogonalRadius + Reef.scoringDistance);
-    // radius = radius.plus(unitLeftRight.times(-Units.inchesToMeters(0)));
 
     Translation2d leftRight = unitLeftRight.times(leftRightPos.NUM * Reef.leftRightDistance);
+
+    //Left right changes depending on whether the selected side is the upper or lower half of the reef.
     if (unitLeftRight.getY() < 0) {
       leftRight = leftRight.times(-1);
     }
@@ -331,7 +352,7 @@ public class TeleopPosSelector {
             new Waypoint(null, currentPos, currentPos.plus(direction)),
             new Waypoint(goalPos.minus(direction), goalPos, null)
         }),
-        DriveConstants.PATHFINDING_CONSTRAINTS,
+        DriveConstants.LEFT_RIGHT_CONSTRAINTS,
         null,
         new GoalEndState(0, goal.getRotation()));
 

@@ -35,7 +35,7 @@ public class VisionConstants {
 
   // Standard deviation baselines, for 1 meter distance and 1 tag
   // (Adjusted automatically based on distance and # of tags)
-  public static final double LINEAR_STD_DEV_BASELINE = 0.015; // Meters
+  public static final double LINEAR_STD_DEV_BASELINE = 0.04; // Meters
   public static final double ANGULAR_STD_DEV_BASELINE = 0.01; // Radians
 
   public static final VisionIO[] limelights =
@@ -54,6 +54,7 @@ public class VisionConstants {
       };
 
   public static final boolean USE_MEGATAG1 = false; // megatag 1 3d solve allows robot to fly
+  public static final double EXTRA_LATENCY_MS = 135;
 
   // Multipliers to apply for MegaTag 2 observations
   public static final double LINEAR_STD_DEV_MEGATAG2_SCALE_FACTOR = 1.0; // More stable than full 3D solve
