@@ -96,7 +96,7 @@ public class CatzSuperstructure extends VirtualSubsystem {
         setCurrentRobotAction(action, level);
     }
 
-    public void setCurrentRobotAction(RobotAction action, int level) {
+    public Command setCurrentRobotAction(RobotAction action, int level) {
         Command robotActionCommand = Commands.print("No robot Action Selected");
         RobotState prevRobotState = currentRobotState;
         this.currentRobotAction = action;
@@ -219,6 +219,9 @@ public class CatzSuperstructure extends VirtualSubsystem {
         if(prevRobotState != currentRobotState){
             System.out.println("scheudled: " + currentRobotState.toString());
             robotActionCommand.schedule();
+            return robotActionCommand;
+        } else {
+            return null;
         }
     }
 

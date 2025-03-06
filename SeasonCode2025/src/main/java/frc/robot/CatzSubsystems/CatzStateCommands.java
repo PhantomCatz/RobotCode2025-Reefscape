@@ -23,9 +23,9 @@ import frc.robot.CatzSubsystems.CatzOuttake.CatzOuttake;
 
 public class CatzStateCommands {
 
+    private final static double TIMEOUT = 1.0;
 
     public static Command stow(RobotContainer robotContainer) {
-
         CatzClimb climb = robotContainer.getCatzClimb();
         CatzAlgaeRemover algae = robotContainer.getCatzAlgaeRemover();
         CatzOuttake outtake = robotContainer.getCatzOuttake();
@@ -37,7 +37,6 @@ public class CatzStateCommands {
             outtake.stopOuttake(),
             elevator.Elevator_Stow()
         ).unless(()-> Robot.isSimulation()).alongWith(Commands.print("Stow"));
-
     }
 
     public static Command intakeCoralGround(RobotContainer robotContainer) {
@@ -59,7 +58,8 @@ public class CatzStateCommands {
             // climb.Climb_Retract(),
             algae.stopAlgae(),
             outtake.startIntaking(),
-            elevator.Elevator_Stow()
+            elevator.Elevator_Stow(),
+            Commands.waitUntil(() -> outtake.hasCoral())
         ).unless(()-> Robot.isSimulation()).alongWith(Commands.print("Intake Coral Station"));
     }
 
@@ -74,7 +74,7 @@ public class CatzStateCommands {
             algae.eatAlgae(),
             outtake.stopOuttake(),
             elevator.Elevator_Stow()
-        ).unless(()-> Robot.isSimulation()).alongWith(Commands.print("intakeAlgae"));
+        ).unless(()-> Robot.isSimulation());
     }
 
     public static Command L1Coral(RobotContainer robotContainer) {
@@ -89,7 +89,9 @@ public class CatzStateCommands {
 
             new SequentialCommandGroup(
                 elevator.Elevator_L1(),
-                outtake.outtakeL1()
+                Commands.waitUntil(() -> elevator.isElevatorInPosition()).withTimeout(TIMEOUT),
+                outtake.startOuttake(),
+                Commands.waitUntil(() -> outtake.hasCoral() == false).withTimeout(TIMEOUT)
             )
         )//.onlyIf(() -> CatzSuperstructure.getCurrentCoralState() == CoralState.IN_OUTTAKE)
          .unless(()-> Robot.isSimulation()).alongWith(Commands.print("L1 Scoring State"));
@@ -107,8 +109,9 @@ public class CatzStateCommands {
 
             new SequentialCommandGroup(
                 elevator.Elevator_L2(),
-                Commands.waitUntil(() -> elevator.isElevatorInPosition()),
-                outtake.startOuttake()
+                Commands.waitUntil(() -> elevator.isElevatorInPosition()).withTimeout(TIMEOUT),
+                outtake.startOuttake(),
+                Commands.waitUntil(() -> outtake.hasCoral() == false).withTimeout(TIMEOUT)
             )
         )//.onlyIf(() -> CatzSuperstructure.getCurrentCoralState() == CoralState.IN_OUTTAKE)
          .unless(()-> Robot.isSimulation()).alongWith(Commands.print("L2 Scoring State")).unless(()-> Robot.isSimulation());
@@ -126,8 +129,9 @@ public class CatzStateCommands {
 
             new SequentialCommandGroup(
                 elevator.Elevator_L3(),
-                Commands.waitUntil(() -> elevator.isElevatorInPosition()),
-                outtake.startOuttake()
+                Commands.waitUntil(() -> elevator.isElevatorInPosition()).withTimeout(TIMEOUT),
+                outtake.startOuttake(),
+                Commands.waitUntil(() -> outtake.hasCoral() == false).withTimeout(TIMEOUT)
             )
         )//.onlyIf(() -> CatzSuperstructure.getCurrentCoralState() == CoralState.IN_OUTTAKE)
          .unless(()-> Robot.isSimulation()).alongWith(Commands.print("L3 scoring state"));
@@ -146,10 +150,11 @@ public class CatzStateCommands {
 
             new SequentialCommandGroup(
                 elevator.Elevator_L4(),
-                Commands.waitUntil(() -> elevator.isElevatorInPosition()).withTimeout(0.8).alongWith(Commands.print("/////////L4?////////")),
-                outtake.outtakeL4().alongWith(Commands.print("/????????????outake???????????")),
+                Commands.waitUntil(() -> elevator.isElevatorInPosition()).withTimeout(TIMEOUT),
+                outtake.outtakeL4(),
                 Commands.waitSeconds(0.5),
-                elevator.Elevator_L4_Adj()
+                elevator.Elevator_L4_Adj(),
+                Commands.waitUntil(() -> outtake.hasCoral() == false).withTimeout(TIMEOUT)
             )
         )//.onlyIf(() -> CatzSuperstructure.getCurrentCoralState() == CoralState.IN_OUTTAKE)
          .unless(()-> Robot.isSimulation()).alongWith(Commands.print("L4 Scoring State"));

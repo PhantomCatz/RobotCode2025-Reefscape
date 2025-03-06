@@ -9,6 +9,7 @@ package frc.robot.Commands.DriveAndRobotOrientationCmds;
 
 import com.pathplanner.lib.path.PathPlannerPath;
 
+import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.CatzSubsystems.CatzSuperstructure.CoralState;
 import frc.robot.CatzSubsystems.CatzSuperstructure.RobotAction;
 import frc.robot.RobotContainer;
@@ -22,14 +23,13 @@ public class DriveAndCycle extends TrajectoryDriveCmd{
     private RobotAction action;
     private TeleopPosSelector selector;
     private CatzSuperstructure superstructure;
-    private CatzOuttake outtake;
+    private Command endCommand;
     private int level;
 
     public DriveAndCycle(PathPlannerPath newPath, RobotContainer container, RobotAction action){
         super(newPath, container.getCatzDrivetrain(), action != RobotAction.INTAKE);
         this.action = action;
         this.superstructure = container.getSuperstructure();
-        this.outtake = container.getCatzOuttake();
         this.selector = container.getSelector();
         addRequirements(super.getRequirements());
     }
@@ -39,7 +39,6 @@ public class DriveAndCycle extends TrajectoryDriveCmd{
         this.level = level;
         this.action = action;
         this.superstructure = container.getSuperstructure();
-        this.outtake = container.getCatzOuttake();
         this.selector = container.getSelector();
         addRequirements(super.getRequirements());
     }
@@ -62,23 +61,24 @@ public class DriveAndCycle extends TrajectoryDriveCmd{
         // Run Scoring or Intaking
         if (super.isPoseWithinThreshold(PREDICT_DISTANCE) && !super.isFinished() && !isAiming){
             if(action == RobotAction.OUTTAKE){
-                System.out.println("raised elevator!!!!!!!");
                 superstructure.setCurrentRobotAction(RobotAction.AIMING, level);
-                isAiming = true;
             }
             else if(action == RobotAction.INTAKE){
-                // System.out.println("intaking!!!!!!");
                 superstructure.setCurrentRobotAction(RobotAction.INTAKE);
             }
+            isAiming = true;
         }
 
         // If we reached the target Destination
         if (super.isFinished() && isAiming){
             super.end(false);
-            superstructure.setCurrentRobotAction(action, this.level);
-            // System.out.println("action: " + action.toString());
             if (selector.useFakeCoral){
                 selector.hasCoralSIM = action == RobotAction.INTAKE;
+            }
+
+            Command scheduledCommand = superstructure.setCurrentRobotAction(action, this.level);
+            if(scheduledCommand != null){
+                endCommand = scheduledCommand;
             }
         }
     }
@@ -93,18 +93,8 @@ public class DriveAndCycle extends TrajectoryDriveCmd{
 
     @Override
     public boolean isFinished(){
-        if(action == RobotAction.OUTTAKE){
-            if(selector.useFakeCoral){
-                return !selector.hasCoralSIM;
-            }else{
-                return (CatzSuperstructure.getCurrentCoralState() == CoralState.NOT_IN_OUTTAKE);
-            }
-        }
-        if(action == RobotAction.INTAKE){
-            if(selector.useFakeCoral){
-                return selector.hasCoralSIM;
-            }
-            return (CatzSuperstructure.getCurrentCoralState() == CoralState.IN_OUTTAKE);
+        if(endCommand != null){
+            return endCommand.isFinished();
         }
         return false;
     }
