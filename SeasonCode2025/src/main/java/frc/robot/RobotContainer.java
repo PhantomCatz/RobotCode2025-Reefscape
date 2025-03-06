@@ -168,7 +168,7 @@ public class RobotContainer {
     // Default driving
     Trigger escapeTrajectory = new Trigger(()->(xboxDrv.getLeftY() > 0.8));
     escapeTrajectory.onTrue(selector.cancelCurrentDrivetrainCommand().alongWith(selector.cancelAutoCommand()));
-    drive.setDefaultCommand(new TeleopDriveCmd(() -> xboxDrv.getLeftX(), () -> xboxDrv.getLeftY(), () -> xboxDrv.getRightX(), drive));
+    drive.setDefaultCommand(new TeleopDriveCmd(() -> xboxDrv.getLeftX(), () -> xboxDrv.getLeftY(), () -> xboxDrv.getRightX(), drive).unless(()->xboxAux.b().getAsBoolean()));
 
     //---------------------------------------------------------------------------------------------------------------------
     // XBOX AUX
@@ -181,7 +181,7 @@ public class RobotContainer {
                                         .alongWith(Commands.runOnce(() -> led.setControllerState(ControllerLEDState.AQUA))));
     xboxAux.rightBumper().onTrue(Commands.runOnce(() -> selector.pathQueuePopBack())
                                          .alongWith(Commands.runOnce(() -> led.setControllerState(ControllerLEDState.AQUA))));
-    xboxAux.rightStick().onTrue(Commands.runOnce(() -> selector.pathQueueClear())
+    xboxAux.rightStick().onTrue(Commands.runOnce(() -> selector.pathQueueClear()).unless(()->xboxAux.leftStick().getAsBoolean())
                                         .alongWith(Commands.runOnce(() -> led.setControllerState(ControllerLEDState.AQUA))));
 
     xboxAux.leftStick().and(xboxAux.rightStick()).onTrue(elevator.elevatorFullManual(()->-xboxAux.getLeftY()));
@@ -203,7 +203,7 @@ public class RobotContainer {
     // algae punch
     DoublePressTracker.createTrigger(xboxAux.x())
                       .onTrue(algaePivot.AlgaePivot_Punch()
-                                        .onlyIf(()->superstructure.getChosenGamepiece() == Gamepiece.ALGAE)
+                                        .onlyIf(()->CatzSuperstructure.getChosenGamepiece() == Gamepiece.ALGAE)
                                         .alongWith(Commands.print("Algae Punch"))
     );
 
