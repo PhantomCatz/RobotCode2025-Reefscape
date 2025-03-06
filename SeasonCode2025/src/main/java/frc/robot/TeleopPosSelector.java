@@ -13,6 +13,7 @@ import java.util.HashMap;
 import java.util.LinkedList;
 
 import com.pathplanner.lib.path.GoalEndState;
+import com.pathplanner.lib.path.PathConstraints;
 import com.pathplanner.lib.path.PathPlannerPath;
 import com.pathplanner.lib.path.Waypoint;
 
@@ -24,6 +25,7 @@ import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.FieldConstants.Reef;
 import frc.robot.Utilities.AllianceFlipUtil;
@@ -357,30 +359,11 @@ public class TeleopPosSelector {
     Pose2d goal = calculateReefPose(new Pair<Integer, LeftRight>(currentPathfindingPair.getFirst(), leftRight), true, true);
     Pose2d currentPose = tracker.getEstimatedPose();
 
-    Translation2d goalPos = goal.getTranslation();
-    Translation2d currentPos = currentPose.getTranslation();
-    Translation2d direction = goalPos.minus(currentPos).div(2.0);
-
-    //if too far from reef side, then don't NBA
-    if (currentPose.getTranslation().getDistance(goal.getTranslation()) > Reef.leftRightDistance * 3
-        || direction.getNorm() <= 1e-3) {
+    if (currentPose.getTranslation().getDistance(goal.getTranslation()) > Reef.leftRightDistance * 3) {
       return;
     }
 
-    PathPlannerPath path = new PathPlannerPath(
-        Arrays.asList(new Waypoint[] {
-            new Waypoint(null, currentPos, currentPos.plus(direction)),
-            new Waypoint(goalPos.minus(direction), goalPos, null)
-        }),
-        DriveConstants.LEFT_RIGHT_CONSTRAINTS,
-        null,
-        new GoalEndState(0, goal.getRotation()));
-
-    if (AllianceFlipUtil.shouldFlipToRed()) {
-      path = path.flipPath();
-    }
-
-    currentDrivetrainCommand = new TrajectoryDriveCmd(path, drivetrain, true, m_container);
+    currentDrivetrainCommand = getStraightLineTrajectory(currentPose, goal, DriveConstants.LEFT_RIGHT_CONSTRAINTS, true);
     currentDrivetrainCommand.schedule();
   }
 
@@ -487,9 +470,42 @@ public class TeleopPosSelector {
     });
   }
 
+  public Command runDriveForwardScoreCommand(){
+    return new InstantCommand(() ->{
+      Pose2d curPose = tracker.getEstimatedPose();
+      Pose2d goalPose = calculateReefPose(currentPathfindingPair, true, false);
+
+      currentDrivetrainCommand = new SequentialCommandGroup(
+        getStraightLineTrajectory(curPose, goalPose, DriveConstants.LEFT_RIGHT_CONSTRAINTS, true).alongWith(new InstantCommand(() ->superstructure.setCurrentRobotAction(RobotAction.AIMING, superstructure.getLevel()))),
+        new InstantCommand(() -> superstructure.setCurrentRobotAction(RobotAction.OUTTAKE, superstructure.getLevel()))
+      );
+    });
+  }
+
   public Command cancelAutoCommand() {
     return new InstantCommand(() -> {
       currentAutoplayCommand.cancel();
     });
+  }
+
+  public Command getStraightLineTrajectory(Pose2d start, Pose2d end, PathConstraints constraints, boolean autoalign){
+    Translation2d direction = end.getTranslation().minus(start.getTranslation()).div(2);
+
+    if(direction.getNorm() <= 1e-3){
+      return new InstantCommand();
+    }
+
+    PathPlannerPath path = new PathPlannerPath(
+      Arrays.asList(new Waypoint[] {
+        new Waypoint(null, start.getTranslation(), start.getTranslation().plus(direction)),
+        new Waypoint(end.getTranslation().minus(direction), end.getTranslation(), null)
+      }), constraints, null, new GoalEndState(0, end.getRotation())
+    );
+
+    if(AllianceFlipUtil.shouldFlipToRed()){
+      path = path.flipPath();
+    }
+
+    return new TrajectoryDriveCmd(path, drivetrain, autoalign, m_container);
   }
 }

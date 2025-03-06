@@ -7,20 +7,15 @@
 
 package frc.robot.Commands.DriveAndRobotOrientationCmds;
 
-import java.util.Arrays;
 
-import com.pathplanner.lib.path.GoalEndState;
 import com.pathplanner.lib.path.PathPlannerPath;
-import com.pathplanner.lib.path.Waypoint;
 
 import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.CatzSubsystems.CatzSuperstructure.RobotAction;
-import frc.robot.Utilities.AllianceFlipUtil;
 import frc.robot.RobotContainer;
 import frc.robot.CatzSubsystems.CatzSuperstructure;
 import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.CatzRobotTracker;
@@ -39,7 +34,6 @@ public class DriveAndCycle extends TrajectoryDriveCmd {
     private Command driveForwardScoreCmd;
 
     private boolean actionAlreadyTaken = false; //i am sorry im currently writing this in my physics class and im running low on time :(
-    private boolean alreadyOuttake = false;
     private boolean alreadyStopped = false;
 
     public DriveAndCycle(PathPlannerPath newPath, RobotContainer container, RobotAction action) {
@@ -70,7 +64,7 @@ public class DriveAndCycle extends TrajectoryDriveCmd {
         super.initialize();
         // selector.hasCoralSIM = true;
         actionAlreadyTaken = false;
-        alreadyOuttake = false;
+        alreadyStopped = false;
     }
 
     @Override
@@ -97,11 +91,10 @@ public class DriveAndCycle extends TrajectoryDriveCmd {
         if (initialDriveFinished && !alreadyStopped) {
             super.end(false);
             alreadyStopped = true;
-            
+
         }
 
-        if (initialDriveFinished && action == RobotAction.OUTTAKE && !alreadyOuttake) {
-            alreadyOuttake = true;
+        if (alreadyStopped && action == RobotAction.OUTTAKE) {
             driveForwardScoreCmd.execute();
             // superstructure.setCurrentRobotAction(RobotAction.OUTTAKE, this.level);
 
@@ -112,7 +105,7 @@ public class DriveAndCycle extends TrajectoryDriveCmd {
             }
         }
         // System.out.println("action: " + action.toString());
-        
+
     }
 
     @Override
@@ -141,23 +134,10 @@ public class DriveAndCycle extends TrajectoryDriveCmd {
     //TODO make a function for creating a straight line trajectory
     private Command getDriveForwardCommand() {
         Pose2d currentPose = CatzRobotTracker.getInstance().getEstimatedPose();
-        Translation2d direction = trueGoal.getTranslation().minus(currentPose.getTranslation()).div(2.0);
-        if (direction.getNorm() <= 1e-3) {
-            return null;
-        }
-
-        PathPlannerPath path = new PathPlannerPath(
-                Arrays.asList(new Waypoint[] {
-                        new Waypoint(null, currentPose.getTranslation(), currentPose.getTranslation().plus(direction)),
-                        new Waypoint(trueGoal.getTranslation().minus(direction), trueGoal.getTranslation(), null)
-                }), DriveConstants.LEFT_RIGHT_CONSTRAINTS, null, new GoalEndState(0.0, trueGoal.getRotation()));
-
-        if(AllianceFlipUtil.shouldFlipToRed()){
-            path = path.flipPath();
-        }
+        Command trajCommand = container.getSelector().getStraightLineTrajectory(currentPose, trueGoal, DriveConstants.LEFT_RIGHT_CONSTRAINTS, true);
 
         return new SequentialCommandGroup(
-            new TrajectoryDriveCmd(path, container.getCatzDrivetrain(), true, container),
+            trajCommand,
             new InstantCommand(() -> superstructure.setCurrentRobotAction(RobotAction.OUTTAKE, level))
         );
     }

@@ -173,7 +173,7 @@ public class CatzAutonomous extends SubsystemBase {
 
           if(components.length == 1){
             command = new TrajectoryDriveCmd(PathPlannerPath.fromPathFile(commandName), drivetrain, true, container);
-          } else if(components.length >= 2){
+          } else if(components.length == 3){
             String name = components[0];
             String action = components[1];
 
@@ -186,6 +186,8 @@ public class CatzAutonomous extends SubsystemBase {
             } else if(action.contains("ReefL")){
               command = new DriveAndCycle(PathPlannerPath.fromPathFile(name), m_container, RobotAction.OUTTAKE, Integer.parseInt(action.substring("ReefL".length())), trueGoal);
             }
+          }else{
+             return;
           }
 
           if(command == null){
