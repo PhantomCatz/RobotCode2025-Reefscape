@@ -171,6 +171,20 @@ public class TeleopPosSelector {
     }
   }
 
+  public Pair<Integer, LeftRight> getPairFromString(String str){
+    String[] split = str.split(" ");
+    LeftRight lr = null;
+
+    if(split[1].equalsIgnoreCase("L")){
+      lr = LeftRight.LEFT;
+    }
+    else if(split[1].equalsIgnoreCase("R")){
+      lr = LeftRight.RIGHT;
+    }
+
+    return new Pair(Integer.parseInt(split[0]), lr);
+  }
+
   public void pathQueuePopBack() {
     queuedPaths.pollLast();
   }
@@ -260,8 +274,8 @@ public class TeleopPosSelector {
 
     for (int side = 0; side < 6; side++) {
       for (LeftRight leftRight : LeftRight.values()) {
-        Pose2d reefPos = calculateReefPose(side, leftRight);
-        if (reefPos.getTranslation().getDistance(robotPos) < calculateReefPose(closestSide, closestLeftRight)
+        Pose2d reefPos = calculateReefPose(side, leftRight, true);
+        if (reefPos.getTranslation().getDistance(robotPos) < calculateReefPose(closestSide, closestLeftRight, true)
             .getTranslation().getDistance(robotPos)) {
           closestSide = side;
           closestLeftRight = leftRight;
@@ -273,7 +287,7 @@ public class TeleopPosSelector {
   }
 
   // TODO calculate this on comptime and store it in an array
-  public Pose2d calculateReefPose(int reefAngle, LeftRight leftRightPos) {
+  public Pose2d calculateReefPose(int reefAngle, LeftRight leftRightPos, boolean driveBack) {
     Rotation2d selectedAngle = Rotation2d.fromRotations(reefAngle / 6.0);
 
     //A unit vector with its origin placed at the center of the reef pointing orthogonally to the selected side.
@@ -283,7 +297,13 @@ public class TeleopPosSelector {
     Translation2d unitLeftRight = unitRadius.rotateBy(Rotation2d.fromDegrees(90));
 
     //This vector is now pointing at the scoring position of the robot, but not accounting for the left right distances
-    Translation2d radius = unitRadius.times(Reef.reefOrthogonalRadius + Reef.scoringDistance);
+    Translation2d radius;
+
+    if(driveBack){
+      radius = unitRadius.times(Reef.reefOrthogonalRadius + Reef.scoringDistance + Reef.backDistance);
+    }else{
+      radius = unitRadius.times(Reef.reefOrthogonalRadius + Reef.scoringDistance);
+    }
 
     Translation2d leftRight = unitLeftRight.times(leftRightPos.NUM * Reef.leftRightDistance);
 
@@ -296,14 +316,14 @@ public class TeleopPosSelector {
     return AllianceFlipUtil.apply(new Pose2d(scoringPos, selectedAngle.plus(Rotation2d.k180deg)));
   }
 
-  public Pose2d calculateReefPose(Pair<Integer, LeftRight> pair, boolean isNBA) {
+  public Pose2d calculateReefPose(Pair<Integer, LeftRight> pair, boolean isNBA, boolean driveback) {
     if (isNBA) {
       currentPathfindingPair = pair;
     }
     if (pair == null) {
       return null;
     } else {
-      return calculateReefPose(pair.getFirst(), pair.getSecond());
+      return calculateReefPose(pair.getFirst(), pair.getSecond(), driveback);
     }
   }
 
@@ -334,7 +354,7 @@ public class TeleopPosSelector {
 
     currentDrivetrainCommand.cancel();
 
-    Pose2d goal = calculateReefPose(new Pair<Integer, LeftRight>(currentPathfindingPair.getFirst(), leftRight), true);
+    Pose2d goal = calculateReefPose(new Pair<Integer, LeftRight>(currentPathfindingPair.getFirst(), leftRight), true, true);
     Pose2d currentPose = tracker.getEstimatedPose();
 
     Translation2d goalPos = goal.getTranslation();
@@ -434,7 +454,7 @@ public class TeleopPosSelector {
       currentPathfindingPair = getClosestReefPos().getFirst();
       currentDrivetrainCommand.cancel();
       try{
-        currentDrivetrainCommand = new TrajectoryDriveCmd(getPathfindingPath(calculateReefPose(currentPathfindingPair, true)), drivetrain, true, m_container);
+        currentDrivetrainCommand = new TrajectoryDriveCmd(getPathfindingPath(calculateReefPose(currentPathfindingPair, true, true)), drivetrain, true, m_container);
         currentDrivetrainCommand.schedule();
       }catch(Exception e){
         e.printStackTrace();
@@ -458,7 +478,7 @@ public class TeleopPosSelector {
 
   public Command getReefScoreCommand(Pair<Pair<Integer, LeftRight>, Integer> pair) {
     currentPathfindingPair = null;
-    return new DriveAndCycle(getPathfindingPath(calculateReefPose(pair.getFirst(), false)), m_container, RobotAction.OUTTAKE, pair.getSecond());
+    return new DriveAndCycle(getPathfindingPath(calculateReefPose(pair.getFirst(), false, true)), m_container, RobotAction.OUTTAKE, pair.getSecond(), calculateReefPose(pair.getFirst(), false, false));
   }
 
   public Command cancelCurrentDrivetrainCommand() {

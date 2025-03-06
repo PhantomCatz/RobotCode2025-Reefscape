@@ -13,6 +13,7 @@ import com.pathplanner.lib.commands.PathPlannerAuto;
 import com.pathplanner.lib.path.PathPlannerPath;
 import com.pathplanner.lib.util.FileVersionException;
 
+import edu.wpi.first.math.Pair;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -24,6 +25,7 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.PrintCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.CatzSubsystems.CatzStateCommands;
+import frc.robot.CatzSubsystems.CatzSuperstructure.LeftRight;
 import frc.robot.CatzSubsystems.CatzSuperstructure.RobotAction;
 import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.*;
 import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.Drivetrain.CatzDrivetrain;
@@ -171,14 +173,18 @@ public class CatzAutonomous extends SubsystemBase {
 
           if(components.length == 1){
             command = new TrajectoryDriveCmd(PathPlannerPath.fromPathFile(commandName), drivetrain, true, container);
-          } else if(components.length == 2){
+          } else if(components.length >= 2){
             String name = components[0];
             String action = components[1];
+
+            String goal = components[2];
+            Pair<Integer, LeftRight> goalPair = container.getSelector().getPairFromString(goal);
+            Pose2d trueGoal = container.getSelector().calculateReefPose(goalPair, false, false);
 
             if(action.equalsIgnoreCase("CS")){
               command = new DriveAndCycle(PathPlannerPath.fromPathFile(name), m_container, RobotAction.INTAKE);
             } else if(action.contains("ReefL")){
-              command = new DriveAndCycle(PathPlannerPath.fromPathFile(name), m_container, RobotAction.OUTTAKE, Integer.parseInt(action.substring("ReefL".length())));
+              command = new DriveAndCycle(PathPlannerPath.fromPathFile(name), m_container, RobotAction.OUTTAKE, Integer.parseInt(action.substring("ReefL".length())), trueGoal);
             }
           }
 
