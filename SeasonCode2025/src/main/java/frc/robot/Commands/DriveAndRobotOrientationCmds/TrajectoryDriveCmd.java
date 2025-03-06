@@ -54,7 +54,7 @@ public class TrajectoryDriveCmd extends Command {
   public static final double ALLOWABLE_VEL_ERROR = 0.2;
   public static final double ALLOWABLE_OMEGA_ERROR = 3.0;
   private static final double TIMEOUT_SCALAR = 50.0;
-  private static final double CONVERGE_DISTANCE = 0.10;
+  private static final double CONVERGE_DISTANCE = 0.05;
   private final double ALLOWABLE_VISION_ADJUST = 4e-3; //TODO tune
 
   // Subsystems
@@ -206,6 +206,8 @@ public class TrajectoryDriveCmd extends Command {
   // ---------------------------------------------------------------------------------------------
   @Override
   public void execute() {
+    if(this.trajectory == null || isBugged) return;
+
     // Collect instananous variables
     double currentTime = timer.get();
     Pose2d currentPose = tracker.getEstimatedPose();
