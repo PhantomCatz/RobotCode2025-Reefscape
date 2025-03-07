@@ -22,6 +22,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.PrintCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.CatzSubsystems.CatzStateCommands;
@@ -166,7 +167,6 @@ public class CatzAutonomous extends SubsystemBase {
       ArrayList<Object> commands = JSONUtil.getCommandsFromAuton(autoName);
       for (Object o : commands) {
         String commandName = JSONUtil.getCommandName(o);
-        System.out.println("nameeee: " + commandName);
         try {
           String[] components = commandName.split("\\+");
           Command command = null;
@@ -179,6 +179,8 @@ public class CatzAutonomous extends SubsystemBase {
 
             String goal = components[2];
             Pair<Integer, LeftRight> goalPair = container.getSelector().getPairFromString(goal);
+
+            //reef pose is not correctly flipped here because alliance is not set yet, so it will be flipped later.
             Pose2d trueGoal = container.getSelector().calculateReefPose(goalPair, false, false);
 
             if(action.equalsIgnoreCase("CS")){
@@ -187,7 +189,7 @@ public class CatzAutonomous extends SubsystemBase {
               command = new DriveAndCycle(PathPlannerPath.fromPathFile(name), m_container, RobotAction.OUTTAKE, Integer.parseInt(action.substring("ReefL".length())), trueGoal);
             }
           }else{
-             return;
+             command = new InstantCommand();
           }
 
           if(command == null){

@@ -506,6 +506,7 @@ public class TeleopPosSelector {
       path = path.flipPath();
     }
 
+
     return new TrajectoryDriveCmd(path, drivetrain, autoalign, m_container);
   }
 }

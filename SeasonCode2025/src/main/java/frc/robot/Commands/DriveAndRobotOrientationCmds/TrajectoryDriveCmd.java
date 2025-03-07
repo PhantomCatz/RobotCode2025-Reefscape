@@ -195,6 +195,9 @@ public class TrajectoryDriveCmd extends Command {
       e.printStackTrace();
     }
     //
+    System.out.println("total:" + trajectory.getTotalTimeSeconds());
+    System.out.println("start:" + trajectory.getInitialPose());
+    System.out.println("end" + trajectory.getState(trajectory.getStates().size()-1).pose);
   } // end of initialize()
 
 
