@@ -170,22 +170,22 @@ public class CatzAutonomous extends SubsystemBase {
         try {
           String[] components = commandName.split("\\+");
           Command command = null;
-
           if(components.length == 1){
             command = new TrajectoryDriveCmd(PathPlannerPath.fromPathFile(commandName), drivetrain, true, container);
-          } else if(components.length == 3){
+          } else if(components.length >= 2){
             String name = components[0];
             String action = components[1];
 
-            String goal = components[2];
-            Pair<Integer, LeftRight> goalPair = container.getSelector().getPairFromString(goal);
-
-            //reef pose is not correctly flipped here because alliance is not set yet, so it will be flipped later.
-            Pose2d trueGoal = container.getSelector().calculateReefPose(goalPair, false, false);
 
             if(action.equalsIgnoreCase("CS")){
+              System.out.println("coral stattiiotioatoin");
               command = new DriveAndCycle(PathPlannerPath.fromPathFile(name), m_container, RobotAction.INTAKE);
-            } else if(action.contains("ReefL")){
+            } else if(action.contains("ReefL") && components.length == 3){
+              String goal = components[2];
+              Pair<Integer, LeftRight> goalPair = container.getSelector().getPairFromString(goal);
+
+              //reef pose is not correctly flipped here because alliance is not set yet, so it will be flipped later.
+              Pose2d trueGoal = container.getSelector().calculateReefPose(goalPair, false, false);
               command = new DriveAndCycle(PathPlannerPath.fromPathFile(name), m_container, RobotAction.OUTTAKE, Integer.parseInt(action.substring("ReefL".length())), trueGoal);
             }
           }else{

@@ -117,6 +117,7 @@ public class DriveAndCycle extends TrajectoryDriveCmd {
 
     @Override
     public void end(boolean interrupted) {
+        System.out.println("the day has ended" + interrupted + action);
         super.end(interrupted);
 
         driveForwardScoreCmd.end(interrupted);
