@@ -187,7 +187,7 @@ public class CatzAutonomous extends SubsystemBase {
 
               //reef pose is not correctly flipped here because alliance is not set yet, so it will be flipped later.
               Pose2d trueGoal = container.getSelector().calculateReefPose(goalPair, false, false);
-              command = new DriveAndCycle(PathPlannerPath.fromPathFile(name), m_container, RobotAction.OUTTAKE, Integer.parseInt(action.substring("ReefL".length())), trueGoal);
+              command = new DriveAndCycle(PathPlannerPath.fromPathFile(name), m_container, RobotAction.OUTTAKE, Integer.parseInt(action.substring("ReefL".length())), trueGoal).alongWith(new WaitCommand(0.3));
             }
           }else{
              command = new InstantCommand();
