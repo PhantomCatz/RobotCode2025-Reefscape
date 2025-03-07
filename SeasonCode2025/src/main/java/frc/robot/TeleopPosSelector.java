@@ -475,10 +475,12 @@ public class TeleopPosSelector {
       Pose2d curPose = tracker.getEstimatedPose();
       Pose2d goalPose = calculateReefPose(currentPathfindingPair, true, false);
 
+      currentDrivetrainCommand.cancel();
       currentDrivetrainCommand = new SequentialCommandGroup(
         getStraightLineTrajectory(curPose, goalPose, DriveConstants.LEFT_RIGHT_CONSTRAINTS, true).alongWith(new InstantCommand(() ->superstructure.setCurrentRobotAction(RobotAction.AIMING, superstructure.getLevel()))),
         new InstantCommand(() -> superstructure.setCurrentRobotAction(RobotAction.OUTTAKE, superstructure.getLevel()))
       );
+      currentDrivetrainCommand.schedule();
     });
   }
 
