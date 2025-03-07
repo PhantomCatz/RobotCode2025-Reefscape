@@ -333,6 +333,7 @@ public class Robot extends LoggedRobot {
   @Override
   public void autonomousInit() {
     isFirstPath = true;
+    m_robotContainer.getSelector().hasCoralSIM = true;
     // deployment benchmark
     LAST_DEPLOYMENT_WARNING.set(true);
     autoStart = Timer.getFPGATimestamp();
