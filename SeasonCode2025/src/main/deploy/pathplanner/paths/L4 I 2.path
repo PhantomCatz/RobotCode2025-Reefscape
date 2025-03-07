@@ -9,7 +9,7 @@
       "prevControl": null,
       "nextControl": {
         "x": 4.153163124285169,
-        "y": 6.300804093297274
+        "y": 6.300804093297273
       },
       "isLocked": false,
       "linkedName": "Reef-I"
@@ -33,7 +33,7 @@
   "pointTowardsZones": [],
   "eventMarkers": [],
   "globalConstraints": {
-    "maxVelocity": 3.5,
+    "maxVelocity": 3.0,
     "maxAcceleration": 4.0,
     "maxAngularVelocity": 540.0,
     "maxAngularAcceleration": 720.0,
