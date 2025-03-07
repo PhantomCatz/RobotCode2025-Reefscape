@@ -12,7 +12,6 @@ import com.pathplanner.lib.path.PathPlannerPath;
 
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.PrintCommand;
@@ -125,7 +124,7 @@ public class DriveAndCycle extends TrajectoryDriveCmd {
         if (action == RobotAction.OUTTAKE) {
             if (level == 4) { // TODO not the best way to do it. eric already had code for it but i didnt have
                               // time to test so just ducttape fix
-                Timer.delay(0.5);
+                // Timer.delay(0.5);
             }
             superstructure.setCurrentRobotAction(RobotAction.STOW, "dnc end");
         }
