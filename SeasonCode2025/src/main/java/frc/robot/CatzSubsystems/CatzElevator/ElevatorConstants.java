@@ -35,11 +35,11 @@ public class ElevatorConstants {
     public static final double STOW_HEIGHT = 8.0; // Raised to prevent boxtube crashing // /ELEVATOR_SPROCKET_RADIUS;
     public static final double L1_HEIGHT   = 10.0; // 8.6    / ELEVATOR_SPROCKET_RADIUS;
     public static final double L2_HEIGHT   = 34.7; //(25.77-5)/* 29.842*/ / ELEVATOR_SPROCKET_RADIUS; //25.77
-    public static final double L3_HEIGHT   = 75.2; //(70.1-8) /*68.8 */  / ELEVATOR_SPROCKET_RADIUS; //70.1
-    public static final double L4_HEIGHT   = 162.0; //(141)/* 133.3*/  / ELEVATOR_SPROCKET_RADIUS; //143.12
+    public static final double L3_HEIGHT   = 78.2; //(70.1-8) /*68.8 */  / ELEVATOR_SPROCKET_RADIUS; //70.1
+    public static final double L4_HEIGHT   = 160.0; //(141)/* 133.3*/  / ELEVATOR_SPROCKET_RADIUS; //143.12
     public static final double L4_CORAL_ADJ = 165.0;
-    public static final double BOT_BOT_ALGAE = 58.6;
-    public static final double BOT_TOP_ALGAE = 80.7;
+    public static final double BOT_BOT_ALGAE = 80.6;
+    public static final double BOT_TOP_ALGAE = 140.7;
     // Motor ID
     public static final int LEFT_LEADER_ID  = 30;
     public static final int RIGHT_FOLLOWER_ID = 31;

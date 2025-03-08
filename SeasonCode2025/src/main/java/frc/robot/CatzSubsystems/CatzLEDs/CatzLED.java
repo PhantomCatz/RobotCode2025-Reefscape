@@ -108,7 +108,7 @@ public class CatzLED extends VirtualSubsystem {
   private final Notifier loadingNotifier;
 
   // LED PWM IDs
-  private final int LEADER_LED_PWM_PORT = 1;
+  private final int LEADER_LED_PWM_PORT = 0;
 
   // Constants
   private static final boolean paradeLeds = false;
@@ -214,7 +214,7 @@ public class CatzLED extends VirtualSubsystem {
     // -----------------------------------------------------------
     // Set LED mode
     // ----------------------------------------------------------
-    setSolidElevatorColor(Color.kBlack); // Default to off
+    //setSolidElevatorColor(Color.kBlack); // Default to off
 
     if (estopped) {
       setSolidElevatorColor(Color.kRed);

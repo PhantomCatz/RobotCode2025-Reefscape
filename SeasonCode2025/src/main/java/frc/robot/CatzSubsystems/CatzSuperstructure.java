@@ -202,12 +202,12 @@ public class CatzSuperstructure extends VirtualSubsystem {
                         case 2:
                             currentRobotState = RobotState.TOP_ALGAE;
                             System.out.println("TOP algae");
-                            robotActionCommand = CatzStateCommands.topAlgae(container);
+                            robotActionCommand = CatzStateCommands.botAlgae(container);
                             break;
                         case 4:
                             currentRobotState = RobotState.BOT_ALGAE;
                             System.out.println("BOT algae");
-                            robotActionCommand = CatzStateCommands.botAlgae(container);
+                            robotActionCommand = CatzStateCommands.topAlgae(container);
                             break;
                         default:
                             break;
