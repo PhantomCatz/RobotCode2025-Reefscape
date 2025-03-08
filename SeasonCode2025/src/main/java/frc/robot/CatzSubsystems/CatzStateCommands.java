@@ -171,14 +171,13 @@ public class CatzStateCommands {
 
         return new ParallelCommandGroup(
             rampPivot.Ramp_Intake_Pos(),
-
             climb.Climb_Retract(),
             algae.stopAlgae(),
             algaePivot.AlgaePivot_Stow(),
 
             new SequentialCommandGroup(
                 elevator.Elevator_L4(),
-                Commands.waitUntil(() -> elevator.isElevatorInPosition()).withTimeout(0.8).alongWith(Commands.print("/////////L4?////////")),
+                Commands.waitUntil(() -> elevator.isElevatorInPosition()).withTimeout(0.6).alongWith(Commands.print("/////////L4?////////")),
                 outtake.outtakeL4(),
                 new WaitCommand(0.06),
                 elevator.Elevator_L4_Adj()
