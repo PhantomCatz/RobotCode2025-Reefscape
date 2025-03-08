@@ -272,51 +272,6 @@ public class CatzDrivetrain extends SubsystemBase {
   //      Drivetrain Misc Methods
   //
   // -----------------------------------------------------------------------------------------------------------
-  /** Get the position of all drive wheels in radians. */
-  public double[] getWheelRadiusCharacterizationPosition() {
-    return Arrays.stream(m_swerveModules).mapToDouble(CatzSwerveModule::getPositionRads).toArray();
-  }
-
-  /** Returns the average drive velocity in radians/sec. */
-  public double getCharacterizationVelocity() {
-    double driveVelocityAverage = 0.0;
-    for (var module : m_swerveModules) {
-      driveVelocityAverage += module.getCharacterizationVelocityRadPerSec();
-    }
-    return driveVelocityAverage / 4.0;
-  }
-
-  /**
-   * Returns command that orients all modules to {@code orientation}, ending when the modules have
-   * rotated.
-   */
-  public Command orientModules(Rotation2d orientation) {
-    return orientModules(new Rotation2d[] {orientation, orientation, orientation, orientation});
-  }
-
-  /**
-   * Returns command that orients all modules to {@code orientations[]}, ending when the modules
-   * have rotated.
-   */
-  public Command orientModules(Rotation2d[] orientations) {
-    return run(() -> {
-          for (int i = 0; i < orientations.length; i++) {
-            m_swerveModules[i].setModuleAngleAndVelocity(
-                new SwerveModuleState(0.0, orientations[i]));
-            // new SwerveModuleState(0.0, new Rotation2d()));
-          }
-        })
-        .until(
-            () ->
-                Arrays.stream(m_swerveModules)
-                    .allMatch(
-                        module ->
-                            EqualsUtil.epsilonEquals(
-                                module.getAngle().getDegrees(),
-                                module.getModuleState().angle.getDegrees(),
-                                2.0)))
-        .withName("Orient Modules");
-  }
 
   /** Set Neutral mode for all swerve modules */
   public void setDriveNeutralMode(NeutralModeValue type) {
