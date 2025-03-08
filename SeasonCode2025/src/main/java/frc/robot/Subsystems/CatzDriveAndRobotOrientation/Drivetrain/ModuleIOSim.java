@@ -5,7 +5,7 @@
 // license that can be found in the LICENSE file at
 // the root directory of this project.
 
-package frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.Drivetrain;
+package frc.robot.Subsystems.CatzDriveAndRobotOrientation.Drivetrain;
 
 
 import edu.wpi.first.math.MathUtil;
@@ -21,7 +21,7 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.simulation.DCMotorSim;
 import frc.robot.CatzConstants;
-import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.Drivetrain.DriveConstants.ModuleIDs;
+import frc.robot.Subsystems.CatzDriveAndRobotOrientation.Drivetrain.DriveConstants.ModuleIDs;
 
 public class ModuleIOSim implements ModuleIO {
   private final LinearSystem<N2, N1, N2> plantDrive =
@@ -101,7 +101,7 @@ public class ModuleIOSim implements ModuleIO {
   }
 
   @Override
-  public void runDriveVelocityRPSIO(double velocityRPS) {
+  public void runDriveVelocity(double velocityRPS) {
     double velocityRadsPerSec = Units.rotationsToRadians(velocityRPS);
     // runDriveVolts has no internal PID so autonomous paths will drift after ending
     // (driveFeedback won't immediately return 0 - it needs to be continuously called to converge to 0 like any other PID,

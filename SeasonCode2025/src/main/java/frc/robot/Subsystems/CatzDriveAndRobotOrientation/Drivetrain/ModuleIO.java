@@ -5,7 +5,7 @@
 // license that can be found in the LICENSE file at
 // the root directory of this project.
 
-package frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.Drivetrain;
+package frc.robot.Subsystems.CatzDriveAndRobotOrientation.Drivetrain;
 
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -45,7 +45,7 @@ public interface ModuleIO {
   // ---------------------------------------------------------------------------
   public default void runDrivePwrPercentIO(double drivePwrPercent) {}
 
-  public default void runDriveVelocityRPSIO(double velocity) {}
+  public default void runDriveVelocity(double velocity) {}
 
   public default void setDriveNeutralModeIO(NeutralModeValue type) {}
 

@@ -5,7 +5,7 @@
 // license that can be found in the LICENSE file at
 // the root directory of this project.
 
-package frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation;
+package frc.robot.Subsystems.CatzDriveAndRobotOrientation;
 
 import edu.wpi.first.math.*;
 import edu.wpi.first.math.geometry.*;
@@ -18,8 +18,8 @@ import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.wpilibj.DriverStation;
 import frc.robot.FieldConstants;
-import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.RobotTracker.VisionObservation;
-import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.Drivetrain.DriveConstants;
+import frc.robot.Subsystems.CatzDriveAndRobotOrientation.Drivetrain.DriveConstants;
+import frc.robot.Subsystems.CatzDriveAndRobotOrientation.RobotTracker.VisionObservation;
 import frc.robot.Utilities.GeomUtil;
 
 import java.util.HashMap;

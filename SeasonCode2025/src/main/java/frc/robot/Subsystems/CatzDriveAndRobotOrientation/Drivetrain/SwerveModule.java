@@ -5,9 +5,9 @@
 // license that can be found in the LICENSE file at
 // the root directory of this project.
 
-package frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.Drivetrain;
+package frc.robot.Subsystems.CatzDriveAndRobotOrientation.Drivetrain;
 
-import static frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.Drivetrain.DriveConstants.*;
+import static frc.robot.Subsystems.CatzDriveAndRobotOrientation.Drivetrain.DriveConstants.*;
 
 import com.ctre.phoenix6.signals.NeutralModeValue;
 
@@ -17,7 +17,7 @@ import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.CatzConstants;
-import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.Drivetrain.ModuleIO.ModuleIOInputs;
+import frc.robot.Subsystems.CatzDriveAndRobotOrientation.Drivetrain.ModuleIO.ModuleIOInputs;
 import frc.robot.Utilities.Alert;
 import frc.robot.Utilities.CatzMathUtils;
 import frc.robot.Utilities.CatzMathUtils.Conversions;
@@ -114,10 +114,13 @@ public class SwerveModule {
     this.m_swerveModuleState = state;
     double targetAngleRads = state.angle.getRadians();
     double currentAngleRads = getAbsEncRadians();
+    if(m_moduleName == DriveConstants.MODULE_NAMES[1]) {
+
+    }
     // --------------------------------------------------------
     // Run closed loop drive control
     // --------------------------------------------------------
-    io.runDriveVelocityRPSIO(Conversions.MPSToRPS(state.speedMetersPerSecond));
+    io.runDriveVelocity(state.speedMetersPerSecond);
     // --------------------------------------------------------
     // Run closed loop steer control
     // --------------------------------------------------------
@@ -134,11 +137,11 @@ public class SwerveModule {
   }
 
   public void setDriveVelocity(double velocity) {
-    io.runDriveVelocityRPSIO(velocity);
+    io.runDriveVelocity(velocity);
   }
 
   public void stopDriving() {
-    io.runDriveVelocityRPSIO(0.0);
+    io.runDriveVelocity(0.0);
   }
 
   // --------------------------------------------------------------------------------------------------------------------
@@ -206,6 +209,6 @@ public class SwerveModule {
 
   private double getAbsEncRadians() {
     // mag enc value should already have offset applied
-    return io.getSteerEncoder();
+    return Units.rotationsToRadians(io.getSteerEncoder());
   }
 }

@@ -5,9 +5,9 @@
 // license that can be found in the LICENSE file at
 // the root directory of this project.
 
-package frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.Drivetrain;
+package frc.robot.Subsystems.CatzDriveAndRobotOrientation.Drivetrain;
 
-import static frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.Drivetrain.DriveConstants.*;
+import static frc.robot.Subsystems.CatzDriveAndRobotOrientation.Drivetrain.DriveConstants.*;
 
 import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.StatusCode;
@@ -24,7 +24,8 @@ import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.Voltage;
-import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.Drivetrain.DriveConstants.ModuleIDs;
+import frc.robot.Subsystems.CatzDriveAndRobotOrientation.Drivetrain.DriveConstants.ModuleIDs;
+import frc.robot.Utilities.CatzMathUtils;
 
 public class ModuleIORealFoc implements ModuleIO {
   // Hardware
@@ -73,10 +74,10 @@ public class ModuleIORealFoc implements ModuleIO {
   public ModuleIORealFoc(ModuleIDs config, String name) {
     MODULE_NAME = name;
 
-    encoder = new CANcoder(config.absoluteEncoderChannel(), "*");
+    encoder = new CANcoder(config.absoluteEncoderChannel());
     m_config = config;
     // Init drive controllers from config constants
-    driveTalon = new TalonFX(config.driveID(), "*");
+    driveTalon = new TalonFX(config.driveID());
 
     // Restore Factory Defaults
     driveTalon.getConfigurator().apply(new TalonFXConfiguration());
@@ -113,7 +114,7 @@ public class ModuleIORealFoc implements ModuleIO {
     driveTalon.optimizeBusUtilization(0, 1.0);
 
     // Init steer controllers from config constants
-    steerTalon = new TalonFX(config.steerID(), "*");
+    steerTalon = new TalonFX(config.steerID());
     absoluteEncoderOffset = Rotation2d.fromRotations(config.absoluteEncoderOffset());
     // absEncoder = new MT6835(config.absoluteEncoderChannel(), false);
 
@@ -203,7 +204,10 @@ public class ModuleIORealFoc implements ModuleIO {
 
   @Override
   public double getSteerEncoder() {
-    return steerPosition.getValueAsDouble();
+    if(MODULE_NAME == MODULE_NAMES[3]) {
+      System.out.println(encoder.getPosition().getValueAsDouble());
+    }
+    return encoder.getPosition().getValueAsDouble() - absoluteEncoderOffset.getRotations();
   }
 
   @Override
@@ -225,10 +229,9 @@ public class ModuleIORealFoc implements ModuleIO {
   }
 
   @Override
-  public void runDriveVelocityRPSIO(double velocityMetersPerSec) {
-    // System.out.println("power " + driveTorqueCurrent.getValueAsDouble());
-    // System.out.println("speed " + velocityMetersPerSec);
-    driveTalon.setControl(velocityTorqueCurrentFOC.withVelocity(velocityMetersPerSec));
+  public void runDriveVelocity(double velocityMetersPerSec) {
+    System.out.println("speed " + velocityMetersPerSec);
+    driveTalon.setControl(new DutyCycleOut(velocityMetersPerSec));
   }
 
   public void runSteerPercentOutput(double percentOutput) {

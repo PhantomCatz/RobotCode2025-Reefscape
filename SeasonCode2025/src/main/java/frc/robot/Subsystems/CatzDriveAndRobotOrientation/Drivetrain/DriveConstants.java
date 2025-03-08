@@ -5,7 +5,7 @@
 // license that can be found in the LICENSE file at
 // the root directory of this project.
 
-package frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.Drivetrain;
+package frc.robot.Subsystems.CatzDriveAndRobotOrientation.Drivetrain;
 
 import com.pathplanner.lib.config.ModuleConfig;
 import com.pathplanner.lib.config.RobotConfig;
@@ -67,14 +67,14 @@ public class DriveConstants {
       switch (CatzConstants.getRobotType()) {
         case SN1, SN2 ->
             new ModuleGainsAndRatios(
-                5.0,
-                0.45,
-                1.0 / DCMotor.getKrakenX60Foc(1).KtNMPerAmp, // A/(N*m)
-                6.0,
                 0.0,
-                0.50,
-                0.005,
-                Mk4iReductions.L2_16t.reduction,
+                0.00,
+                1.0 / DCMotor.getKrakenX60Foc(1).KtNMPerAmp, // A/(N*m)
+                0.01,
+                0.0,
+                0.08,
+                0.000,
+                Mk4iReductions.WCP.reduction,
                 Mk4iReductions.steer.reduction);
         case SN_TEST ->
             new ModuleGainsAndRatios(
@@ -92,9 +92,9 @@ public class DriveConstants {
                 5.0,
                 0.0,
                 1.0 / DCMotor.getKrakenX60Foc(1).KtNMPerAmp, // A/(N*m)
-                0.2,
+                5.0,
                 0.0,
-                0.3,
+                9.0,
                 0.005,
                 Mk4iReductions.L2_PLUS.reduction,
                 Mk4iReductions.steer.reduction);
@@ -118,10 +118,10 @@ public class DriveConstants {
   static{
     switch(CatzConstants.getRobotType()){
         case SN2:
-            MODULE_CONFIGS[INDEX_FR] = new ModuleIDs(1, 2, 11, 0.4599609375, false);
-            MODULE_CONFIGS[INDEX_BR] = new ModuleIDs(3, 4, 12, 0.082763671875, false);
-            MODULE_CONFIGS[INDEX_BL] = new ModuleIDs(5, 6, 13, 0.8525390625, false);
-            MODULE_CONFIGS[INDEX_FL] = new ModuleIDs(7, 8, 14, 0.946533203125, false);
+            MODULE_CONFIGS[INDEX_FR] = new ModuleIDs(1, 2, 11, -0.005859, false);
+            MODULE_CONFIGS[INDEX_BR] = new ModuleIDs(3, 4, 12, 0.508301+0.5, false);
+            MODULE_CONFIGS[INDEX_BL] = new ModuleIDs(5, 6, 13, 0.004883+0.5, false);
+            MODULE_CONFIGS[INDEX_FL] = new ModuleIDs(7, 8, 14, 0.005371+0.5, false);
         break;
 
         case SN1:
@@ -280,7 +280,8 @@ public class DriveConstants {
     L2_16t(
         (50.0 / 16.0)
             * (17.0 / 27.0)
-            * (45.0 / 15.0)), // SDS mk4i L2 ratio reduction plus 16 tooth pinion
+            * (45.0 / 15.0)), // SDS mk4i L2 ratio reduction plus 16 tooth pinion\
+    WCP(7.85),
     L3((50.0 / 14.0) * (16.0 / 28.0) * (45.0 / 15.0)),
 
     L2_PLUS(6.75 * (14.0 / 16.0)),

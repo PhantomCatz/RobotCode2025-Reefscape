@@ -5,9 +5,7 @@
 // license that can be found in the LICENSE file at
 // the root directory of this project.
 
-package frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.Drivetrain;
-
-import static frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.Drivetrain.DriveConstants.*;
+package frc.robot.Subsystems.CatzDriveAndRobotOrientation.Drivetrain;
 
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.pathplanner.lib.util.PathPlannerLogging;
@@ -26,11 +24,13 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.CatzConstants;
-import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.RobotTracker;
-import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.RobotTracker.OdometryObservation;
 import frc.robot.Robot;
+import frc.robot.Subsystems.CatzDriveAndRobotOrientation.RobotTracker;
+import frc.robot.Subsystems.CatzDriveAndRobotOrientation.RobotTracker.OdometryObservation;
 import frc.robot.Utilities.Alert;
 import frc.robot.Utilities.EqualsUtil;
+
+import static frc.robot.Subsystems.CatzDriveAndRobotOrientation.Drivetrain.DriveConstants.*;
 
 import java.util.Arrays;
 
