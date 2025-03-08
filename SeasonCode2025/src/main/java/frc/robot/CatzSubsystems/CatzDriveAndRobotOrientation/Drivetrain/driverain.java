@@ -39,7 +39,7 @@ import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 
 // Drive train subsystem for swerve drive implementation
-public class CatzDrivetrain extends SubsystemBase {
+public class driverain extends SubsystemBase {
 
   // Gyro input/output interface
   private final GyroIO gyroIO;
@@ -52,14 +52,14 @@ public class CatzDrivetrain extends SubsystemBase {
   private final Alert gyroDisconnected;
 
   // Array of swerve modules representing each wheel in the drive train
-  private CatzSwerveModule[] m_swerveModules = new CatzSwerveModule[4];
+  private SwerveModule[] m_swerveModules = new SwerveModule[4];
   private SwerveModuleState[] optimizedDesiredStates = new SwerveModuleState[4];
 
   // Swerve modules representing each corner of the robot
-  public final CatzSwerveModule RT_FRNT_MODULE;
-  public final CatzSwerveModule RT_BACK_MODULE;
-  public final CatzSwerveModule LT_BACK_MODULE;
-  public final CatzSwerveModule LT_FRNT_MODULE;
+  public final SwerveModule RT_FRNT_MODULE;
+  public final SwerveModule RT_BACK_MODULE;
+  public final SwerveModule LT_BACK_MODULE;
+  public final SwerveModule LT_FRNT_MODULE;
 
   private SwerveSetpoint currentSetpoint =
       new SwerveSetpoint(
@@ -74,7 +74,7 @@ public class CatzDrivetrain extends SubsystemBase {
 
   private final Field2d field;
 
-  public CatzDrivetrain() {
+  public driverain() {
 
     // Gyro Instantiation
     switch (CatzConstants.hardwareMode) {
@@ -92,10 +92,10 @@ public class CatzDrivetrain extends SubsystemBase {
     gyroDisconnected = new Alert("Gyro disconnected!", Alert.AlertType.kWarning);
 
     // Create swerve modules for each corner of the robot
-    RT_FRNT_MODULE = new CatzSwerveModule(DriveConstants.MODULE_CONFIGS[INDEX_FR], MODULE_NAMES[INDEX_FR]);
-    RT_BACK_MODULE = new CatzSwerveModule(DriveConstants.MODULE_CONFIGS[INDEX_BR], MODULE_NAMES[INDEX_BR]);
-    LT_BACK_MODULE = new CatzSwerveModule(DriveConstants.MODULE_CONFIGS[INDEX_BL], MODULE_NAMES[INDEX_BL]);
-    LT_FRNT_MODULE = new CatzSwerveModule(DriveConstants.MODULE_CONFIGS[INDEX_FL], MODULE_NAMES[INDEX_FL]);
+    RT_FRNT_MODULE = new SwerveModule(DriveConstants.MODULE_CONFIGS[INDEX_FR], MODULE_NAMES[INDEX_FR]);
+    RT_BACK_MODULE = new SwerveModule(DriveConstants.MODULE_CONFIGS[INDEX_BR], MODULE_NAMES[INDEX_BR]);
+    LT_BACK_MODULE = new SwerveModule(DriveConstants.MODULE_CONFIGS[INDEX_BL], MODULE_NAMES[INDEX_BL]);
+    LT_FRNT_MODULE = new SwerveModule(DriveConstants.MODULE_CONFIGS[INDEX_FL], MODULE_NAMES[INDEX_FL]);
 
     // Assign swerve modules to the array for easier access
     m_swerveModules[INDEX_FR] = RT_FRNT_MODULE;
@@ -139,7 +139,7 @@ public class CatzDrivetrain extends SubsystemBase {
     // ----------------------------------------------------------------------------------------------------
     // Update inputs (sensors/encoders) for code logic and advantage kit
     // ----------------------------------------------------------------------------------------------------
-    for (CatzSwerveModule module : m_swerveModules) {
+    for (SwerveModule module : m_swerveModules) {
       module.periodic();
     }
 
@@ -246,7 +246,7 @@ public class CatzDrivetrain extends SubsystemBase {
 
   /** Create a command to stop driving */
   public void stopDriving() {
-    for (CatzSwerveModule module : m_swerveModules) {
+    for (SwerveModule module : m_swerveModules) {
       module.stopDriving();
       module.setSteerPower(0.0);
     }
@@ -275,14 +275,14 @@ public class CatzDrivetrain extends SubsystemBase {
 
   /** Set Neutral mode for all swerve modules */
   public void setDriveNeutralMode(NeutralModeValue type) {
-    for (CatzSwerveModule module : m_swerveModules) {
+    for (SwerveModule module : m_swerveModules) {
       module.setNeutralModeDrive(type);
     }
   }
 
   /** Set coast mode for all swerve modules */
   public void setSteerNeutralMode(NeutralModeValue type) {
-    for (CatzSwerveModule module : m_swerveModules) {
+    for (SwerveModule module : m_swerveModules) {
       module.setNeutralModeSteer(type);
     }
   }
@@ -295,7 +295,7 @@ public class CatzDrivetrain extends SubsystemBase {
   }
 
   public void resetDriveEncs() {
-    for (CatzSwerveModule module : m_swerveModules) {
+    for (SwerveModule module : m_swerveModules) {
       module.resetDriveEncs();
     }
   }

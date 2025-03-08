@@ -11,7 +11,7 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.CatzConstants.XboxInterfaceConstants;
 import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.RobotTracker;
-import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.Drivetrain.CatzDrivetrain;
+import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.Drivetrain.driverain;
 import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.Drivetrain.DriveConstants;
 import frc.robot.Utilities.AllianceFlipUtil;
 import java.util.function.Supplier;
@@ -25,7 +25,7 @@ import org.littletonrobotics.junction.Logger;
 
 public class TeleopDriveCmd extends Command {
   // Subsystem declaration
-  private final CatzDrivetrain m_drivetrain;
+  private final driverain m_drivetrain;
 
   // Xbox controller buttons
   private final Supplier<Double> m_headingPctOutput_X;
@@ -48,7 +48,7 @@ public class TeleopDriveCmd extends Command {
       Supplier<Double> supplierLeftJoyX,
       Supplier<Double> supplierLeftJoyY,
       Supplier<Double> angVelocityPctOutput,
-      CatzDrivetrain drivetrain) {
+      driverain drivetrain) {
     // Chassis magnatude and direction control
     this.m_headingPctOutput_X = supplierLeftJoyX;
     this.m_headingPctOutput_Y = supplierLeftJoyY;

@@ -17,7 +17,7 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.RobotTracker;
-import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.Drivetrain.CatzDrivetrain;
+import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.Drivetrain.driverain;
 import frc.robot.Commands.DriveAndRobotOrientationCmds.TeleopDriveCmd;
 import frc.robot.Utilities.Alert;
 import frc.robot.Utilities.AllianceFlipUtil;
@@ -33,7 +33,7 @@ public class RobotContainer {
   // Subsystem Declaration
   // -------------------------------------------------------------------------------------------------------------------
   // Primary subsystem declaration
-  private static CatzDrivetrain drive = new CatzDrivetrain();
+  private static driverain drive = new driverain();
 
   // Assistance Subsystem declaration
   private RobotTracker robotTracker = RobotTracker.getInstance();
@@ -149,7 +149,7 @@ public class RobotContainer {
   //      Subsystem getters
   //
   // ---------------------------------------------------------------------------
-  public CatzDrivetrain getCatzDrivetrain() {
+  public driverain getCatzDrivetrain() {
     return drive;
   }
 }

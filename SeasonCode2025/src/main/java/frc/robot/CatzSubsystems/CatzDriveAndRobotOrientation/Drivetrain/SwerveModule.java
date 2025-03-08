@@ -23,7 +23,7 @@ import frc.robot.Utilities.CatzMathUtils.Conversions;
 import frc.robot.Utilities.LoggedTunableNumber;
 import org.littletonrobotics.junction.Logger;
 
-public class CatzSwerveModule {
+public class SwerveModule {
 
   // Module delcaration block
   private final ModuleIO io;
@@ -44,7 +44,7 @@ public class CatzSwerveModule {
   //  CatzServeModule() - Constructor
   //
   // ----------------------------------------------------------------------------------------------
-  public CatzSwerveModule(ModuleIDs config, String moduleName) {
+  public SwerveModule(ModuleIDs config, String moduleName) {
     this.m_moduleName = moduleName;
     // Run Subsystem disconnect check
     if (DriveConstants.IS_DRIVE_DISABLED) {

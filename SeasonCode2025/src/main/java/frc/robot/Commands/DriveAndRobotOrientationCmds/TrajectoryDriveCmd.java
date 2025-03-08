@@ -27,7 +27,7 @@ import frc.robot.FieldConstants;
 import frc.robot.Robot;
 import frc.robot.RobotContainer;
 import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.RobotTracker;
-import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.Drivetrain.CatzDrivetrain;
+import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.Drivetrain.driverain;
 import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.Drivetrain.DriveConstants;
 import frc.robot.Utilities.AllianceFlipUtil;
 import java.util.Collections;
@@ -58,7 +58,7 @@ public class TrajectoryDriveCmd extends Command {
   private final double ALLOWABLE_VISION_ADJUST = 4e-3; //TODO tune
 
   // Subsystems
-  private CatzDrivetrain m_driveTrain;
+  private driverain m_driveTrain;
   private RobotTracker tracker = RobotTracker.getInstance();
   private final RobotContainer container;
 
@@ -88,7 +88,7 @@ public class TrajectoryDriveCmd extends Command {
   // Trajectory Drive Command Constructor
   //
   // ---------------------------------------------------------------------------------------------
-  public TrajectoryDriveCmd(PathPlannerPath newPath, CatzDrivetrain drivetrain, boolean autoalign, RobotContainer container) {
+  public TrajectoryDriveCmd(PathPlannerPath newPath, driverain drivetrain, boolean autoalign, RobotContainer container) {
     this.path = newPath;
     this.m_driveTrain = drivetrain;
     this.autoalign = autoalign;
@@ -107,7 +107,7 @@ public class TrajectoryDriveCmd extends Command {
   }
 
   //For NBA. Used to rumble the controller when done driving
-  public TrajectoryDriveCmd(PathPlannerPath newPath, CatzDrivetrain drivetrain, boolean autoalign, RobotContainer container, XboxController xboxDrv) {
+  public TrajectoryDriveCmd(PathPlannerPath newPath, driverain drivetrain, boolean autoalign, RobotContainer container, XboxController xboxDrv) {
     this.path = newPath;
     this.m_driveTrain = drivetrain;
     this.autoalign = autoalign;
