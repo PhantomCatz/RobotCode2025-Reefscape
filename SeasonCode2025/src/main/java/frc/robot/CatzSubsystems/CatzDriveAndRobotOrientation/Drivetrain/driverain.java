@@ -31,19 +31,14 @@ import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.RobotTracker.Odomet
 import frc.robot.Robot;
 import frc.robot.Utilities.Alert;
 import frc.robot.Utilities.EqualsUtil;
-import frc.robot.Utilities.SwerveSetpoint;
-import frc.robot.Utilities.SwerveSetpointGenerator;
 
 import java.util.Arrays;
-import org.littletonrobotics.junction.AutoLogOutput;
-import org.littletonrobotics.junction.Logger;
 
 // Drive train subsystem for swerve drive implementation
 public class driverain extends SubsystemBase {
 
   // Gyro input/output interface
   private final GyroIO gyroIO;
-  private final GyroIOInputsAutoLogged gyroInputs = new GyroIOInputsAutoLogged();
 
   // Position, odmetetry, and velocity estimator
   private final RobotTracker tracker = RobotTracker.getInstance();
@@ -61,16 +56,6 @@ public class driverain extends SubsystemBase {
   public final SwerveModule LT_BACK_MODULE;
   public final SwerveModule LT_FRNT_MODULE;
 
-  private SwerveSetpoint currentSetpoint =
-      new SwerveSetpoint(
-          new ChassisSpeeds(),
-          new SwerveModuleState[] {
-            new SwerveModuleState(),
-            new SwerveModuleState(),
-            new SwerveModuleState(),
-            new SwerveModuleState()
-          });
-  private final SwerveSetpointGenerator swerveSetpointGenerator;
 
   private final Field2d field;
 
@@ -103,9 +88,6 @@ public class driverain extends SubsystemBase {
     m_swerveModules[INDEX_BL] = LT_BACK_MODULE;
     m_swerveModules[INDEX_FL] = LT_FRNT_MODULE;
 
-    swerveSetpointGenerator =
-        new SwerveSetpointGenerator(DriveConstants.SWERVE_KINEMATICS, DriveConstants.MODULE_TRANSLATIONS);
-
 
     field = new Field2d();
     SmartDashboard.putData("Field", field);
@@ -117,12 +99,7 @@ public class driverain extends SubsystemBase {
           field.setRobotPose(pose);
         });
 
-    // Logging callback for target robot pose
-    PathPlannerLogging.setLogTargetPoseCallback(
-        (pose) -> {
-          Logger.recordOutput("Drive/targetPos", pose);
-          field.getObject("target pose").setPose(pose);
-        });
+
 
     // Logging callback for the active path, this is sent as a list of poses
     PathPlannerLogging.setLogActivePathCallback(
@@ -144,22 +121,13 @@ public class driverain extends SubsystemBase {
     }
 
     pose = pose.interpolate(tracker.getEstimatedPose(), 0.05);
-    Logger.recordOutput("CatzRobotTracker/interlated pose", pose);
 
     // -----------------------------------------------------------------------------------------------------
     // Attempt to update gyro inputs and log
     // -----------------------------------------------------------------------------------------------------
-    try {
-      gyroIO.updateInputs(gyroInputs);
-    } catch (Exception e) {
-
-    }
-    Logger.processInputs("RealInputs/Drive/gyro ", gyroInputs);
     // NOTE Gyro needs to be firmly mounted to rio for accurate results.
     // Set Gyro Disconnect alert to go off when gyro is disconnected
-    if (Robot.isReal()) {
-      gyroDisconnected.set(!gyroInputs.gyroConnected);
-    }
+
 
     // ----------------------------------------------------------------------------------------------------
     // Swerve drive Odometry and Velocity updates
@@ -182,11 +150,6 @@ public class driverain extends SubsystemBase {
 
     // Update current velocities use gyro when possible
     Twist2d robotRelativeVelocity = getTwist2dSpeeds();
-    robotRelativeVelocity.dtheta =
-        gyroInputs.gyroConnected
-            ? Math.toRadians(gyroInputs.gyroYawVel)
-            : robotRelativeVelocity.dtheta;
-    RobotTracker.getInstance().addVelocityData(robotRelativeVelocity);
 
     // --------------------------------------------------------------
     // Logging
@@ -224,8 +187,6 @@ public class driverain extends SubsystemBase {
     // Logging
     // --------------------------------------------------------
 
-    Logger.recordOutput("Drive/chassispeeds", descreteSpeeds);
-    Logger.recordOutput("Drive/modulestates", optimizedDesiredStates);
   }
   public void d(ChassisSpeeds s){
     //nothing
@@ -311,7 +272,7 @@ public class driverain extends SubsystemBase {
    * @return The Heading of the robot dependant on where it's been instantiated
    */
   private double getGyroHeading() {
-    return gyroInputs.gyroAngle; // Negative on Forte due to instalation, gyro's left is not robot left
+    return gyroIO.getAngle(); // Negative on Forte due to instalation, gyro's left is not robot left
   }
 
   /** Get the Rotation2d object based on the gyro angle */
@@ -329,7 +290,6 @@ public class driverain extends SubsystemBase {
   }
 
   /** Returns the measured speeds of the robot in the robot's frame of reference. */
-  @AutoLogOutput(key = "Drive/MeasuredSpeeds")
   private Twist2d getTwist2dSpeeds() {
     return DriveConstants.SWERVE_KINEMATICS.toTwist2d(getModulePositions());
   }

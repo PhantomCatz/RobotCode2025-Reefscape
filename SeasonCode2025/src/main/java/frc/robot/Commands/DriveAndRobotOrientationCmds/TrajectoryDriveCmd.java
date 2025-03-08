@@ -34,8 +34,6 @@ import java.util.Collections;
 import java.util.NoSuchElementException;
 import java.util.Set;
 
-import org.littletonrobotics.junction.Logger;
-
 /**************************************************************************************************
  *
  *
@@ -257,7 +255,6 @@ public class TrajectoryDriveCmd extends Command {
     // System.out.println("av: " + Math.hypot(adjustedSpeeds.vxMetersPerSecond, adjustedSpeeds.vyMetersPerSecond));
 
     // Logging
-    Logger.recordOutput("CatzRobotTracker/Desired Auto Pose", goal.pose);
 
     PPLibTelemetry.setCurrentPose(currentPose);
     PathPlannerLogging.logCurrentPose(currentPose);

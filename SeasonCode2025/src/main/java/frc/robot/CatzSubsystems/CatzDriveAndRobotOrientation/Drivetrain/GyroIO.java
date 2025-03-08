@@ -7,10 +7,8 @@
 
 package frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.Drivetrain;
 
-import org.littletonrobotics.junction.AutoLog;
 
 public interface GyroIO {
-  @AutoLog
   public static class GyroIOInputs {
     public double gyroAngle = 0.0;
     public double gyroYawDegrees = 0.0;
@@ -23,4 +21,8 @@ public interface GyroIO {
   }
 
   public default void updateInputs(GyroIOInputs inputs) {}
+
+  public default double getAngle() {
+    return 0.0;
+  }
 }

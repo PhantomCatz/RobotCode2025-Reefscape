@@ -26,12 +26,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.NoSuchElementException;
 
-import lombok.Getter;
-import lombok.experimental.ExtensionMethod;
-import org.littletonrobotics.junction.AutoLogOutput;
 
-
-@ExtensionMethod({GeomUtil.class})
 public class RobotTracker {
   private static final double POSE_BUFFER_SIZE_SEC = 2.0;
   private static final Matrix<N3, N1> ODOMETRY_STD_DEVS =
@@ -46,33 +41,20 @@ public class RobotTracker {
 
   private static final Map<Integer, Pose2d> tagPoses2d = new HashMap<>();
 
-  static {
-    for (int i = 1; i <= FieldConstants.aprilTagCount; i++) {
-      tagPoses2d.put(
-          i,
-          FieldConstants.defaultAprilTagType
-              .getLayout()
-              .getTagPose(i)
-              .map(Pose3d::toPose2d)
-              .orElse(new Pose2d()));
-    }
-  }
 
   private final Map<Integer, TxTyPoseRecord> txTyPoses = new HashMap<>();
 
   // ------------------------------------------------------------------------------------------------------
   //  Pose estimation Members
   // ------------------------------------------------------------------------------------------------------
-  @Getter
-  @AutoLogOutput(key = "CatzRobotTracker/PureOdometryPose")
   private Pose2d odometryPose = new Pose2d();
 
-  @Getter
-  @AutoLogOutput(key = "CatzRobotTracker/EstimatedPose")
+  public Pose2d getEstimatedPose() {
+    return estimatedPose;
+  }
+
   private Pose2d estimatedPose = new Pose2d();
 
-  @Getter
-  @AutoLogOutput(key = "CatzRobotTracker/TxTyPose")
   private Pose2d txTyPose = new Pose2d();
 
   private final TimeInterpolatableBuffer<Pose2d> POSE_BUFFER =
@@ -89,7 +71,6 @@ public class RobotTracker {
         new SwerveModulePosition()
       };
 
-  @Getter
   private SwerveModuleState[] currentModuleStates =
       new SwerveModuleState[] {
         new SwerveModuleState(),
@@ -311,7 +292,6 @@ public class RobotTracker {
   //  CatzRobotTracker Getters
   //
   // ------------------------------------------------------------------------------------------------------
-  @AutoLogOutput(key = "CatzRobotTracker/FieldVelocity")
   public Twist2d fieldVelocity() {
     Translation2d linearFieldVelocity =
         new Translation2d(robotVelocity.dx, robotVelocity.dy).rotateBy(estimatedPose.getRotation());
@@ -331,7 +311,6 @@ public class RobotTracker {
    * @param rotationLookaheadS The lookahead time for the rotation of the robot
    * @return The predicted pose.
    */
-  @AutoLogOutput(key = "CatzRobotTracker/PredictedPose")
   public Pose2d getPredictedPose(double translationLookaheadS, double rotationLookaheadS) {
     Twist2d velocity = DriverStation.isAutonomousEnabled() ? trajectoryVelocity : robotVelocity;
     return getEstimatedPose()
@@ -342,7 +321,6 @@ public class RobotTracker {
                 Rotation2d.fromRadians(velocity.dtheta * rotationLookaheadS)));
   }
 
-  @AutoLogOutput(key = "CatzRobotTracker/RecordedChassisSpeeds")
   public ChassisSpeeds getRobotChassisSpeeds() {
     return m_lastChassisSpeeds;
   }
@@ -364,4 +342,9 @@ public class RobotTracker {
       int tagId, int camera, double tx, double ty, double distance, double timestamp) {}
 
   public record TxTyPoseRecord(Pose2d pose, double distance, double timestamp) {}
+
+public SwerveModuleState getCurrentModuleStates() {
+    // TODO Auto-generated method stub
+    throw new UnsupportedOperationException("Unimplemented method 'getCurrentModuleStates'");
+}
 }

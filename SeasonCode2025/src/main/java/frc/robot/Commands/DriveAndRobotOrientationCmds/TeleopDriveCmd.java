@@ -15,7 +15,6 @@ import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.Drivetrain.driverai
 import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.Drivetrain.DriveConstants;
 import frc.robot.Utilities.AllianceFlipUtil;
 import java.util.function.Supplier;
-import org.littletonrobotics.junction.Logger;
 
 /**************************************************************************************************
  *
@@ -117,9 +116,6 @@ public class TeleopDriveCmd extends Command {
   //
   // --------------------------------------------------------------------------------------
   public void debugLogsDrive() {
-    Logger.recordOutput("Drive/robot orientation rad per sec", chassisSpeeds.omegaRadiansPerSecond);
-    Logger.recordOutput("Drive/chassisspeed x speed mtr sec", chassisSpeeds.vxMetersPerSecond);
-    Logger.recordOutput("Drive/chassisspeed y speed mtr sec", chassisSpeeds.vyMetersPerSecond);
   }
 
   // --------------------------------------------------------------------------------------

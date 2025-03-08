@@ -17,17 +17,16 @@ import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.CatzConstants;
+import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.Drivetrain.ModuleIO.ModuleIOInputs;
 import frc.robot.Utilities.Alert;
 import frc.robot.Utilities.CatzMathUtils;
 import frc.robot.Utilities.CatzMathUtils.Conversions;
-import frc.robot.Utilities.LoggedTunableNumber;
-import org.littletonrobotics.junction.Logger;
 
 public class SwerveModule {
 
   // Module delcaration block
   private final ModuleIO io;
-  private final ModuleIOInputsAutoLogged inputs = new ModuleIOInputsAutoLogged();
+  private final ModuleIOInputs inputs = new ModuleIOInputs();
 
   // Module Strings for Logging
   private final String m_moduleName;
@@ -89,36 +88,12 @@ public class SwerveModule {
   public void periodic() {
     // Process and Log Module Inputs
     io.updateInputs(inputs);
-    Logger.processInputs("RealInputs/Drive/Motors " + m_moduleName, inputs);
-
-    // Update ff and controllers
-    LoggedTunableNumber.ifChanged(
-        hashCode(), () -> io.setDrivePID(drivekP.get(), 0, drivekD.get()), drivekP, drivekD);
-    LoggedTunableNumber.ifChanged(
-        hashCode(), () -> io.setSteerPID(steerkP.get(), 0, steerkD.get()), steerkP, steerkD);
-
-    // Display alerts
-    driveMotorDisconnected.set(!inputs.isDriveMotorConnected);
-    steerMotorDisconnected.set(!inputs.isSteerMotorConnected);
 
     debugLogsSwerve();
   } // -End of CatzSwerveModule Periodic
 
   public void debugLogsSwerve() {
-    Logger.recordOutput(
-        "Module " + m_moduleName + "/drive recorded fps",
-        Units.metersToFeet(Conversions.RPSToMPS(inputs.driveVelocityRPS)));
-    Logger.recordOutput(
-        "Module " + m_moduleName + "/drive target fps",
-        Units.metersToFeet(m_swerveModuleState.speedMetersPerSecond));
-    Logger.recordOutput(
-        "Module " + m_moduleName + "/currentmodule state", m_swerveModuleState.angle.getRadians());
-    Logger.recordOutput(
-        "Module " + m_moduleName + "/angle error deg",
-        Math.toDegrees(m_swerveModuleState.angle.getRadians() - getAbsEncRadians()));
-    Logger.recordOutput("Module " + m_moduleName + "/currentmoduleangle rad", getAbsEncRadians());
-    Logger.recordOutput(
-        "Module " + m_moduleName + "/current absolute enc", inputs.rawAbsEncValueRotation);
+
     // Logger.recordOutput("Module " + m_moduleName + "/targetmoduleangle rad",
     // m_swerveModuleState.angle.getRadians());
 
@@ -196,9 +171,8 @@ public class SwerveModule {
   //
   // --------------------------------------------------------------------------------------------------------------------
   public SwerveModuleState getModuleState() {
-    double velocityMPS = CatzMathUtils.Conversions.RPSToMPS(inputs.driveVelocityRPS);
+    double velocityMPS = CatzMathUtils.Conversions.RPSToMPS(io.getDriveVelocity());
 
-    Logger.recordOutput("Module " + m_moduleName + "/velocityMPS", velocityMPS);
     return new SwerveModuleState(velocityMPS, getCurrentRotation());
   }
 
@@ -212,17 +186,9 @@ public class SwerveModule {
 
   public double getDriveDistanceMeters() {
     // seconds cancels out
-    return CatzMathUtils.Conversions.RPSToMPS(inputs.drivePositionUnits);
+    return CatzMathUtils.Conversions.RPSToMPS(io.getDriveDistanceUnits());
   }
 
-  public double getPositionRads() {
-    return Units.rotationsToRadians(inputs.drivePositionUnits);
-  }
-
-  /** Get steer angle of module as {@link Rotation2d}. */
-  public Rotation2d getAngle() {
-    return inputs.steerAbsPosition;
-  }
 
   /** Get velocity of drive wheel for characterization */
   public double getCharacterizationVelocityRadPerSec() {
@@ -230,7 +196,7 @@ public class SwerveModule {
   }
 
   public double getDrvVelocityRPS() {
-    return inputs.driveVelocityRPS;
+    return io.getDriveVelocity();
   }
 
   /** Outputs the Rotation object of the module */
@@ -240,6 +206,6 @@ public class SwerveModule {
 
   private double getAbsEncRadians() {
     // mag enc value should already have offset applied
-    return inputs.steerAbsPosition.getRadians();
+    return io.getSteerEncoder();
   }
 }

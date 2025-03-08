@@ -9,11 +9,9 @@ package frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.Drivetrain;
 
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import edu.wpi.first.math.geometry.Rotation2d;
-import org.littletonrobotics.junction.AutoLog;
 
 public interface ModuleIO {
 
-  @AutoLog
   static class ModuleIOInputs {
     public boolean isDriveMotorConnected;
     public double drivePositionUnits;
@@ -59,6 +57,14 @@ public interface ModuleIO {
 
   public default void setDrivePID(double kP, double kI, double kD) {}
 
+  public default double getDriveVelocity() {
+    return 0.0;
+  }
+
+  public default double getDriveDistanceUnits() {
+    return 0.0;
+  }
+
   // ---------------------------------------------------------------------------
   //   Steer Access Methods
   // ---------------------------------------------------------------------------
@@ -72,6 +78,9 @@ public interface ModuleIO {
 
   public default void setSteerPID(double kP, double kI, double kD) {}
 
+  public default double getSteerEncoder() {
+    return 0.0;
+  }
   // ---------------------------------------------------------------------------
   //   Mag Enc Access Methods
   // ---------------------------------------------------------------------------

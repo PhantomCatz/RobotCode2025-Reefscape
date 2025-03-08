@@ -42,4 +42,8 @@ public class GyroIOPigeon implements GyroIO {
     inputs.gyroAngle = yaw.getValueAsDouble();
     inputs.gyroYawVel = Units.degreesToRadians(yawVelocity.getValueAsDouble());
   }
+
+  public double getAngle() {
+    return yaw.getValueAsDouble();
+  }
 }

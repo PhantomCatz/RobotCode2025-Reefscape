@@ -16,7 +16,6 @@ import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.geometry.*;
 import edu.wpi.first.math.util.Units;
 import frc.robot.Utilities.AllianceFlipUtil;
-import lombok.Getter;
 
 /**
  * Contains various field dimensions and useful reference points. All units are in meters and poses
@@ -109,7 +108,6 @@ public class FieldConstants {
   public static final AprilTagLayoutType defaultAprilTagType = AprilTagLayoutType.OFFICIAL;
   public static final int aprilTagCount = 22;
 
-  @Getter
   public enum AprilTagLayoutType {
     OFFICIAL("2025-official");
 

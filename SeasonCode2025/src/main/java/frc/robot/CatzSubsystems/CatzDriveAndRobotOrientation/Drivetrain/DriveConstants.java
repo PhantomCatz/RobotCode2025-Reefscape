@@ -20,8 +20,6 @@ import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
 import frc.robot.CatzConstants;
 import frc.robot.Commands.DriveAndRobotOrientationCmds.HolonomicDriveController;
-import frc.robot.Utilities.LoggedTunableNumber;
-import lombok.Builder;
 
 public class DriveConstants {
   // ---------------------------------------------------------------------------------------------------------------
@@ -50,25 +48,20 @@ public class DriveConstants {
   // ---------------------------------------------------------------------------------------------------------------
 
   public static final DriveConfig DRIVE_CONFIG =
-    DriveConfig.builder()
-        .wheelRadius(Units.inchesToMeters(1.9136))
-        .robotLengthX(Units.inchesToMeters(24.2))
-        .robotWidthY(Units.inchesToMeters(24.2))
-        .bumperWidthX(Units.inchesToMeters(32))
-        .bumperWidthY(Units.inchesToMeters(32))
-        .maxLinearVelocity(4)
-        .maxLinearAcceleration(120)
-        .maxAngularVelocity(Units.degreesToRadians(540))
-        .maxAngularAcceleration(Units.degreesToRadians(720))
-        .build();
-
+      new DriveConfig(
+        Units.inchesToMeters(1.9136),
+        Units.inchesToMeters(24.2),
+        Units.inchesToMeters(24.2),
+        Units.inchesToMeters(32),
+        Units.inchesToMeters(32),
+        4,
+        120,
+        Units.degreesToRadians(540),
+        Units.degreesToRadians(720));
+        
   public static final DriveConfig SCORING_TRAJECTORY_CONFIG =
-    DriveConfig.builder()
-      .maxLinearVelocity(2)
-      .maxLinearAcceleration(0.5)
-      .maxAngularVelocity(Units.degreesToRadians(540))
-      .maxAngularAcceleration(Units.degreesToRadians(720))
-      .build();
+    new DriveConfig(2, 0.5, 540, 720, 0.0, 0.0, 0.0, 0.0, 0.0);
+
 
   public static final ModuleGainsAndRatios MODULE_GAINS_AND_RATIOS =
       switch (CatzConstants.getRobotType()) {
@@ -120,12 +113,6 @@ public class DriveConstants {
   // ---------------------------------------------------------------------------------------------------------------------
   // Logged Tunable PIDF values for swerve modules
   // ---------------------------------------------------------------------------------------------------------------------
-  public static final LoggedTunableNumber drivekP = new LoggedTunableNumber("Drive/Module/DrivekP", MODULE_GAINS_AND_RATIOS.drivekP());
-  public static final LoggedTunableNumber drivekD = new LoggedTunableNumber("Drive/Module/DrivekD", MODULE_GAINS_AND_RATIOS.drivekD());
-  public static final LoggedTunableNumber drivekS = new LoggedTunableNumber("Drive/Module/DrivekS", MODULE_GAINS_AND_RATIOS.driveFFkS());
-  public static final LoggedTunableNumber drivekV = new LoggedTunableNumber("Drive/Module/DrivekV", MODULE_GAINS_AND_RATIOS.driveFFkV());
-  public static final LoggedTunableNumber steerkP = new LoggedTunableNumber("Drive/Module/steerkP", MODULE_GAINS_AND_RATIOS.steerkP());
-  public static final LoggedTunableNumber steerkD = new LoggedTunableNumber("Drive/Module/steerkD", MODULE_GAINS_AND_RATIOS.steerkD());
 
   public static final ModuleIDs[] MODULE_CONFIGS = new ModuleIDs[4];
   static{
@@ -273,7 +260,6 @@ public class DriveConstants {
       double driveReduction,
       double steerReduction) {}
 
-  @Builder
   public record DriveConfig(
       double wheelRadius,
       double robotLengthX,

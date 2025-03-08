@@ -25,7 +25,6 @@ import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.Voltage;
 import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.Drivetrain.DriveConstants.ModuleIDs;
-import org.littletonrobotics.junction.Logger;
 
 public class ModuleIORealFoc implements ModuleIO {
   // Hardware
@@ -197,6 +196,21 @@ public class ModuleIORealFoc implements ModuleIO {
     inputs.odometrySteerPositions       = new Rotation2d[] {inputs.steerAbsPosition};
   }
 
+  @Override
+  public double getDriveVelocity() {
+    return driveVelocity.getValueAsDouble();
+  }
+
+  @Override
+  public double getSteerEncoder() {
+    return steerPosition.getValueAsDouble();
+  }
+
+  @Override
+  public double getDriveDistanceUnits() {
+    return drivePosition.getValueAsDouble();
+  }
+
   public void runDriveVolts(double volts) {
     driveTalon.setControl(voltageControl.withOutput(volts));
   }
@@ -227,9 +241,6 @@ public class ModuleIORealFoc implements ModuleIO {
         dutyCycleOutControl.withOutput(
             -steerFeedback.calculate(currentAngleRads, targetAngleRads))
     );
-
-    Logger.recordOutput("Module " + MODULE_NAME + "/steer Target Angle", targetAngleRads);
-    Logger.recordOutput("Module " + MODULE_NAME + "/steer current Angle", currentAngleRads);
   }
 
   @Override

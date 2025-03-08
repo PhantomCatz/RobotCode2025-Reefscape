@@ -7,8 +7,6 @@
 
 package frc.robot.Commands.DriveAndRobotOrientationCmds;
 
-import org.littletonrobotics.junction.Logger;
-
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -117,14 +115,6 @@ public class HolonomicDriveController {
     // Calculate feedback velocities (based on position error).
     double xFeedback = m_xController.calculate(currentPose.getX(), trajectoryPose.getX());
     double yFeedback = m_yController.calculate(currentPose.getY(), trajectoryPose.getY());
-
-    Logger.recordOutput("xFF " , xFF);
-    Logger.recordOutput("xFeedback " , xFeedback);
-    Logger.recordOutput("yFF " , yFF);
-    Logger.recordOutput("yFeedback " , yFeedback);
-
-    Logger.recordOutput("xDerivative " , m_xController.getErrorDerivative());
-    Logger.recordOutput("xError " , m_xController.getError());
 
     // Return next output.
     return ChassisSpeeds.fromFieldRelativeSpeeds(
