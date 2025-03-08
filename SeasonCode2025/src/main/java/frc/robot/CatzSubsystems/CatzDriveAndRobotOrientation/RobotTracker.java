@@ -18,7 +18,7 @@ import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.wpilibj.DriverStation;
 import frc.robot.FieldConstants;
-import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.CatzRobotTracker.VisionObservation;
+import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.RobotTracker.VisionObservation;
 import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.Drivetrain.DriveConstants;
 import frc.robot.Utilities.GeomUtil;
 
@@ -32,15 +32,15 @@ import org.littletonrobotics.junction.AutoLogOutput;
 
 
 @ExtensionMethod({GeomUtil.class})
-public class CatzRobotTracker {
+public class RobotTracker {
   private static final double POSE_BUFFER_SIZE_SEC = 2.0;
   private static final Matrix<N3, N1> ODOMETRY_STD_DEVS =
       new Matrix<>(VecBuilder.fill(0.003, 0.003, 0.002));
 
-  private static CatzRobotTracker instance;
+  private static RobotTracker instance;
 
-  public static CatzRobotTracker getInstance() {
-    if (instance == null) instance = new CatzRobotTracker();
+  public static RobotTracker getInstance() {
+    if (instance == null) instance = new RobotTracker();
     return instance;
   }
 
@@ -110,7 +110,7 @@ public class CatzRobotTracker {
   //  Constructor
   //
   // ------------------------------------------------------------------------------------------------------
-  private CatzRobotTracker() {
+  private RobotTracker() {
     for (int i = 0; i < 3; ++i) {
       TRACKER_STD_DEVS.set(i, 0, Math.pow(ODOMETRY_STD_DEVS.get(i, 0), 2));
     }

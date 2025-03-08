@@ -26,7 +26,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.FieldConstants;
 import frc.robot.Robot;
 import frc.robot.RobotContainer;
-import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.CatzRobotTracker;
+import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.RobotTracker;
 import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.Drivetrain.CatzDrivetrain;
 import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.Drivetrain.DriveConstants;
 import frc.robot.Utilities.AllianceFlipUtil;
@@ -59,7 +59,7 @@ public class TrajectoryDriveCmd extends Command {
 
   // Subsystems
   private CatzDrivetrain m_driveTrain;
-  private CatzRobotTracker tracker = CatzRobotTracker.getInstance();
+  private RobotTracker tracker = RobotTracker.getInstance();
   private final RobotContainer container;
 
   // Trajectory variables
@@ -326,13 +326,6 @@ public class TrajectoryDriveCmd extends Command {
     if (timer.hasElapsed(pathTimeOut)) {
       System.out.println("timed out!!@)!*()*!)(#*)");
       return true;
-    }
-    // System.out.println("vision: " + (tracker.getVisionPoseShift().getNorm()) + " pose: " + translationError);
-
-    if (container.getCatzVision().isSeeingApriltag() && autoalign && tracker.getVisionPoseShift().getNorm() > ALLOWABLE_VISION_ADJUST) {
-      // If trailing pose is within margin
-      // System.out.println("vision is not true");
-      return false;
     }
     // Finish command if the total time the path takes is over
 

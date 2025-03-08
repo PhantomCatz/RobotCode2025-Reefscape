@@ -11,14 +11,13 @@ package frc.robot;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.RobotController;
+import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.CatzConstants.RobotHardwareMode;
 import frc.robot.CatzConstants.RobotID;
-import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.CatzRobotTracker;
-import frc.robot.CatzSubsystems.CatzLEDs.CatzLED;
-import frc.robot.CatzSubsystems.CatzLEDs.CatzLED.ControllerLEDState;
 import frc.robot.Utilities.Alert;
 import frc.robot.Utilities.Alert.AlertType;
 import frc.robot.Utilities.VirtualSubsystem;
@@ -29,14 +28,9 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.BiConsumer;
-import org.littletonrobotics.junction.LogFileUtil;
-import org.littletonrobotics.junction.LoggedRobot;
 import org.littletonrobotics.junction.Logger;
-import org.littletonrobotics.junction.networktables.NT4Publisher;
-import org.littletonrobotics.junction.wpilog.WPILOGReader;
-import org.littletonrobotics.junction.wpilog.WPILOGWriter;
 
-public class Robot extends LoggedRobot {
+public class Robot extends TimedRobot {
   // -------------------------------------------------------------------------------------------------------------
   //  Essential Robot.java object declaration
   // --------------------------------------------------------------------------------------------------------------
@@ -100,53 +94,6 @@ public class Robot extends LoggedRobot {
   // --------------------------------------------------------------------------------------------------------
   @Override
   public void robotInit() {
-    System.gc();
-
-    // Record metadata
-    Logger.recordMetadata("ProjectName", BuildConstants.MAVEN_NAME);
-    Logger.recordMetadata("BuildDate", BuildConstants.BUILD_DATE);
-    Logger.recordMetadata("GitSHA", BuildConstants.GIT_SHA);
-    Logger.recordMetadata("GitDate", BuildConstants.GIT_DATE);
-    Logger.recordMetadata("GitBranch", BuildConstants.GIT_BRANCH);
-    switch (BuildConstants.DIRTY) {
-      case 0:
-        Logger.recordMetadata("GitDirty", "All changes committed");
-        break;
-      case 1:
-        Logger.recordMetadata("GitDirty", "Uncomitted changes");
-        break;
-      default:
-        Logger.recordMetadata("GitDirty", "Unknown");
-        break;
-    }
-
-    // Set up data receivers & replay source
-    switch (CatzConstants.hardwareMode) {
-      case REAL:
-        // Running on a real robot, log to a USB stick ("/U/logs")
-        //Logger.addDataReceiver(new WPILOGWriter());
-        Logger.addDataReceiver(new WPILOGWriter("D:/Logs"));
-        Logger.addDataReceiver(new NT4Publisher());
-        break;
-
-      case SIM:
-        // Running a physics simulator, log to NT
-        // Logger.addDataReceiver(new WPILOGWriter("F:/robotics code projects/loggingfiles/"));
-        Logger.addDataReceiver(new NT4Publisher());
-        break;
-
-      case REPLAY:
-        // Replaying a log, set up replay source
-        setUseTiming(false); // Run as fast as possible
-        String logPath = LogFileUtil.findReplayLog();
-        Logger.setReplaySource(new WPILOGReader(logPath));
-        Logger.addDataReceiver(new WPILOGWriter(LogFileUtil.addPathSuffix(logPath, "_sim")));
-        break;
-    }
-
-    // Start AdvantageKit logger //TODO enable this in autonomous and telop init for comp setting //
-    // make advantage kit an on demand feature
-    Logger.start();
 
     // Instantiate robotContainer
     m_robotContainer = new RobotContainer();
@@ -244,8 +191,6 @@ public class Robot extends LoggedRobot {
               "*** Auto cancelled in %.2f secs ***%n", Timer.getFPGATimestamp() - autoStart);
         }
         autoMessagePrinted = true;
-        CatzLED.getInstance().setControllerState(ControllerLEDState.autoFinished);
-        CatzLED.getInstance().autoFinishedTime = Timer.getFPGATimestamp();
       }
     }
 
@@ -265,11 +210,6 @@ public class Robot extends LoggedRobot {
       CAN_ERROR_TIMER.restart();
     }
     CAN_ERROR_ALERT.set(!CAN_ERROR_TIMER.hasElapsed(CAN_ERROR_TIME_THRESHOLD) && !CAN_INITIAL_ERROR_TIMER.hasElapsed(CAN_ERROR_TIME_THRESHOLD));
-    Logger.recordOutput("CANErrors/Transmit Errors", canStatus.transmitErrorCount);
-    Logger.recordOutput("CANErrors/Recieve Errors count", canStatus.receiveErrorCount);
-    Logger.recordOutput("CANErrors/Bus Off Count", canStatus.busOffCount);
-    Logger.recordOutput("CANErrors/Percent Utilization", canStatus.percentBusUtilization);
-    Logger.recordOutput("CANErrors/TxFullCount", canStatus.txFullCount);
 
     //------------------------------------------------------------------------------------------------
     // Low battery alert to determine whether necessary to put in new battery
@@ -281,7 +221,6 @@ public class Robot extends LoggedRobot {
     if (RobotController.getBatteryVoltage() <= LOW_BATTERY_VOLTAGE
         && DISABLED_TIMER.hasElapsed(LOW_BATTERY_DISABLED_TIME)) {
       LOW_BATTERY_ALERT.set(true);
-      CatzLED.getInstance().setControllerState(ControllerLEDState.lowBatteryAlert);
     }
   }
 
@@ -313,11 +252,6 @@ public class Robot extends LoggedRobot {
       garbageCollectionCounter = 0;
     }
     garbageCollectionCounter++;
-
-    // Checked leds
-    if(m_robotContainer.getCatzVision().getTagId(1) == 263 || m_robotContainer.getCatzVision().getTagId(0) == 263) { 
-      CatzLED.getInstance().setControllerState(ControllerLEDState.ledChecked);
-    }
   }
 
   @Override
@@ -336,7 +270,7 @@ public class Robot extends LoggedRobot {
     // deployment benchmark
     LAST_DEPLOYMENT_WARNING.set(true);
     autoStart = Timer.getFPGATimestamp();
-    m_autonomousCommand = m_robotContainer.getAutonomousCommand();
+    m_autonomousCommand = new SequentialCommandGroup();
 
     if (m_autonomousCommand != null) {
       m_autonomousCommand.schedule();
@@ -376,7 +310,6 @@ public class Robot extends LoggedRobot {
   public void teleopPeriodic() {
 
     teleElapsedTime = Timer.getFPGATimestamp() - teleStart;
-    m_robotContainer.getSelector().updateCurrentlySelected();
 
   }
 
@@ -391,7 +324,6 @@ public class Robot extends LoggedRobot {
   @Override
   public void testInit() {
     CommandScheduler.getInstance().cancelAll();
-    CatzRobotTracker.getInstance().resetPose(m_robotContainer.getCatzVision().getPoseObservation()[0].pose().toPose2d());
   }
 
   @Override

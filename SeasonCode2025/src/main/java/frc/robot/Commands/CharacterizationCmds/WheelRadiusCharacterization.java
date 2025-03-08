@@ -11,7 +11,7 @@ import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.CatzRobotTracker;
+import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.RobotTracker;
 import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.Drivetrain.CatzDrivetrain;
 import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.Drivetrain.DriveConstants;
 import frc.robot.Utilities.LoggedTunableNumber;
@@ -34,7 +34,7 @@ public class WheelRadiusCharacterization extends Command {
       new LoggedTunableNumber("WheelRadiusCharacterization/SpeedRadsPerSec", 1);
   private static final double driveRadius = DriveConstants.DRIVE_CONFIG.driveBaseRadius();
   private static final DoubleSupplier gyroYawRadsSupplier =
-      () -> CatzRobotTracker.getInstance().getEstimatedPose().getRotation().getRadians();
+      () -> RobotTracker.getInstance().getEstimatedPose().getRotation().getRadians();
 
   @RequiredArgsConstructor
   public enum Direction {

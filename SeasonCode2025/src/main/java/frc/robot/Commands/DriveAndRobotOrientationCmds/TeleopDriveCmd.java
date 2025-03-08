@@ -10,7 +10,7 @@ package frc.robot.Commands.DriveAndRobotOrientationCmds;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.CatzConstants.XboxInterfaceConstants;
-import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.CatzRobotTracker;
+import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.RobotTracker;
 import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.Drivetrain.CatzDrivetrain;
 import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.Drivetrain.DriveConstants;
 import frc.robot.Utilities.AllianceFlipUtil;
@@ -104,7 +104,7 @@ public class TeleopDriveCmd extends Command {
     chassisSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(m_headingAndVelocity_X,
                                                           m_headingAndVelocity_Y,
                                                           turningVelocity,
-                                                          CatzRobotTracker.getInstance().getEstimatedPose().getRotation());
+                                                          RobotTracker.getInstance().getEstimatedPose().getRotation());
 
     // Send new chassisspeeds object to the drivetrain
     m_drivetrain.drive(chassisSpeeds);

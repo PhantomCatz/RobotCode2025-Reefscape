@@ -26,8 +26,8 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.CatzConstants;
-import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.CatzRobotTracker;
-import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.CatzRobotTracker.OdometryObservation;
+import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.RobotTracker;
+import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.RobotTracker.OdometryObservation;
 import frc.robot.Robot;
 import frc.robot.Utilities.Alert;
 import frc.robot.Utilities.EqualsUtil;
@@ -46,7 +46,7 @@ public class CatzDrivetrain extends SubsystemBase {
   private final GyroIOInputsAutoLogged gyroInputs = new GyroIOInputsAutoLogged();
 
   // Position, odmetetry, and velocity estimator
-  private final CatzRobotTracker tracker = CatzRobotTracker.getInstance();
+  private final RobotTracker tracker = RobotTracker.getInstance();
 
   // Alerts
   private final Alert gyroDisconnected;
@@ -178,7 +178,7 @@ public class CatzDrivetrain extends SubsystemBase {
                                                     gyroAngle2d,
                                                     Timer.getFPGATimestamp()
                                           );
-    CatzRobotTracker.getInstance().addOdometryObservation(observation);
+    RobotTracker.getInstance().addOdometryObservation(observation);
 
     // Update current velocities use gyro when possible
     Twist2d robotRelativeVelocity = getTwist2dSpeeds();
@@ -186,15 +186,12 @@ public class CatzDrivetrain extends SubsystemBase {
         gyroInputs.gyroConnected
             ? Math.toRadians(gyroInputs.gyroYawVel)
             : robotRelativeVelocity.dtheta;
-    CatzRobotTracker.getInstance().addVelocityData(robotRelativeVelocity);
+    RobotTracker.getInstance().addVelocityData(robotRelativeVelocity);
 
     // --------------------------------------------------------------
     // Logging
     // --------------------------------------------------------------
     SmartDashboard.putNumber("Heading", getGyroHeading());
-    Logger.recordOutput("Drive/Odometry module states", getModuleStates());
-    Logger.recordOutput("Drive/Odometry wheel positions", wheelPositions);
-    Logger.recordOutput("Drive/Odometry robot velocity", robotRelativeVelocity);
   } // end of drivetrain periodic
 
   // --------------------------------------------------------------------------------------------------------------------------
