@@ -62,7 +62,7 @@ public class ElevatorConstants {
     // Initial PIDF and motion magic assignment
     public static final Gains gains =
         switch (CatzConstants.getRobotType()) {
-            case SN2 -> new Gains(75.0, 0.1, 0.0, 0.175, 0.13, 0.016, 0.55); //TODO fix gains
+            case SN2 -> new Gains(125.0, 0.1, 0.0, 0.175, 0.13, 0.016, 0.6); //TODO fix gains
             case SN1 -> new Gains(75.0, 0.1, 0.0, 0.175, 0.13, 0.013, 0.4); //
             case SN_TEST, SN1_2024 -> new Gains(7000.0, 0.0, 250.0, 8.4, 0.2, 0.2, 22.9);
         };

@@ -38,6 +38,7 @@ public class CatzRampPivot extends SubsystemBase {
     PosStow(() -> RAMP_STOW),
     PosClimb(() -> RAMP_CLIMB),
     PosIntake(() -> RAMP_INTAKE),
+    PosL1Score(() -> RAMP_L1_SCORE),
     PosNull(() -> heightPlaceholder),
     PosManual(new LoggedTunableNumber("RampPivot/RampPivotManual",0.0));
 

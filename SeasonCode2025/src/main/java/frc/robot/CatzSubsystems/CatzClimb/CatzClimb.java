@@ -90,10 +90,10 @@ public class CatzClimb extends SubsystemBase {
     } else {
       if(targetPosition == ClimbPosition.FULL_MANUAL) {
         io.setPower(manualPow);
-        System.out.println("full");
+        // System.out.println("full");
       } else if(targetPosition == ClimbPosition.MANUAL) {
         io.setPosition(position);
-        System.out.println("semi");
+        // System.out.println("semi");
       } else if(targetPosition != ClimbPosition.MANUAL && targetPosition != ClimbPosition.FULL_MANUAL) {
         // System.out.println("Target");
         io.setPosition(position);

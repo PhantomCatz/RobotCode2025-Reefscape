@@ -189,7 +189,7 @@ public class CatzOuttake extends SubsystemBase {
     io.runIntakesIntakeMotor(0.0);
     io.runMotor(OUTTAKE_L1_LT, OUTTAKE_L1_RT);
     interationCounter++;
-    if(!inputs.bbreakFrntTriggered&& interationCounter >= 40) {
+    if(!inputs.bbreakFrntTriggered&& interationCounter >= 50) {
       interationCounter = 0;
       CatzSuperstructure.setCurrentCoralState(CoralState.NOT_IN_OUTTAKE);
       currentState = outtakeStates.STOP;
@@ -199,7 +199,7 @@ public class CatzOuttake extends SubsystemBase {
   private void case_shootL4() {
     io.runMotor(OUTTAKE_L4, OUTTAKE_L4);
     interationCounter++;
-    if(!inputs.bbreakFrntTriggered && interationCounter >= 40) {
+    if(!inputs.bbreakFrntTriggered && interationCounter >= 100) {
         interationCounter = 0;
         CatzSuperstructure.setCurrentCoralState(CoralState.NOT_IN_OUTTAKE);
         currentState = outtakeStates.STOP;
