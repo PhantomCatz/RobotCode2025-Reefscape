@@ -38,7 +38,6 @@ public class CatzRampPivot extends SubsystemBase {
     PosStow(() -> RAMP_STOW),
     PosClimb(() -> RAMP_CLIMB),
     PosIntake(() -> RAMP_INTAKE),
-    PosL1Score(() -> RAMP_L1_SCORE),
     PosNull(() -> heightPlaceholder),
     PosManual(new LoggedTunableNumber("RampPivot/RampPivotManual",0.0));
 
@@ -99,14 +98,18 @@ public class CatzRampPivot extends SubsystemBase {
     return run(() -> rampPivotSetManual(manualSupplier.get())).alongWith(Commands.print("full manual"));
   }
 
+  public Command rampPivotPosManual(Supplier<Double> manualSupplier) {
+    return runOnce(() -> rampPivotPosManual(manualSupplier.get())).alongWith(Commands.print("pos manual"));
+  }
+
   public void rampPivotSetManual(double manualSupplier) {
     this.rampPower = manualSupplier * 0.1;
     rampPivotPositions = RampPivotPositions.PosManual;
   }
 
-  // public void rampPivotSetManual(double manualSupplier) {
-  //   targetPos += manualSupplier * MANUAL_SCALE;
-  // }
+  public void rampPivotPosManual(double manualSupplier) {
+    targetPos += manualSupplier * MANUAL_SCALE;
+  }
 
    public void setRampPos(RampPivotPositions target) {
     this.targetPos = target.getTargetPositionRot();

@@ -11,6 +11,7 @@ import org.littletonrobotics.junction.AutoLogOutput;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import frc.robot.RobotContainer;
 import frc.robot.Utilities.VirtualSubsystem;
 import lombok.Getter;
@@ -34,6 +35,8 @@ public class CatzSuperstructure extends VirtualSubsystem {
 
     @Getter @Setter @AutoLogOutput(key = "CatzSuperstructure/CurrentCoralState")
     private static CoralState currentCoralState = CoralState.IN_OUTTAKE;
+
+    private Command previousAction = new InstantCommand();
 
     public enum Gamepiece{
         CORAL,
@@ -73,7 +76,8 @@ public class CatzSuperstructure extends VirtualSubsystem {
         INTAKE,
         AIMING,
         INTAKE_GROUND,
-        STOW
+        STOW,
+        L4_AUTO_OUTTAKE
     }
 
 
@@ -116,8 +120,8 @@ public class CatzSuperstructure extends VirtualSubsystem {
         switch(currentRobotAction) {
             // Outtaking Algae or Coral
             case OUTTAKE:
-                System.out.println("Outtake Coral at L"+level);
                 if(chosenGamepiece == Gamepiece.CORAL) {
+                    System.out.println("Outtake Coral at L"+level);
                     switch (level) {
                         case 1:
                         currentRobotState = RobotState.L1_CORAL;
@@ -126,7 +130,7 @@ public class CatzSuperstructure extends VirtualSubsystem {
 
                         case 2:
                         currentRobotState = RobotState.L2_CORAL;
-                        robotActionCommand =  CatzStateCommands.L2Coral(container);
+                        robotActionCommand = CatzStateCommands.L2Coral(container);
                         break;
 
                         case 3:
@@ -233,13 +237,24 @@ public class CatzSuperstructure extends VirtualSubsystem {
                  break;
 
             // Sets All Mechanisms to Base Positions
+
+            case L4_AUTO_OUTTAKE:
+                 robotActionCommand = CatzStateCommands.L4CoralAuto(container);
+                 break;
             default:
             case STOW:
                 currentRobotState = RobotState.STOW;
                 robotActionCommand = CatzStateCommands.stow(container);
                 break;
+
+
         }
-        robotActionCommand.schedule();
+
+        System.out.println("acton: " + currentRobotState);
+        if(previousAction != robotActionCommand){
+            robotActionCommand.schedule();
+        }
+        previousAction = robotActionCommand;
     }
 
 

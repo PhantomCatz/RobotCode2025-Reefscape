@@ -147,7 +147,7 @@ public class ElevatorIOReal implements ElevatorIO {
   public void runSetpoint(double setpointRads, double feedforward) {
     double setpointRotations = Units.radiansToRotations(setpointRads);
     leaderTalon.setControl(positionControl.withPosition(setpointRotations)
-                                          .withFeedForward(feedforward));
+                                          .withFeedForward(feedforward + Math.max((setpointRads - 76.2) / 60 * 0.4, 0)));
   }
 
   @Override
