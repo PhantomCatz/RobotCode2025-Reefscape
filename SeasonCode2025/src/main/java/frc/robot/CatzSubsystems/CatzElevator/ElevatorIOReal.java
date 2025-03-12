@@ -35,7 +35,7 @@ public class ElevatorIOReal implements ElevatorIO {
 
   // Motor configuration
   private final TalonFXConfiguration config = new TalonFXConfiguration();
-  private final MotionMagicVoltage positionControl = new MotionMagicVoltage(0.0).withUpdateFreqHz(0.0);
+  private final MotionMagicTorqueCurrentFOC positionControl = new MotionMagicTorqueCurrentFOC(0.0).withUpdateFreqHz(0.0);
 
   // Status Signals
   private final StatusSignal<Angle> internalPositionRotations;
@@ -101,7 +101,6 @@ public class ElevatorIOReal implements ElevatorIO {
 
     // Setting follower
     followerTalon.setControl(new Follower(leaderTalon.getDeviceID(), true));
-    positionControl.EnableFOC = true;
   }
 
     public void updateInputs(ElevatorIOInputs inputs) {
