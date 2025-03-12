@@ -35,7 +35,7 @@ public class CatzOuttake extends SubsystemBase {
     SCORE_L1,
     SCORE_L4,
     STOP,
-    TEMP_RUN
+    RAMP_EJECT
   }
 
   private outtakeStates currentState = outtakeStates.STOP;
@@ -108,6 +108,7 @@ public class CatzOuttake extends SubsystemBase {
       case SCORE_L1:
       //Outtakes with speeds fit for L1 Scoring until FrontBeambreak = triggered AND once 1s has passed
         case_shootL1();
+        io.runIntakesIntakeMotor(-0.8);
         break;
       case SCORE_L4:
       //Outtakes with speeds fit for L4 Scoring until FrontBeambreak = triggered AND once 0.5s has passed
@@ -117,8 +118,8 @@ public class CatzOuttake extends SubsystemBase {
         io.runIntakesIntakeMotor(0.0);
         io.runMotor(0,0);
         break;
-      case TEMP_RUN:
-        io.runMotor(OUTTAKE_LT, OUTTAKE_RT);
+      case RAMP_EJECT:
+        io.runIntakesIntakeMotor(-0.8);
         break;
     }
 
@@ -218,8 +219,8 @@ public class CatzOuttake extends SubsystemBase {
   }
 
 
-  public Command tempIntake() {
-    return runOnce(() -> currentState = outtakeStates.TEMP_RUN);
+  public Command rampEject() {
+    return runOnce(() -> currentState = outtakeStates.RAMP_EJECT);
   }
 
   public Command startOuttake() {

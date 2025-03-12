@@ -3,13 +3,13 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 1.1867827868852459,
-        "y": 7.027920081967213
+        "x": 1.297,
+        "y": 6.918
       },
       "prevControl": null,
       "nextControl": {
-        "x": 1.8948546174448748,
-        "y": 6.477037776087046
+        "x": 2.005071830559629,
+        "y": 6.367117694119833
       },
       "isLocked": false,
       "linkedName": "Coral-Top"
@@ -17,11 +17,11 @@
     {
       "anchor": {
         "x": 3.692213114754098,
-        "y": 5.085911885245901
+        "y": 5.0499487704918025
       },
       "prevControl": {
         "x": 2.9564434855510315,
-        "y": 5.67263285564413
+        "y": 5.6366697408900315
       },
       "nextControl": null,
       "isLocked": false,
@@ -33,8 +33,8 @@
   "pointTowardsZones": [],
   "eventMarkers": [],
   "globalConstraints": {
-    "maxVelocity": 2.0,
-    "maxAcceleration": 1.0,
+    "maxVelocity": 3.0,
+    "maxAcceleration": 4.0,
     "maxAngularVelocity": 540.0,
     "maxAngularAcceleration": 720.0,
     "nominalVoltage": 12.0,
@@ -42,7 +42,7 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": -61.50436138175507
+    "rotation": -58.43772133704708
   },
   "reversed": false,
   "folder": "L4 H Paths",

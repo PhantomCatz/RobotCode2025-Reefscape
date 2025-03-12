@@ -3,13 +3,13 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 1.1867827868852459,
-        "y": 7.027920081967213
+        "x": 1.297,
+        "y": 6.918
       },
       "prevControl": null,
       "nextControl": {
-        "x": 1.858282786885245,
-        "y": 6.324670081967213
+        "x": 1.968499999999999,
+        "y": 6.2147499999999996
       },
       "isLocked": false,
       "linkedName": "Coral-Top"
@@ -17,27 +17,27 @@
     {
       "anchor": {
         "x": 3.692213114754098,
-        "y": 5.085911885245901
+        "y": 5.0499487704918025
       },
       "prevControl": {
         "x": 3.4972131147540977,
-        "y": 5.3101618852459005
+        "y": 5.274198770491802
       },
       "nextControl": {
         "x": 3.8935431961549427,
-        "y": 4.8543822916349315
+        "y": 4.818419176880833
       },
       "isLocked": false,
       "linkedName": "Reef-L"
     },
     {
       "anchor": {
-        "x": 1.1867827868852459,
-        "y": 7.027920081967213
+        "x": 1.297,
+        "y": 6.918
       },
       "prevControl": {
-        "x": 1.9667827868852457,
-        "y": 6.286920081967213
+        "x": 2.077,
+        "y": 6.177
       },
       "nextControl": null,
       "isLocked": false,
@@ -81,8 +81,8 @@
     }
   ],
   "globalConstraints": {
-    "maxVelocity": 2.0,
-    "maxAcceleration": 1.0,
+    "maxVelocity": 3.0,
+    "maxAcceleration": 4.0,
     "maxAngularVelocity": 540.0,
     "maxAngularAcceleration": 720.0,
     "nominalVoltage": 12.0,

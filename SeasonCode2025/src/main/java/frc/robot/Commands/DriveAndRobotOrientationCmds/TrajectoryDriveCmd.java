@@ -49,12 +49,12 @@ import org.littletonrobotics.junction.Logger;
 public class TrajectoryDriveCmd extends Command {
   // Trajectory constants
   public static final double ALLOWABLE_POSE_ERROR = 0.05;
-  public static final double ALLOWABLE_AUTOAIM_ERROR = 0.02;
+  public static final double ALLOWABLE_AUTOAIM_ERROR = 0.01;
   public static final double ALLOWABLE_ROTATION_ERROR = 1.0;
   public static final double ALLOWABLE_VEL_ERROR = 0.2;
   public static final double ALLOWABLE_OMEGA_ERROR = 3.0;
   private static final double TIMEOUT_SCALAR = 50.0;
-  private static final double CONVERGE_DISTANCE = 0.50;
+  private static final double CONVERGE_DISTANCE = 0.02;
   private final double ALLOWABLE_VISION_ADJUST = 4e-3; //TODO tune
 
   // Subsystems
@@ -152,35 +152,22 @@ public class TrajectoryDriveCmd extends Command {
         }
       }
 
-
       // Collect current drive state
       ChassisSpeeds currentSpeeds = DriveConstants.SWERVE_KINEMATICS.toChassisSpeeds(tracker.getCurrentModuleStates());
 
-
-      // If we provide an initial speed of zero the trajectory will take an infinite
-      // time to finish
-      // (divide by 0) and not be sampleable
-      // if (Math.hypot(currentSpeeds.vxMetersPerSecond, currentSpeeds.vxMetersPerSecond) < 1e-6) {
-      //   currentSpeeds = DriveConstants.NON_ZERO_CHASSIS_SPEED;
-      // }
-
-      // System.out.println("path: " + usePath);
-      // System.out.println("speed;" + currentSpeeds);
-      // System.out.println("rototat:" + tracker.getEstimatedPose().getRotation());
-
       // Construct trajectory
-
       if(autoalign){
         this.trajectory = new PathPlannerTrajectory(
           usePath,
-          DriveConstants.NON_ZERO_CHASSIS_SPEED, //TODO make it not zero if its a thing thingy y esdpoifi
+          currentSpeeds, //TODO make it not zero if its a thing thingy y esdpoifi
           tracker.getEstimatedPose().getRotation(),
-          DriveConstants.SCORING_ROBOT_CONFIG
+          DriveConstants.TRAJ_ROBOT_CONFIG
         );
       }else{
         this.trajectory = new PathPlannerTrajectory(
           usePath,
-          DriveConstants.NON_ZERO_CHASSIS_SPEED, //TODO make it not zero if its a thing thingy y esdpoifi
+
+          currentSpeeds, //TODO make it not zero if its a thing thingy y esdpoifi
           tracker.getEstimatedPose().getRotation(),
           DriveConstants.TRAJ_ROBOT_CONFIG
         );
@@ -219,6 +206,8 @@ public class TrajectoryDriveCmd extends Command {
   // ---------------------------------------------------------------------------------------------
   @Override
   public void execute() {
+    if(this.trajectory == null || isBugged) return;
+
     // Collect instananous variables
     double currentTime = timer.get();
     Pose2d currentPose = tracker.getEstimatedPose();

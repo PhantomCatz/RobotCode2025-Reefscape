@@ -38,6 +38,7 @@ public class CatzRampPivot extends SubsystemBase {
     PosStow(() -> RAMP_STOW),
     PosClimb(() -> RAMP_CLIMB),
     PosIntake(() -> RAMP_INTAKE),
+    PosL1Score(() -> RAMP_L1_SCORE),
     PosNull(() -> heightPlaceholder),
     PosManual(new LoggedTunableNumber("RampPivot/RampPivotManual",0.0));
 
@@ -77,11 +78,12 @@ public class CatzRampPivot extends SubsystemBase {
     if(DriverStation.isDisabled()) {
       // Disabled
       io.stop();
-      targetPos = RampPivotPositions.PosStow.getTargetPositionRot();
+      targetPos = RampPivotPositions.PosIntake.getTargetPositionRot();
 
     } else if(rampPivotPositions != RampPivotPositions.PosNull &&
               rampPivotPositions != RampPivotPositions.PosManual){
-      // System.out.println("RaMp_PiVoT TaRgEt: " + targetPos);
+
+      //System.out.println("RaMp_PiVoT TaRgEt: " + targetPos);
       io.setPosition(targetPos, 0);
 
     } else if (rampPivotPositions == RampPivotPositions.PosManual) {

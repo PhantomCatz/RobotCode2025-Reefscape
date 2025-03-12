@@ -33,6 +33,7 @@ import org.littletonrobotics.junction.LogFileUtil;
 import org.littletonrobotics.junction.LoggedRobot;
 import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.networktables.NT4Publisher;
+import org.littletonrobotics.junction.rlog.RLOGServer;
 import org.littletonrobotics.junction.wpilog.WPILOGReader;
 import org.littletonrobotics.junction.wpilog.WPILOGWriter;
 
@@ -124,8 +125,10 @@ public class Robot extends LoggedRobot {
     switch (CatzConstants.hardwareMode) {
       case REAL:
         // Running on a real robot, log to a USB stick ("/U/logs")
-        //Logger.addDataReceiver(new WPILOGWriter());
-        Logger.addDataReceiver(new WPILOGWriter("D:/Logs"));
+        Logger.addDataReceiver(new WPILOGWriter());
+        Logger.addDataReceiver(new RLOGServer());
+        //Logger.addDataReceiver(new WPILOGWriter("D:/Logs"));
+
         Logger.addDataReceiver(new NT4Publisher());
         break;
 
@@ -315,7 +318,7 @@ public class Robot extends LoggedRobot {
     garbageCollectionCounter++;
 
     // Checked leds
-    if(m_robotContainer.getCatzVision().getTagId(1) == 263 || m_robotContainer.getCatzVision().getTagId(0) == 263) { 
+    if(m_robotContainer.getCatzVision().getTagId(1) == 263 || m_robotContainer.getCatzVision().getTagId(0) == 263) {
       CatzLED.getInstance().setControllerState(ControllerLEDState.ledChecked);
     }
   }
@@ -337,7 +340,7 @@ public class Robot extends LoggedRobot {
     LAST_DEPLOYMENT_WARNING.set(true);
     autoStart = Timer.getFPGATimestamp();
     m_autonomousCommand = m_robotContainer.getAutonomousCommand();
-
+    m_robotContainer.getCatzRampPivot().Ramp_Intake_Pos().withTimeout(1.0);
     if (m_autonomousCommand != null) {
       m_autonomousCommand.schedule();
     }
@@ -362,7 +365,8 @@ public class Robot extends LoggedRobot {
     LAST_DEPLOYMENT_WARNING.set(true);
     if (m_autonomousCommand != null) {
       m_autonomousCommand.cancel();
-
+    } else {
+      m_robotContainer.getCatzRampPivot().Ramp_Intake_Pos().withTimeout(1.0);
     }
 
     teleStart = Timer.getFPGATimestamp();

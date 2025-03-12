@@ -49,7 +49,7 @@ public class CatzAlgaePivot extends SubsystemBase {
     HORIZONTAL(() -> -15.0), // TBD
     NetAlgae(() -> 100.0), // TBD
     MANUAL(() -> manualPow),
-    BOTBOT(() -> -49.7),
+    BOTBOT(() -> -20.7),
     BOTTOP(() -> -20.1),
     PUNCH(() -> 30),
     TUNNABLE(tunnablePos);

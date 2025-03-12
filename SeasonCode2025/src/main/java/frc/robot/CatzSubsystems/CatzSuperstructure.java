@@ -21,7 +21,7 @@ public class CatzSuperstructure extends VirtualSubsystem {
     private RobotContainer container;
 
     @Getter @Setter @AutoLogOutput(key = "CatzSuperstructure/ChosenGamepiece")
-    private Gamepiece chosenGamepiece = Gamepiece.CORAL;
+    private static Gamepiece chosenGamepiece = Gamepiece.CORAL;
 
     @Getter @Setter @AutoLogOutput(key = "CatzSuperstructure/Level")
     private int level = 1;
@@ -155,8 +155,6 @@ public class CatzSuperstructure extends VirtualSubsystem {
                             robotActionCommand = Commands.none();
                             break;
                     }
-                    currentRobotState = RobotState.PROCESSOR;
-                    robotActionCommand = CatzStateCommands.processor(container);
                     // System.out.println("Processor");
 
                 }
@@ -196,28 +194,26 @@ public class CatzSuperstructure extends VirtualSubsystem {
 
             // Intake Algae From Reef or Coral from Coral Substation
             case INTAKE:
-                currentRobotState = RobotState.INTAKE_CORAL_STATION;
-                robotActionCommand = CatzStateCommands.intakeCoralStation(container);
+                if(chosenGamepiece == Gamepiece.CORAL) {
+                    currentRobotState = RobotState.INTAKE_CORAL_STATION;
+                    robotActionCommand = CatzStateCommands.intakeCoralStation(container);
+                } else {
+                    switch (level) {
+                        case 2:
+                            currentRobotState = RobotState.TOP_ALGAE;
+                            System.out.println("TOP algae");
+                            robotActionCommand = CatzStateCommands.botAlgae(container);
+                            break;
+                        case 4:
+                            currentRobotState = RobotState.BOT_ALGAE;
+                            System.out.println("BOT algae");
+                            robotActionCommand = CatzStateCommands.topAlgae(container);
+                            break;
+                        default:
+                            break;
+                    }
+                }
                 break;
-                // if(chosenGamepiece == Gamepiece.CORAL) {
-
-                // } else {
-                //     switch (level) {
-                //         case 2:
-                //             currentRobotState = RobotState.TOP_ALGAE;
-                //             System.out.println("TOP algae");
-                //             robotActionCommand = CatzStateCommands.topAlgae(container);
-                //             break;
-                //         case 4:
-                //             currentRobotState = RobotState.BOT_ALGAE;
-                //             System.out.println("BOT algae");
-                //             robotActionCommand = CatzStateCommands.botAlgae(container);
-                //             break;
-                //         default:
-                //             break;
-                //     }
-                // }
-                // break;
 
             // Intake Algae Ground or Coral Ground
 

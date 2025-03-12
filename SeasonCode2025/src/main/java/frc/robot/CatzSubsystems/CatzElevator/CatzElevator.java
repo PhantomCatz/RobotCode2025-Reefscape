@@ -118,12 +118,11 @@ public class CatzElevator extends SubsystemBase {
     //---------------------------------------------------------------------------------------------------------------------------
     //    Feed Foward
     //---------------------------------------------------------------------------------------------------------------------------
-    // if(targetPosition == ElevatorPosition.PosL4) {
-
-    //   elevatorFeedForward =  gains.kG() + 0.1;
-    //} else {
+    if(targetPosition == ElevatorPosition.PosL3) {
+      elevatorFeedForward =  gains.kG() + 0.4;
+    } else {
       elevatorFeedForward =  gains.kG();
-    //}
+    }
 
     //---------------------------------------------------------------------------------------------------------------------------
     //    Control Mode setting
@@ -223,7 +222,7 @@ public class CatzElevator extends SubsystemBase {
     boolean isElevatorInPos = (Math.abs((getElevatorPositionRads() - targetPosition.getTargetPositionRads())) < 1.5);
     if(isElevatorInPos) {
       settlingCounter++;
-      if(settlingCounter >= 10) {
+      if(settlingCounter >= 5) {
         isElevatorSettled = true;
         settlingCounter = 0;
          //System.out.println("////////////ELEVATOR SETTLED FOR .2 SECONDS///////////////////");

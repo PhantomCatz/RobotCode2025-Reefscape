@@ -141,8 +141,8 @@ public class RobotContainer {
     }));
 
     // NBA
-    xboxDrv.b().onTrue(selector.runToNearestBranch().alongWith(Commands.runOnce(()->led.setControllerState(ControllerLEDState.NBA))));
-    xboxDrv.b().onFalse(selector.cancelCurrentDrivetrainCommand().alongWith(Commands.runOnce(()->led.setControllerState(ControllerLEDState.FULL_MANUAL))));
+    xboxDrv.rightTrigger().onTrue(selector.runToNearestBranch().unless(()->xboxAux.back().getAsBoolean()).alongWith(Commands.runOnce(()->led.setControllerState(ControllerLEDState.NBA))));
+    xboxDrv.rightTrigger().onFalse(selector.cancelCurrentDrivetrainCommand().alongWith(Commands.runOnce(()->led.setControllerState(ControllerLEDState.FULL_MANUAL))));
 
     // BALLS
     xboxDrv.y().onTrue(selector.runCoralStationCommand());
@@ -157,10 +157,10 @@ public class RobotContainer {
     xboxDrv.rightBumper().onTrue(new InstantCommand(() -> selector.runLeftRight(LeftRight.RIGHT)));
 
     // Climb
-    xboxDrv.back().and(xboxDrv.b().onTrue(CatzStateCommands.climb(this))); // Setup Climb
-    xboxDrv.back().and(xboxDrv.x().onTrue(climb.Climb_Retract()));
+    xboxDrv.back().and(xboxDrv.b()).onTrue(CatzStateCommands.climb(this)); // Setup Climb
+    xboxDrv.back().and(xboxDrv.x()).onTrue(climb.Climb_Retract());
     // Manual Climb Control
-    xboxDrv.back().and(xboxDrv.rightStick().onTrue(climb.ClimbManualMode(() -> xboxDrv.getRightY()).alongWith(Commands.print("Using manual climb"))));
+    xboxDrv.back().and(xboxDrv.leftStick()).onTrue(climb.ClimbManualMode(() -> xboxDrv.getLeftY()).alongWith(Commands.print("Using manual climb")));
 
     //TODO Score
     xboxDrv.leftTrigger(SCORE_TRIGGER_THRESHHOLD).onTrue(new InstantCommand(() -> superstructure.setCurrentRobotAction(RobotAction.OUTTAKE, superstructure.getLevel())));
@@ -168,6 +168,7 @@ public class RobotContainer {
     // Default driving
     Trigger escapeTrajectory = new Trigger(()->(xboxDrv.getLeftY() > 0.8));
     escapeTrajectory.onTrue(selector.cancelCurrentDrivetrainCommand().alongWith(selector.cancelAutoCommand()));
+
     drive.setDefaultCommand(new TeleopDriveCmd(() -> xboxDrv.getLeftX(), () -> xboxDrv.getLeftY(), () -> xboxDrv.getRightX(), drive));
 
     //---------------------------------------------------------------------------------------------------------------------
@@ -181,12 +182,11 @@ public class RobotContainer {
                                         .alongWith(Commands.runOnce(() -> led.setControllerState(ControllerLEDState.AQUA))));
     xboxAux.rightBumper().onTrue(Commands.runOnce(() -> selector.pathQueuePopBack())
                                          .alongWith(Commands.runOnce(() -> led.setControllerState(ControllerLEDState.AQUA))));
-    xboxAux.rightStick().onTrue(Commands.runOnce(() -> selector.pathQueueClear())
+    xboxAux.rightStick().onTrue(Commands.runOnce(() -> selector.pathQueueClear()).unless(()->xboxAux.leftStick().getAsBoolean())
                                         .alongWith(Commands.runOnce(() -> led.setControllerState(ControllerLEDState.AQUA))));
 
-    xboxAux.leftStick().and(xboxAux.rightStick()).onTrue(elevator.elevatorFullManual(()->xboxAux.getLeftY()));
+    xboxAux.leftStick().and(xboxAux.rightStick()).onTrue(elevator.elevatorFullManual(() -> -xboxAux.getLeftY()));
     xboxAux.leftStick().and(xboxAux.rightStick()).onTrue(algaePivot.AlgaePivotFullManualCommand(()->xboxAux.getRightY()));
-
 
     // Coral Station Run Back
     xboxAux.button(7).onTrue(new InstantCommand(() -> selector.toggleLeftStation()).alongWith(Commands.runOnce(() -> led.setControllerState(ControllerLEDState.BALLS))));
@@ -204,7 +204,7 @@ public class RobotContainer {
     // algae punch
     DoublePressTracker.createTrigger(xboxAux.x())
                       .onTrue(algaePivot.AlgaePivot_Punch()
-                                        .onlyIf(()->superstructure.getChosenGamepiece() == Gamepiece.ALGAE)
+                                        .onlyIf(()->CatzSuperstructure.getChosenGamepiece() == Gamepiece.ALGAE)
                                         .alongWith(Commands.print("Algae Punch"))
     );
 
@@ -219,9 +219,9 @@ public class RobotContainer {
     //------------------------------------------------------------------------------------------------------------------------------
     //  XBOX test controls
     //------------------------------------------------------------------------------------------------------------------------------
-    // xboxTest.povRight().toggleOnTrue(rampPivot.Ramp_Stow_Pos().alongWith(Commands.print("pressed POV Right"))); //TBD
-    // xboxTest.povUp().toggleOnTrue(rampPivot.Ramp_Intake_Pos().alongWith(Commands.print("pressed POV Up"))); //TBD
-    // xboxTest.povLeft().toggleOnTrue(rampPivot.Ramp_Climb_Pos().alongWith(Commands.print("pressed POV Left")));
+    xboxTest.povRight().toggleOnTrue(rampPivot.Ramp_Stow_Pos().alongWith(Commands.print("pressed POV Right"))); //TBD
+    xboxTest.povUp().toggleOnTrue(rampPivot.Ramp_Intake_Pos().alongWith(Commands.print("pressed POV Up"))); //TBD
+    xboxTest.povLeft().toggleOnTrue(rampPivot.Ramp_Climb_Pos().alongWith(Commands.print("pressed POV Left")));
 
     // xboxTest.rightBumper().toggleOnTrue(algaePivot.AlgaePivot_Stow().alongWith(Commands.print("stow")));
     // xboxTest.leftBumper().toggleOnTrue(algaePivot.AlgaePivot_Horizontal().alongWith(Commands.print("eat")));
@@ -229,6 +229,9 @@ public class RobotContainer {
     // xboxTest.leftTrigger().onTrue(algaeRemover.vomitAlgae().alongWith(Commands.print("vomiting algae")));
     // xboxTest.rightStick().onTrue(algaeRemover.stopAlgae().alongWith(Commands.print("stop algaeing")));
 
+    xboxTest.a().onTrue(outtake.startIntaking().alongWith(Commands.print("INTAKEKKKEEKKEKEKEING")));
+    xboxTest.b().onTrue(outtake.startOuttake().alongWith(Commands.print("INTAKEKKKEEKKEKEKEING")));
+    xboxTest.x().onTrue(outtake.stopOuttake().alongWith(Commands.print("INTAKEKKKEEKKEKEKEING")));
 
     // STOWING INTAKE RAMP FOR WHATEVER REASON
     //xboxTest.start().toggleOnTrue(rampPivot.Ramp_Stow_Pos().alongWith(Commands.print("pressed start"))); //TBD
@@ -252,17 +255,17 @@ public class RobotContainer {
     // xboxTest.a().toggleOnTrue(rampPivot.Ramp_Intake().alongWith(Commands.print("pressed a")));
 
     // Manual Elevator Control
-    // Trigger leftJoystickTrigger = new Trigger(
-    //   () -> Math.abs(xboxTest.getLeftY()) > 0.1);
-    // Trigger rightJoystickTrigger = new Trigger(
-    //   () -> Math.abs(xboxTest.getRightY()) > 0.1);
+    Trigger leftJoystickTrigger = new Trigger(
+      () -> Math.abs(xboxTest.getLeftY()) > 0.1);
+    Trigger rightJoystickTrigger = new Trigger(
+      () -> Math.abs(xboxTest.getRightY()) > 0.1);
 
-    // leftJoystickTrigger.onTrue(rampPivot.rampPivotManual(() -> xboxTest.getLeftY()).alongWith(Commands.print("Using manual ramp pivot")));
-    // leftJoystickTrigger.onFalse(rampPivot.rampPivotManual(()-> 0.0).alongWith(Commands.print("Nah - ramp motor")));
+    leftJoystickTrigger.onTrue(rampPivot.rampPivotManual(() -> xboxTest.getLeftY()).alongWith(Commands.print("Using manual ramp pivot")));
+    leftJoystickTrigger.onFalse(rampPivot.rampPivotManual(()-> 0.0).alongWith(Commands.print("Nah - ramp motor")));
 
-    // //climb.ClimbManualMode(
-    // rightJoystickTrigger.onTrue(climb.ClimbManualMode(() -> xboxTest.getRightY()).alongWith(Commands.print("Using manual climb")));
-    // rightJoystickTrigger.onFalse(climb.ClimbManualMode(()-> 0.0).alongWith(Commands.print("Nah - climb motor")));
+    //climb.ClimbManualMode(
+    rightJoystickTrigger.onTrue(climb.ClimbManualMode(() -> xboxTest.getRightY()).alongWith(Commands.print("Using manual climb")));
+    rightJoystickTrigger.onFalse(climb.ClimbManualMode(()-> 0.0).alongWith(Commands.print("Nah - climb motor")));
 
   }
 

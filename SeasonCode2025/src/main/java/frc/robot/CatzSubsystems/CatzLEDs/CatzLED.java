@@ -18,6 +18,7 @@ import edu.wpi.first.wpilibj.util.Color;
 import frc.robot.CatzConstants;
 import frc.robot.CatzSubsystems.CatzSuperstructure;
 import frc.robot.CatzSubsystems.CatzSuperstructure.CoralState;
+import frc.robot.CatzSubsystems.CatzSuperstructure.Gamepiece;
 import frc.robot.Utilities.VirtualSubsystem;
 import lombok.Getter;
 import lombok.Setter;
@@ -40,13 +41,13 @@ public class CatzLED extends VirtualSubsystem {
   // ----------------------------------------------------------------------------------------------
   // Robot state LED tracking
   // ----------------------------------------------------------------------------------------------
-  @Getter @Setter @AutoLogOutput (key = "CatzLED/ledState")
+  @Getter @Setter @AutoLogOutput (key = "CatzLED/ElevatorLEDState")
   public ControllerLEDState ControllerState = ControllerLEDState.nuhthing;
 
   @Getter @Setter @AutoLogOutput (key = "CatzLED/QueueState")
   public QueueLEDState queueLEDState = QueueLEDState.EMPTY;
 
-  @Getter @Setter @AutoLogOutput (key = "CatzLED/ledScoringState")
+  @Getter @Setter @AutoLogOutput (key = "CatzLED/CrossbarLEDState")
   public LocationState CrossbarState = LocationState.nuhthing;
 
   public enum QueueLEDState {
@@ -107,7 +108,7 @@ public class CatzLED extends VirtualSubsystem {
   private final Notifier loadingNotifier;
 
   // LED PWM IDs
-  private final int LEADER_LED_PWM_PORT = 1;
+  private final int LEADER_LED_PWM_PORT = 0;
 
   // Constants
   private static final boolean paradeLeds = false;
@@ -213,7 +214,7 @@ public class CatzLED extends VirtualSubsystem {
     // -----------------------------------------------------------
     // Set LED mode
     // ----------------------------------------------------------
-    setSolidElevatorColor(Color.kBlack); // Default to off
+    //setSolidElevatorColor(Color.kBlack); // Default to off
 
     if (estopped) {
       setSolidElevatorColor(Color.kRed);
@@ -227,7 +228,7 @@ public class CatzLED extends VirtualSubsystem {
         // APRILTAG CHECK
         if(ControllerState == ControllerLEDState.ledChecked) {
           setSolidElevatorColor(Color.kGreen);
-        } 
+        }
       }
       // MODE AUTON
     } else if (DriverStation.isAutonomous()) {
@@ -309,27 +310,10 @@ public class CatzLED extends VirtualSubsystem {
           break;
       }
 
-      switch(CrossbarState) {
-        case A, G:
-          setSolidCrossbarColor(Color.kRed);
-          break;
-        case B, H:
-          setSolidCrossbarColor(Color.kBlue);
-          break;
-        case C, I:
-          setSolidCrossbarColor(Color.kRed);
-          break;
-        case D, J:
-          setSolidCrossbarColor(Color.kBlue);
-          break;
-        case E, K:
-          setSolidCrossbarColor(Color.kRed);
-          break;
-        case F, L:
-          setSolidCrossbarColor(Color.kBlue);
-          break;
-        default:
-          break;
+      if(CatzSuperstructure.getChosenGamepiece() == Gamepiece.ALGAE) {
+        setSolidCrossbarColor(Color.kAquamarine);
+      } else {
+        setSolidCrossbarColor(Color.kWhite);
       }
     }
 

@@ -13,6 +13,7 @@ import frc.robot.CatzSubsystems.CatzSuperstructure.RobotAction;
 import frc.robot.RobotContainer;
 import frc.robot.CatzSubsystems.CatzSuperstructure;
 import frc.robot.CatzSubsystems.CatzOuttake.CatzOuttake;
+import frc.robot.CatzSubsystems.CatzRampPivot.CatzRampPivot;
 
 public class DriveAndCycle extends TrajectoryDriveCmd{
     private final double PREDICT_DISTANCE = 0.3; // meters
@@ -20,16 +21,21 @@ public class DriveAndCycle extends TrajectoryDriveCmd{
     private final RobotAction action;
     private CatzSuperstructure superstructure;
     private CatzOuttake outtake;
+    private CatzRampPivot pivot;
     private int level;
     private RobotContainer container;
 
+    private int intakeIterationCounter = 0;
+
     private boolean actionAlreadyTaken = false;
     private boolean alreadyOuttake = false;
+    private boolean skipped = false;
 
     public DriveAndCycle(PathPlannerPath newPath, RobotContainer container, RobotAction action){
         super(newPath, container.getCatzDrivetrain(), action != RobotAction.INTAKE, container);
         this.action = action;
         this.superstructure = container.getSuperstructure();
+        this.pivot = container.getCatzRampPivot();
         this.outtake = container.getCatzOuttake();
         addRequirements(super.getRequirements());
         this.container = container;
@@ -39,6 +45,7 @@ public class DriveAndCycle extends TrajectoryDriveCmd{
         super(newPath, container.getCatzDrivetrain(), action != RobotAction.INTAKE, container);
         this.level = level;
         this.action = action;
+        this.pivot = container.getCatzRampPivot();
         this.superstructure = container.getSuperstructure();
         this.outtake = container.getCatzOuttake();
         addRequirements(super.getRequirements());
@@ -51,6 +58,8 @@ public class DriveAndCycle extends TrajectoryDriveCmd{
         // selector.hasCoralSIM = true;
         actionAlreadyTaken = false;
         alreadyOuttake = false;
+        intakeIterationCounter = 0;
+        skipped = false;
     }
 
     @Override
@@ -70,6 +79,10 @@ public class DriveAndCycle extends TrajectoryDriveCmd{
             else if(action == RobotAction.INTAKE){
                 System.out.println("intaking!!!!!!");
                 superstructure.setCurrentRobotAction(RobotAction.INTAKE, "intak");
+                intakeIterationCounter++;
+                if(!outtake.hasCoral() && intakeIterationCounter > 100) {
+                    skipped = true;
+                }
             }
         }
 
@@ -91,7 +104,9 @@ public class DriveAndCycle extends TrajectoryDriveCmd{
     public void end(boolean interrupted){
         super.end(interrupted);
         if(action == RobotAction.OUTTAKE){
-            System.out.println("Auto Stowing");
+            if(level == 4){ //TODO not the best way to do it. eric already had code for it but i didnt have time to test so just ducttape fix
+               // Timer.delay(0.5);
+            }
             superstructure.setCurrentRobotAction(RobotAction.STOW, "dnc end");
         }
     }
@@ -99,10 +114,10 @@ public class DriveAndCycle extends TrajectoryDriveCmd{
     @Override
     public boolean isFinished(){
         if(action == RobotAction.OUTTAKE){
-            return !outtake.hasCoral();
+            return !outtake.hasCoral() || skipped;
         }
         if(action == RobotAction.INTAKE){
-            return outtake.hasCoral();
+            return outtake.hasCoral() || skipped;
         }
         return false;
     }
