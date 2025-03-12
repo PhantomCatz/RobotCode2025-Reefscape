@@ -177,15 +177,37 @@ public class CatzStateCommands {
 
             new SequentialCommandGroup(
                 elevator.Elevator_L4(),
-                Commands.waitUntil(() -> elevator.isElevatorInPosition()).withTimeout(0.6).alongWith(Commands.print("/////////L4?////////")),
+                Commands.waitUntil(() -> elevator.isElevatorInPosition()).withTimeout(2.0).alongWith(Commands.print("/////////L4?////////")),
                 outtake.outtakeL4(),
-                new WaitCommand(0.06),
+                new WaitCommand(0.1),
                 elevator.Elevator_L4_Adj()
-            ).withTimeout(2.0)
+            ).withTimeout(3.0)
         )//.onlyIf(() -> CatzSuperstructure.getCurrentCoralState() == CoralState.IN_OUTTAKE)
          .unless(()-> Robot.isSimulation()).alongWith(Commands.print("L4 Scoring State"));
     }
 
+    public static Command L4CoralAuto(RobotContainer robotContainer) {
+        CatzClimb climb = robotContainer.getCatzClimb();
+        CatzAlgaeRemover algae = robotContainer.getCatzAlgaeRemover();
+        CatzOuttake outtake = robotContainer.getCatzOuttake();
+        CatzElevator elevator = robotContainer.getCatzElevator();
+        CatzAlgaePivot algaePivot = robotContainer.getAlgaePivot();
+        CatzRampPivot rampPivot = robotContainer.getCatzRampPivot();
+
+        return new ParallelCommandGroup(
+            rampPivot.Ramp_Intake_Pos(),
+            climb.Climb_Retract(),
+            algae.stopAlgae(),
+            algaePivot.AlgaePivot_Stow(),
+
+            new SequentialCommandGroup(
+                outtake.outtakeL4(),
+                new WaitCommand(0.1),
+                elevator.Elevator_L4_Adj()
+            ).withTimeout(3.0)
+        )//.onlyIf(() -> CatzSuperstructure.getCurrentCoralState() == CoralState.IN_OUTTAKE)
+         .unless(()-> Robot.isSimulation()).alongWith(Commands.print("L4 Scoring State"));
+    }
     public static Command L1Elevator(RobotContainer robotContainer) {
         CatzClimb climb = robotContainer.getCatzClimb();
         CatzAlgaeRemover algae = robotContainer.getCatzAlgaeRemover();
@@ -259,7 +281,7 @@ public class CatzStateCommands {
             elevator.Elevator_L4()
         )
         //.onlyIf(() -> CatzSuperstructure.getCurrentCoralState() == CoralState.IN_OUTTAKE)
-         .unless(()-> Robot.isSimulation()).alongWith(Commands.print("L4 Scoring State")).unless(()-> Robot.isSimulation());
+         .unless(()-> Robot.isSimulation()).alongWith(Commands.print("L4 Scoring Elevator State")).unless(()-> Robot.isSimulation());
     }
 
     public static Command processor(RobotContainer robotContainer) {
@@ -363,7 +385,7 @@ public class CatzStateCommands {
                 algae.stopAlgae(),
                 rampPivot.Ramp_Climb_Pos(),
                 elevator.Elevator_Stow()
-            ),
+            ).alongWith(Commands.waitSeconds(1)),
             climb.Climb_Full()
         ).unless(()-> Robot.isSimulation()).alongWith(Commands.print("Climb"));
     }

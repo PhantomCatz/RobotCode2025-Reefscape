@@ -9,6 +9,7 @@ package frc.robot.Commands.DriveAndRobotOrientationCmds;
 
 import com.pathplanner.lib.path.PathPlannerPath;
 
+import edu.wpi.first.wpilibj.Timer;
 import frc.robot.CatzSubsystems.CatzSuperstructure.RobotAction;
 import frc.robot.RobotContainer;
 import frc.robot.CatzSubsystems.CatzSuperstructure;
@@ -16,13 +17,13 @@ import frc.robot.CatzSubsystems.CatzOuttake.CatzOuttake;
 import frc.robot.CatzSubsystems.CatzRampPivot.CatzRampPivot;
 
 public class DriveAndCycle extends TrajectoryDriveCmd{
-    private final double PREDICT_DISTANCE = 0.3; // meters
+    private final double PREDICT_DISTANCE =0.05;// 0.3; // meters
 
     private final RobotAction action;
     private CatzSuperstructure superstructure;
     private CatzOuttake outtake;
     private CatzRampPivot pivot;
-    private int level;
+    private int level = 0;
     private RobotContainer container;
 
     private int intakeIterationCounter = 0;
@@ -30,6 +31,13 @@ public class DriveAndCycle extends TrajectoryDriveCmd{
     private boolean actionAlreadyTaken = false;
     private boolean alreadyOuttake = false;
     private boolean skipped = false;
+
+    private final double INTAKE_TIMEOUT = 2.0; //seconds
+    private final double INTAKE_UNJAM_TIME = 0.2; //seconds
+    private boolean isUnjamming = false;
+
+    private double intake_time = 0.0;
+    private double unjam_time = 0.0;
 
     public DriveAndCycle(PathPlannerPath newPath, RobotContainer container, RobotAction action){
         super(newPath, container.getCatzDrivetrain(), action != RobotAction.INTAKE, container);
@@ -60,17 +68,33 @@ public class DriveAndCycle extends TrajectoryDriveCmd{
         alreadyOuttake = false;
         intakeIterationCounter = 0;
         skipped = false;
+        intake_time = 0.0;
     }
 
     @Override
     public void execute(){
+        // if(intake_time != 0.0 && (timeElapsedSince(intake_time) >= INTAKE_TIMEOUT)){
+        //     isUnjamming = true;
+        //     unjam_time = Timer.getFPGATimestamp();
+        // }
+
+        // if(isUnjamming){
+        //     if(timeElapsedSince(unjam_time) < INTAKE_UNJAM_TIME){
+        //         outtake.setCurrentState(outtakeStates.RAMP_EJECT);
+        //     }else{
+        //         isUnjamming = false;
+        //         actionAlreadyTaken = false;
+        //         intake_time = 0.0;
+        //     }
+        // }
+
         // Run Trajectory
         if( super.isFinished() == false){
             super.execute();
         }
 
         // Run Scoring or Intaking
-        if (super.isPoseWithinThreshold(PREDICT_DISTANCE) && !super.isFinished() && !actionAlreadyTaken){
+        if (super.isPoseWithinThreshold(PREDICT_DISTANCE) && !actionAlreadyTaken){
             actionAlreadyTaken = true;
             if(action == RobotAction.OUTTAKE && superstructure.getCurrentRobotAction() != RobotAction.OUTTAKE){
                 System.out.println("raised elevator!!!!!!!");
@@ -79,20 +103,31 @@ public class DriveAndCycle extends TrajectoryDriveCmd{
             else if(action == RobotAction.INTAKE){
                 System.out.println("intaking!!!!!!");
                 superstructure.setCurrentRobotAction(RobotAction.INTAKE, "intak");
-                intakeIterationCounter++;
-                if(!outtake.hasCoral() && intakeIterationCounter > 100) {
-                    skipped = true;
-                }
+                // intakeIterationCounter++;
+                // if(!outtake.hasCoral() && intakeIterationCounter > 100) {
+                //     skipped = true;
+                // }
             }
         }
 
         // If we reached the target Destination
         if (super.isFinished()){
             super.end(false);
-            if(action == RobotAction.OUTTAKE && !alreadyOuttake){
+            if(action == RobotAction.OUTTAKE){
                 alreadyOuttake = true;
-                superstructure.setCurrentRobotAction(RobotAction.OUTTAKE, this.level);
+                if(level > 0){
+                    // superstructure.setCurrentRobotAction(RobotAction.OUTTAKE, level);
+                    superstructure.setCurrentRobotAction(RobotAction.OUTTAKE, level);
+                    // System.out.println("auto l4 score!!");
+                } else {
+                    superstructure.setCurrentRobotAction(RobotAction.OUTTAKE, "DriveAndCycle");
+                }
+
             }
+
+            // if(intake_time == 0.0 && action == RobotAction.INTAKE){
+            //     intake_time = Timer.getFPGATimestamp();
+            // }
             // System.out.println("action: " + action.toString());
             if (container.getSelector().useFakeCoral){
                 container.getSelector().hasCoralSIM = action == RobotAction.INTAKE;
@@ -114,11 +149,15 @@ public class DriveAndCycle extends TrajectoryDriveCmd{
     @Override
     public boolean isFinished(){
         if(action == RobotAction.OUTTAKE){
-            return !outtake.hasCoral() || skipped;
+            return outtake.isDesiredCoralState(true);
         }
         if(action == RobotAction.INTAKE){
-            return outtake.hasCoral() || skipped;
+            return outtake.isDesiredCoralState(false);
         }
         return false;
+    }
+
+    private double timeElapsedSince(double time){
+        return Timer.getFPGATimestamp() - time;
     }
 }

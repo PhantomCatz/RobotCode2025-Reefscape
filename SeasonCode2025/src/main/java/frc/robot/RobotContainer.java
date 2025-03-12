@@ -145,12 +145,12 @@ public class RobotContainer {
     xboxDrv.rightTrigger().onFalse(selector.cancelCurrentDrivetrainCommand().alongWith(Commands.runOnce(()->led.setControllerState(ControllerLEDState.FULL_MANUAL))));
 
     // BALLS
-    xboxDrv.y().onTrue(selector.runCoralStationCommand());
-    xboxDrv.y().onFalse(selector.cancelCurrentDrivetrainCommand());
+    // xboxDrv.y().onTrue(selector.runCoralStationCommand());
+    // xboxDrv.y().onFalse(selector.cancelCurrentDrivetrainCommand());
 
     // AQUA
-    xboxDrv.a().onTrue(new InstantCommand(() -> selector.runAutoCommand().schedule()));
-    xboxDrv.a().onFalse(selector.cancelAutoCommand());
+    // xboxDrv.a().onTrue(new InstantCommand(() -> selector.runAutoCommand().schedule()));
+    // xboxDrv.a().onFalse(selector.cancelAutoCommand());
 
     // Left Right
     xboxDrv.leftBumper().onTrue(new InstantCommand(() -> selector.runLeftRight(LeftRight.LEFT)));
@@ -159,11 +159,12 @@ public class RobotContainer {
     // Climb
     xboxDrv.back().and(xboxDrv.b()).onTrue(CatzStateCommands.climb(this)); // Setup Climb
     xboxDrv.back().and(xboxDrv.x()).onTrue(climb.Climb_Retract());
+    xboxDrv.x().onFalse(climb.ClimbManualMode(()->0.0));
     // Manual Climb Control
     xboxDrv.back().and(xboxDrv.leftStick()).onTrue(climb.ClimbManualMode(() -> xboxDrv.getLeftY()).alongWith(Commands.print("Using manual climb")));
 
     //TODO Score
-    xboxDrv.leftTrigger(SCORE_TRIGGER_THRESHHOLD).onTrue(new InstantCommand(() -> superstructure.setCurrentRobotAction(RobotAction.OUTTAKE, superstructure.getLevel())));
+    // xboxDrv.leftTrigger(SCORE_TRIGGER_THRESHHOLD).onTrue(new InstantCommand(() -> superstructure.setCurrentRobotAction(RobotAction.OUTTAKE, superstructure.getLevel())));
 
     // Default driving
     Trigger escapeTrajectory = new Trigger(()->(xboxDrv.getLeftY() > 0.8));
@@ -171,6 +172,9 @@ public class RobotContainer {
 
     drive.setDefaultCommand(new TeleopDriveCmd(() -> xboxDrv.getLeftX(), () -> xboxDrv.getLeftY(), () -> xboxDrv.getRightX(), drive));
 
+    // Manual Ramp Pivot Control
+    // xboxDrv.povUp().onTrue(rampPivot.rampPivotPosManual(() -> 0.5).alongWith(Commands.print("Using manual ramp pivot")));
+    // xboxDrv.povDown().onTrue(rampPivot.rampPivotPosManual(() -> -0.5).alongWith(Commands.print("Using manual ramp pivot")));
     //---------------------------------------------------------------------------------------------------------------------
     // XBOX AUX
     //---------------------------------------------------------------------------------------------------------------------
@@ -198,7 +202,9 @@ public class RobotContainer {
     // Scoring Action
     xboxAux.y().onTrue(Commands.runOnce(() -> superstructure.setCurrentRobotAction(RobotAction.OUTTAKE, "container")).alongWith(Commands.print("OUTTAKE L" + superstructure.getLevel())));
     xboxAux.x().onTrue(Commands.runOnce(() -> superstructure.setCurrentRobotAction(RobotAction.INTAKE, "container")).alongWith(Commands.print("INTAKE")));
-    xboxAux.b().onTrue(Commands.runOnce(() -> superstructure.setCurrentRobotAction(RobotAction.INTAKE_GROUND, "container")).alongWith(Commands.print("INTAKEGROUND")));
+    xboxAux.b().toggleOnTrue(outtake.rampEject().alongWith(Commands.print("pressed b"))); //TBD
+
+    // xboxAux.b().onTrue(Commands.run(() -> outtake.rampEject()).alongWith(Commands.print("ramp eject")));
     xboxAux.a().onTrue(Commands.runOnce(() -> superstructure.setCurrentRobotAction(RobotAction.STOW, "container")).alongWith(Commands.print("STOWWW")));
 
     // algae punch
@@ -215,7 +221,7 @@ public class RobotContainer {
     xboxAux.povDown().onTrue(Commands.runOnce(() -> {superstructure.setLevel(4); SmartDashboard.putNumber("Reef Level", 4);}));
 
     xboxAux.a().onTrue(Commands.runOnce(() -> System.out.println("L:"+superstructure.getLevel()+", "+superstructure.getChosenGamepiece())));
-
+    xboxAux.start().onTrue(outtake.startOuttake());
     //------------------------------------------------------------------------------------------------------------------------------
     //  XBOX test controls
     //------------------------------------------------------------------------------------------------------------------------------
@@ -242,8 +248,8 @@ public class RobotContainer {
 
     // xboxTest.rightStick().onTrue(elevator.elevatorFullManual(()->xboxTest.getRightY()));
 
-    // leftJoystickTrigger.onTrue(climb.ClimbManualMode(() -> xboxTest.getLeftY()).alongWith(Commands.print("Using manual ramp pivot")));
-    // leftJoystickTrigger.onFalse(climb.ClimbManualMode(()-> 0.0).alongWith(Commands.print("Nah - pivot motor")));
+    xboxTest.rightStick().onTrue(climb.ClimbManualMode(() -> xboxTest.getLeftY()).alongWith(Commands.print("Using manual ramp pivot")));
+    xboxTest.rightStick().onFalse(climb.ClimbManualMode(()-> 0.0).alongWith(Commands.print("Nah - pivot motor")));
 
     // Climb SetPosition Control
     // xboxTest.y().toggleOnTrue(climb.Climb_Retract().alongWith(Commands.print("pressed y")));

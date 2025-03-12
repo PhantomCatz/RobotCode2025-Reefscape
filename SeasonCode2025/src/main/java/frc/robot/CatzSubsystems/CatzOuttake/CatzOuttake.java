@@ -16,6 +16,8 @@ import frc.robot.CatzConstants;
 import frc.robot.RobotContainer;
 import frc.robot.CatzSubsystems.CatzSuperstructure;
 import frc.robot.CatzSubsystems.CatzSuperstructure.CoralState;
+import lombok.Getter;
+import lombok.Setter;
 
 import org.littletonrobotics.junction.Logger;
 
@@ -38,6 +40,7 @@ public class CatzOuttake extends SubsystemBase {
     RAMP_EJECT
   }
 
+  @Setter @Getter
   private outtakeStates currentState = outtakeStates.STOP;
   private outtakeStates previousState = outtakeStates.STOP;
 
@@ -64,11 +67,21 @@ public class CatzOuttake extends SubsystemBase {
     }
   }
 
-  public boolean hasCoral(){
+
+  /**
+   *
+   * @param isOut This is the question asked. Is it out? Is it in?
+   * @return
+   */
+  public boolean isDesiredCoralState(boolean isOut){
     if (container.getSelector().useFakeCoral){
       return container.getSelector().hasCoralSIM;
     } else {
-      return inputs.bbreakBackTriggered || inputs.bbreakFrntTriggered;
+      if(isOut){
+        return (!inputs.bbreakBackTriggered) && (!inputs.bbreakFrntTriggered);
+      }else{
+        return inputs.bbreakBackTriggered && inputs.bbreakFrntTriggered;
+      }
     }
   }
 
@@ -108,7 +121,6 @@ public class CatzOuttake extends SubsystemBase {
       case SCORE_L1:
       //Outtakes with speeds fit for L1 Scoring until FrontBeambreak = triggered AND once 1s has passed
         case_shootL1();
-        io.runIntakesIntakeMotor(-0.8);
         break;
       case SCORE_L4:
       //Outtakes with speeds fit for L4 Scoring until FrontBeambreak = triggered AND once 0.5s has passed
@@ -119,9 +131,11 @@ public class CatzOuttake extends SubsystemBase {
         io.runMotor(0,0);
         break;
       case RAMP_EJECT:
-        io.runIntakesIntakeMotor(-0.8);
+        io.runIntakesIntakeMotor(0.8);
         break;
     }
+
+    Logger.recordOutput("Outtake/State", currentState);
 
     previousState = currentState;
 
@@ -199,7 +213,7 @@ public class CatzOuttake extends SubsystemBase {
   private void case_shootL4() {
     io.runMotor(OUTTAKE_L4, OUTTAKE_L4);
     interationCounter++;
-    if(!inputs.bbreakFrntTriggered && interationCounter >= 100) {
+    if(!inputs.bbreakFrntTriggered && interationCounter >= 40) {
         interationCounter = 0;
         CatzSuperstructure.setCurrentCoralState(CoralState.NOT_IN_OUTTAKE);
         currentState = outtakeStates.STOP;
@@ -232,7 +246,8 @@ public class CatzOuttake extends SubsystemBase {
   }
 
   public Command outtakeL4() {
-    return runOnce(() -> currentState = outtakeStates.SCORE_L4);
+
+    return runOnce(() -> {currentState = outtakeStates.SCORE_L4;interationCounter = 0;});
   }
 
   public Command stopOuttake() {

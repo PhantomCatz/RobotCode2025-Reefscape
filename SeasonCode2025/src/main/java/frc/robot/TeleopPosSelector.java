@@ -20,7 +20,6 @@ import edu.wpi.first.math.Pair;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
@@ -418,7 +417,7 @@ public class TeleopPosSelector {
         return getCoralStationCommand();
       }
     } else {
-      if (outtake.hasCoral()) {
+      if (outtake.isDesiredCoralState(true)) {
         if (queuedPaths.isEmpty())
           return new InstantCommand();
         return getReefScoreCommand(pair).andThen(new InstantCommand(() -> pathQueuePopFront()));
@@ -429,17 +428,51 @@ public class TeleopPosSelector {
   }
 
   public Command runToNearestBranch() {
+    // return new InstantCommand(() -> {
+    //   currentPathfindingPair = getClosestReefPos().getFirst();
+    //   currentDrivetrainCommand.cancel();
+    //   try {
+    //     Pose2d goal = calculateReefPose(getClosestReefPos().getFirst(), true);
+    //     Pose2d currentPose = tracker.getEstimatedPose();
+
+    //     Translation2d goalPos = goal.getTranslation();
+    //     Translation2d currentPos = currentPose.getTranslation();
+    //     Translation2d direction = goalPos.minus(currentPos).div(2.0);
+
+    //     // if too far from reef side, then don't NBA
+    //     if (direction.getNorm() <= 1e-3) {
+    //       return;
+    //     }
+
+    //     PathPlannerPath path = new PathPlannerPath(
+    //         Arrays.asList(new Waypoint[] {
+    //             new Waypoint(null, currentPos, currentPos.plus(direction)),
+    //             new Waypoint(goalPos.minus(direction), goalPos, null)
+    //         }),
+    //         DriveConstants.PATHFINDING_CONSTRAINTS,
+    //         null,
+    //         new GoalEndState(0, goal.getRotation()));
+
+    //     if (AllianceFlipUtil.shouldFlipToRed()) {
+    //       path = path.flipPath();
+    //     }
+    //     currentDrivetrainCommand = new TrajectoryDriveCmd(path, m_container.getCatzDrivetrain(), true, m_container);
+    //     currentDrivetrainCommand.schedule();
+    //   } catch (Exception e) {
+    //     e.printStackTrace();
+    //   }
+
+    // });
+
     return new InstantCommand(() -> {
-      double time = Timer.getFPGATimestamp();
       currentPathfindingPair = getClosestReefPos().getFirst();
       currentDrivetrainCommand.cancel();
       try{
-        currentDrivetrainCommand = new TrajectoryDriveCmd(getPathfindingPath(calculateReefPose(currentPathfindingPair, true)), drivetrain, true, m_container);
+        currentDrivetrainCommand = new TrajectoryDriveCmd(getPathfindingPath(calculateReefPose(currentPathfindingPair, true)), m_container.getCatzDrivetrain(), true, m_container);
         currentDrivetrainCommand.schedule();
       }catch(Exception e){
         e.printStackTrace();
       }
-      // System.out.println("sdfsdfdf     : " + (Timer.getFPGATimestamp()-time));
     });
   }
 

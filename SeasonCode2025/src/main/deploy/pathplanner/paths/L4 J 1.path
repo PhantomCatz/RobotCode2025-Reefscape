@@ -3,25 +3,25 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 7.1566598360655735,
-        "y": 6.140829918032787
+        "x": 7.2165983606557385,
+        "y": 3.9950307377049183
       },
       "prevControl": null,
       "nextControl": {
-        "x": 6.156659836065581,
-        "y": 6.140829918032787
+        "x": 7.18063524590164,
+        "y": 5.0499487704918025
       },
       "isLocked": false,
-      "linkedName": "Start-Top"
+      "linkedName": "Start3"
     },
     {
       "anchor": {
-        "x": 4.974897540983607,
-        "y": 5.217776639344262
+        "x": 5.2985655737704915,
+        "y": 5.085911885245901
       },
       "prevControl": {
-        "x": 5.861987704918033,
-        "y": 6.260706967213115
+        "x": 6.8449795081967215,
+        "y": 4.906096311475409
       },
       "nextControl": null,
       "isLocked": false,
@@ -48,7 +48,7 @@
   "folder": "L4 J Paths",
   "idealStartingState": {
     "velocity": 0,
-    "rotation": 179.34145682243644
+    "rotation": 180.0
   },
   "useDefaultConstraints": true
 }

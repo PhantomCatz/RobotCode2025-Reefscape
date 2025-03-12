@@ -1,0 +1,31 @@
+{
+  "version": "2025.0",
+  "command": {
+    "type": "sequential",
+    "data": {
+      "commands": [
+        {
+          "type": "named",
+          "data": {
+            "name": "testy1+ReefL1"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "testy2+CS"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "testy3+ReefL1"
+          }
+        }
+      ]
+    }
+  },
+  "resetOdom": false,
+  "folder": null,
+  "choreoAuto": false
+}

@@ -116,10 +116,10 @@ public class CatzLED extends VirtualSubsystem {
   private static final int length = 56;
   //22 11 24
   private static final int LED_Sidebar_Start_LT = 0;
-  private static final int LED_Sidebar_End_LT   = 22;
-  private static final int LED_Crossbar_Start   = 23;
-  private static final int LED_Crossbar_End     = 33;
-  private static final int LED_Sidebar_Start_RT = 34;
+  private static final int LED_Sidebar_End_LT   = 18;
+  private static final int LED_Crossbar_Start   = 19;
+  private static final int LED_Crossbar_End     = 29;
+  private static final int LED_Sidebar_Start_RT = 30;
   private static final int LED_Sidebar_End_RT   = 56;
 
   //LED Build up constants
@@ -220,7 +220,7 @@ public class CatzLED extends VirtualSubsystem {
       setSolidElevatorColor(Color.kRed);
       // MODE DISABLED
     } else if (DriverStation.isDisabled()) {
-      breath(Color.kAliceBlue, Color.kWhite, breathDuration);
+      breath(Color.kBlue, Color.kWhite, breathDuration);
       if (lastEnabledAuto && Timer.getFPGATimestamp() - lastEnabledTime < autoFadeMaxTime) {
         // Auto fade
         solid(1.0 - ((Timer.getFPGATimestamp() - lastEnabledTime) / autoFadeTime), Color.kGreen);
@@ -311,7 +311,7 @@ public class CatzLED extends VirtualSubsystem {
       }
 
       if(CatzSuperstructure.getChosenGamepiece() == Gamepiece.ALGAE) {
-        setSolidCrossbarColor(Color.kAquamarine);
+        setSolidCrossbarColor(Color.kAqua);
       } else {
         setSolidCrossbarColor(Color.kWhite);
       }

@@ -118,11 +118,25 @@ public class CatzElevator extends SubsystemBase {
     //---------------------------------------------------------------------------------------------------------------------------
     //    Feed Foward
     //---------------------------------------------------------------------------------------------------------------------------
-    if(targetPosition == ElevatorPosition.PosL3) {
-      elevatorFeedForward =  gains.kG() + 0.4;
-    } else {
-      elevatorFeedForward =  gains.kG();
-    }
+
+    // double additionalGain = 0.0;
+    // switch (targetPosition) {
+    //   case  PosL1:
+    //     additionalGain = 0.00;
+    //     break;
+    //   case  PosL2:
+    //     additionalGain = 0.025;
+    //     break;
+    //   case  PosL3:
+    //     additionalGain = 0.0;
+    //     break;
+    //   case  PosL4:
+    //     additionalGain = -0.2;
+    //     break;
+    //   default:
+    //     break;
+    // }
+    elevatorFeedForward = gains.kG();// + additionalGain;
 
     //---------------------------------------------------------------------------------------------------------------------------
     //    Control Mode setting
@@ -136,7 +150,7 @@ public class CatzElevator extends SubsystemBase {
       // Setpoint PID
       if(targetPosition == ElevatorPosition.PosStow) {
         // Safety Stow
-        if(getElevatorPositionRads() < 9.5) {
+        if(getElevatorPositionRads() < 9.50) {
           io.stop();
         } else {
           io.runSetpoint(targetPosition.getTargetPositionRads(), elevatorFeedForward);
@@ -219,10 +233,10 @@ public class CatzElevator extends SubsystemBase {
 
   public boolean isElevatorInPosition() {
     boolean isElevatorSettled = false;
-    boolean isElevatorInPos = (Math.abs((getElevatorPositionRads() - targetPosition.getTargetPositionRads())) < 1.5);
+    boolean isElevatorInPos = (Math.abs((getElevatorPositionRads() - targetPosition.getTargetPositionRads())) < 5);
     if(isElevatorInPos) {
       settlingCounter++;
-      if(settlingCounter >= 5) {
+      if(settlingCounter >= 10) {
         isElevatorSettled = true;
         settlingCounter = 0;
          //System.out.println("////////////ELEVATOR SETTLED FOR .2 SECONDS///////////////////");

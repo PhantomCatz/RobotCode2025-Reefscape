@@ -49,11 +49,11 @@ import org.littletonrobotics.junction.Logger;
 public class TrajectoryDriveCmd extends Command {
   // Trajectory constants
   public static final double ALLOWABLE_POSE_ERROR = 0.05;
-  public static final double ALLOWABLE_AUTOAIM_ERROR = 0.01;
+  public static final double ALLOWABLE_AUTOAIM_ERROR = 0.02;
   public static final double ALLOWABLE_ROTATION_ERROR = 1.0;
-  public static final double ALLOWABLE_VEL_ERROR = 0.2;
-  public static final double ALLOWABLE_OMEGA_ERROR = 3.0;
-  private static final double TIMEOUT_SCALAR = 50.0;
+  public static final double ALLOWABLE_VEL_ERROR = 0.05;
+  public static final double ALLOWABLE_OMEGA_ERROR = 1.0;
+  private static final double TIMEOUT_SCALAR = 3.0;
   private static final double CONVERGE_DISTANCE = 0.02;
   private final double ALLOWABLE_VISION_ADJUST = 4e-3; //TODO tune
 
@@ -194,6 +194,8 @@ public class TrajectoryDriveCmd extends Command {
       isBugged = true;
       e.printStackTrace();
     }
+
+    System.out.println("timeoutt::" + trajectory.getTotalTimeSeconds());
     //
   } // end of initialize()
 
