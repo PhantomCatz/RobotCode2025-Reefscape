@@ -17,6 +17,6 @@ public class MotorUtil {
 
   public static enum NeutralMode {
     COAST,
-    BREAK
+    BRAKE
   }
 }

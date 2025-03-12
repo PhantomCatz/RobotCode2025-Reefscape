@@ -13,6 +13,7 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.CatzConstants;
 import frc.robot.Utilities.LoggedTunableNumber;
+import frc.robot.Utilities.MotorUtil.NeutralMode;
 import lombok.RequiredArgsConstructor;
 
 import static frc.robot.CatzSubsystems.CatzRampPivot.RampPivotConstants.*;
@@ -32,6 +33,9 @@ public class CatzRampPivot extends SubsystemBase {
   public double targetPos = RampPivotPositions.PosStow.getTargetPositionRot();
   public double RampPivotFeedForward = 0.0;
   public static boolean isManual = false;
+  
+  public NeutralMode currentNeutralMode = NeutralMode.COAST;
+  public NeutralMode prevNeutralMode = NeutralMode.COAST;
 
   @RequiredArgsConstructor
   public static enum RampPivotPositions {
@@ -74,10 +78,25 @@ public class CatzRampPivot extends SubsystemBase {
     io.updateInputs(inputs);
     Logger.processInputs("RealInputs/RampPivot", inputs);
 
+    // Neutral Mode setting
+    if(DriverStation.isEnabled()) {
+      if (currentNeutralMode != NeutralMode.BRAKE) {
+        io.setNeutralMode(NeutralMode.BRAKE);
+        currentNeutralMode = NeutralMode.BRAKE;
+      }
+    } else {
+      if (currentNeutralMode != NeutralMode.COAST) {
+        io.setNeutralMode(NeutralMode.COAST);
+        currentNeutralMode = NeutralMode.COAST;
+      }
+    }
+
+
     if(DriverStation.isDisabled()) {
       // Disabled
       io.stop();
       targetPos = RampPivotPositions.PosIntake.getTargetPositionRot();
+      io.setNeutralMode(NeutralMode.COAST);
 
     } else if(rampPivotPositions != RampPivotPositions.PosNull &&
               rampPivotPositions != RampPivotPositions.PosManual){

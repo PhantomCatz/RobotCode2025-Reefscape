@@ -70,17 +70,17 @@ public class CatzOuttake extends SubsystemBase {
 
   /**
    *
-   * @param isOut This is the question asked. Is it out? Is it in?
+   * @param isOuttaking This is the question asked. Is it out? Is it in?
    * @return
    */
-  public boolean isDesiredCoralState(boolean isOut){
+  public boolean isDesiredCoralState(boolean isOuttaking){
     if (container.getSelector().useFakeCoral){
       return container.getSelector().hasCoralSIM;
     } else {
-      if(isOut){
+      if(isOuttaking){
         return (!inputs.bbreakBackTriggered) && (!inputs.bbreakFrntTriggered);
       }else{
-        return inputs.bbreakBackTriggered && inputs.bbreakFrntTriggered;
+        return (inputs.bbreakBackTriggered && inputs.bbreakFrntTriggered);
       }
     }
   }

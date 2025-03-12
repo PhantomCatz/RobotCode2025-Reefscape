@@ -19,6 +19,7 @@ import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.Temperature;
 import edu.wpi.first.units.measure.Voltage;
+import frc.robot.Utilities.MotorUtil.NeutralMode;
 
 import static frc.robot.CatzSubsystems.CatzRampPivot.RampPivotConstants.*;
 
@@ -104,4 +105,16 @@ public class RampPivotIOReal implements RampPivotIO{
     public void stop() {
         rampPivotMotor.setControl(new DutyCycleOut(0));
     }
+
+    @Override
+    public void setNeutralMode(NeutralMode mode) {
+        if(mode == NeutralMode.BRAKE) {
+            config.MotorOutput.NeutralMode = NeutralModeValue.Brake;
+        } else {
+            config.MotorOutput.NeutralMode = NeutralModeValue.Coast;
+        }
+        rampPivotMotor.getConfigurator().apply(config);
+    }
+
+
 }

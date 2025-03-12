@@ -36,6 +36,9 @@ public class CatzSuperstructure extends VirtualSubsystem {
     @Getter @Setter @AutoLogOutput(key = "CatzSuperstructure/CurrentCoralState")
     private static CoralState currentCoralState = CoralState.IN_OUTTAKE;
 
+    @Getter @AutoLogOutput(key = "CatzSuperstructure/robotactionCommand")
+    private Command robotActionCommand = Commands.none();
+
     private Command previousAction = new InstantCommand();
 
     public enum Gamepiece{
@@ -114,7 +117,7 @@ public class CatzSuperstructure extends VirtualSubsystem {
     }
 
     public void setCurrentRobotAction(RobotAction action, int level) {
-        Command robotActionCommand = Commands.print("No robot Action Selected");
+        robotActionCommand = Commands.print("No robot Action Selected");
         this.currentRobotAction = action;
 
         switch(currentRobotAction) {
@@ -237,7 +240,6 @@ public class CatzSuperstructure extends VirtualSubsystem {
                  break;
 
             // Sets All Mechanisms to Base Positions
-
             case L4_AUTO_OUTTAKE:
                  robotActionCommand = CatzStateCommands.L4CoralAuto(container);
                  break;
