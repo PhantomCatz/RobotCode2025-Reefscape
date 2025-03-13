@@ -78,9 +78,9 @@ public class CatzOuttake extends SubsystemBase {
       return container.getSelector().hasCoralSIM;
     } else {
       if(isOuttaking){
-        return (!inputs.bbreakBackTriggered) && (!inputs.bbreakFrntTriggered);
+        return (!inputs.bbreakBackTriggered) && (!inputs.bbreakFrntTriggered); //both beam breaks must be off to be out of the coral effector
       }else{
-        return (inputs.bbreakBackTriggered && inputs.bbreakFrntTriggered);
+        return (inputs.bbreakBackTriggered || inputs.bbreakFrntTriggered); //only one of the beambreak must be triggered to be considered inside the coral effector
       }
     }
   }

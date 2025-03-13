@@ -13,6 +13,7 @@ import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
 
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.CatzConstants;
 import frc.robot.Utilities.LoggedTunableNumber;
@@ -185,6 +186,26 @@ public class CatzElevator extends SubsystemBase {
   //  Elevator Setpos Commands
   //
   //--------------------------------------------------------------------------------------------------------------------------
+  public Command Elevator_LX(int level){
+    switch (level){
+      case 1:
+        return Elevator_L1();
+
+      case 2:
+        return Elevator_L2();
+
+      case 3:
+        return Elevator_L3();
+
+      case 4:
+        return Elevator_L4();
+      
+      default:
+        System.out.println("Invalid elevator level!");
+        return new InstantCommand();
+    }
+  }
+
   public Command Elevator_Stow() {
     return runOnce(() -> setElevatorPos(ElevatorPosition.PosStow));
   }

@@ -29,8 +29,6 @@ import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.Drivetrain.CatzDriv
 import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.Drivetrain.DriveConstants;
 import frc.robot.Commands.CharacterizationCmds.WheelRadiusCharacterization;
 import frc.robot.Commands.CharacterizationCmds.WheelRadiusCharacterization.Direction;
-import frc.robot.Commands.DriveAndRobotOrientationCmds.DriveToCoralStation;
-import frc.robot.Commands.DriveAndRobotOrientationCmds.DriveToScore;
 import frc.robot.Commands.DriveAndRobotOrientationCmds.TrajectoryDriveCmd;
 import frc.robot.RobotContainer;
 import frc.robot.Utilities.AllianceFlipUtil;
@@ -178,9 +176,9 @@ public class CatzAutonomous extends SubsystemBase {
             String action = components[1];
 
             if(action.equalsIgnoreCase("CS")){
-              command = new DriveToCoralStation(PathPlannerPath.fromPathFile(name), m_container);
+              command = CatzStateCommands.driveToCoralStation(container, PathPlannerPath.fromPathFile(name));
             } else if(action.contains("ReefL")){
-              command = new DriveToScore(PathPlannerPath.fromPathFile(name), m_container, Integer.parseInt(action.substring("ReefL".length())));
+              command = CatzStateCommands.driveToScore(container, PathPlannerPath.fromPathFile(name),Integer.parseInt(action.substring("ReefL".length())));
             }
           }
 

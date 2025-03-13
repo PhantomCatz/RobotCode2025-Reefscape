@@ -238,14 +238,8 @@ public class TrajectoryDriveCmd extends Command {
 
     // construct chassisspeeds
     adjustedSpeeds = hocontroller.calculate(currentPose, state, goal.pose.getRotation());
-    // System.out.println("bv: " + Math.hypot(adjustedSpeeds.vxMetersPerSecond, adjustedSpeeds.vyMetersPerSecond));
 
     adjustedSpeeds = applyCusp(adjustedSpeeds, translationError, CONVERGE_DISTANCE);
-
-    // if(currentTime < 0.7){
-    //   adjustedSpeeds = adjustedSpeeds.times(7);
-    // }
-    // System.out.println("av: " + Math.hypot(adjustedSpeeds.vxMetersPerSecond, adjustedSpeeds.vyMetersPerSecond));
 
     // Logging
     Logger.recordOutput("CatzRobotTracker/Desired Auto Pose", goal.pose);
@@ -265,6 +259,8 @@ public class TrajectoryDriveCmd extends Command {
 
     // send to drivetrain
     m_driveTrain.drive(adjustedSpeeds);
+
+    m_driveTrain.setDistanceError(translationError);
 
     // Named Commands
     eventScheduler.execute(currentTime);
@@ -307,42 +303,37 @@ public class TrajectoryDriveCmd extends Command {
 
   @Override
   public boolean isFinished() {
-    // System.out.println("vision: "
-    // +tracker.getDEstimatedPose().getTranslation().getNorm() );
     if(isBugged){
       System.out.println("Path Bugged");
       return true;
     }
     // Event Command or timeout
     if (timer.hasElapsed(pathTimeOut)) {
-      System.out.println("timed out!!@)!*()*!)(#*)");
+      System.out.println("path timed out!");
       return true;
     }
-    // System.out.println("vision: " + (tracker.getVisionPoseShift().getNorm()) + " pose: " + translationError);
 
     if (container.getCatzVision().isSeeingApriltag() && autoalign && tracker.getVisionPoseShift().getNorm() > ALLOWABLE_VISION_ADJUST) {
       // If trailing pose is within margin
-      // System.out.println("vision is not true");
       return false;
     }
     // Finish command if the total time the path takes is over
 
     // Autonomous vs Autoalign margins
     if (autoalign) {
-      // System.out.println("passed vision check!!!@)*)(*)(@*#()*@)#(*)");
       return isAtGoalState(ALLOWABLE_AUTOAIM_ERROR);
     } else {
-      // System.out.println("not auto align!@!@!");
       return isAtGoalState(ALLOWABLE_POSE_ERROR);
     }
   }
 
-  private ChassisSpeeds applyCusp(ChassisSpeeds speeds, double distance, double threshold) {
+  private ChassisSpeeds applyCusp(ChassisSpeeds speeds, double distance, final double threshold) {
     // graph 1 / (1+x) on desmos
     double x = distance / threshold;
     double omega = speeds.omegaRadiansPerSecond;
 
     ChassisSpeeds s = speeds.times(Math.min(2 * x / (1 + x), 1.0));
+    //don't apply cusp to angle
     s.omegaRadiansPerSecond = omega;
     return s;
 

@@ -29,6 +29,7 @@ import frc.robot.Utilities.AllianceFlipUtil;
 import frc.robot.Utilities.CornerTrackingPathfinder;
 import frc.robot.CatzSubsystems.CatzSuperstructure.LeftRight;
 import frc.robot.CatzSubsystems.CatzSuperstructure.RobotAction;
+import frc.robot.CatzSubsystems.CatzStateCommands;
 import frc.robot.CatzSubsystems.CatzSuperstructure;
 import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.CatzRobotTracker;
 import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.Drivetrain.CatzDrivetrain;
@@ -36,7 +37,6 @@ import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.Drivetrain.DriveCon
 import frc.robot.CatzSubsystems.CatzLEDs.CatzLED;
 import frc.robot.CatzSubsystems.CatzLEDs.CatzLED.QueueLEDState;
 import frc.robot.CatzSubsystems.CatzOuttake.CatzOuttake;
-import frc.robot.Commands.DriveAndRobotOrientationCmds.DriveAndCycle;
 import frc.robot.Commands.DriveAndRobotOrientationCmds.TrajectoryDriveCmd;
 
 @SuppressWarnings({ "rawtypes", "unchecked" })
@@ -486,12 +486,12 @@ public class TeleopPosSelector {
   }
 
   public Command getCoralStationCommand() {
-    return new DriveAndCycle(getPathfindingPath(getBestCoralStation()), m_container, RobotAction.INTAKE);
+    return CatzStateCommands.driveToCoralStation(m_container, getPathfindingPath(getBestCoralStation()));
   }
 
   public Command getReefScoreCommand(Pair<Pair<Integer, LeftRight>, Integer> pair) {
     currentPathfindingPair = null;
-    return new DriveAndCycle(getPathfindingPath(calculateReefPose(pair.getFirst(), false)), m_container, RobotAction.OUTTAKE, pair.getSecond());
+    return CatzStateCommands.driveToScore(m_container, getPathfindingPath(calculateReefPose(pair.getFirst(), false)), pair.getSecond());
   }
 
   public Command cancelCurrentDrivetrainCommand() {
