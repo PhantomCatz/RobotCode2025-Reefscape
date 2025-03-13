@@ -15,6 +15,8 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Autonomous.CatzAutonomous;
@@ -88,6 +90,7 @@ public class RobotContainer {
   // -------------------------------------------------------------------------------------------------------------------
   // Auto Declaration
   // ---------------------------------------------------------------------------------------------------------------------
+
   private CatzAutonomous auto;
 
   public RobotContainer() {
@@ -300,6 +303,22 @@ public class RobotContainer {
         });
   }
 
+  public Command rumbleDrvController(double strength, double duration){
+    return new SequentialCommandGroup(
+      new InstantCommand(() ->xboxDrv.getHID().setRumble(RumbleType.kBothRumble, strength)),
+      new WaitCommand(duration),
+      new InstantCommand(() ->xboxDrv.getHID().setRumble(RumbleType.kBothRumble, 0.0))
+    );
+  }
+
+  public Command rumbleAuxController(double strength, double duration){
+    return new SequentialCommandGroup(
+      new InstantCommand(() ->xboxAux.getHID().setRumble(RumbleType.kBothRumble, strength)),
+      new WaitCommand(duration),
+      new InstantCommand(() ->xboxAux.getHID().setRumble(RumbleType.kBothRumble, 0.0))
+    );
+  }
+
   /** Updates the alerts for disconnected controllers. */
   public void checkControllers() {
     disconnectedAlertDrive.set(
@@ -309,6 +328,7 @@ public class RobotContainer {
         !DriverStation.isJoystickConnected(xboxAux.getHID().getPort())
             || !DriverStation.getJoystickIsXbox(xboxAux.getHID().getPort()));
   }
+
 
   // ---------------------------------------------------------------------------
   //

@@ -13,6 +13,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
+import edu.wpi.first.wpilibj2.command.RepeatCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.Robot;
@@ -36,9 +37,8 @@ public class CatzStateCommands {
         CatzOuttake outtake = robotContainer.getCatzOuttake();
 
         return new SequentialCommandGroup(
-            new ParallelCommandGroup(
-                new TrajectoryDriveCmd(path, drivetrain, true, robotContainer),
-                LXElevator(robotContainer, level).onlyIf(() -> drivetrain.getDistanceError() < PREDICT_DISTANCE)
+            new TrajectoryDriveCmd(path, drivetrain, true, robotContainer).deadlineFor(
+                new RepeatCommand(LXElevator(robotContainer, level).onlyIf(() -> drivetrain.getDistanceError() < PREDICT_DISTANCE))
             ),
             LXCoral(robotContainer, level),
             Commands.waitUntil(() -> outtake.isDesiredCoralState(true)),
@@ -53,9 +53,8 @@ public class CatzStateCommands {
         CatzOuttake outtake = robotContainer.getCatzOuttake();
 
         return new SequentialCommandGroup(
-            new ParallelCommandGroup(
-                new TrajectoryDriveCmd(path, drivetrain, false, robotContainer),
-                intakeCoralStation(robotContainer).onlyIf(() -> drivetrain.getDistanceError() < PREDICT_DISTANCE)
+            new TrajectoryDriveCmd(path, drivetrain, false, robotContainer).deadlineFor(
+                new RepeatCommand(intakeCoralStation(robotContainer).onlyIf(() -> drivetrain.getDistanceError() < PREDICT_DISTANCE))
             ),
             Commands.waitUntil(() -> outtake.isDesiredCoralState(false))
         );
