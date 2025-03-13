@@ -13,13 +13,11 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
-import edu.wpi.first.wpilibj2.command.PrintCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.Robot;
 import frc.robot.RobotContainer;
 import frc.robot.TeleopPosSelector;
-import frc.robot.CatzSubsystems.CatzSuperstructure.RobotAction;
 import frc.robot.CatzSubsystems.CatzAlgaeEffector.CatzAlgaePivot.CatzAlgaePivot;
 import frc.robot.CatzSubsystems.CatzAlgaeEffector.CatzAlgaeRemover.CatzAlgaeRemover;
 import frc.robot.CatzSubsystems.CatzClimb.CatzClimb;
@@ -57,7 +55,7 @@ public class CatzStateCommands {
         return new SequentialCommandGroup(
             new ParallelCommandGroup(
                 new TrajectoryDriveCmd(path, drivetrain, false, robotContainer),
-                intakeCoralGround(robotContainer).onlyIf(() -> drivetrain.getDistanceError() < PREDICT_DISTANCE)
+                intakeCoralStation(robotContainer).onlyIf(() -> drivetrain.getDistanceError() < PREDICT_DISTANCE)
             ),
             Commands.waitUntil(() -> outtake.isDesiredCoralState(false))
         );
@@ -223,19 +221,20 @@ public class CatzStateCommands {
 
     public static Command LXCoral(RobotContainer robotContainer, int level){
         TeleopPosSelector selector = robotContainer.getSelector();
+        System.out.println("selctrrr: " + selector);
 
         switch(level){
             case 1:
-                return L1Coral(robotContainer).andThen(new InstantCommand(()-> selector.hasCoralSIM = false));
+                return L1Coral(robotContainer).andThen(new InstantCommand(()-> {selector.hasCoralSIM = false;}));
 
             case 2:
-                return L2Coral(robotContainer).andThen(new InstantCommand(()-> selector.hasCoralSIM = false));
+                return L2Coral(robotContainer).andThen(new InstantCommand(()-> {selector.hasCoralSIM = false;}));
 
             case 3:
-                return L3Coral(robotContainer).andThen(new InstantCommand(()-> selector.hasCoralSIM = false));
+                return L3Coral(robotContainer).andThen(new InstantCommand(()-> {selector.hasCoralSIM = false;}));
 
             case 4:
-                return L4Coral(robotContainer).andThen(new InstantCommand(()-> selector.hasCoralSIM = false));
+                return L4Coral(robotContainer).andThen(new InstantCommand(()-> {selector.hasCoralSIM = false;}));
 
             default:
                 System.out.println("Invalid Coral Scoring Level!");

@@ -199,7 +199,7 @@ public class CatzElevator extends SubsystemBase {
 
       case 4:
         return Elevator_L4();
-      
+
       default:
         System.out.println("Invalid elevator level!");
         return new InstantCommand();

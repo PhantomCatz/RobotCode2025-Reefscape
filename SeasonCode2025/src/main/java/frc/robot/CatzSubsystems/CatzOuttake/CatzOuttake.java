@@ -74,8 +74,13 @@ public class CatzOuttake extends SubsystemBase {
    * @return
    */
   public boolean isDesiredCoralState(boolean isOuttaking){
+    System.out.println("coraala: " + container.getSelector().hasCoralSIM);
     if (container.getSelector().useFakeCoral){
-      return container.getSelector().hasCoralSIM;
+      if(isOuttaking){
+        return !container.getSelector().hasCoralSIM;
+      }else{
+        return container.getSelector().hasCoralSIM;
+      }
     } else {
       if(isOuttaking){
         return (!inputs.bbreakBackTriggered) && (!inputs.bbreakFrntTriggered); //both beam breaks must be off to be out of the coral effector

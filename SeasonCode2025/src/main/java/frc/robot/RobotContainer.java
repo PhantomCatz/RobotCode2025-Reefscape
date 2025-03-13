@@ -92,8 +92,8 @@ public class RobotContainer {
 
   public RobotContainer() {
     outtake = new CatzOuttake(this);
-    auto = new CatzAutonomous(this);
     selector = new TeleopPosSelector(xboxAux, this);
+    auto = new CatzAutonomous(this);
 
     // Drive And Aux Command Mapping
     configureBindings();

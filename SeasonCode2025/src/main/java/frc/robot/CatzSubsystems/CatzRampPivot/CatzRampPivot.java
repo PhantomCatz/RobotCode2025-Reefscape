@@ -33,7 +33,7 @@ public class CatzRampPivot extends SubsystemBase {
   public double targetPos = RampPivotPositions.PosStow.getTargetPositionRot();
   public double RampPivotFeedForward = 0.0;
   public static boolean isManual = false;
-  
+
   public NeutralMode currentNeutralMode = NeutralMode.COAST;
   public NeutralMode prevNeutralMode = NeutralMode.COAST;
 
