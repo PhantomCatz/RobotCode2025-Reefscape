@@ -24,6 +24,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
+import edu.wpi.first.wpilibj2.command.RepeatCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.FieldConstants.Reef;
 import frc.robot.Utilities.AllianceFlipUtil;
@@ -428,13 +429,14 @@ public class TeleopPosSelector {
   }
 
   public Command runToNearestBranch() {
+    final double PREDICT_DISTANCE = 0.3;
 
     return new InstantCommand(() -> {
       currentPathfindingPair = getClosestReefPos().getFirst();
       currentDrivetrainCommand.cancel();
       try{
-        currentDrivetrainCommand = new ParallelCommandGroup(
-          new TrajectoryDriveCmd(getPathfindingPath(calculateReefPose(currentPathfindingPair, true)), m_container.getCatzDrivetrain(), true, m_container)
+        currentDrivetrainCommand = new TrajectoryDriveCmd(getPathfindingPath(calculateReefPose(currentPathfindingPair, true)), m_container.getCatzDrivetrain(), true, m_container).deadlineFor(
+          new RepeatCommand(CatzStateCommands.LXElevator(m_container, superstructure.getLevel()).onlyIf(() -> drivetrain.getDistanceError() < PREDICT_DISTANCE))
         );
         currentDrivetrainCommand.schedule();
       }catch(Exception e){
