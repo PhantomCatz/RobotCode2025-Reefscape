@@ -37,15 +37,19 @@ public interface ElevatorIO {
 
   public default void runCurrent(double amps) {}
 
-  public default void setPID(double kP, double kI, double kD) {}
+  public default void setGainsSlot0(double kP, double kI, double kD, double kS, double kV, double kA, double kG) {}
+
+  public default void setGainsSlot1(double kP, double kI, double kD, double kS, double kV, double kA, double kG) {}
 
   public default void setFF(double kS, double kV, double kA) {}
 
   public default void runCharacterizationMotor(double input) {}
 
-  public default void runSetpoint(double setpointRotations) {}
+  public default void runSetpointUp(double setpointRotations) {}
 
-  public default void setPosition(double pos) {}
+  public default void runSetpointDown(double setpointRotations) {}
+
+  public default void resetPosition(double pos) {}
 
   public default void setBrakeMode(boolean enabled) {}
 

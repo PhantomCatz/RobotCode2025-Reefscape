@@ -118,13 +118,49 @@ public class CatzElevator extends SubsystemBase {
     // Update controllers when user specifies
     //--------------------------------------------------------------------------------------------------------
     LoggedTunableNumber.ifChanged(
-        hashCode(), () -> io.setPID(kP.get(), kI.get(), kD.get()), kP, kI, kD);
+        hashCode(), 
+        () -> io.setGainsSlot0(slot0_kP.get(), 
+                               slot0_kI.get(), 
+                               slot0_kD.get(), 
+                               slot0_kS.get(), 
+                               slot0_kV.get(), 
+                               slot0_kA.get(), 
+                               slot0_kG.get()
+        ), 
+        slot0_kP, 
+        slot0_kI, 
+        slot0_kD, 
+        slot0_kS, 
+        slot0_kV, 
+        slot0_kA, 
+        slot0_kG
+    );
+
+    LoggedTunableNumber.ifChanged(
+        hashCode(), 
+        () -> io.setGainsSlot0(slot0_kP.get(), 
+                               slot0_kI.get(), 
+                               slot0_kD.get(), 
+                               slot0_kS.get(), 
+                               slot0_kV.get(), 
+                               slot0_kA.get(), 
+                               slot0_kG.get()
+        ), 
+        slot0_kP, 
+        slot0_kI, 
+        slot0_kD, 
+        slot0_kS, 
+        slot0_kV, 
+        slot0_kA, 
+        slot0_kG
+    );
+
     LoggedTunableNumber.ifChanged(hashCode(),
         ()-> io.setMotionMagicParameters(mmCruiseVelocity.get(), mmAcceleration.get(), mmJerk.get()),
         mmCruiseVelocity,
         mmAcceleration,
         mmJerk);
-
+    
     if(previousLoggedPosition != targetPosition) {
       prevTargetPositon = targetPosition;
     }
@@ -133,13 +169,8 @@ public class CatzElevator extends SubsystemBase {
     //    Limit switch position setting
     //---------------------------------------------------------------------------------------------------------------------------
     if(inputs.isBotLimitSwitched) {
-      io.setPosition(ElevatorPosition.PosLimitSwitchStow.getTargetPositionRads());
+      io.resetPosition(ElevatorPosition.PosLimitSwitchStow.getTargetPositionRads());
     }
-
-    //---------------------------------------------------------------------------------------------------------------------------
-    //    Feed Foward
-    //---------------------------------------------------------------------------------------------------------------------------
-
 
     //---------------------------------------------------------------------------------------------------------------------------
     //    Control Mode setting
@@ -156,19 +187,16 @@ public class CatzElevator extends SubsystemBase {
         if(getElevatorPositionRads() < 29.0) {
           io.stop();
         } else {
-          //runTrapProfile(targetPosition);
-          io.runSetpoint(targetPosition.getTargetPositionRads());
+          io.runSetpointDown(targetPosition.getTargetPositionRads());
         }
       } else {
         //Setpoint PID
-        io.runSetpoint(targetPosition.getTargetPositionRads());
+        io.runSetpointUp(targetPosition.getTargetPositionRads());
       }
     } else if (targetPosition == ElevatorPosition.PosManual) {
       io.runMotor(elevatorSpeed);
-      // System.out.println("Running Elevator Motor");
     } else {
       // Nothing happening
-      // System.out.println("Stopping running motor");
       io.stop();
     }
 
