@@ -42,7 +42,7 @@ public class RampPivotIOReal implements RampPivotIO{
 
         config.CurrentLimits.SupplyCurrentLimit = 100;
         config.CurrentLimits.SupplyCurrentLimitEnable = true;
-        config.MotorOutput.NeutralMode = NeutralModeValue.Brake;
+        config.MotorOutput.NeutralMode = NeutralModeValue.Coast;
 
         rampPivotPosition = rampPivotMotor.getPosition();
         rampPivotAppliedVolts = rampPivotMotor.getMotorVoltage();

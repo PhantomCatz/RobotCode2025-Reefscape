@@ -55,20 +55,20 @@ public class ElevatorConstants {
 
     // Misc constants
     public static final boolean IS_LEADER_INVERTED = false;
-    public static final double  MIN_ROTATIONS = 0.0;
-    public static final double  MAX_ROTATIONS = 117.0;
+    public static final double  MIN_TRAVEL_RADIANS = 0.0;
+    public static final double  MAX_TRAVEL_RADIANS = 164.0;
     public static final Translation2d elevatorOrigin = new Translation2d(-0.238, 0.298);
     public static final double MANUAL_SCALE = 0.5;
     // Initial PIDF and motion magic assignment
     public static final Gains gains =
         switch (CatzConstants.getRobotType()) {
-            case SN2 -> new Gains(75.0, 0.1, 0.0, 0.175, 0.13, 0.013, 0.4);//new Gains(75.0, 0.0, 0.0, 0.0, 0.13, 0.016, 0.4); //TODO fix gains
+            case SN2 -> new Gains(125.0, 0.0, 0.0, 0.175, 0.130, 0.013, 0.4);
             case SN1 -> new Gains(75.0, 0.1, 0.0, 0.175, 0.13, 0.013, 0.4); //
             case SN_TEST, SN1_2024 -> new Gains(7000.0, 0.0, 250.0, 8.4, 0.2, 0.2, 22.9);
         };
     public static final MotionMagicParameters motionMagicParameters =
         switch (CatzConstants.getRobotType()) {
-            case SN2, SN1 -> new MotionMagicParameters(100, 200, 2000);
+            case SN2, SN1 -> new MotionMagicParameters(100, 220, 2000);
             case SN_TEST, SN1_2024 -> new MotionMagicParameters(0.0, 0.0, 0.0);
         };
 
@@ -83,7 +83,7 @@ public class ElevatorConstants {
     public static final LoggedTunableNumber mmCruiseVelocity = new LoggedTunableNumber("Elevator/Gains/kV", motionMagicParameters.mmCruiseVelocity());
     public static final LoggedTunableNumber mmAcceleration = new LoggedTunableNumber("Elevator/Gains/kA", motionMagicParameters.mmAcceleration());
     public static final LoggedTunableNumber mmJerk = new LoggedTunableNumber("Elevator/Gains/kG", motionMagicParameters.mmJerk());
-    public static final LoggedTunableNumber lowerLimitRotations = new LoggedTunableNumber("Elevator/LowerLimitDegrees", MIN_ROTATIONS);
-    public static final LoggedTunableNumber upperLimitRotations = new LoggedTunableNumber("Elevator/UpperLimitDegrees", MAX_ROTATIONS);
+    public static final LoggedTunableNumber lowerLimitRotations = new LoggedTunableNumber("Elevator/LowerLimitDegrees", MIN_TRAVEL_RADIANS);
+    public static final LoggedTunableNumber upperLimitRotations = new LoggedTunableNumber("Elevator/UpperLimitDegrees", MAX_TRAVEL_RADIANS);
 
 }

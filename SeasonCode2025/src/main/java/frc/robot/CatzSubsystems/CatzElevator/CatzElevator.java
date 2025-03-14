@@ -15,11 +15,16 @@ import java.util.function.Supplier;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.CatzConstants;
+import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.trajectory.TrapezoidProfile;
+import edu.wpi.first.math.trajectory.TrapezoidProfile.State;
 import frc.robot.Utilities.LoggedTunableNumber;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import edu.wpi.first.wpilibj.DriverStation;
 
 import org.littletonrobotics.junction.Logger;
+
 
 
 public class CatzElevator extends SubsystemBase {
@@ -43,6 +48,12 @@ public class CatzElevator extends SubsystemBase {
   private ElevatorPosition targetPosition = ElevatorPosition.PosStow;
   private ElevatorPosition prevTargetPositon = ElevatorPosition.PosNull;
   private ElevatorPosition previousLoggedPosition = ElevatorPosition.PosNull;
+
+  // Trap profile
+  private TrapezoidProfile profile;
+  private TrapezoidProfile algaeProfile;
+  @Getter private State setpoint = new State();
+  private State currentGoal = new State();
 
   @RequiredArgsConstructor
   public static enum ElevatorPosition {
@@ -86,6 +97,16 @@ public class CatzElevator extends SubsystemBase {
         break;
       }
     }
+
+    profile =
+        new TrapezoidProfile(
+            new TrapezoidProfile.Constraints(
+                motionMagicParameters.mmCruiseVelocity(), motionMagicParameters.mmAcceleration()));
+
+    algaeProfile =
+        new TrapezoidProfile(
+            new TrapezoidProfile.Constraints(
+                motionMagicParameters.mmCruiseVelocity(), motionMagicParameters.mmAcceleration()));
   }
 
   @Override
@@ -119,24 +140,6 @@ public class CatzElevator extends SubsystemBase {
     //    Feed Foward
     //---------------------------------------------------------------------------------------------------------------------------
 
-    // double additionalGain = 0.0;
-    // switch (targetPosition) {
-    //   case  PosL1:
-    //     additionalGain = 0.00;
-    //     break;
-    //   case  PosL2:
-    //     additionalGain = 0.025;
-    //     break;
-    //   case  PosL3:
-    //     additionalGain = 0.0;
-    //     break;
-    //   case  PosL4:
-    //     additionalGain = -0.2;
-    //     break;
-    //   default:
-    //     break;
-    // }
-    elevatorFeedForward = gains.kG();// + additionalGain;
 
     //---------------------------------------------------------------------------------------------------------------------------
     //    Control Mode setting
@@ -150,14 +153,15 @@ public class CatzElevator extends SubsystemBase {
       // Setpoint PID
       if(targetPosition == ElevatorPosition.PosStow) {
         // Safety Stow
-        if(getElevatorPositionRads() < 9.50) {
+        if(getElevatorPositionRads() < 29.0) {
           io.stop();
         } else {
-          io.runSetpoint(targetPosition.getTargetPositionRads(), elevatorFeedForward);
+          //runTrapProfile(targetPosition);
+          io.runSetpoint(targetPosition.getTargetPositionRads());
         }
       } else {
         //Setpoint PID
-        io.runSetpoint(targetPosition.getTargetPositionRads(), elevatorFeedForward);
+        io.runSetpoint(targetPosition.getTargetPositionRads());
       }
     } else if (targetPosition == ElevatorPosition.PosManual) {
       io.runMotor(elevatorSpeed);
@@ -171,6 +175,10 @@ public class CatzElevator extends SubsystemBase {
     //----------------------------------------------------------------------------------------------------------------------------
     // Logging
     //----------------------------------------------------------------------------------------------------------------------------
+    // Log state
+    Logger.recordOutput("Elevator/Profile/SetpointPositionMeters", setpoint.position);
+    Logger.recordOutput("Elevator/Profile/SetpointVelocityMetersPerSec", setpoint.velocity);
+
     Logger.recordOutput("Elevator/CurrentRadians", getElevatorPositionRads());
     Logger.recordOutput("Elevator/prevtargetPosition", prevTargetPositon.getTargetPositionRads());
     Logger.recordOutput("Elevator/logged prev targetPosition", previousLoggedPosition.getTargetPositionRads());
@@ -179,6 +187,47 @@ public class CatzElevator extends SubsystemBase {
 
     // Target Postioin Logging
     previousLoggedPosition = targetPosition;
+  }
+  //-------------------------------------------------------------------------------------------------------------------------
+  //
+  //  Setposition Control
+  //
+  //--------------------------------------------------------------------------------------------------------------------------
+
+  private void runTrapProfile(ElevatorPosition setPosition) {
+      // Clamp goal aka where we want the elevator to be at the end
+      var goalState = new State(
+                            MathUtil.clamp(setPosition.getTargetPositionRads(),0.0, ElevatorConstants.MAX_TRAVEL_RADIANS),
+                            0.0
+      );
+
+      double previousVelocity = inputs.velocityRadsPerSec;
+
+      // Calculate trap sepoint
+      if(setPosition == ElevatorPosition.PosBotBot ||
+         setPosition == ElevatorPosition.PosBotTop ) {
+        setpoint = algaeProfile.calculate(CatzConstants.LOOP_TIME, setpoint, goalState);
+      } else {
+        setpoint = profile.calculate(CatzConstants.LOOP_TIME, setpoint, goalState);
+      }
+
+      // Clamp trap profile
+      if (setPosition.getTargetPositionRads() < 0.0 || setPosition.getTargetPositionRads() > ElevatorConstants.MAX_TRAVEL_RADIANS) {
+        setpoint = new State(
+                MathUtil.clamp(setpoint.position, 0.0, ElevatorConstants.MAX_TRAVEL_RADIANS),
+                0.0);
+      }
+
+      System.out.println(setpoint.position);
+    double accel = (setpoint.velocity - previousVelocity) / CatzConstants.LOOP_TIME;
+          // io.runSetpoint(
+          //     setpoint.position,
+          //     ElevatorConstants.gains.kV() * Math.signum(setpoint.velocity) // Magnitude irrelevant
+          //         + ElevatorConstants.gains.kG()
+          //         + ElevatorConstants.gains.kA() * accel);
+
+    currentGoal = goalState;
+
   }
   //--------------------------------------------------------------------------------------------------------------------------
   //

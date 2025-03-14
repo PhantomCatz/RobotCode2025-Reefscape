@@ -21,6 +21,7 @@ import frc.robot.CatzSubsystems.CatzLEDs.CatzLED;
 import frc.robot.CatzSubsystems.CatzLEDs.CatzLED.ControllerLEDState;
 import frc.robot.Utilities.Alert;
 import frc.robot.Utilities.Alert.AlertType;
+import frc.robot.Utilities.MotorUtil.NeutralMode;
 import frc.robot.Utilities.VirtualSubsystem;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -295,6 +296,7 @@ public class Robot extends LoggedRobot {
   // --------------------------------------------------------------------------------------------------------
   @Override
   public void disabledInit() {
+    m_robotContainer.getCatzRampPivot().setNeutralMode(NeutralMode.COAST);
     isResetPositionUsedInAuto = false;
   }
 
@@ -338,6 +340,7 @@ public class Robot extends LoggedRobot {
     isFirstPath = true;
     // deployment benchmark
     LAST_DEPLOYMENT_WARNING.set(true);
+    m_robotContainer.getCatzRampPivot().setNeutralMode(NeutralMode.BRAKE);
     autoStart = Timer.getFPGATimestamp();
     m_autonomousCommand = m_robotContainer.getAutonomousCommand();
     m_robotContainer.getCatzRampPivot().Ramp_Intake_Pos().withTimeout(1.0);
@@ -370,6 +373,7 @@ public class Robot extends LoggedRobot {
     }
 
     teleStart = Timer.getFPGATimestamp();
+    m_robotContainer.getCatzRampPivot().setNeutralMode(NeutralMode.BRAKE);
     //CatzRobotTracker.getInstance().resetPose(m_robotContainer.getAutonomous().calculateReefPos(2, LeftRight.LEFT));
 
   //  CatzRobotTracker.getInstance().resetPose(new Pose2d(Reef.center.minus(new Translation2d(Units.inchesToMeters(52.743), 0)), Rotation2d.k180deg));

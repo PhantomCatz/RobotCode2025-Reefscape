@@ -35,7 +35,7 @@ public class ElevatorIOReal implements ElevatorIO {
 
   // Motor configuration
   private final TalonFXConfiguration config = new TalonFXConfiguration();
-  private final MotionMagicTorqueCurrentFOC positionControl = new MotionMagicTorqueCurrentFOC(0.0).withUpdateFreqHz(0.0);
+  private final MotionMagicVoltage positionControl = new MotionMagicVoltage(0.0).withUpdateFreqHz(0.0);
 
   // Status Signals
   private final StatusSignal<Angle> internalPositionRotations;
@@ -78,11 +78,19 @@ public class ElevatorIOReal implements ElevatorIO {
     config.Slot0.kI = gains.kI();
     config.Slot0.kD = gains.kD();
 
+    config.Slot1.kS = gains.kS();
+    config.Slot1.kV = gains.kV();
+    config.Slot1.kA = gains.kA();
+    config.Slot1.kP = gains.kP();
+    config.Slot1.kI = gains.kI();
+    config.Slot1.kD = gains.kD();
+
     // Supply Current Limits
     config.TorqueCurrent.PeakForwardTorqueCurrent =  80.0;
     config.TorqueCurrent.PeakReverseTorqueCurrent = -80.0;
-    config.CurrentLimits.SupplyCurrentLimitEnable = true;
     config.CurrentLimits.SupplyCurrentLimit = 80.0;
+    config.CurrentLimits.SupplyCurrentLimitEnable = true;
+
     config.MotorOutput.NeutralMode = NeutralModeValue.Brake;
 
     // Motion Magic Parameters
@@ -101,6 +109,8 @@ public class ElevatorIOReal implements ElevatorIO {
 
     // Setting follower
     followerTalon.setControl(new Follower(leaderTalon.getDeviceID(), true));
+    positionControl.EnableFOC = true;
+    positionControl.Slot = 0;
   }
 
     public void updateInputs(ElevatorIOInputs inputs) {
@@ -143,10 +153,10 @@ public class ElevatorIOReal implements ElevatorIO {
 
 
   @Override
-  public void runSetpoint(double setpointRads, double feedforward) {
+  public void runSetpoint(double setpointRads) {
     double setpointRotations = Units.radiansToRotations(setpointRads);
-    leaderTalon.setControl(positionControl.withPosition(setpointRotations)
-                                          .withFeedForward(feedforward + Math.max((setpointRads - 76.2) / 60 * 0.4, 0)));
+    System.out.println(setpointRotations);
+    leaderTalon.setControl(positionControl.withPosition(setpointRotations));
   }
 
   @Override
