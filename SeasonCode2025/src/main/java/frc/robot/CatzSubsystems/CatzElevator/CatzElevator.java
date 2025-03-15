@@ -9,6 +9,7 @@ package frc.robot.CatzSubsystems.CatzElevator;
 
 import static frc.robot.CatzSubsystems.CatzElevator.ElevatorConstants.*;
 
+import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
 
@@ -44,6 +45,8 @@ public class CatzElevator extends SubsystemBase {
   private double elevatorFeedForward = 0.0;
   private int settlingCounter = 0;
   private boolean breakModeEnabled = true;
+  private BooleanSupplier manualOverride = () -> false;
+
 
   private ElevatorPosition targetPosition = ElevatorPosition.PosStow;
   private ElevatorPosition prevTargetPositon = ElevatorPosition.PosNull;
@@ -118,40 +121,40 @@ public class CatzElevator extends SubsystemBase {
     // Update controllers when user specifies
     //--------------------------------------------------------------------------------------------------------
     LoggedTunableNumber.ifChanged(
-        hashCode(), 
-        () -> io.setGainsSlot0(slot0_kP.get(), 
-                               slot0_kI.get(), 
-                               slot0_kD.get(), 
-                               slot0_kS.get(), 
-                               slot0_kV.get(), 
-                               slot0_kA.get(), 
+        hashCode(),
+        () -> io.setGainsSlot0(slot0_kP.get(),
+                               slot0_kI.get(),
+                               slot0_kD.get(),
+                               slot0_kS.get(),
+                               slot0_kV.get(),
+                               slot0_kA.get(),
                                slot0_kG.get()
-        ), 
-        slot0_kP, 
-        slot0_kI, 
-        slot0_kD, 
-        slot0_kS, 
-        slot0_kV, 
-        slot0_kA, 
+        ),
+        slot0_kP,
+        slot0_kI,
+        slot0_kD,
+        slot0_kS,
+        slot0_kV,
+        slot0_kA,
         slot0_kG
     );
 
     LoggedTunableNumber.ifChanged(
-        hashCode(), 
-        () -> io.setGainsSlot0(slot0_kP.get(), 
-                               slot0_kI.get(), 
-                               slot0_kD.get(), 
-                               slot0_kS.get(), 
-                               slot0_kV.get(), 
-                               slot0_kA.get(), 
+        hashCode(),
+        () -> io.setGainsSlot0(slot0_kP.get(),
+                               slot0_kI.get(),
+                               slot0_kD.get(),
+                               slot0_kS.get(),
+                               slot0_kV.get(),
+                               slot0_kA.get(),
                                slot0_kG.get()
-        ), 
-        slot0_kP, 
-        slot0_kI, 
-        slot0_kD, 
-        slot0_kS, 
-        slot0_kV, 
-        slot0_kA, 
+        ),
+        slot0_kP,
+        slot0_kI,
+        slot0_kD,
+        slot0_kS,
+        slot0_kV,
+        slot0_kA,
         slot0_kG
     );
 
@@ -160,7 +163,7 @@ public class CatzElevator extends SubsystemBase {
         mmCruiseVelocity,
         mmAcceleration,
         mmJerk);
-    
+
     if(previousLoggedPosition != targetPosition) {
       prevTargetPositon = targetPosition;
     }
@@ -193,7 +196,7 @@ public class CatzElevator extends SubsystemBase {
         //Setpoint PID
         io.runSetpointUp(targetPosition.getTargetPositionRads());
       }
-    } else if (targetPosition == ElevatorPosition.PosManual) {
+    } else if (manualOverride.getAsBoolean()) {
       io.runMotor(elevatorSpeed);
     } else {
       // Nothing happening
@@ -338,6 +341,10 @@ public class CatzElevator extends SubsystemBase {
   public void elevatorFullManual(double manualPower) {
     this.elevatorSpeed = manualPower;
     targetPosition = ElevatorPosition.PosManual;
+  }
+
+  public void setOverrides(BooleanSupplier manualOverride) {
+    this.manualOverride = manualOverride;
   }
 
   public Command elevatorFullManual(Supplier<Double> manuaSupplier) {

@@ -32,10 +32,10 @@ public class ElevatorConstants {
 
     // Elevator Heights:(Radians)
     public static final double STOW_HEIGHT = 5.0;
-    public static final double L1_HEIGHT   = 11.0; 
-    public static final double L2_HEIGHT   = 33.0; 
-    public static final double L3_HEIGHT   = 81.7; 
-    public static final double L4_HEIGHT   = 149.0; 
+    public static final double L1_HEIGHT   = 11.0;
+    public static final double L2_HEIGHT   = 33.0;
+    public static final double L3_HEIGHT   = 81.7;
+    public static final double L4_HEIGHT   = 149.0;
     public static final double L4_CORAL_ADJ = 158.0;
     public static final double BOT_BOT_ALGAE = 80.6;
     public static final double BOT_TOP_ALGAE = 140.7;
