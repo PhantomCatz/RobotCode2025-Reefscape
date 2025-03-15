@@ -27,23 +27,19 @@ import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.Drivetrain.CatzDriv
 import frc.robot.CatzSubsystems.CatzElevator.CatzElevator;
 import frc.robot.CatzSubsystems.CatzOuttake.CatzOuttake;
 import frc.robot.CatzSubsystems.CatzRampPivot.CatzRampPivot;
+import frc.robot.Commands.DriveAndRobotOrientationCmds.MoveScore;
 import frc.robot.Commands.DriveAndRobotOrientationCmds.TrajectoryDriveCmd;
 import frc.robot.Utilities.waituntil;
 
 public class CatzStateCommands {
 
-    public static Command driveToScore(RobotContainer robotContainer, PathPlannerPath path, int level){
-        final double PREDICT_DISTANCE = 0.3; //meters
+    public static Command driveToScore(RobotContainer robotContainer, PathPlannerPath pathToReadyPose, int level){
 
         CatzDrivetrain drivetrain = robotContainer.getCatzDrivetrain();
-        CatzOuttake outtake = robotContainer.getCatzOuttake();
 
         return new SequentialCommandGroup(
-            new TrajectoryDriveCmd(path, drivetrain, true, robotContainer).deadlineFor(
-                new RepeatCommand(LXElevator(robotContainer, level).alongWith(new PrintCommand("elevatorrrrrroro")).onlyIf(() -> drivetrain.getDistanceError() < PREDICT_DISTANCE))
-            ).andThen(new PrintCommand("trajjaja dondondon")),
-            LXCoral(robotContainer, level),
-            Commands.waitUntil(() -> outtake.isDesiredCoralState(true)),
+            new TrajectoryDriveCmd(pathToReadyPose, drivetrain, false, robotContainer),
+            new MoveScore(robotContainer, level),
             stow(robotContainer)
         );
     }
@@ -55,8 +51,9 @@ public class CatzStateCommands {
         CatzOuttake outtake = robotContainer.getCatzOuttake();
 
         return new SequentialCommandGroup(
-            new TrajectoryDriveCmd(path, drivetrain, false, robotContainer),
-            intakeCoralStation(robotContainer),
+            new TrajectoryDriveCmd(path, drivetrain, false, robotContainer).deadlineFor(
+                new RepeatCommand(intakeCoralStation(robotContainer).onlyIf(() -> drivetrain.getDistanceError() < PREDICT_DISTANCE))
+            ),
             Commands.waitUntil(() -> outtake.isDesiredCoralState(false))
         );
     }

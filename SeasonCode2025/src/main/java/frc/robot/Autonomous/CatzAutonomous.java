@@ -175,10 +175,12 @@ public class CatzAutonomous extends SubsystemBase {
             String name = components[0];
             String action = components[1];
 
+            PathPlannerPath path = PathPlannerPath.fromPathFile(name);
+
             if(action.equalsIgnoreCase("CS")){
-              command = CatzStateCommands.driveToCoralStation(container, PathPlannerPath.fromPathFile(name));
+              command = CatzStateCommands.driveToCoralStation(container, path);
             } else if(action.contains("ReefL")){
-              command = CatzStateCommands.driveToScore(container, PathPlannerPath.fromPathFile(name),Integer.parseInt(action.substring("ReefL".length())));
+              command = CatzStateCommands.driveToScore(container, path, Integer.parseInt(action.substring("ReefL".length())));
             }
           }
 

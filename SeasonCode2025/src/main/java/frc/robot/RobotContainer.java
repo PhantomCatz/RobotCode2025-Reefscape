@@ -39,6 +39,7 @@ import frc.robot.CatzSubsystems.CatzLEDs.CatzLED;
 import frc.robot.CatzSubsystems.CatzLEDs.CatzLED.ControllerLEDState;
 import frc.robot.CatzSubsystems.CatzOuttake.CatzOuttake;
 import frc.robot.CatzSubsystems.CatzRampPivot.CatzRampPivot;
+import frc.robot.Commands.DriveAndRobotOrientationCmds.MoveScore;
 import frc.robot.Commands.DriveAndRobotOrientationCmds.TeleopDriveCmd;
 import frc.robot.Utilities.Alert;
 import frc.robot.Utilities.AllianceFlipUtil;
@@ -152,8 +153,8 @@ public class RobotContainer {
     // xboxDrv.y().onFalse(selector.cancelCurrentDrivetrainCommand());
 
     // AQUA
-    // xboxDrv.a().onTrue(new InstantCommand(() -> selector.runAutoCommand().schedule()));
-    // xboxDrv.a().onFalse(selector.cancelAutoCommand());
+    xboxDrv.a().onTrue(new InstantCommand(() -> selector.runAutoCommand().schedule()));
+    xboxDrv.a().onFalse(selector.cancelAutoCommand());
 
     // Left Right
     xboxDrv.leftBumper().onTrue(new InstantCommand(() -> selector.runLeftRight(LeftRight.LEFT)));
@@ -167,7 +168,7 @@ public class RobotContainer {
     xboxDrv.back().and(xboxDrv.leftStick()).onTrue(climb.ClimbManualMode(() -> xboxDrv.getLeftY()).alongWith(Commands.print("Using manual climb")));
 
     //TODO Score
-    // xboxDrv.leftTrigger(SCORE_TRIGGER_THRESHHOLD).onTrue(new InstantCommand(() -> superstructure.setCurrentRobotAction(RobotAction.OUTTAKE, superstructure.getLevel())));
+    xboxDrv.leftTrigger(SCORE_TRIGGER_THRESHHOLD).onTrue(new InstantCommand(() -> new MoveScore(this, superstructure.getLevel()).schedule()));
 
     // Default driving
     Trigger escapeTrajectory = new Trigger(()->(xboxDrv.getLeftY() > 0.8));

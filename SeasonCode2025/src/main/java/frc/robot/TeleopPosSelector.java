@@ -23,8 +23,6 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.PrintCommand;
-import edu.wpi.first.wpilibj2.command.RepeatCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.FieldConstants.Reef;
 import frc.robot.Utilities.AllianceFlipUtil;
@@ -41,7 +39,7 @@ import frc.robot.CatzSubsystems.CatzOuttake.CatzOuttake;
 import frc.robot.Commands.DriveAndRobotOrientationCmds.TrajectoryDriveCmd;
 
 @SuppressWarnings({ "rawtypes", "unchecked" })
-public class TeleopPosSelector {
+public class TeleopPosSelector { //TODO split up the file. it's too big and does too much stuff
   private final RobotContainer m_container;
 
   private final CommandXboxController xboxAux;
@@ -50,7 +48,6 @@ public class TeleopPosSelector {
   private final String QUEUE = "PathQueue ";
   private final int NUM_QUEUE_DISPLAY = 4;
   private final double SELECTION_THRESHOLD = 0.7;
-  private final double ELEVATOR_RAISE_DIST = 1.0; // meters
 
   private CatzSuperstructure superstructure;
   private CatzDrivetrain drivetrain;
@@ -260,20 +257,37 @@ public class TeleopPosSelector {
 
     for (int side = 0; side < 6; side++) {
       for (LeftRight leftRight : LeftRight.values()) {
-        Pose2d reefPos = calculateReefPose(side, leftRight);
-        if (reefPos.getTranslation().getDistance(robotPos) < calculateReefPose(closestSide, closestLeftRight)
+        Pose2d reefPos = calculateReefPose(side, leftRight, false);
+        if (reefPos.getTranslation().getDistance(robotPos) < calculateReefPose(closestSide, closestLeftRight, false)
             .getTranslation().getDistance(robotPos)) {
           closestSide = side;
           closestLeftRight = leftRight;
         }
       }
     }
-
     return new Pair(new Pair(closestSide, closestLeftRight), superstructure.getLevel());
   }
 
+  public Pair<Integer, LeftRight> getClosestReefPos(Translation2d pose) {
+    int closestSide = 0;
+    LeftRight closestLeftRight = LeftRight.LEFT;
+    Translation2d robotPos = pose;
+
+    for (int side = 0; side < 6; side++) {
+      for (LeftRight leftRight : LeftRight.values()) {
+        Pose2d reefPos = calculateReefPose(side, leftRight, false);
+        if (reefPos.getTranslation().getDistance(robotPos) < calculateReefPose(closestSide, closestLeftRight, false)
+            .getTranslation().getDistance(robotPos)) {
+          closestSide = side;
+          closestLeftRight = leftRight;
+        }
+      }
+    }
+    return new Pair(closestSide, closestLeftRight);
+  }
+
   // TODO calculate this on comptime and store it in an array
-  public Pose2d calculateReefPose(int reefAngle, LeftRight leftRightPos) {
+  public Pose2d calculateReefPose(int reefAngle, LeftRight leftRightPos, boolean isDistanced) {
     Rotation2d selectedAngle = Rotation2d.fromRotations(reefAngle / 6.0);
 
     //A unit vector with its origin placed at the center of the reef pointing orthogonally to the selected side.
@@ -284,6 +298,10 @@ public class TeleopPosSelector {
 
     //This vector is now pointing at the scoring position of the robot, but not accounting for the left right distances
     Translation2d radius = unitRadius.times(Reef.reefOrthogonalRadius + Reef.scoringDistance);
+
+    if(isDistanced){
+      radius = radius.plus(unitRadius.times(Reef.backDistance));
+    }
 
     Translation2d leftRight = unitLeftRight.times(leftRightPos.NUM * Reef.leftRightDistance);
 
@@ -296,14 +314,14 @@ public class TeleopPosSelector {
     return AllianceFlipUtil.apply(new Pose2d(scoringPos, selectedAngle.plus(Rotation2d.k180deg)));
   }
 
-  public Pose2d calculateReefPose(Pair<Integer, LeftRight> pair, boolean isNBA) {
+  public Pose2d calculateReefPose(Pair<Integer, LeftRight> pair, boolean isNBA, boolean isDistanced) {
     if (isNBA) {
       currentPathfindingPair = pair;
     }
     if (pair == null) {
       return null;
     } else {
-      return calculateReefPose(pair.getFirst(), pair.getSecond());
+      return calculateReefPose(pair.getFirst(), pair.getSecond(), isDistanced);
     }
   }
 
@@ -328,13 +346,34 @@ public class TeleopPosSelector {
     }
   }
 
+  public PathPlannerPath getPathfindingPath(Translation2d start, Pose2d goal) {
+    if (goal == null) {
+      System.out.println("The goal is null");
+      return null;
+    }
+
+    Translation2d robotPos = start;
+    PathPlannerPath path   = pathfinder.getPath(robotPos, goal.getTranslation(),
+        new GoalEndState(0.0, goal.getRotation()));
+
+    if (path == null) {
+      System.out.println("The path is null: " + robotPos + goal.getTranslation());
+      return null;
+    } else {
+      if (AllianceFlipUtil.shouldFlipToRed()) {
+        path = path.flipPath();
+      }
+      return path;
+    }
+  }
+
   public void runLeftRight(LeftRight leftRight) {
     if (currentPathfindingPair == null)
       return; // means it is in AQUA
 
     currentDrivetrainCommand.cancel();
 
-    Pose2d goal = calculateReefPose(new Pair<Integer, LeftRight>(currentPathfindingPair.getFirst(), leftRight), true);
+    Pose2d goal = calculateReefPose(new Pair<Integer, LeftRight>(currentPathfindingPair.getFirst(), leftRight), true, true);
     Pose2d currentPose = tracker.getEstimatedPose();
 
     Translation2d goalPos = goal.getTranslation();
@@ -429,21 +468,20 @@ public class TeleopPosSelector {
   }
 
   public Command runToNearestBranch() {
-    final double PREDICT_DISTANCE = 0.3;
 
     return new InstantCommand(() -> {
       currentPathfindingPair = getClosestReefPos().getFirst();
       currentDrivetrainCommand.cancel();
       try{
-        currentDrivetrainCommand = new TrajectoryDriveCmd(getPathfindingPath(calculateReefPose(currentPathfindingPair, true)), m_container.getCatzDrivetrain(), true, m_container).deadlineFor(
-          new RepeatCommand(CatzStateCommands.LXElevator(m_container, superstructure.getLevel()).alongWith(new PrintCommand("nababababbaab")).onlyIf(() -> drivetrain.getDistanceError() < PREDICT_DISTANCE))
-        );
+        currentDrivetrainCommand = new TrajectoryDriveCmd(getPathfindingPath(calculateReefPose(currentPathfindingPair, true, true)), m_container.getCatzDrivetrain(), true, m_container);
         currentDrivetrainCommand.schedule();
       }catch(Exception e){
         e.printStackTrace();
       }
     });
   }
+
+
 
   public Command runCoralStationCommand() {
     return new InstantCommand(() -> {
@@ -460,7 +498,12 @@ public class TeleopPosSelector {
 
   public Command getReefScoreCommand(Pair<Pair<Integer, LeftRight>, Integer> pair) {
     currentPathfindingPair = null;
-    return CatzStateCommands.driveToScore(m_container, getPathfindingPath(calculateReefPose(pair.getFirst(), false)), pair.getSecond());
+
+    return CatzStateCommands.driveToScore(
+      m_container,
+      getPathfindingPath(calculateReefPose(pair.getFirst(), false, true)),
+      pair.getSecond()
+    );
   }
 
   public Command cancelCurrentDrivetrainCommand() {
