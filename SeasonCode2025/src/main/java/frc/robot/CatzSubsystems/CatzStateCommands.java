@@ -49,7 +49,7 @@ public class CatzStateCommands {
         TeleopPosSelector selector = robotContainer.getSelector();
 
         return new SequentialCommandGroup(
-            new TrajectoryDriveCmd(()->selector.getNBAPath(false), drivetrain, true, robotContainer),
+            new TrajectoryDriveCmd(()->selector.getMoveScorePath(), drivetrain, true, robotContainer),
             LXCoral(robotContainer, level)
         );
     }

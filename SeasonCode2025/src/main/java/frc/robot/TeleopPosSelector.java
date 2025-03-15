@@ -13,6 +13,7 @@ import java.util.HashMap;
 import java.util.LinkedList;
 
 import com.pathplanner.lib.path.GoalEndState;
+import com.pathplanner.lib.path.PathConstraints;
 import com.pathplanner.lib.path.PathPlannerPath;
 import com.pathplanner.lib.path.Waypoint;
 
@@ -373,8 +374,8 @@ public class TeleopPosSelector { //TODO split up the file. it's too big and does
 
     currentDrivetrainCommand.cancel();
 
-    Pose2d goal = calculateReefPose(new Pair<Integer, LeftRight>(currentPathfindingPair.getFirst(), leftRight), true, true);
     Pose2d currentPose = tracker.getEstimatedPose();
+    Pose2d goal = calculateReefPose(new Pair<Integer, LeftRight>(currentPathfindingPair.getFirst(), leftRight), true, true);
 
     Translation2d goalPos = goal.getTranslation();
     Translation2d currentPos = currentPose.getTranslation();
@@ -386,18 +387,7 @@ public class TeleopPosSelector { //TODO split up the file. it's too big and does
       return;
     }
 
-    PathPlannerPath path = new PathPlannerPath(
-        Arrays.asList(new Waypoint[] {
-            new Waypoint(null, currentPos, currentPos.plus(direction)),
-            new Waypoint(goalPos.minus(direction), goalPos, null)
-        }),
-        DriveConstants.LEFT_RIGHT_CONSTRAINTS,
-        null,
-        new GoalEndState(0, goal.getRotation()));
-
-    if (AllianceFlipUtil.shouldFlipToRed()) {
-      path = path.flipPath();
-    }
+    PathPlannerPath path = getStraightLinePath(currentPose, goal, DriveConstants.LEFT_RIGHT_CONSTRAINTS);
 
     currentDrivetrainCommand = new TrajectoryDriveCmd(path, drivetrain, true, m_container);
     currentDrivetrainCommand.schedule();
@@ -473,7 +463,7 @@ public class TeleopPosSelector { //TODO split up the file. it's too big and does
       currentPathfindingPair = getClosestReefPos().getFirst();
       currentDrivetrainCommand.cancel();
       try{
-        currentDrivetrainCommand = new TrajectoryDriveCmd(getNBAPath(true), m_container.getCatzDrivetrain(), true, m_container);
+        currentDrivetrainCommand = new TrajectoryDriveCmd(getPathfindingPath(calculateReefPose(getClosestReefPos().getFirst(), true, true)), m_container.getCatzDrivetrain(), true, m_container);
         currentDrivetrainCommand.schedule();
       }catch(Exception e){
         e.printStackTrace();
@@ -481,8 +471,10 @@ public class TeleopPosSelector { //TODO split up the file. it's too big and does
     });
   }
 
-  public PathPlannerPath getNBAPath(boolean isDistanced){
-    return getPathfindingPath(calculateReefPose(getClosestReefPos().getFirst(), true, isDistanced));
+  public PathPlannerPath getMoveScorePath(){
+    Pose2d goalPose = calculateReefPose(getClosestReefPos().getFirst(), true, false);
+
+    return getStraightLinePath(CatzRobotTracker.getInstance().getEstimatedPose(), goalPose, DriveConstants.PATHFINDING_CONSTRAINTS);
   }
 
   public Command runCoralStationCommand() {
@@ -518,5 +510,26 @@ public class TeleopPosSelector { //TODO split up the file. it's too big and does
     return new InstantCommand(() -> {
       currentAutoplayCommand.cancel();
     });
+  }
+
+  public PathPlannerPath getStraightLinePath(Pose2d start, Pose2d goal, PathConstraints constraints){
+    Translation2d currentPose = start.getTranslation();
+    Translation2d goalPos = goal.getTranslation();
+    Translation2d direction = goalPos.minus(currentPose).div(2.0);
+
+    PathPlannerPath path = new PathPlannerPath(
+        Arrays.asList(new Waypoint[] {
+            new Waypoint(null, currentPose, currentPose.plus(direction)),
+            new Waypoint(goalPos.minus(direction), goalPos, null)
+        }),
+        constraints,
+        null,
+        new GoalEndState(0, goal.getRotation()));
+
+    if (AllianceFlipUtil.shouldFlipToRed()) {
+      path = path.flipPath();
+    }
+
+    return path;
   }
 }

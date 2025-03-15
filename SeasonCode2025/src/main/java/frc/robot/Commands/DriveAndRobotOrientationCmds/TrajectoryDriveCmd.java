@@ -121,7 +121,6 @@ public class TrajectoryDriveCmd extends Command {
       if(pathSupplier != null){
         path = pathSupplier.get();
         usePath = path;
-        System.out.println("path::: " + usePath);
       }else{
         usePath = path;
       }
