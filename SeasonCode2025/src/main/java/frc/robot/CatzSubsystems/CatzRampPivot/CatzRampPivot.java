@@ -96,7 +96,7 @@ public class CatzRampPivot extends SubsystemBase {
       // Disabled
       io.stop();
       targetPos = RampPivotPositions.PosIntake.getTargetPositionRot();
-      io.setNeutralMode(NeutralMode.COAST);
+     // io.setNeutralMode(NeutralMode.COAST);
 
     } else if(rampPivotPositions != RampPivotPositions.PosNull &&
               rampPivotPositions != RampPivotPositions.PosManual){
@@ -132,6 +132,10 @@ public class CatzRampPivot extends SubsystemBase {
 
    public void setRampPos(RampPivotPositions target) {
     this.targetPos = target.getTargetPositionRot();
+  }
+
+  public boolean isSafeToRaiseElevator(){
+    return inputs.positionMechs >= 5;
   }
 
   public Command Ramp_Stow_Pos() {

@@ -45,6 +45,8 @@ public class CatzElevator extends SubsystemBase {
   private ElevatorPosition prevTargetPositon = ElevatorPosition.PosNull;
   private ElevatorPosition previousLoggedPosition = ElevatorPosition.PosNull;
 
+  private boolean isElevatorInPos = false;
+
   @RequiredArgsConstructor
   public static enum ElevatorPosition {
       //TO CHANGE HEIGHT GO TO ElevatorConstants.java
@@ -93,6 +95,8 @@ public class CatzElevator extends SubsystemBase {
   public void periodic() {
     io.updateInputs(inputs);
     Logger.processInputs("RealInputs/Elevator", inputs);
+
+    isElevatorInPos = isElevatorInPosition();
 
     //--------------------------------------------------------------------------------------------------------
     // Update controllers when user specifies
@@ -175,7 +179,7 @@ public class CatzElevator extends SubsystemBase {
     Logger.recordOutput("Elevator/CurrentRadians", getElevatorPositionRads());
     Logger.recordOutput("Elevator/prevtargetPosition", prevTargetPositon.getTargetPositionRads());
     Logger.recordOutput("Elevator/logged prev targetPosition", previousLoggedPosition.getTargetPositionRads());
-    Logger.recordOutput("Elevator/isElevatorInPos", isElevatorInPosition());
+    Logger.recordOutput("Elevator/isElevatorInPos", isElevatorInPos);
     Logger.recordOutput("Elevator/targetPosition", targetPosition.getTargetPositionRads());
 
     // Target Postioin Logging
@@ -204,6 +208,10 @@ public class CatzElevator extends SubsystemBase {
         System.out.println("Invalid elevator level!");
         return new InstantCommand();
     }
+  }
+
+  public boolean isElevatorInPos(){
+    return isElevatorInPos;
   }
 
   public Command Elevator_Stow() {
@@ -252,7 +260,7 @@ public class CatzElevator extends SubsystemBase {
     return inputs.positionRads;
   }
 
-  public boolean isElevatorInPosition() {
+  private boolean isElevatorInPosition() {
     boolean isElevatorSettled = false;
     boolean isElevatorInPos = (Math.abs((getElevatorPositionRads() - targetPosition.getTargetPositionRads())) < 5);
     if(isElevatorInPos) {

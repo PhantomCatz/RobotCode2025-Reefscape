@@ -74,7 +74,6 @@ public class CatzOuttake extends SubsystemBase {
    * @return
    */
   public boolean isDesiredCoralState(boolean isOuttaking){
-    System.out.println("coraala: " + container.getSelector().hasCoralSIM);
     if (container.getSelector().useFakeCoral){
       if(isOuttaking){
         return !container.getSelector().hasCoralSIM;
@@ -102,6 +101,7 @@ public class CatzOuttake extends SubsystemBase {
     }
 
     if(currentState != previousState) {
+      System.out.println("changed outtake state!");
       interationCounter = 0;
       intakeIterationCoutner = 0;
     }
@@ -156,7 +156,7 @@ public class CatzOuttake extends SubsystemBase {
 
     io.runMotor(INTAKE_SPD, INTAKE_SPD);
     io.runIntakesIntakeMotor(INTAKE_INTAKE_SPEED);
-
+    System.out.println("adjusting!");
     CatzSuperstructure.setCurrentCoralState(CoralState.CORAL_ADJUSTING);
 
     if(inputs.bbreakFrntTriggered) {
