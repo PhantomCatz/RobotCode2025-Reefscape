@@ -33,24 +33,16 @@ import frc.robot.Utilities.waituntil;
 public class CatzStateCommands {
 
     public static Command driveToScore(RobotContainer robotContainer, PathPlannerPath pathToReadyPose, int level){
+        final double PREDICT_DISTANCE = 0.3; //meters
 
         CatzDrivetrain drivetrain = robotContainer.getCatzDrivetrain();
 
         return new SequentialCommandGroup(
-            new TrajectoryDriveCmd(pathToReadyPose, drivetrain, false, robotContainer),
-            LXElevator(robotContainer, level),
-            moveScore(robotContainer, level),
+            new TrajectoryDriveCmd(pathToReadyPose, drivetrain, false, robotContainer).deadlineFor(
+                new RepeatCommand(LXElevator(robotContainer, level).onlyIf(() -> drivetrain.getDistanceError() < PREDICT_DISTANCE))
+            ),
+            LXCoral(robotContainer, level),
             stow(robotContainer)
-        );
-    }
-
-    public static Command moveScore(RobotContainer robotContainer, int level){
-        CatzDrivetrain drivetrain = robotContainer.getCatzDrivetrain();
-        TeleopPosSelector selector = robotContainer.getSelector();
-
-        return new SequentialCommandGroup(
-            new TrajectoryDriveCmd(()->selector.getMoveScorePath(), drivetrain, true, robotContainer),
-            LXCoral(robotContainer, level)
         );
     }
 

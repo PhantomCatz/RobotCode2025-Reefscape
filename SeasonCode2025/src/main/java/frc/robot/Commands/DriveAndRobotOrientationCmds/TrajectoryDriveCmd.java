@@ -15,6 +15,8 @@ import com.pathplanner.lib.trajectory.PathPlannerTrajectoryState;
 import com.pathplanner.lib.util.PPLibTelemetry;
 import com.pathplanner.lib.util.PathPlannerLogging;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.math.util.Units;
@@ -225,7 +227,13 @@ public class TrajectoryDriveCmd extends Command {
     );
 
     // construct chassisspeeds
-    adjustedSpeeds = hocontroller.calculate(currentPose, state, goal.pose.getRotation());
+    if (autoalign) {
+      Translation2d reef = FieldConstants.Reef.center;
+      adjustedSpeeds = hocontroller.calculate(currentPose, state, Rotation2d.fromRadians(Math.atan2(reef.getY() - currentPose.getY(),reef.getX() - currentPose.getX())));
+
+    }else{
+      adjustedSpeeds = hocontroller.calculate(currentPose, state, goal.pose.getRotation());
+    }
 
     adjustedSpeeds = applyCusp(adjustedSpeeds, translationError, CONVERGE_DISTANCE);
 
