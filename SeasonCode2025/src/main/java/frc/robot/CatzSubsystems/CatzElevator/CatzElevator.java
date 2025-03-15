@@ -16,7 +16,6 @@ import java.util.function.Supplier;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.CatzConstants;
-import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.State;
 import frc.robot.Utilities.LoggedTunableNumber;
@@ -172,7 +171,7 @@ public class CatzElevator extends SubsystemBase {
     //    Limit switch position setting
     //---------------------------------------------------------------------------------------------------------------------------
     if(inputs.isBotLimitSwitched) {
-      io.resetPosition(ElevatorPosition.PosLimitSwitchStow.getTargetPositionRads());
+      //io.resetPosition(ElevatorPosition.PosLimitSwitchStow.getTargetPositionRads());
     }
 
     //---------------------------------------------------------------------------------------------------------------------------
@@ -187,7 +186,7 @@ public class CatzElevator extends SubsystemBase {
       // Setpoint PID
       if(targetPosition == ElevatorPosition.PosStow) {
         // Safety Stow
-        if(getElevatorPositionRads() < 29.0) {
+        if(getElevatorPositionRads() < 1.3) {
           io.stop();
         } else {
           io.runSetpointDown(targetPosition.getTargetPositionRads());
@@ -196,7 +195,7 @@ public class CatzElevator extends SubsystemBase {
         //Setpoint PID
         io.runSetpointUp(targetPosition.getTargetPositionRads());
       }
-    } else if (manualOverride.getAsBoolean()) {
+    } else if (manualOverride.getAsBoolean() || targetPosition == ElevatorPosition.PosManual) {
       io.runMotor(elevatorSpeed);
     } else {
       // Nothing happening
@@ -219,47 +218,7 @@ public class CatzElevator extends SubsystemBase {
     // Target Postioin Logging
     previousLoggedPosition = targetPosition;
   }
-  //-------------------------------------------------------------------------------------------------------------------------
-  //
-  //  Setposition Control
-  //
-  //--------------------------------------------------------------------------------------------------------------------------
 
-  private void runTrapProfile(ElevatorPosition setPosition) {
-      // Clamp goal aka where we want the elevator to be at the end
-      var goalState = new State(
-                            MathUtil.clamp(setPosition.getTargetPositionRads(),0.0, ElevatorConstants.MAX_TRAVEL_RADIANS),
-                            0.0
-      );
-
-      double previousVelocity = inputs.velocityRadsPerSec;
-
-      // Calculate trap sepoint
-      if(setPosition == ElevatorPosition.PosBotBot ||
-         setPosition == ElevatorPosition.PosBotTop ) {
-        setpoint = algaeProfile.calculate(CatzConstants.LOOP_TIME, setpoint, goalState);
-      } else {
-        setpoint = profile.calculate(CatzConstants.LOOP_TIME, setpoint, goalState);
-      }
-
-      // Clamp trap profile
-      if (setPosition.getTargetPositionRads() < 0.0 || setPosition.getTargetPositionRads() > ElevatorConstants.MAX_TRAVEL_RADIANS) {
-        setpoint = new State(
-                MathUtil.clamp(setpoint.position, 0.0, ElevatorConstants.MAX_TRAVEL_RADIANS),
-                0.0);
-      }
-
-      System.out.println(setpoint.position);
-    double accel = (setpoint.velocity - previousVelocity) / CatzConstants.LOOP_TIME;
-          // io.runSetpoint(
-          //     setpoint.position,
-          //     ElevatorConstants.gains.kV() * Math.signum(setpoint.velocity) // Magnitude irrelevant
-          //         + ElevatorConstants.gains.kG()
-          //         + ElevatorConstants.gains.kA() * accel);
-
-    currentGoal = goalState;
-
-  }
   //--------------------------------------------------------------------------------------------------------------------------
   //
   //  Elevator Setpos Commands

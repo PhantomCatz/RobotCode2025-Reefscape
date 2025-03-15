@@ -31,14 +31,14 @@ public class ElevatorConstants {
     public static final double LOWER_LIMIT_RAD = 0.0;
 
     // Elevator Heights:(Radians)
-    public static final double STOW_HEIGHT = 5.0;
-    public static final double L1_HEIGHT   = 11.0;
-    public static final double L2_HEIGHT   = 33.0;
-    public static final double L3_HEIGHT   = 81.7;
-    public static final double L4_HEIGHT   = 149.0;
-    public static final double L4_CORAL_ADJ = 158.0;
-    public static final double BOT_BOT_ALGAE = 80.6;
-    public static final double BOT_TOP_ALGAE = 140.7;
+    public static final double STOW_HEIGHT = 1.0;
+    public static final double L1_HEIGHT   = 2.0;
+    public static final double L2_HEIGHT   = 10.0;
+    public static final double L3_HEIGHT   = 20.0;//81.7;
+    public static final double L4_HEIGHT   = 27.0;
+    public static final double L4_CORAL_ADJ = 25.0;
+    public static final double BOT_BOT_ALGAE = 20.6;
+    public static final double BOT_TOP_ALGAE = 22.7;
     // Motor ID
     public static final int LEFT_LEADER_ID  = 30;
     public static final int RIGHT_FOLLOWER_ID = 31;
@@ -63,7 +63,7 @@ public class ElevatorConstants {
     public static final Gains slot0_gains =
         switch (CatzConstants.getRobotType()) {
             case SN2 -> new Gains(125.0, 0.0, 0.0, 0.175, 0.130, 0.013, 0.4);
-            case SN1 -> new Gains(75.0, 0.1, 0.0, 0.175, 0.13, 0.013, 0.4); //
+            case SN1 -> new Gains(75.0, 0.0, 0.0, 0.175, 0.3, 0.13, 0.4); //
             case SN_TEST, SN1_2024 -> new Gains(7000.0, 0.0, 250.0, 8.4, 0.2, 0.2, 22.9);
         };
 

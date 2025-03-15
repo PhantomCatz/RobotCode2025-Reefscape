@@ -9,7 +9,6 @@ package frc.robot.CatzSubsystems.CatzElevator;
 
 import static frc.robot.CatzSubsystems.CatzElevator.ElevatorConstants.*;
 
-import java.util.List;
 
 import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.StatusSignal;
@@ -30,8 +29,7 @@ import edu.wpi.first.wpilibj.DigitalInput;
 
 public class ElevatorIOReal implements ElevatorIO {
   // Motor Instantiation
-  TalonFX leaderTalon = new TalonFX(LEFT_LEADER_ID);
-  TalonFX followerTalon = new TalonFX(RIGHT_FOLLOWER_ID);
+  TalonFX leaderTalon = new TalonFX(RIGHT_FOLLOWER_ID);
 
   // Motor configuration
   private final TalonFXConfiguration config = new TalonFXConfiguration();
@@ -41,10 +39,10 @@ public class ElevatorIOReal implements ElevatorIO {
   // Status Signals
   private final StatusSignal<Angle> internalPositionRotations;
   private final StatusSignal<AngularVelocity> velocityRps;
-  private final List<StatusSignal<Voltage>> appliedVoltage;
-  private final List<StatusSignal<Current>> supplyCurrent;
-  private final List<StatusSignal<Current>> torqueCurrent;
-  private final List<StatusSignal<Temperature>> tempCelsius;
+  private final StatusSignal<Voltage> appliedVoltage;
+  private final StatusSignal<Current> supplyCurrent;
+  private final StatusSignal<Current> torqueCurrent;
+  private final StatusSignal<Temperature> tempCelsius;
 
   // External Sensors
   final DigitalInput m_elevatorLimitBot = new DigitalInput(BOT_LIMIT_SWITCH);
@@ -54,22 +52,19 @@ public class ElevatorIOReal implements ElevatorIO {
     // Status signals
     internalPositionRotations = leaderTalon.getPosition();
     velocityRps = leaderTalon.getVelocity();
-    appliedVoltage = List.of(leaderTalon.getMotorVoltage(), followerTalon.getMotorVoltage());
-    supplyCurrent = List.of(leaderTalon.getSupplyCurrent(), followerTalon.getSupplyCurrent());
-    torqueCurrent = List.of(leaderTalon.getTorqueCurrent(), followerTalon.getTorqueCurrent());
-    tempCelsius = List.of(leaderTalon.getDeviceTemp(), followerTalon.getDeviceTemp());
+    appliedVoltage = leaderTalon.getMotorVoltage();
+    supplyCurrent = leaderTalon.getSupplyCurrent();
+    torqueCurrent = leaderTalon.getTorqueCurrent();
+    tempCelsius = leaderTalon.getDeviceTemp();
     BaseStatusSignal.setUpdateFrequencyForAll(
         100,
         internalPositionRotations,
         velocityRps,
-        appliedVoltage.get(0),
-        appliedVoltage.get(1),
-        supplyCurrent.get(0),
-        supplyCurrent.get(1),
-        torqueCurrent.get(0),
-        torqueCurrent.get(1),
-        tempCelsius.get(0),
-        tempCelsius.get(1));
+        appliedVoltage,
+        supplyCurrent,
+        torqueCurrent,
+        tempCelsius
+    );
 
     // PID configs
     config.Slot0.kS = slot0_gains.kS();
@@ -96,7 +91,7 @@ public class ElevatorIOReal implements ElevatorIO {
     config.MotionMagic.MotionMagicJerk = motionMagicParameters.mmJerk();
 
     // Encoder Inversion
-    config.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
+    config.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
 
     // Current Limits
     config.TorqueCurrent.PeakForwardTorqueCurrent =  80.0;
@@ -108,14 +103,11 @@ public class ElevatorIOReal implements ElevatorIO {
 
     // Encoder Resetting
     leaderTalon.setPosition(0);
-    followerTalon.setPosition(0);
 
     // Applying Configs
     leaderTalon.getConfigurator().apply(config, 1.0);
-    followerTalon.getConfigurator().apply(config, 1.0);
 
     // Setting follower
-    followerTalon.setControl(new Follower(leaderTalon.getDeviceID(), true));
     positionControlUp.EnableFOC = true;
     positionControlUp.Slot = 0;
 
@@ -129,34 +121,18 @@ public class ElevatorIOReal implements ElevatorIO {
           BaseStatusSignal.refreshAll(
                   internalPositionRotations,
                   velocityRps,
-                  appliedVoltage.get(0),
-                  supplyCurrent.get(0),
-                  torqueCurrent.get(0),
-                  tempCelsius.get(0))
+                  appliedVoltage,
+                  supplyCurrent,
+                  torqueCurrent,
+                  tempCelsius)
               .isOK();
 
-      inputs.isFollowerMotorConnected =
-          BaseStatusSignal.refreshAll(
-                  appliedVoltage.get(1),
-                  supplyCurrent.get(1),
-                  torqueCurrent.get(1),
-                  tempCelsius.get(1))
-              .isOK();
-
-      inputs.positionRads =       Units.rotationsToRadians(internalPositionRotations.getValueAsDouble());
-      inputs.velocityRadsPerSec = Units.rotationsToRadians(velocityRps.getValueAsDouble());
-      inputs.appliedVolts =       appliedVoltage.stream()
-                                                .mapToDouble(StatusSignal::getValueAsDouble)
-                                                .toArray();
-      inputs.supplyCurrentAmps =  supplyCurrent.stream()
-                                                .mapToDouble(StatusSignal::getValueAsDouble)
-                                                .toArray();
-      inputs.torqueCurrentAmps =  torqueCurrent.stream()
-                                              .mapToDouble(StatusSignal::getValueAsDouble)
-                                              .toArray();
-      inputs.tempCelcius =        tempCelsius.stream()
-                                            .mapToDouble(StatusSignal::getValueAsDouble)
-                                            .toArray();
+      inputs.positionRads =       Units.rotationsToRadians(internalPositionRotations.getValueAsDouble()/9);
+      inputs.velocityRadsPerSec = Units.rotationsToRadians(velocityRps.getValueAsDouble()/9);
+      inputs.appliedVolts =       appliedVoltage.getValueAsDouble();
+      inputs.supplyCurrentAmps =  supplyCurrent.getValueAsDouble();
+      inputs.torqueCurrentAmps =  torqueCurrent.getValueAsDouble();
+      inputs.tempCelcius =        tempCelsius.getValueAsDouble();
 
       inputs.isBotLimitSwitched = m_elevatorLimitBot.get();
     }
@@ -164,13 +140,13 @@ public class ElevatorIOReal implements ElevatorIO {
 
   @Override
   public void runSetpointUp(double setpointRads) {
-    double setpointRotations = Units.radiansToRotations(setpointRads);
+    double setpointRotations = Units.radiansToRotations(setpointRads)*9;
     leaderTalon.setControl(positionControlUp.withPosition(setpointRotations));
   }
 
   @Override
   public void runSetpointDown(double setpointRads) {
-    double setpointRotations = Units.radiansToRotations(setpointRads);
+    double setpointRotations = Units.radiansToRotations(setpointRads)*9;
     leaderTalon.setControl(positionControlDown.withPosition(setpointRotations));
   }
 
@@ -211,7 +187,6 @@ public class ElevatorIOReal implements ElevatorIO {
   @Override
   public void setBrakeMode(boolean enabled) {
     leaderTalon.setNeutralMode(enabled ? NeutralModeValue.Brake : NeutralModeValue.Coast);
-    followerTalon.setNeutralMode(enabled ? NeutralModeValue.Brake : NeutralModeValue.Coast);
   }
 
   @Override
