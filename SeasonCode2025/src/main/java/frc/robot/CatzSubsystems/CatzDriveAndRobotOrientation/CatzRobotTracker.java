@@ -25,6 +25,7 @@ import frc.robot.Utilities.GeomUtil;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.NoSuchElementException;
+import java.util.function.Supplier;
 
 import lombok.Getter;
 import lombok.experimental.ExtensionMethod;
@@ -304,6 +305,13 @@ public class CatzRobotTracker {
     // System.out.println(initialPose.getRotation().getDegrees());
     estimatedPose = initialPose;
     odometryPose = initialPose;
+    POSE_BUFFER.clear();
+  }
+
+  public void resetPose(Supplier<Pose2d> initialPoseSupplier) {
+    // System.out.println(initialPose.getRotation().getDegrees());
+    estimatedPose = initialPoseSupplier.get();
+    odometryPose = initialPoseSupplier.get();
     POSE_BUFFER.clear();
   }
 

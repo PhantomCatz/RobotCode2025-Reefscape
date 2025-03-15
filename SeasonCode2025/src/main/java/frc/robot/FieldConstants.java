@@ -84,6 +84,27 @@ public class FieldConstants {
         Units.inchesToMeters(6.625); // Center of each face to the left and right scoring positions of each face
   }
 
+  public static class StartPoses{
+
+    public static final Translation2d start1 = new Translation2d(7.253, 7.256);
+    public static final Translation2d start2 = new Translation2d(7.253, 6.141);
+    public static final Translation2d start3 = new Translation2d(7.253, 5.050);
+    public static final Translation2d start4 = new Translation2d(7.253, 4.019);
+    public static final Translation2d start5 = new Translation2d(7.253, 3.024);
+    public static final Translation2d start6 = new Translation2d(7.253, 1.897);
+    public static final Translation2d start7 = new Translation2d(7.253, 0.794);
+
+    public static final Translation2d[] startArray = new Translation2d[] {
+      start1,
+      start2,
+      start3,
+      start4,
+      start5,
+      start6,
+      start7
+    };
+  }
+
   public static class StagingPositions {
     // Measured from the center of the ice cream
     public static final Pose2d leftIceCream =   new Pose2d(Units.inchesToMeters(48), Units.inchesToMeters(230.5), new Rotation2d());
