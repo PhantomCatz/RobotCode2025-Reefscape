@@ -20,8 +20,6 @@ import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
-import edu.wpi.first.wpilibj.XboxController;
-import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.FieldConstants;
 import frc.robot.Robot;
@@ -30,9 +28,8 @@ import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.CatzRobotTracker;
 import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.Drivetrain.CatzDrivetrain;
 import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.Drivetrain.DriveConstants;
 import frc.robot.Utilities.AllianceFlipUtil;
-import java.util.Collections;
 import java.util.NoSuchElementException;
-import java.util.Set;
+import java.util.function.Supplier;
 
 import org.littletonrobotics.junction.Logger;
 
@@ -66,6 +63,8 @@ public class TrajectoryDriveCmd extends Command {
   private HolonomicDriveController hocontroller;
   private PathPlannerTrajectory trajectory;
   private PathPlannerPath path;
+  private Supplier<PathPlannerPath> pathSupplier;
+
   private double pathTimeOut = -999.0;
   private Timer timer = new Timer();
   private boolean autoalign = false;
@@ -78,8 +77,6 @@ public class TrajectoryDriveCmd extends Command {
   // Event Command variables
   private final EventScheduler eventScheduler;
   private boolean isEventCommandRunning = false;
-
-  private final XboxController xboxDrv;
 
   private boolean isBugged = false;
 
@@ -94,35 +91,20 @@ public class TrajectoryDriveCmd extends Command {
     this.autoalign = autoalign;
     this.container = container;
     this.eventScheduler = new EventScheduler();
-    xboxDrv = null;
     addRequirements(m_driveTrain);
-
-    // Add all event scheduler requirements to this command's requirements
-    var eventReqs = EventScheduler.getSchedulerRequirements(this.path);
-    if (!Collections.disjoint(Set.of(m_driveTrain), eventReqs)) {
-      throw new IllegalArgumentException(
-          "Events that are triggered during path following cannot require the drive subsystem");
-    }
-    addRequirements(eventReqs);
   }
 
-  //For NBA. Used to rumble the controller when done driving
-  public TrajectoryDriveCmd(PathPlannerPath newPath, CatzDrivetrain drivetrain, boolean autoalign, RobotContainer container, XboxController xboxDrv) {
-    this.path = newPath;
+  public TrajectoryDriveCmd(Supplier<PathPlannerPath> newPathSupplier, CatzDrivetrain drivetrain, boolean autoalign, RobotContainer container) {
+    this.pathSupplier = newPathSupplier;
     this.m_driveTrain = drivetrain;
     this.autoalign = autoalign;
     this.container = container;
     this.eventScheduler = new EventScheduler();
-    this.xboxDrv = xboxDrv;
     addRequirements(m_driveTrain);
+  }
 
-    // Add all event scheduler requirements to this command's requirements
-    var eventReqs = EventScheduler.getSchedulerRequirements(this.path);
-    if (!Collections.disjoint(Set.of(m_driveTrain), eventReqs)) {
-      throw new IllegalArgumentException(
-          "Events that are triggered during path following cannot require the drive subsystem");
-    }
-    addRequirements(eventReqs);
+  public void setPath(PathPlannerPath path){
+    this.path = path;
   }
 
   // ---------------------------------------------------------------------------------------------
@@ -135,7 +117,14 @@ public class TrajectoryDriveCmd extends Command {
     try{
       // Flip path if necessary
       System.out.println("trajec start");
-      PathPlannerPath usePath = path;
+      PathPlannerPath usePath;
+      if(pathSupplier != null){
+        path = pathSupplier.get();
+        usePath = path;
+        System.out.println("path::: " + usePath);
+      }else{
+        usePath = path;
+      }
       if (AllianceFlipUtil.shouldFlipToRed()) {
         usePath = path.flipPath();
         System.out.println("Path flipped!!!!!");
@@ -291,13 +280,6 @@ public class TrajectoryDriveCmd extends Command {
     eventScheduler.end();
     if (interrupted) {
       System.out.println("OH NO I WAS INTERRUPTED HOW RUDE");
-    }else{
-      //Rumble the controller for NBA when auto aiming is done
-      if(xboxDrv != null){
-        xboxDrv.setRumble(RumbleType.kBothRumble, 0.7);
-        Timer.delay(0.2);
-        xboxDrv.setRumble(RumbleType.kBothRumble, 0.0);
-      }
     }
   }
 

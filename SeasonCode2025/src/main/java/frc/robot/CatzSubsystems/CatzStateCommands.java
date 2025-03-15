@@ -27,7 +27,6 @@ import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.Drivetrain.CatzDriv
 import frc.robot.CatzSubsystems.CatzElevator.CatzElevator;
 import frc.robot.CatzSubsystems.CatzOuttake.CatzOuttake;
 import frc.robot.CatzSubsystems.CatzRampPivot.CatzRampPivot;
-import frc.robot.Commands.DriveAndRobotOrientationCmds.MoveScore;
 import frc.robot.Commands.DriveAndRobotOrientationCmds.TrajectoryDriveCmd;
 import frc.robot.Utilities.waituntil;
 
@@ -39,8 +38,19 @@ public class CatzStateCommands {
 
         return new SequentialCommandGroup(
             new TrajectoryDriveCmd(pathToReadyPose, drivetrain, false, robotContainer),
-            new MoveScore(robotContainer, level),
+            LXElevator(robotContainer, level),
+            moveScore(robotContainer, level),
             stow(robotContainer)
+        );
+    }
+
+    public static Command moveScore(RobotContainer robotContainer, int level){
+        CatzDrivetrain drivetrain = robotContainer.getCatzDrivetrain();
+        TeleopPosSelector selector = robotContainer.getSelector();
+
+        return new SequentialCommandGroup(
+            new TrajectoryDriveCmd(()->selector.getNBAPath(false), drivetrain, true, robotContainer),
+            LXCoral(robotContainer, level)
         );
     }
 

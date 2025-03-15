@@ -473,7 +473,7 @@ public class TeleopPosSelector { //TODO split up the file. it's too big and does
       currentPathfindingPair = getClosestReefPos().getFirst();
       currentDrivetrainCommand.cancel();
       try{
-        currentDrivetrainCommand = new TrajectoryDriveCmd(getPathfindingPath(calculateReefPose(currentPathfindingPair, true, true)), m_container.getCatzDrivetrain(), true, m_container);
+        currentDrivetrainCommand = new TrajectoryDriveCmd(getNBAPath(true), m_container.getCatzDrivetrain(), true, m_container);
         currentDrivetrainCommand.schedule();
       }catch(Exception e){
         e.printStackTrace();
@@ -481,7 +481,9 @@ public class TeleopPosSelector { //TODO split up the file. it's too big and does
     });
   }
 
-
+  public PathPlannerPath getNBAPath(boolean isDistanced){
+    return getPathfindingPath(calculateReefPose(getClosestReefPos().getFirst(), true, isDistanced));
+  }
 
   public Command runCoralStationCommand() {
     return new InstantCommand(() -> {
