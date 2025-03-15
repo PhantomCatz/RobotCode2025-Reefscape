@@ -177,7 +177,6 @@ public class CatzRobotTracker {
       // exit if not there
       return;
     }
-    Logger.recordOutput("Buffer Pose", sample.get());
 
     // print out robot position relative to april tag
     // Translation2d aprilPos = AllianceFlipUtil.apply(Reef.center).plus(new Translation2d(Reef.reefOrthogonalRadius, 0).rotateBy(Rotation2d.fromDegrees(-60)));

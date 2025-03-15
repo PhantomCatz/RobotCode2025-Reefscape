@@ -210,7 +210,6 @@ public class CatzAutonomous extends SubsystemBase {
       ArrayList<Object> commands = JSONUtil.getCommandsFromAuton(autoName);
       for (Object o : commands) {
         String commandName = JSONUtil.getCommandName(o);
-        System.out.println("nameeee: " + commandName);
         try {
           String[] components = commandName.split("\\+");
           Command command = null;
@@ -234,7 +233,7 @@ public class CatzAutonomous extends SubsystemBase {
 
           if(command == null){
             System.out.println("****** typotypotypotypotypotypotypotypotypotypotypotypotypo       \n\n\n\n\nn\n\n\n\n \n\n\n typo in pathplanner reverting to drvive forward auto ********** ");
-            command = Commands.run(() -> drivetrain.drive(new ChassisSpeeds(0.5, 0.0, 0.0)), drivetrain).withTimeout(5.0);
+            command = Commands.run(() -> drivetrain.drive(new ChassisSpeeds(0.5, 0.0, 0.0)), drivetrain).withTimeout(5.0); //TODO this only drives to the right(field relative). so make this different for blue alliance
           }
           NamedCommands.registerCommand(commandName, command);
         } catch (FileVersionException | IOException | ParseException e) {

@@ -102,7 +102,42 @@ public class CatzElevator extends SubsystemBase {
     // Update controllers when user specifies
     //--------------------------------------------------------------------------------------------------------
     LoggedTunableNumber.ifChanged(
-        hashCode(), () -> io.setPID(kP.get(), kI.get(), kD.get()), kP, kI, kD);
+        hashCode(),
+        () -> io.setGainsSlot0(slot0_kP.get(),
+                               slot0_kI.get(),
+                               slot0_kD.get(),
+                               slot0_kS.get(),
+                               slot0_kV.get(),
+                               slot0_kA.get(),
+                               slot0_kG.get()
+        ),
+        slot0_kP,
+        slot0_kI,
+        slot0_kD,
+        slot0_kS,
+        slot0_kV,
+        slot0_kA,
+        slot0_kG
+    );
+
+    LoggedTunableNumber.ifChanged(
+        hashCode(),
+        () -> io.setGainsSlot0(slot0_kP.get(),
+                               slot0_kI.get(),
+                               slot0_kD.get(),
+                               slot0_kS.get(),
+                               slot0_kV.get(),
+                               slot0_kA.get(),
+                               slot0_kG.get()
+        ),
+        slot0_kP,
+        slot0_kI,
+        slot0_kD,
+        slot0_kS,
+        slot0_kV,
+        slot0_kA,
+        slot0_kG
+    );
     LoggedTunableNumber.ifChanged(hashCode(),
         ()-> io.setMotionMagicParameters(mmCruiseVelocity.get(), mmAcceleration.get(), mmJerk.get()),
         mmCruiseVelocity,
@@ -124,25 +159,6 @@ public class CatzElevator extends SubsystemBase {
     //    Feed Foward
     //---------------------------------------------------------------------------------------------------------------------------
 
-    // double additionalGain = 0.0;
-    // switch (targetPosition) {
-    //   case  PosL1:
-    //     additionalGain = 0.00;
-    //     break;
-    //   case  PosL2:
-    //     additionalGain = 0.025;
-    //     break;
-    //   case  PosL3:
-    //     additionalGain = 0.0;
-    //     break;
-    //   case  PosL4:
-    //     additionalGain = -0.2;
-    //     break;
-    //   default:
-    //     break;
-    // }
-    elevatorFeedForward = gains.kG();// + additionalGain;
-
     //---------------------------------------------------------------------------------------------------------------------------
     //    Control Mode setting
     //---------------------------------------------------------------------------------------------------------------------------
@@ -158,11 +174,11 @@ public class CatzElevator extends SubsystemBase {
         if(getElevatorPositionRads() < 9.50) {
           io.stop();
         } else {
-          io.runSetpoint(targetPosition.getTargetPositionRads(), elevatorFeedForward);
+          io.runSetpointDown(targetPosition.getTargetPositionRads());
         }
       } else {
         //Setpoint PID
-        io.runSetpoint(targetPosition.getTargetPositionRads(), elevatorFeedForward);
+        io.runSetpointUp(targetPosition.getTargetPositionRads());
       }
     } else if (targetPosition == ElevatorPosition.PosManual) {
       io.runMotor(elevatorSpeed);
