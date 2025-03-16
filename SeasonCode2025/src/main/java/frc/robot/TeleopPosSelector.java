@@ -320,6 +320,23 @@ public class TeleopPosSelector { //TODO split up the file. it's too big and does
       return calculateReefPose(pair.getFirst(), pair.getSecond());
     }
   }
+  public PathPlannerPath getClosestNetPath(){
+    PathPlannerPath path = pathfinder.getPathToNet(CatzRobotTracker.getInstance().getEstimatedPose().getTranslation(), new GoalEndState(0.0, AllianceFlipUtil.apply(Rotation2d.kZero)));
+
+    if (AllianceFlipUtil.shouldFlipToRed()) {
+      path = path.flipPath();
+    }
+
+    return path;
+  }
+
+  public Command runToNetCommand(){
+    return new InstantCommand(() -> {
+      currentDrivetrainCommand.cancel();
+      currentDrivetrainCommand = new TrajectoryDriveCmd(getClosestNetPath(), drivetrain, false, m_container);
+      currentDrivetrainCommand.schedule();
+    });
+  }
 
   public PathPlannerPath getPathfindingPath(Pose2d goal) {
     if (goal == null) {

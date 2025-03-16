@@ -13,6 +13,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.*;
 import edu.wpi.first.math.util.Units;
 import frc.robot.Utilities.AllianceFlipUtil;
@@ -41,12 +42,12 @@ public class FieldConstants {
   }
 
   public static class CoralStation {
-    public static final Pose2d leftCenterFace =
+    private static final Pose2d leftCenterFace =
         new Pose2d(
             1.197,
             7.028,
             Rotation2d.fromDegrees(-53.673));
-    public static final Pose2d rightCenterFace =
+    private static final Pose2d rightCenterFace =
         new Pose2d(
             1.197,
             0.950,
@@ -82,6 +83,50 @@ public class FieldConstants {
         Units.inchesToMeters(32.305); // Distance from the center to the side of the reef
     public static final double leftRightDistance =
         Units.inchesToMeters(6.625); // Center of each face to the left and right scoring positions of each face
+  }
+
+  public static class Net{
+    private static final double x = 7.768;// meters
+    private static final double yLeft = 7.507; //left and right is from the driverstation pov
+    private static final double yRight = 4.606;
+
+    public static double getX(){
+      if(AllianceFlipUtil.shouldFlipToRed()){
+        return FieldConstants.FIELD_LENGTH_MTRS - x;
+      }else{
+        return x;
+      }
+    }
+
+    public static double getYLeft(){
+      if(AllianceFlipUtil.shouldFlipToRed()){
+        return FieldConstants.FIELD_WIDTH - yLeft;
+      }else{
+        return yLeft;
+      }
+    }
+    public static double getYRight(){
+      if(AllianceFlipUtil.shouldFlipToRed()){
+        return FieldConstants.FIELD_WIDTH - yRight;
+      }else{
+        return yRight;
+      }
+    }
+
+    /**
+     * Returns the closest net position assuming no obstacles
+     * @param y Y position of the robot
+     * @return
+     */
+    public static Translation2d getGuessClosestNetPose(double y){
+      double guessY;
+      if(AllianceFlipUtil.shouldFlipToRed()){
+        guessY = MathUtil.clamp(y, getYLeft(), getYRight());
+      }else{
+        guessY = MathUtil.clamp(y, getYRight(), getYLeft());
+      }
+      return new Translation2d(getX(), guessY);
+    }
   }
 
   public static class StagingPositions {

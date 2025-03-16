@@ -148,8 +148,8 @@ public class RobotContainer {
     xboxDrv.rightTrigger().onFalse(selector.cancelCurrentDrivetrainCommand().alongWith(Commands.runOnce(()->led.setControllerState(ControllerLEDState.FULL_MANUAL))));
 
     // BALLS
-    // xboxDrv.y().onTrue(selector.runCoralStationCommand());
-    // xboxDrv.y().onFalse(selector.cancelCurrentDrivetrainCommand());
+    xboxDrv.y().onTrue(selector.runToNetCommand());
+    xboxDrv.y().onFalse(selector.cancelCurrentDrivetrainCommand());
 
     // AQUA
     xboxDrv.a().onTrue(new InstantCommand(() -> selector.runAutoCommand().schedule()));

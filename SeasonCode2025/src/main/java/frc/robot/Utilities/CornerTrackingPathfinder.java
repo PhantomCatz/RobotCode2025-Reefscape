@@ -8,10 +8,12 @@
 package frc.robot.Utilities;
 
 import com.pathplanner.lib.path.*;
+
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.Filesystem;
+import frc.robot.FieldConstants;
 import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.Drivetrain.DriveConstants;
 
 import java.io.BufferedReader;
@@ -145,6 +147,40 @@ public class CornerTrackingPathfinder{
     //Waypoint[prevControl=Translation2d(X: 2.56, Y: 3.53), anchor=Translation2d(X: 3.05, Y: 3.72), nextControl=null]]
   }
 
+  public PathPlannerPath getPathToNet(Translation2d start, GoalEndState goal){
+    List<GridPosition> reverseNetPath = findReversePathNet(
+      findClosestNonObstacle(translation2dToGridPos(start), walls),
+      start.getY(),
+      walls
+    );
+
+    // if(reverseNetPath.size() < 2){
+    //   System.out.println("why path smol?");
+    //   return null;
+    // }
+
+    List<Waypoint> waypoints = createWaypoints(
+      reverseNetPath,
+    start, gridPosToTranslation2d(reverseNetPath.get(0)), walls);
+
+
+    if(waypoints.size() >= 2){
+      PathPlannerPath path = new PathPlannerPath(waypoints, DriveConstants.PATHFINDING_CONSTRAINTS, null, goal);
+      return path;
+    } else {
+      return null;
+    }
+
+    // slow
+    //[Waypoint[prevControl=null, anchor=Translation2d(X: 2.13, Y: 3.34), nextControl=Translation2d(X: 2.50, Y: 3.49)],
+    //Waypoint[prevControl=Translation2d(X: 2.68, Y: 3.57), anchor=Translation2d(X: 3.05, Y: 3.72), nextControl=null]]
+
+    // fast
+    //[Waypoint[prevControl=null, anchor=Translation2d(X: 1.84, Y: 3.25), nextControl=Translation2d(X: 2.32, Y: 3.44)],
+    //Waypoint[prevControl=Translation2d(X: 2.56, Y: 3.53), anchor=Translation2d(X: 3.05, Y: 3.72), nextControl=null]]
+  }
+
+
   /**
    * Comparator used in the PriorityQueue during pathfinding.
    * The queue is ordered based on the distance from the corners traveled so far and the distance from the position's associated corner.
@@ -266,6 +302,119 @@ public class CornerTrackingPathfinder{
     return path;
   }
 
+  private List<GridPosition> findReversePathNet(GridPosition start, double startY, Set<GridPosition> obstacles) {
+    //Queue to store the nodes to explore, prioritizing the shortest paths.
+    PriorityQueue<PathfindingPosition> frontier = new PriorityQueue<>(new CompareDistances());
+
+    //Maps a position in the node to the corner that it is associated with.
+    //Used to construct the path by retracing the corners that it traveled
+    HashMap<GridPosition, GridPosition> lastCorner = new HashMap<>();
+
+    //Invisible lines that draws a line-of-sight from corners to corners, ensuring that areas with different "lastCorners" don't spill over eachother
+    HashMap<GridPosition, Set<GridPosition>> ghostWalls = new HashMap<>();
+
+    GridPosition guessGoal = translation2dToGridPos(FieldConstants.Net.getGuessClosestNetPose(startY));
+
+    frontier.add(new PathfindingPosition(start, start, guessGoal, 0.0));
+
+    //the start counts as a corner
+    lastCorner.put(start, start);
+    ghostWalls.put(start, new HashSet<>());
+
+    while(frontier.size() > 0){
+      PathfindingPosition currentPathfindingPos = frontier.poll();
+      GridPosition currentPos = currentPathfindingPos.position;
+      GridPosition currentCorner = currentPathfindingPos.corner;
+      double currentCornerDistance = currentPathfindingPos.cornerDistancesTraveled;
+
+      guessGoal = translation2dToGridPos(FieldConstants.Net.getGuessClosestNetPose(gridPosToTranslation2d(currentPos).getY()));
+      if(currentPos.compareTo(guessGoal) == 0){
+        break;
+      }
+      Translation2d m = new Translation2d(currentCorner.y - guessGoal.y, currentCorner.x - guessGoal.x);
+
+      if(!hasObstacleOnLine(currentCorner, m, walls)){
+        lastCorner.put(guessGoal, currentCorner);
+        break;
+      }
+
+      //if a corner is found, draw an imaginary line from the previous corner to this corner
+      //now all cells propagating from this corner identifies as this corner (if that makes sense)
+      if(corners.keySet().contains(currentPos)){
+        Translation2d slope = new Translation2d(currentPos.y - currentCorner.y, currentPos.x - currentCorner.x);
+        int diagonalIndex = corners.get(currentPos);
+
+        //If the angle between the imaginary slope and a vector extruding diagonally from the corner (length sqrt2) is greater than 135 degrees, ignore the corner
+        //The angle is measured using dot products
+        if (diagonalIndex != -1 && DIAGONAL[diagonalIndex].getX() * slope.getX() + DIAGONAL[diagonalIndex].getY() * slope.getY() >= - slope.getNorm()){
+          ghostWalls.get(currentCorner).addAll(getCellsOnLine(currentPos, slope, obstacles));
+          ghostWalls.put(currentPos, new HashSet<>());
+
+          //add the euclidean distance from the previous corner to this corner
+          currentCornerDistance += currentPos.getDistance(currentCorner);
+          currentCorner = currentPos;
+        }
+      }
+
+      for(GridPosition dxy: ADJACENT){
+        GridPosition newPos = currentPos.add(dxy);
+
+        //floodfill from the current node.
+        //if the next node is not an imaginary obstacle and it's not an actual obstacle and if it hasn't been traveled before, add it to the frontier.
+        if(
+          !ghostWalls.get(currentCorner).contains(newPos) &&
+          !obstacles.contains(newPos) &&
+          !lastCorner.containsKey(newPos)
+        ){
+          frontier.add(new PathfindingPosition(newPos, currentCorner, guessGoal, currentCornerDistance));
+          lastCorner.put(newPos, currentCorner);
+        }
+      }
+    }
+
+    //at this point the guessGoal is no longer a guess.
+    final GridPosition g = guessGoal;
+
+    //either a path was found (or wasn't found)
+    //retrace the path backwards by going through the corners that this path visited.
+    List<GridPosition> path = new ArrayList<>();
+    while(guessGoal != null && guessGoal.compareTo(start) != 0){
+      path.add(guessGoal);
+      guessGoal = lastCorner.get(guessGoal);
+    }
+    // Visualize path
+
+    // for (int row = nodesY - 1; row >= 0; row--) {
+    //   for (int col = 0; col < nodesX; col++) {
+    //     if(start.equals(new GridPosition(col, row))){
+    //       //starting point
+    //       System.out.print("s");
+    //     }
+    //     else if(g.equals(new GridPosition(col, row))){
+    //       System.out.print("e");
+    //     }
+    //     else if (obstacles.contains(new GridPosition(col, row))){
+    //       //wall
+    //       System.out.print("#");
+    //     }
+    //     else if(path.contains(new GridPosition(col, row))){
+    //       //goal points
+    //       System.out.print("@");
+    //     }
+    //     else if (lastCorner.keySet().contains(new GridPosition(col, row))){
+    //       //areas flood filled
+    //       System.out.print("+");
+    //     }
+    //     else {
+    //       System.out.print("_");
+    //     }
+    //   }
+    //   System.out.println();
+    // }
+
+    return path;
+  }
+
   private List<Waypoint> createWaypoints(
       List<GridPosition> path,
       Translation2d realStartPos,
@@ -353,6 +502,33 @@ public class CornerTrackingPathfinder{
     }
 
     return onLine;
+  }
+
+  private boolean hasObstacleOnLine(GridPosition start, Translation2d slope, Set<GridPosition> obstacles){
+    double n = Math.max(nodesX, nodesY);
+
+    if (slope.getX() == 0 || slope.getY() == 0) {
+      slope = slope.div(slope.getNorm());
+    } else {
+      slope = slope.div(Math.max(slope.getX(), slope.getY()));
+    }
+
+    double x = start.x;
+    double y = start.y;
+
+    while (n >= 0) {
+      x += slope.getX();
+      y += slope.getY();
+
+      int gx = (int) Math.round(x);
+      int gy = (int) Math.round(y);
+
+      if (obstacles.contains(new GridPosition(gx, gy))) {
+        return true;
+      }
+      n--;
+    }
+    return false;
   }
 
   private GridPosition findClosestNonObstacle(GridPosition pos, Set<GridPosition> obstacles) {
