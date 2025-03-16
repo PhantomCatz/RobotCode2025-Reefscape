@@ -19,12 +19,11 @@ public class ElevatorConstants {
     public static final boolean isElevatorDisabled = false;
 
     // Gearbox definitions
-    public static final double MAXPLANETARY_GEAR_RATIO   = 4.0 * 4.0;
-    public static final double ELEVATOR_DRIVING_PULLEY   = 24.0;
-    public static final double ELEVATOR_DRIVEN_PULLEY    = 18.0;
-    public static final double ELEVATOR_RATIO_STAGE_ONE  = ELEVATOR_DRIVING_PULLEY/ELEVATOR_DRIVEN_PULLEY;
-    public static final double FINAL_REDUCATION          = MAXPLANETARY_GEAR_RATIO * ELEVATOR_RATIO_STAGE_ONE;
-    public static final double ELEVATOR_SPROCKET_RADIUS  = 0.86; //inches
+    public static final double MAXPLANETARY_GEAR_RATIO   = 9.0;
+    public static final double T22_DIAMETER_INCHES       = 1.981;
+    //For every 9 rotations of the motor, the output shaft rotates once.
+    //For every inch moved up by by the sprocket, the carriage rises by 2 inches
+    public static final double FINAL_RATIO               = 2 * (T22_DIAMETER_INCHES * Math.PI) / MAXPLANETARY_GEAR_RATIO;
 
     // Elevator Limits
     public static final double UPPER_LIMIT_RAD = 162.0;
@@ -97,9 +96,9 @@ public class ElevatorConstants {
     public static final LoggedTunableNumber slot1_kA = new LoggedTunableNumber("Elevator/Gains/slot1_kA", slot1_gains.kA());
     public static final LoggedTunableNumber slot1_kG = new LoggedTunableNumber("Elevator/Gains/slot1_kG", slot1_gains.kG());
 
-    public static final LoggedTunableNumber mmCruiseVelocity = new LoggedTunableNumber("Elevator/Gains/kV", motionMagicParameters.mmCruiseVelocity());
-    public static final LoggedTunableNumber mmAcceleration = new LoggedTunableNumber("Elevator/Gains/kA", motionMagicParameters.mmAcceleration());
-    public static final LoggedTunableNumber mmJerk = new LoggedTunableNumber("Elevator/Gains/kG", motionMagicParameters.mmJerk());
+    public static final LoggedTunableNumber mmCruiseVelocity = new LoggedTunableNumber("Elevator/Gains/Magic Velocity", motionMagicParameters.mmCruiseVelocity());
+    public static final LoggedTunableNumber mmAcceleration = new LoggedTunableNumber("Elevator/Gains/Magic Acceleration", motionMagicParameters.mmAcceleration());
+    public static final LoggedTunableNumber mmJerk = new LoggedTunableNumber("Elevator/Gains/Magic Jerk", motionMagicParameters.mmJerk());
     public static final LoggedTunableNumber lowerLimitRotations = new LoggedTunableNumber("Elevator/LowerLimitDegrees", MIN_TRAVEL_RADIANS);
     public static final LoggedTunableNumber upperLimitRotations = new LoggedTunableNumber("Elevator/UpperLimitDegrees", MAX_TRAVEL_RADIANS);
 

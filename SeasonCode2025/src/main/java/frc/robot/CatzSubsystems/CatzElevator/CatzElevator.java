@@ -124,21 +124,21 @@ public class CatzElevator extends SubsystemBase {
 
     LoggedTunableNumber.ifChanged(
         hashCode(),
-        () -> io.setGainsSlot0(slot0_kP.get(),
-                               slot0_kI.get(),
-                               slot0_kD.get(),
-                               slot0_kS.get(),
-                               slot0_kV.get(),
-                               slot0_kA.get(),
-                               slot0_kG.get()
+        () -> io.setGainsSlot1(slot1_kP.get(),
+                               slot1_kI.get(),
+                               slot1_kD.get(),
+                               slot1_kS.get(),
+                               slot1_kV.get(),
+                               slot1_kA.get(),
+                               slot1_kG.get()
         ),
-        slot0_kP,
-        slot0_kI,
-        slot0_kD,
-        slot0_kS,
-        slot0_kV,
-        slot0_kA,
-        slot0_kG
+        slot1_kP,
+        slot1_kI,
+        slot1_kD,
+        slot1_kS,
+        slot1_kV,
+        slot1_kA,
+        slot1_kG
     );
 
     LoggedTunableNumber.ifChanged(hashCode(),

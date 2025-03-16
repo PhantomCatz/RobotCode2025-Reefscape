@@ -139,14 +139,14 @@ public class ElevatorIOReal implements ElevatorIO {
 
 
   @Override
-  public void runSetpointUp(double setpointRads) {
-    double setpointRotations = Units.radiansToRotations(setpointRads)*9;
+  public void runSetpointUp(double setpointInches) {
+    double setpointRotations = setpointInches/FINAL_RATIO;
     leaderTalon.setControl(positionControlUp.withPosition(setpointRotations));
   }
 
   @Override
-  public void runSetpointDown(double setpointRads) {
-    double setpointRotations = Units.radiansToRotations(setpointRads)*9;
+  public void runSetpointDown(double setpointInches) {
+    double setpointRotations = setpointInches/FINAL_RATIO;
     leaderTalon.setControl(positionControlDown.withPosition(setpointRotations));
   }
 
