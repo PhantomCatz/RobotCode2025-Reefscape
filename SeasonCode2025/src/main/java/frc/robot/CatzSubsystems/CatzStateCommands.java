@@ -321,7 +321,7 @@ public class CatzStateCommands {
 
             new SequentialCommandGroup(
                 elevator.Elevator_L4(),
-                Commands.waitUntil(() -> elevator.getElevatorPositionRads() > 140.0),
+                Commands.waitUntil(() -> elevator.getElevatorPositionInch() > 140.0),
                 new ParallelCommandGroup(
                     algaePivot.AlgaePivot_NetAlgae(),
                     algae.vomitAlgae()

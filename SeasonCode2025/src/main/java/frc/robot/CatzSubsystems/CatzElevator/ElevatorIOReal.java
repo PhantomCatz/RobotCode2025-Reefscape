@@ -127,8 +127,8 @@ public class ElevatorIOReal implements ElevatorIO {
                   tempCelsius)
               .isOK();
 
-      inputs.positionRads =       Units.rotationsToRadians(internalPositionRotations.getValueAsDouble()/9);
-      inputs.velocityRadsPerSec = Units.rotationsToRadians(velocityRps.getValueAsDouble()/9);
+      inputs.positionInch =       internalPositionRotations.getValueAsDouble() * FINAL_RATIO;
+      inputs.velocityInchPerSec = velocityRps.getValueAsDouble() * FINAL_RATIO;
       inputs.appliedVolts =       appliedVoltage.getValueAsDouble();
       inputs.supplyCurrentAmps =  supplyCurrent.getValueAsDouble();
       inputs.torqueCurrentAmps =  torqueCurrent.getValueAsDouble();
