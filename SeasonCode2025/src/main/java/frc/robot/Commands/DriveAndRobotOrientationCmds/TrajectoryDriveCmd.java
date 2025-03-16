@@ -54,6 +54,7 @@ public class TrajectoryDriveCmd extends Command {
   public static final double ALLOWABLE_OMEGA_ERROR = 1.0;
   private static final double TIMEOUT_SCALAR = 3.0;
   private static final double CONVERGE_DISTANCE = 0.02;
+  private static final double FACE_REEF_DIST = 1.0;
   private final double ALLOWABLE_VISION_ADJUST = 4e-3; //TODO tune
 
   // Subsystems
@@ -227,10 +228,9 @@ public class TrajectoryDriveCmd extends Command {
     );
 
     // construct chassisspeeds
-    if (autoalign) {
-      Translation2d reef = FieldConstants.Reef.center;
+    if (autoalign && translationError > FACE_REEF_DIST) {
+      Translation2d reef = AllianceFlipUtil.apply(FieldConstants.Reef.center);
       adjustedSpeeds = hocontroller.calculate(currentPose, state, Rotation2d.fromRadians(Math.atan2(reef.getY() - currentPose.getY(),reef.getX() - currentPose.getX())));
-
     }else{
       adjustedSpeeds = hocontroller.calculate(currentPose, state, goal.pose.getRotation());
     }
@@ -288,6 +288,8 @@ public class TrajectoryDriveCmd extends Command {
     if (interrupted) {
       System.out.println("OH NO I WAS INTERRUPTED HOW RUDE");
     }
+
+    m_driveTrain.setDistanceError(9999999.9);
   }
 
   @Override

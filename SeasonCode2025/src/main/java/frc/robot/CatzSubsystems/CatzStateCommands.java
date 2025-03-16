@@ -33,13 +33,13 @@ import frc.robot.Utilities.waituntil;
 public class CatzStateCommands {
 
     public static Command driveToScore(RobotContainer robotContainer, PathPlannerPath pathToReadyPose, int level){
-        final double PREDICT_DISTANCE = 0.3; //meters
+        final double PREDICT_DISTANCE = 0.5; //meters
 
         CatzDrivetrain drivetrain = robotContainer.getCatzDrivetrain();
 
         return new SequentialCommandGroup(
-            new TrajectoryDriveCmd(pathToReadyPose, drivetrain, false, robotContainer).deadlineFor(
-                new RepeatCommand(LXElevator(robotContainer, level).onlyIf(() -> drivetrain.getDistanceError() < PREDICT_DISTANCE))
+            new TrajectoryDriveCmd(pathToReadyPose, drivetrain, true, robotContainer).deadlineFor(
+                new RepeatCommand(LXElevator(robotContainer, level).alongWith(new PrintCommand("sfhoisdhfisdf")).onlyIf(() -> drivetrain.getDistanceError() < PREDICT_DISTANCE))
             ),
             LXCoral(robotContainer, level),
             stow(robotContainer)
@@ -220,7 +220,8 @@ public class CatzStateCommands {
                 Commands.waitUntil(() -> elevator.isElevatorInPos()).withTimeout(2.0),
                 outtake.outtakeL4(),
                 new WaitCommand(0.1),
-                elevator.Elevator_L4_Adj()
+                elevator.Elevator_L4_Adj(),
+                Commands.waitUntil(() -> elevator.isElevatorInPos()).withTimeout(2.0)
             ).withTimeout(3.0)
         )
          .unless(()-> Robot.isSimulation()).alongWith(Commands.print("L4 Scoring State"));
@@ -228,14 +229,13 @@ public class CatzStateCommands {
 
     public static Command LXCoral(RobotContainer robotContainer, int level){
         TeleopPosSelector selector = robotContainer.getSelector();
-        System.out.println("selctrrr: " + selector);
 
         switch(level){
             case 1:
                 return L1Coral(robotContainer).andThen(new InstantCommand(()-> {selector.hasCoralSIM = false;}));
 
             case 2:
-                return L2Coral(robotContainer).andThen(new PrintCommand("l2 coralala")).andThen(new InstantCommand(()-> {selector.hasCoralSIM = false;}));
+                return L2Coral(robotContainer).andThen(new InstantCommand(()-> {selector.hasCoralSIM = false;}));
 
             case 3:
                 return L3Coral(robotContainer).andThen(new InstantCommand(()-> {selector.hasCoralSIM = false;}));

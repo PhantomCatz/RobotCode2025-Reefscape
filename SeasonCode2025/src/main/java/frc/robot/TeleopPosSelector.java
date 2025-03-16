@@ -100,6 +100,10 @@ public class TeleopPosSelector { //TODO split up the file. it's too big and does
 
     SmartDashboard.putBoolean("Left Coral Station", leftCoralStation);
     SmartDashboard.putBoolean("Right Coral Station", rightCoralStation);
+
+    for (int i = 0; i < NUM_QUEUE_DISPLAY; i++) {
+      SmartDashboard.putString(QUEUE + i, "");
+    }
   }
 
   public void toggleLeftStation() {
@@ -187,11 +191,6 @@ public class TeleopPosSelector { //TODO split up the file. it's too big and does
       SmartDashboard.putBoolean(REEFSIDE + side + " R",
           side == currentlySelected.getFirst() && currentlySelected.getSecond().equals(LeftRight.RIGHT));
     }
-
-
-    // for (int i = 0; i < NUM_QUEUE_DISPLAY; i++) {
-    //   SmartDashboard.putString(QUEUE + i, "");
-    // } im pretty sure this thing isnt needed. uncomment if i messed up tho
 
     //Update the queue display
     int i = 0;
@@ -444,11 +443,10 @@ public class TeleopPosSelector { //TODO split up the file. it's too big and does
       }
     } else {
       if (outtake.isDesiredCoralState(true)) {
-        if (queuedPaths.isEmpty())
-          return new InstantCommand();
-        return getReefScoreCommand(pair).andThen(new InstantCommand(() -> pathQueuePopFront()));
-      } else {
         return getCoralStationCommand();
+      } else {
+          if (queuedPaths.isEmpty()) {return new InstantCommand();}
+        return getReefScoreCommand(pair).andThen(new InstantCommand(() -> pathQueuePopFront()));
       }
     }
   }

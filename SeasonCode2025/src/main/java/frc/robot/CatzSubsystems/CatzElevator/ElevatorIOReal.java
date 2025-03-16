@@ -35,8 +35,8 @@ public class ElevatorIOReal implements ElevatorIO {
 
   // Motor configuration
   private final TalonFXConfiguration config = new TalonFXConfiguration();
-  private final MotionMagicVoltage positionControl = new MotionMagicVoltage(0.0).withUpdateFreqHz(0.0);
-
+  private final MotionMagicVoltage positionControlUp = new MotionMagicVoltage(0.0).withUpdateFreqHz(0.0);
+  private final MotionMagicVoltage positionControlDown = new MotionMagicVoltage(0.0).withUpdateFreqHz(0.0);
   // Status Signals
   private final StatusSignal<Angle> internalPositionRotations;
   private final StatusSignal<AngularVelocity> velocityRps;
@@ -71,12 +71,24 @@ public class ElevatorIOReal implements ElevatorIO {
         tempCelsius.get(1));
 
     // PID configs
-    config.Slot0.kS = gains.kS();
-    config.Slot0.kV = gains.kV();
-    config.Slot0.kA = gains.kA();
-    config.Slot0.kP = gains.kP();
-    config.Slot0.kI = gains.kI();
-    config.Slot0.kD = gains.kD();
+    config.Slot0.kS = slot0_gains.kS();
+    config.Slot0.kV = slot0_gains.kV();
+    config.Slot0.kA = slot0_gains.kA();
+    config.Slot0.kP = slot0_gains.kP();
+    config.Slot0.kI = slot0_gains.kI();
+    config.Slot0.kD = slot0_gains.kD();
+    config.Slot0.kG = slot0_gains.kG();
+    config.Slot0.GravityType = GravityTypeValue.Elevator_Static;
+
+    config.Slot1.kS = slot1_gains.kS();
+    config.Slot1.kV = slot1_gains.kV();
+    config.Slot1.kA = slot1_gains.kA();
+    config.Slot1.kP = slot1_gains.kP();
+    config.Slot1.kI = slot1_gains.kI();
+    config.Slot1.kD = slot1_gains.kD();
+    config.Slot1.kG = slot1_gains.kG();
+    config.Slot1.GravityType = GravityTypeValue.Elevator_Static;
+
 
     // Supply Current Limits
     config.TorqueCurrent.PeakForwardTorqueCurrent =  80.0;
@@ -101,7 +113,13 @@ public class ElevatorIOReal implements ElevatorIO {
 
     // Setting follower
     followerTalon.setControl(new Follower(leaderTalon.getDeviceID(), true));
-    positionControl.EnableFOC = true;
+
+    // Setting follower
+    positionControlUp.EnableFOC = true;
+    positionControlUp.Slot = 0;
+
+    positionControlDown.EnableFOC = true;
+    positionControlDown.Slot = 1;
   }
 
     public void updateInputs(ElevatorIOInputs inputs) {
@@ -143,12 +161,18 @@ public class ElevatorIOReal implements ElevatorIO {
     }
 
 
-  @Override
-  public void runSetpoint(double setpointRads, double feedforward) {
-    double setpointRotations = Units.radiansToRotations(setpointRads);
-    leaderTalon.setControl(positionControl.withPosition(setpointRotations)
-                                          .withFeedForward(feedforward));
-  }
+    @Override
+    public void runSetpointUp(double setpointRads) {
+      double setpointRotations = Units.radiansToRotations(setpointRads);
+      leaderTalon.setControl(positionControlUp.withPosition(setpointRotations));
+    }
+
+    @Override
+    public void runSetpointDown(double setpointRads) {
+      double setpointRotations = Units.radiansToRotations(setpointRads);
+      leaderTalon.setControl(positionControlDown.withPosition(setpointRotations));
+    }
+
 
   @Override
   public void stop() {
@@ -161,10 +185,26 @@ public class ElevatorIOReal implements ElevatorIO {
   }
 
   @Override
-  public void setPID(double kP, double kI, double kD) {
+  public void setGainsSlot0(double kP, double kI, double kD, double kS, double kV, double kA, double kG) {
     config.Slot0.kP = kP;
     config.Slot0.kI = kI;
     config.Slot0.kD = kD;
+    config.Slot0.kS = kS;
+    config.Slot0.kV = kV;
+    config.Slot0.kA = kA;
+    config.Slot0.kG = kG;
+    leaderTalon.getConfigurator().apply(config);
+  }
+
+  @Override
+  public void setGainsSlot1(double kP, double kI, double kD, double kS, double kV, double kA, double kG) {
+    config.Slot1.kP = kP;
+    config.Slot1.kI = kI;
+    config.Slot1.kD = kD;
+    config.Slot1.kS = kS;
+    config.Slot1.kV = kV;
+    config.Slot1.kA = kA;
+    config.Slot1.kG = kG;
     leaderTalon.getConfigurator().apply(config);
   }
 

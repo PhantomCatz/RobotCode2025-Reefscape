@@ -43,7 +43,7 @@ import org.littletonrobotics.junction.Logger;
 // Drive train subsystem for swerve drive implementation
 public class CatzDrivetrain extends SubsystemBase {
   @Getter @Setter
-  private double distanceError = 0.0; //meters
+  private double distanceError = 999999.9; //meters
 
   // Gyro input/output interface
   private final GyroIO gyroIO;
@@ -146,6 +146,8 @@ public class CatzDrivetrain extends SubsystemBase {
     for (CatzSwerveModule module : m_swerveModules) {
       module.periodic();
     }
+
+    Logger.recordOutput("Drive/DistanceError", distanceError);
 
     pose = pose.interpolate(tracker.getEstimatedPose(), 0.05);
     Logger.recordOutput("CatzRobotTracker/interlated pose", pose);
