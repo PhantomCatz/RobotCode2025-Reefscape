@@ -159,6 +159,9 @@ public class RobotContainer {
     xboxDrv.leftBumper().onTrue(new InstantCommand(() -> selector.runLeftRight(LeftRight.LEFT)));
     xboxDrv.rightBumper().onTrue(new InstantCommand(() -> selector.runLeftRight(LeftRight.RIGHT)));
 
+    xboxDrv.leftBumper().onFalse(new InstantCommand(() -> selector.cancelCurrentDrivetrainCommand().schedule()));
+    xboxDrv.rightBumper().onFalse(new InstantCommand(() -> selector.cancelCurrentDrivetrainCommand().schedule()));
+
     // Climb
     xboxDrv.back().and(xboxDrv.b()).onTrue(CatzStateCommands.climb(this)); // Setup Climb
     xboxDrv.back().and(xboxDrv.x()).onTrue(climb.Climb_Retract());

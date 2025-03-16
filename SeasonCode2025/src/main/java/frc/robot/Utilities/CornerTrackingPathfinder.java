@@ -158,7 +158,9 @@ public class CornerTrackingPathfinder{
     //   System.out.println("why path smol?");
     //   return null;
     // }
-
+    if(reverseNetPath.isEmpty()){
+      return null;
+    }
     List<Waypoint> waypoints = createWaypoints(
       reverseNetPath,
     start, gridPosToTranslation2d(reverseNetPath.get(0)), walls);
@@ -327,20 +329,23 @@ public class CornerTrackingPathfinder{
       GridPosition currentCorner = currentPathfindingPos.corner;
       double currentCornerDistance = currentPathfindingPos.cornerDistancesTraveled;
 
-      guessGoal = translation2dToGridPos(FieldConstants.Net.getGuessClosestNetPose(gridPosToTranslation2d(currentPos).getY()));
       if(currentPos.compareTo(guessGoal) == 0){
         break;
       }
-      Translation2d m = new Translation2d(currentCorner.y - guessGoal.y, currentCorner.x - guessGoal.x);
 
-      if(!hasObstacleOnLine(currentCorner, m, walls)){
-        lastCorner.put(guessGoal, currentCorner);
-        break;
-      }
 
       //if a corner is found, draw an imaginary line from the previous corner to this corner
       //now all cells propagating from this corner identifies as this corner (if that makes sense)
       if(corners.keySet().contains(currentPos)){
+        guessGoal = translation2dToGridPos(FieldConstants.Net.getGuessClosestNetPose(gridPosToTranslation2d(currentPos).getY()));
+
+        Translation2d m = new Translation2d(currentCorner.y - guessGoal.y, currentCorner.x - guessGoal.x);
+
+        if(!hasObstacleOnLine(currentCorner, m, walls)){
+          lastCorner.put(guessGoal, currentCorner);
+          break;
+        }
+
         Translation2d slope = new Translation2d(currentPos.y - currentCorner.y, currentPos.x - currentCorner.x);
         int diagonalIndex = corners.get(currentPos);
 

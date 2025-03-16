@@ -71,6 +71,9 @@ public class TeleopPosSelector { //TODO split up the file. it's too big and does
 
   public boolean hasCoralSIM = true;
 
+  private boolean isNetAiming = false;
+  private boolean isNBALeftRight = false;
+
   public TeleopPosSelector(CommandXboxController aux, RobotContainer container) {
     this.xboxAux = aux;
     this.m_container = container;
@@ -322,6 +325,9 @@ public class TeleopPosSelector { //TODO split up the file. it's too big and does
   }
   public PathPlannerPath getClosestNetPath(){
     PathPlannerPath path = pathfinder.getPathToNet(CatzRobotTracker.getInstance().getEstimatedPose().getTranslation(), new GoalEndState(0.0, AllianceFlipUtil.apply(Rotation2d.kZero)));
+    if(path == null){
+      return null;
+    }
 
     if (AllianceFlipUtil.shouldFlipToRed()) {
       path = path.flipPath();
@@ -332,8 +338,14 @@ public class TeleopPosSelector { //TODO split up the file. it's too big and does
 
   public Command runToNetCommand(){
     return new InstantCommand(() -> {
+      isNetAiming = true;
       currentDrivetrainCommand.cancel();
-      currentDrivetrainCommand = new TrajectoryDriveCmd(getClosestNetPath(), drivetrain, false, m_container);
+      PathPlannerPath path = getClosestNetPath();
+      if(path != null){
+        currentDrivetrainCommand = new TrajectoryDriveCmd(path, drivetrain, false, m_container);
+      }else{
+      currentDrivetrainCommand = new InstantCommand();
+      }
       currentDrivetrainCommand.schedule();
     });
   }
@@ -380,7 +392,15 @@ public class TeleopPosSelector { //TODO split up the file. it's too big and does
     }
   }
 
-  public void runLeftRight(LeftRight leftRight) {
+  public void runLeftRight(LeftRight leftRight){
+    if(isNetAiming) {
+      runLeftRightNet(leftRight);
+    }else{
+      runLeftRightNBA(leftRight);
+    }
+  }
+
+  private void runLeftRightNBA(LeftRight leftRight) {
     if (currentPathfindingPair == null)
       return; // means it is in AQUA
 
@@ -398,10 +418,28 @@ public class TeleopPosSelector { //TODO split up the file. it's too big and does
         || direction.getNorm() <= 1e-3) {
       return;
     }
+    isNBALeftRight = true;
 
     PathPlannerPath path = getStraightLinePath(currentPose, goal, DriveConstants.LEFT_RIGHT_CONSTRAINTS);
 
-    currentDrivetrainCommand = new TrajectoryDriveCmd(path, drivetrain, true, m_container);
+    currentDrivetrainCommand = new TrajectoryDriveCmd(path, drivetrain, true, m_container).andThen(new InstantCommand(() -> isNBALeftRight = false));
+    currentDrivetrainCommand.schedule();
+  }
+
+  private void runLeftRightNet(LeftRight leftRight){
+    currentDrivetrainCommand.cancel();
+
+    Pose2d currentPose = tracker.getEstimatedPose();
+    Pose2d goal;
+
+    if(leftRight == LeftRight.LEFT){
+      goal = new Pose2d(FieldConstants.Net.getX(), FieldConstants.Net.getYLeft(), AllianceFlipUtil.apply(Rotation2d.kZero));
+    }else{
+      goal = new Pose2d(FieldConstants.Net.getX(), FieldConstants.Net.getYRight(), AllianceFlipUtil.apply(Rotation2d.kZero));
+    }
+
+    PathPlannerPath path = getStraightLinePath(currentPose, goal, DriveConstants.LEFT_RIGHT_NET_CONSTRAINTS);
+    currentDrivetrainCommand = new TrajectoryDriveCmd(path, drivetrain, false, m_container);
     currentDrivetrainCommand.schedule();
   }
 
@@ -472,6 +510,7 @@ public class TeleopPosSelector { //TODO split up the file. it's too big and does
   public Command runToNearestBranch() {
 
     return new InstantCommand(() -> {
+      isNetAiming = false;
       currentPathfindingPair = getClosestReefPos().getFirst();
       currentDrivetrainCommand.cancel();
       try{
@@ -498,6 +537,7 @@ public class TeleopPosSelector { //TODO split up the file. it's too big and does
 
   public Command getReefScoreCommand(Pair<Pair<Integer, LeftRight>, Integer> pair) {
     currentPathfindingPair = null;
+    isNetAiming = false;
 
     return CatzStateCommands.driveToScore(
       m_container,
@@ -508,6 +548,10 @@ public class TeleopPosSelector { //TODO split up the file. it's too big and does
 
   public Command cancelCurrentDrivetrainCommand() {
     return new InstantCommand(() -> {
+      System.out.println("cancelling!");
+      if(isNBALeftRight) return;
+
+
       currentDrivetrainCommand.cancel();
     });
   }
