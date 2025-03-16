@@ -445,7 +445,8 @@ public class TeleopPosSelector { //TODO split up the file. it's too big and does
       if (outtake.isDesiredCoralState(true)) {
         return getCoralStationCommand();
       } else {
-          if (queuedPaths.isEmpty()) {return new InstantCommand();}
+        System.out.println("i have coral/?");
+          if (queuedPaths.isEmpty()) {System.out.println("no ");return new InstantCommand();}
         return getReefScoreCommand(pair).andThen(new InstantCommand(() -> pathQueuePopFront()));
       }
     }
