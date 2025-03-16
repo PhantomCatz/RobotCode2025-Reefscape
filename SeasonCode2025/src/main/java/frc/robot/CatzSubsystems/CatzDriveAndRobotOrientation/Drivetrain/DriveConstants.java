@@ -27,7 +27,7 @@ public class DriveConstants {
   // ---------------------------------------------------------------------------------------------------------------
   // Disabled flag for testing
   // ---------------------------------------------------------------------------------------------------------------
-  public static final boolean IS_DRIVE_DISABLED = true; //bruh
+  public static final boolean IS_DRIVE_DISABLED = false; //bruh
 
   // ---------------------------------------------------------------------------------------------------------------
   // Module organizations
@@ -138,10 +138,10 @@ public class DriveConstants {
         break;
 
         case SN1:
-            MODULE_CONFIGS[INDEX_FR] = new ModuleIDs(1, 2, 11, 0.885986, false);
-            MODULE_CONFIGS[INDEX_BR] = new ModuleIDs(3, 4, 12, 0.3620605, false);
-            MODULE_CONFIGS[INDEX_BL] = new ModuleIDs(5, 6, 13, 0.13012695, false);
-            MODULE_CONFIGS[INDEX_FL] = new ModuleIDs(7, 8, 14, 0.22900, false);
+            MODULE_CONFIGS[INDEX_FR] = new ModuleIDs(1, 2, 11, 0.885986+0.5, false);
+            MODULE_CONFIGS[INDEX_BR] = new ModuleIDs(3, 4, 12, 0.3620605+0.5, false);
+            MODULE_CONFIGS[INDEX_BL] = new ModuleIDs(5, 6, 13, 0.13012695+0.5, false);
+            MODULE_CONFIGS[INDEX_FL] = new ModuleIDs(7, 8, 14, 0.22900+0.5, false);
         break;
 
         case SN_TEST:

@@ -78,7 +78,6 @@ public class RobotContainer {
   private final Trigger isElevatorFullManual = overrideHID.auxSwitch(0);
   private final Trigger isAlgaeEffectorFullManual = overrideHID.auxSwitch(0);
   private final Trigger isRampPivotFullManual = overrideHID.auxSwitch(0);
-
   private final Trigger isClimbFullManual = overrideHID.driverSwitch(1);
 
   private CommandXboxController xboxTest = new CommandXboxController(3);

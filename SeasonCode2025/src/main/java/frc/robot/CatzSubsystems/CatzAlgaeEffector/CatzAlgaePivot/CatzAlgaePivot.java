@@ -98,7 +98,7 @@ public class CatzAlgaePivot extends SubsystemBase {
       } else {
         if(manualOverride.getAsBoolean()) {
           io.setPercentOutput(manualPow);
-        }else if(targetPosition != null) {
+        } else if(targetPosition != null) {
           io.runSetpoint(targetPosition.getTargetMotionPosition(), 0.0);
         } else {
 
