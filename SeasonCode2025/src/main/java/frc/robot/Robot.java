@@ -247,7 +247,6 @@ public class Robot extends LoggedRobot {
               "*** Auto cancelled in %.2f secs ***%n", Timer.getFPGATimestamp() - autoStart);
         }
         autoMessagePrinted = true;
-        CatzLED.getInstance().setControllerState(ControllerLEDState.autoFinished);
         CatzLED.getInstance().autoFinishedTime = Timer.getFPGATimestamp();
       }
     }
