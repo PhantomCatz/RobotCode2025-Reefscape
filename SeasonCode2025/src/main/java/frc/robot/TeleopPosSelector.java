@@ -63,7 +63,7 @@ public class TeleopPosSelector { //TODO split up the file. it's too big and does
   private Deque<Pair<Pair<Integer, LeftRight>, Integer>> queuedPaths = new LinkedList<>();
   private HashMap<String, String> poseToLetter = new HashMap<>();
 
-  private final boolean manualOverrideUseFakeCoral = true; //if the real robot doesn't have mechanisms to hold real coral, simulate one
+  private final boolean manualOverrideUseFakeCoral = false; //if the real robot doesn't have mechanisms to hold real coral, simulate one
   public final boolean useFakeCoral = manualOverrideUseFakeCoral || Robot.isSimulation();
 
   private boolean leftCoralStation = true;
@@ -103,10 +103,6 @@ public class TeleopPosSelector { //TODO split up the file. it's too big and does
 
     SmartDashboard.putBoolean("Left Coral Station", leftCoralStation);
     SmartDashboard.putBoolean("Right Coral Station", rightCoralStation);
-
-    for (int i = 0; i < NUM_QUEUE_DISPLAY; i++) {
-      SmartDashboard.putString(QUEUE + i, "");
-    }
   }
 
   public void toggleLeftStation() {
@@ -193,6 +189,11 @@ public class TeleopPosSelector { //TODO split up the file. it's too big and does
           side == currentlySelected.getFirst() && currentlySelected.getSecond().equals(LeftRight.LEFT));
       SmartDashboard.putBoolean(REEFSIDE + side + " R",
           side == currentlySelected.getFirst() && currentlySelected.getSecond().equals(LeftRight.RIGHT));
+    }
+
+    //clear the display queue in case a queue was deleted
+    for (int i = 0; i < NUM_QUEUE_DISPLAY; i++) {
+      SmartDashboard.putString(QUEUE + i, "");
     }
 
     //Update the queue display
