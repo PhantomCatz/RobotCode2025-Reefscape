@@ -342,7 +342,7 @@ public class TeleopPosSelector { //TODO split up the file. it's too big and does
       currentDrivetrainCommand.cancel();
       PathPlannerPath path = getClosestNetPath();
       if(path != null){
-        currentDrivetrainCommand = new TrajectoryDriveCmd(path, drivetrain, false, m_container);
+        currentDrivetrainCommand = new TrajectoryDriveCmd(path, drivetrain, true, m_container);
       }else{
       currentDrivetrainCommand = new InstantCommand();
       }
