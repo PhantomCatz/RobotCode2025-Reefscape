@@ -63,7 +63,7 @@ public class TeleopPosSelector { //TODO split up the file. it's too big and does
   private Deque<Pair<Pair<Integer, LeftRight>, Integer>> queuedPaths = new LinkedList<>();
   private HashMap<String, String> poseToLetter = new HashMap<>();
 
-  private final boolean manualOverrideUseFakeCoral = false; //if the real robot doesn't have mechanisms to hold real coral, simulate one
+  private final boolean manualOverrideUseFakeCoral = true; //if the real robot doesn't have mechanisms to hold real coral, simulate one
   public final boolean useFakeCoral = manualOverrideUseFakeCoral || Robot.isSimulation();
 
   private boolean leftCoralStation = true;
@@ -423,7 +423,13 @@ public class TeleopPosSelector { //TODO split up the file. it's too big and does
     PathPlannerPath path = getStraightLinePath(currentPose, goal, DriveConstants.LEFT_RIGHT_CONSTRAINTS);
 
     currentDrivetrainCommand = new TrajectoryDriveCmd(path, drivetrain, true, m_container).andThen(new InstantCommand(() -> isNBALeftRight = false));
-    currentDrivetrainCommand.schedule();
+
+    try{
+      currentDrivetrainCommand.schedule();
+    }catch(Error e){
+      e.printStackTrace();
+      //i dunno man spamming nba causes so much problems
+    }
   }
 
   private void runLeftRightNet(LeftRight leftRight){

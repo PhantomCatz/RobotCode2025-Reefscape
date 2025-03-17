@@ -54,7 +54,7 @@ public class TrajectoryDriveCmd extends Command {
   public static final double ALLOWABLE_OMEGA_ERROR = 1.0;
   private static final double TIMEOUT_SCALAR = 3.0;
   private static final double CONVERGE_DISTANCE = 0.02;
-  private static final double FACE_REEF_DIST = 1.0;
+  private static final double FACE_REEF_DIST = 2.0;
   private final double ALLOWABLE_VISION_ADJUST = 4e-3; //TODO tune
 
   // Subsystems
@@ -146,24 +146,28 @@ public class TrajectoryDriveCmd extends Command {
       // Collect current drive state
       ChassisSpeeds currentSpeeds = DriveConstants.SWERVE_KINEMATICS.toChassisSpeeds(tracker.getCurrentModuleStates());
 
-      // Construct trajectory
-      if(autoalign){
+      try{
+        // Construct trajectory
         this.trajectory = new PathPlannerTrajectory(
           usePath,
           currentSpeeds, //TODO make it not zero if its a thing thingy y esdpoifi
           tracker.getEstimatedPose().getRotation(),
           DriveConstants.TRAJ_ROBOT_CONFIG
         );
-      }else{
+      }catch (Error e){
+        e.printStackTrace();
+        //for some reason if you spam NBA current rotation gets bugged.
         this.trajectory = new PathPlannerTrajectory(
           usePath,
-
           currentSpeeds, //TODO make it not zero if its a thing thingy y esdpoifi
-          tracker.getEstimatedPose().getRotation(),
+          new Rotation2d(),
           DriveConstants.TRAJ_ROBOT_CONFIG
         );
       }
-
+      if(trajectory == null) {
+        isBugged = true;
+        return;
+      }
 
       hocontroller = DriveConstants.getNewHolController();
       pathTimeOut = trajectory.getTotalTimeSeconds() * TIMEOUT_SCALAR;
@@ -186,7 +190,7 @@ public class TrajectoryDriveCmd extends Command {
       e.printStackTrace();
     }
 
-    System.out.println("timeoutt::" + trajectory.getTotalTimeSeconds());
+    // System.out.println("timeoutt::" + trajectory.getTotalTimeSeconds());
     //
   } // end of initialize()
 
