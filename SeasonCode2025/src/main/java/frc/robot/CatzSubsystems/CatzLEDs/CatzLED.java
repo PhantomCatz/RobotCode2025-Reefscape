@@ -15,7 +15,6 @@ import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.Notifier;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.util.Color;
-import frc.robot.CatzConstants;
 import frc.robot.CatzSubsystems.CatzSuperstructure;
 import frc.robot.CatzSubsystems.CatzSuperstructure.CoralState;
 import frc.robot.CatzSubsystems.CatzSuperstructure.Gamepiece;
@@ -42,7 +41,7 @@ public class CatzLED extends VirtualSubsystem {
   // Robot state LED tracking
   // ----------------------------------------------------------------------------------------------
   @Getter @Setter @AutoLogOutput (key = "CatzLED/ElevatorLEDState")
-  public ControllerLEDState ControllerState = ControllerLEDState.nuhthing;
+  public ControllerLEDState controllerState = ControllerLEDState.nuhthing;
 
   @Getter @Setter @AutoLogOutput (key = "CatzLED/QueueState")
   public QueueLEDState queueLEDState = QueueLEDState.EMPTY;
@@ -207,7 +206,6 @@ public class CatzLED extends VirtualSubsystem {
     // Stop loading notifier if running
     loadingNotifier.stop();
 
-    breath(Color.kPurple, Color.kAqua, System.currentTimeMillis()/10000.0);
 
     // -----------------------------------------------------------------------------------------------
     // Set Elevator LED state
@@ -220,10 +218,11 @@ public class CatzLED extends VirtualSubsystem {
         // Auto fade
         bubble((int) ((((Timer.getFPGATimestamp() - lastEnabledTime) % bubbleTime)) / bubbleTime * LED_Sidebar_End_RT), Color.kAqua);
       } else {
+        breath(Color.kPurple, Color.kAqua, System.currentTimeMillis()/10000.0);
         bubble((int) ((((Timer.getFPGATimestamp() - lastEnabledTime) % bubbleTime)) / bubbleTime * LED_Sidebar_End_RT), allianceColor);
         // APRILTAG CHECK
-        if(ControllerState == ControllerLEDState.ledChecked) {
-          bubble((int) ((((Timer.getFPGATimestamp() - lastEnabledTime) % bubbleTime)) / bubbleTime * LED_Sidebar_End_RT), Color.kGreen);
+        if(controllerState == ControllerLEDState.ledChecked) {
+          bigBubble((int) ((Timer.getFPGATimestamp() / bubbleTime) * LED_Sidebar_End_RT), 4, 10, Color.kGreen);
         }
       }
       // MODE AUTON
@@ -231,7 +230,7 @@ public class CatzLED extends VirtualSubsystem {
       wave(Color.kAqua, Color.kDarkBlue, waveFastCycleLength, waveFastDuration);
       // MODE ENABLED
     } else {
-      switch(ControllerState) {
+      switch(controllerState) {
         case REMOVE_ALGAE:
           breath(Color.kAqua, Color.kRed, 0.3);
         break;
@@ -361,7 +360,7 @@ public class CatzLED extends VirtualSubsystem {
   private void bigBubble(int colored, int bubbleLength, int bubbleInterval, Color color) {
     // System.out.println("big bubble" + colored);
     for (int i=0; i<LED_Crossbar_Start; i++) {
-      if (i <= colored && ((i-colored % bubbleInterval)+bubbleInterval)%bubbleInterval < bubbleLength) {
+      if (i <= colored && ((i - colored % bubbleInterval) + bubbleInterval) % bubbleInterval < bubbleLength) {
         buffer.setLED(i, color);
         buffer.setLED(46-i, color);
       }
