@@ -18,14 +18,14 @@ public interface ElevatorIO {
     public boolean isFollowerMotorConnected = false;
     public boolean isBotLimitSwitched = false;
 
-    public double positionInch = 0.0;
+    public double positionRads = 0.0;
     public double absoluteEncoderPositionRads = 0.0;
     public double relativeEncoderPositionRads = 0.0;
-    public double velocityInchPerSec = 0.0;
-    public double appliedVolts = 0.0;
-    public double supplyCurrentAmps = 0.0;
-    public double torqueCurrentAmps = 0.0;
-    public double tempCelcius = 0.0;
+    public double velocityRadsPerSec = 0.0;
+    public double[] appliedVolts = new double[] {};
+    public double[] supplyCurrentAmps = new double[] {};
+    public double[] torqueCurrentAmps = new double[] {};
+    public double[] tempCelcius = new double[] {};
 
   }
 
@@ -49,7 +49,7 @@ public interface ElevatorIO {
 
   public default void runSetpointDown(double setpointRotations) {}
 
-  public default void resetPosition(double pos) {}
+  public default void setPosition(double pos) {}
 
   public default void setBrakeMode(boolean enabled) {}
 

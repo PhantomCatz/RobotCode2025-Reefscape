@@ -50,7 +50,7 @@ public class TrajectoryDriveCmd extends Command {
   public static final double ALLOWABLE_POSE_ERROR = 0.05;
   public static final double ALLOWABLE_AUTOAIM_ERROR = 0.02;
   public static final double ALLOWABLE_ROTATION_ERROR = 1.0;
-  public static final double ALLOWABLE_VEL_ERROR = 0.05;
+  public static final double ALLOWABLE_VEL_ERROR = 0.12;
   public static final double ALLOWABLE_OMEGA_ERROR = 1.0;
   private static final double TIMEOUT_SCALAR = 3.0;
   private static final double CONVERGE_DISTANCE = 0.02;
@@ -231,6 +231,8 @@ public class TrajectoryDriveCmd extends Command {
         0.0
     );
 
+    System.out.println("speed:"+state.velocityMetersPerSecond);
+
     // construct chassisspeeds
     if (autoalign && translationError > FACE_REEF_DIST) {
       Translation2d reef = AllianceFlipUtil.apply(FieldConstants.Reef.center);
@@ -310,6 +312,7 @@ public class TrajectoryDriveCmd extends Command {
 
     if (container.getCatzVision().isSeeingApriltag() && autoalign && tracker.getVisionPoseShift().getNorm() > ALLOWABLE_VISION_ADJUST) {
       // If trailing pose is within margin
+      // System.out.println("not visioning");
       return false;
     }
     // Finish command if the total time the path takes is over

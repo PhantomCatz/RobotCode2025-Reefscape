@@ -156,7 +156,7 @@ public class CatzSuperstructure extends VirtualSubsystem {
                         case 4:
                             currentRobotState = RobotState.NET_ALGAE;
                             System.out.println("Net Algae");
-                            robotActionCommand = CatzStateCommands.netAlgae(container);
+                            // robotActionCommand = CatzStateCommands.netAlgae(container);
                             break;
                         default:
                             robotActionCommand = Commands.none();

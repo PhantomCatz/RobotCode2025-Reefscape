@@ -24,6 +24,8 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.PrintCommand;
+import edu.wpi.first.wpilibj2.command.RepeatCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.FieldConstants.Reef;
 import frc.robot.Utilities.AllianceFlipUtil;
@@ -79,6 +81,8 @@ public class TeleopPosSelector { //TODO split up the file. it's too big and does
     this.m_container = container;
     this.outtake = container.getCatzOuttake();
     this.currentDrivetrainCommand.addRequirements(container.getCatzDrivetrain());
+    this.currentDrivetrainCommand.addRequirements(container.getCatzElevator());
+    this.currentDrivetrainCommand.addRequirements(container.getCatzOuttake());
     //this.currentAutoplayCommand.addRequirements(container.getCatzDrivetrain());
 
     superstructure = m_container.getSuperstructure();
@@ -521,7 +525,8 @@ public class TeleopPosSelector { //TODO split up the file. it's too big and does
       currentPathfindingPair = getClosestReefPos().getFirst();
       currentDrivetrainCommand.cancel();
       try{
-        currentDrivetrainCommand = new TrajectoryDriveCmd(getPathfindingPath(calculateReefPose(getClosestReefPos().getFirst(), true)), m_container.getCatzDrivetrain(), true, m_container);
+        currentDrivetrainCommand = new TrajectoryDriveCmd(getPathfindingPath(calculateReefPose(getClosestReefPos().getFirst(), true)), m_container.getCatzDrivetrain(), true, m_container)
+                                        .deadlineFor(new RepeatCommand(new PrintCommand("sdf" + drivetrain.getDistanceError())),new RepeatCommand(CatzStateCommands.LXElevator(m_container, superstructure.getLevel()).alongWith(new PrintCommand("elevaktorktpa!"))).onlyIf(() -> drivetrain.getDistanceError() < 0.5));
         currentDrivetrainCommand.schedule();
       }catch(Exception e){
         e.printStackTrace();
