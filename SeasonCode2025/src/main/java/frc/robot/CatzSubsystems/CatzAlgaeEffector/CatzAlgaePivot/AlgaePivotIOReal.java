@@ -97,7 +97,7 @@ public class AlgaePivotIOReal implements AlgaePivotIO {
                 algaePivotTempCelsius)
             .isOK();
     inputs.positionDegrees     = (algaePivotPosition.getValueAsDouble() / ALGAE_PIVOT_GEAR_REDUCTION) * (360.0);
-    inputs.velocityRpm       = algaePivotVelocity.getValueAsDouble() * 60.0;
+    inputs.velocityRpm       = (algaePivotVelocity.getValueAsDouble() * 60.0) / ALGAE_PIVOT_GEAR_REDUCTION * 360.0;
     inputs.appliedVolts      = algaePivotAppliedVolts.getValueAsDouble();
     inputs.supplyCurrentAmps = algaePivotSupplyCurrent.getValueAsDouble();
     inputs.torqueCurrentAmps = algaePivotTorqueCurrent.getValueAsDouble();
@@ -109,19 +109,22 @@ public class AlgaePivotIOReal implements AlgaePivotIO {
     algaePivotMotor.setPosition((pos / 360) * ALGAE_PIVOT_GEAR_REDUCTION);
   }
 
-    @Override
-    public void runSetpoint(double targetDegrees, double feedforward) {
-      double setpointRotations = ((targetDegrees / 360) * ALGAE_PIVOT_GEAR_REDUCTION);
-      algaePivotMotor.setControl(positionControl.withPosition(setpointRotations)
-                                                .withFeedForward(feedforward));
-      // System.out.println(setpointRotations);
-    }
+  @Override
+  public void runSetpoint(double targetDegrees, double feedforward) {
+    double setpointRotations = ((targetDegrees / 360) * ALGAE_PIVOT_GEAR_REDUCTION);
+    algaePivotMotor.setControl(positionControl.withPosition(setpointRotations)
+                                              .withFeedForward(feedforward));
+    // System.out.println(setpointRotations);
+  }
 
   @Override
   public void setGainsSlot0(double kP, double kI, double kD, double kS, double kV, double kA) {
     config.Slot0.kP = kP;
     config.Slot0.kI = kI;
     config.Slot0.kD = kD;
+    config.Slot0.kS = kS;
+    config.Slot0.kV = kV;
+    config.Slot0.kA = kA;
     System.out.println("kP: " + kP + " kI: " + kI + " kD: " + kD);
     algaePivotMotor.getConfigurator().apply(config);
   }
