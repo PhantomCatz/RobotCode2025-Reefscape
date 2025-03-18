@@ -28,15 +28,6 @@ public class CatzElevator extends SubsystemBase {
   private final ElevatorIO io;
   private final ElevatorIOInputsAutoLogged inputs = new ElevatorIOInputsAutoLogged();
 
-  static LoggedTunableNumber tunableNumber = new LoggedTunableNumber("Elevator/MotorPower", 0.1);
-  static LoggedTunableNumber kP = new LoggedTunableNumber("Elevator/kP", 0.17);
-  static LoggedTunableNumber kI = new LoggedTunableNumber("Elevator/kI", 0.0);
-  static LoggedTunableNumber kD = new LoggedTunableNumber("Elevator/kD", 0.0006);
-
-  static LoggedTunableNumber kS = new LoggedTunableNumber("Elevator/kS", 0);
-  static LoggedTunableNumber kV = new LoggedTunableNumber("Elevator/kV", 0);
-  static LoggedTunableNumber kA = new LoggedTunableNumber("Elevator/kA", 0);
-
   private double elevatorSpeed = 0.0;
   private double elevatorFeedForward = 0.0;
   private int settlingCounter = 0;

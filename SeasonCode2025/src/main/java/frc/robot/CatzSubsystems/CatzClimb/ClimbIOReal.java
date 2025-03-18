@@ -26,9 +26,7 @@ import edu.wpi.first.units.measure.Voltage;
 
 /** Add your docs here. */
 public class ClimbIOReal implements ClimbIO {
-
   TalonFX climbMotor = new TalonFX(CLIMB_MOTOR_ID);
-
 
   private final PositionTorqueCurrentFOC positionControl = new PositionTorqueCurrentFOC(0).withUpdateFreqHz(0.0);
   private final VoltageOut voltageControl = new VoltageOut(0).withUpdateFreqHz(0.0);

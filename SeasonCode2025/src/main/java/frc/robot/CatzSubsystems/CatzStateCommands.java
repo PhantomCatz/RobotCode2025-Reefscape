@@ -321,7 +321,7 @@ public class CatzStateCommands {
 
             new SequentialCommandGroup(
                 elevator.Elevator_L4(),
-                Commands.waitUntil(() -> elevator.getElevatorPositionInch() > 140.0),
+                Commands.waitUntil(() -> elevator.getElevatorPositionInch() > 60.0),
                 new ParallelCommandGroup(
                     algaePivot.AlgaePivot_NetAlgae(),
                     algae.vomitAlgae()
@@ -344,8 +344,8 @@ public class CatzStateCommands {
             rampPivot.Ramp_Intake_Pos(),
 
             new SequentialCommandGroup(
-                elevator.Elevator_BOT_BOT(), //TODO real height
                 algaePivot.AlgaePivot_BotBot(),
+                elevator.Elevator_BOT_BOT(), //TODO real height
                 algae.eatAlgae()
             )
         ).unless(()-> Robot.isSimulation()).alongWith(Commands.print("Bot Algae"));
@@ -365,8 +365,8 @@ public class CatzStateCommands {
             rampPivot.Ramp_Intake_Pos(),
 
             new SequentialCommandGroup(
-                elevator.Elevator_BOT_TOP().withTimeout(2), //TODO real height
                 algaePivot.AlgaePivot_BotTop(),
+                elevator.Elevator_BOT_TOP().withTimeout(2), //TODO real height
                 algae.eatAlgae()
             )
         ).unless(()-> Robot.isSimulation()).alongWith(Commands.print("Top Algae"));

@@ -193,13 +193,10 @@ public class RobotContainer {
     // Scoring Level Aqua determination
     xboxAux.rightTrigger().onTrue(Commands.runOnce(() -> selector.pathQueueAddBack(selector.getXBoxReefPos(), superstructure.getLevel()))
                                           .alongWith(Commands.runOnce(() -> led.setControllerState(ControllerLEDState.AQUA))));
-    // xboxAux.leftBumper().onTrue(Commands.runOnce(() -> selector.pathQueuePopFront())
-    //                                     .alongWith(Commands.runOnce(() -> led.setControllerState(ControllerLEDState.AQUA))));
-    // xboxAux.rightBumper().onTrue(Commands.runOnce(() -> selector.pathQueuePopBack())
-    //                                      .alongWith(Commands.runOnce(() -> led.setControllerState(ControllerLEDState.AQUA))));
-
-    xboxAux.leftBumper().onTrue(algaeRemover.eatAlgae());
-    xboxAux.rightBumper().onTrue(algaeRemover.vomitAlgae());
+    xboxAux.leftBumper().onTrue(Commands.runOnce(() -> selector.pathQueuePopFront())
+                                        .alongWith(Commands.runOnce(() -> led.setControllerState(ControllerLEDState.AQUA))));
+    xboxAux.rightBumper().onTrue(Commands.runOnce(() -> selector.pathQueuePopBack())
+                                         .alongWith(Commands.runOnce(() -> led.setControllerState(ControllerLEDState.AQUA))));
     xboxAux.rightStick().onTrue(Commands.runOnce(() -> selector.pathQueueClear()).unless(()->xboxAux.leftStick().getAsBoolean())
                                         .alongWith(Commands.runOnce(() -> led.setControllerState(ControllerLEDState.AQUA))));
 

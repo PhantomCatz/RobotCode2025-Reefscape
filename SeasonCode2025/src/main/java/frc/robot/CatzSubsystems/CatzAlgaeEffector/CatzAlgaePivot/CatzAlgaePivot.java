@@ -29,18 +29,12 @@ public class CatzAlgaePivot extends SubsystemBase {
   private BooleanSupplier manualOverride = () -> false;
 
   private static double manualPow = 0;
-  private static boolean isManual = false;
   private static int settlingCounter;
 
-  private static double targetPosDeg = 90.0;
+  private static AlgaePivotPosition targetPosition = AlgaePivotPosition.STOW;
 
-  /** Creates a new PositionSubsystem. */
-
-  // ==========================================================//
-  // ^^ Hallo make sure you set this to the correct motor ^^  //
-  // ==========================================================//
   @RequiredArgsConstructor
-  public enum Position { //In degrees
+  public enum AlgaePivotPosition { //In degrees
     STOW(() -> 60.0),
     HORIZONTAL(() -> -15.0), // TBD
     NetAlgae(() -> 80.0), // TBD
@@ -48,11 +42,12 @@ public class CatzAlgaePivot extends SubsystemBase {
     BOTBOT(() -> 0.7),
     BOTTOP(() -> 0.1),
     PUNCH(() -> 30.0),
+    NULL(() -> 90.0),
     TUNNABLE(tunnablePos);
 
     private final DoubleSupplier motionType;
 
-    private double getTargetMotionPosition() {
+    private double getTargetAngle() {
       return motionType.getAsDouble();
     }
   }
@@ -105,30 +100,61 @@ public class CatzAlgaePivot extends SubsystemBase {
         slot0_kA
     );
 
+    LoggedTunableNumber.ifChanged(
+        hashCode(),
+        () -> io.setGainsSlot1(slot1_kP.get(),
+                               slot1_kI.get(),
+                               slot1_kD.get(),
+                               slot1_kS.get(),
+                               slot1_kV.get(),
+                               slot1_kA.get()
+        ),
+        slot1_kP,
+        slot1_kI,
+        slot1_kD,
+        slot1_kS,
+        slot1_kV,
+        slot1_kA
+    );
+
     //-------------------------------------------------------------------------------------------
     //  Setpoint running
     //-------------------------------------------------------------------------------------------
-    // System.out.println(position);
     if (DriverStation.isDisabled()) {
-
+      io.setPercentOutput(0.0);
+      targetPosition = AlgaePivotPosition.NULL;
     } else {
-      if(manualOverride.getAsBoolean()) {
-        io.setPercentOutput(manualPow);
-      } else {
-        io.runSetpoint(targetPosDeg, 0.0);
-      }
+      io.setVoltage(tunnablePos.get());
+      // if(manualOverride.getAsBoolean()) {
+      //   io.setPercentOutput(manualPow);
+      // } else if(targetPosition != AlgaePivotPosition.NULL) {
+      //   io.runSetpoint(targetPosition.getTargetAngle(), calculateArmFeedFoward());
+      // } else {
 
+      // }
     }
-    Logger.recordOutput("Algae Pivot/targetPositionDeg", targetPosDeg);
+
+    // Logging
+    Logger.recordOutput("Algae Pivot/targetPositionDeg", targetPosition.getTargetAngle());
+    Logger.recordOutput("Algae Pivot/ff power", calculateArmFeedFoward());
   }
 
-  public double getAlgaePivotPositionRads() {
+  //-------------------------------------------------------------------------------------------
+  //  MISC methods
+  //-------------------------------------------------------------------------------------------
+  public double getAlgaePivotDeg() {
     return inputs.positionDegrees;
+  }
+
+  public double calculateArmFeedFoward() {
+    double result = 0.0;
+    result = slot0_gains.kG() * Math.cos(getAlgaePivotDeg());
+    return result;
   }
 
   public boolean isAlgaePivotInPosition() {
     boolean isAlgaePivotSettled = false;
-    boolean isAlgaePivotInPos = (Math.abs(getAlgaePivotPositionRads() - targetPosDeg) < 10);
+    boolean isAlgaePivotInPos = (Math.abs(getAlgaePivotDeg() - targetPosition.getTargetAngle()) < 10);
     if(isAlgaePivotInPos) {
       settlingCounter++;
       if(settlingCounter >= 10) {
@@ -143,51 +169,53 @@ public class CatzAlgaePivot extends SubsystemBase {
     return isAlgaePivotSettled;
   }
 
-  public Command AlgaePivot_Stow() {
-    return runOnce(() -> setAlgaePivotPos(Position.STOW));
-  }
-
-  public Command AlgaePivot_Horizontal() {
-    return runOnce(() -> setAlgaePivotPos(Position.HORIZONTAL));
-  }
-
-  public Command AlgaePivot_NetAlgae() {
-    return runOnce(() -> setAlgaePivotPos(Position.NetAlgae));
-  }
-
-  public Command AlgaePivot_Tunnable() {
-    return runOnce(() -> setAlgaePivotPos(Position.TUNNABLE));
-  }
-
-  public Command AlgaePivot_BotBot() {
-    return runOnce(() -> setAlgaePivotPos(Position.BOTBOT));
-  }
-
-  public Command AlgaePivot_BotTop() {
-    return runOnce(() -> setAlgaePivotPos(Position.BOTTOP));
-  }
-
-  public Command AlgaePivot_Punch() {
-    return runOnce(() -> setAlgaePivotPos(Position.PUNCH));
-  }
-
-  public void setAlgaePivotPos(Position target) {
-    targetPosDeg = target.getTargetMotionPosition();
-    isManual = false;
-  }
-
   public void algaePivotManual(Supplier<Double> manualSupplier) {
-    targetPosDeg += manualSupplier.get() * MANUAL_SCALE;
-    isManual = true;
-    // System.out.println("algae:" +INITIAL_POSITION);
+    // targetPosDeg += manualSupplier.get() * MANUAL_SCALE;
+     // System.out.println("algae:" +INITIAL_POSITION);
   }
-
+ 
   public Command AlgaePivotFullManualCommand(Supplier<Double> manualSupplier) {
     return run(() -> algaePivotManual(manualSupplier));
   }
 
   public void setOverrides(BooleanSupplier manualOverride) {
       this.manualOverride = manualOverride;
+  }
+
+
+  //-------------------------------------------------------------------------------------------
+  //  Command type methods
+  //-------------------------------------------------------------------------------------------
+  public Command AlgaePivot_Stow() {
+    return runOnce(() -> setAlgaePivotPos(AlgaePivotPosition.STOW));
+  }
+
+  public Command AlgaePivot_Horizontal() {
+    return runOnce(() -> setAlgaePivotPos(AlgaePivotPosition.HORIZONTAL));
+  }
+
+  public Command AlgaePivot_NetAlgae() {
+    return runOnce(() -> setAlgaePivotPos(AlgaePivotPosition.NetAlgae));
+  }
+
+  public Command AlgaePivot_Tunnable() {
+    return runOnce(() -> setAlgaePivotPos(AlgaePivotPosition.TUNNABLE));
+  }
+
+  public Command AlgaePivot_BotBot() {
+    return runOnce(() -> setAlgaePivotPos(AlgaePivotPosition.BOTBOT));
+  }
+
+  public Command AlgaePivot_BotTop() {
+    return runOnce(() -> setAlgaePivotPos(AlgaePivotPosition.BOTTOP));
+  }
+
+  public Command AlgaePivot_Punch() {
+    return runOnce(() -> setAlgaePivotPos(AlgaePivotPosition.PUNCH));
+  }
+
+  public void setAlgaePivotPos(AlgaePivotPosition target) {
+    targetPosition = target;
   }
 
 }

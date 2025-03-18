@@ -26,7 +26,7 @@ public interface AlgaePivotIO {
 
   public default void updateInputs(AlgaePivotIOInputs inputs) {}
 
-  public default void setPosition(double pos) {}
+  public default void resetPosition(double pos) {}
 
   public default void setPercentOutput(double percentOutput) {}
 
@@ -34,10 +34,15 @@ public interface AlgaePivotIO {
 
   public default void setGainsSlot0(double kP, double kI, double kD, double kS, double kV, double kA) {}
 
-  public default void setFF(double kS, double kV, double kA) {}
+  public default void setGainsSlot1(double kP, double kI, double kD, double kS, double kV, double kA) {}
+
+  public default void setVoltage(double volts) {}
 
   public default void runCharacterizationMotor(double input) {}
 
-  public default void runSetpoint(double setpointRotations, double feedforward) {}
+  public default void runSetpointUp(double setpointRotations, double feedforward) {}
+
+  public default void runSetpointDown(double setpointRotations, double feedforward) {}
+
 
 }
