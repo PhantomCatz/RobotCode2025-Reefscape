@@ -18,10 +18,10 @@ public interface ElevatorIO {
     public boolean isFollowerMotorConnected = false;
     public boolean isBotLimitSwitched = false;
 
-    public double positionRads = 0.0;
+    public double positionInch = 0.0;
     public double absoluteEncoderPositionRads = 0.0;
     public double relativeEncoderPositionRads = 0.0;
-    public double velocityRadsPerSec = 0.0;
+    public double velocityInchPerSec = 0.0;
     public double appliedVolts = 0.0;
     public double supplyCurrentAmps = 0.0;
     public double torqueCurrentAmps = 0.0;

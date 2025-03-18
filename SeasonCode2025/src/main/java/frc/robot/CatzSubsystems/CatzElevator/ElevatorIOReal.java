@@ -17,7 +17,6 @@ import com.ctre.phoenix6.controls.*;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.*;
 
-import edu.wpi.first.math.util.Units;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Current;
@@ -127,8 +126,8 @@ public class ElevatorIOReal implements ElevatorIO {
                   tempCelsius)
               .isOK();
 
-      inputs.positionRads =       Units.rotationsToRadians(internalPositionRotations.getValueAsDouble()/9);
-      inputs.velocityRadsPerSec = Units.rotationsToRadians(velocityRps.getValueAsDouble()/9);
+      inputs.positionInch =       internalPositionRotations.getValueAsDouble() * FINAL_RATIO;
+      inputs.velocityInchPerSec = velocityRps.getValueAsDouble() * FINAL_RATIO;
       inputs.appliedVolts =       appliedVoltage.getValueAsDouble();
       inputs.supplyCurrentAmps =  supplyCurrent.getValueAsDouble();
       inputs.torqueCurrentAmps =  torqueCurrent.getValueAsDouble();
@@ -139,14 +138,14 @@ public class ElevatorIOReal implements ElevatorIO {
 
 
   @Override
-  public void runSetpointUp(double setpointRads) {
-    double setpointRotations = Units.radiansToRotations(setpointRads)*9;
+  public void runSetpointUp(double setpointInches) {
+    double setpointRotations = setpointInches/FINAL_RATIO;
     leaderTalon.setControl(positionControlUp.withPosition(setpointRotations));
   }
 
   @Override
-  public void runSetpointDown(double setpointRads) {
-    double setpointRotations = Units.radiansToRotations(setpointRads)*9;
+  public void runSetpointDown(double setpointInches) {
+    double setpointRotations = setpointInches/FINAL_RATIO;
     leaderTalon.setControl(positionControlDown.withPosition(setpointRotations));
   }
 
