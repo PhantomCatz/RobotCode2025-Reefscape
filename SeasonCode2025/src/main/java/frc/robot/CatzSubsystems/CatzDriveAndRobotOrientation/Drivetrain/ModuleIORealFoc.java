@@ -155,6 +155,7 @@ public class ModuleIORealFoc implements ModuleIO {
       if (!initializationStatus.isOK())
         System.out.println("Failed to Configure CAN ID" + config.steerID());
     }
+
   }
 
   @Override

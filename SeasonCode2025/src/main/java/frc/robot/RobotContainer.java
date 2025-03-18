@@ -41,6 +41,7 @@ import frc.robot.Commands.DriveAndRobotOrientationCmds.TeleopDriveCmd;
 import frc.robot.Utilities.Alert;
 import frc.robot.Utilities.AllianceFlipUtil;
 import frc.robot.Utilities.DoublePressTracker;
+import frc.robot.Utilities.OverrideSwitch;
 import frc.robot.Utilities.Alert.AlertType;
 
 import org.littletonrobotics.junction.networktables.LoggedNetworkNumber;
@@ -71,9 +72,15 @@ public class RobotContainer {
   // ------------------------------------------------------------------------------------------------------------------
   // Drive Controller Declaration
   // -----------------------------------------------------------------------------------------------------------------
-  private CommandXboxController xboxDrv = new CommandXboxController(0);
-  private CommandXboxController xboxAux = new CommandXboxController(1);
-  private CommandXboxController xboxTest = new CommandXboxController(2);
+  private final CommandXboxController xboxDrv = new CommandXboxController(0);
+  private final CommandXboxController xboxAux = new CommandXboxController(1);
+  private final OverrideSwitch overrideHID = new OverrideSwitch(2);
+  private final Trigger isElevatorFullManual = overrideHID.auxSwitch(0);
+  private final Trigger isAlgaeEffectorFullManual = overrideHID.auxSwitch(0);
+  private final Trigger isRampPivotFullManual = overrideHID.auxSwitch(0);
+  private final Trigger isClimbFullManual = overrideHID.driverSwitch(1);
+
+  private CommandXboxController xboxTest = new CommandXboxController(3);
   private TeleopPosSelector selector;
 
 
@@ -81,7 +88,8 @@ public class RobotContainer {
   // Alert Declaration
   // -------------------------------------------------------------------------------------------------------------------
   private final Alert disconnectedAlertDrive      = new Alert("Driver controller disconnected (port 0).", AlertType.kWarning);
-  private final Alert disconnectedAlertAux        = new Alert("Operator controller disconnected (port 1).", AlertType.kWarning);
+  private final Alert disconnectedAlertAux        = new Alert("Aux controller disconnected (port 1).", AlertType.kWarning);
+  private final Alert disconnectedAlertOvverride  = new Alert("Override Switch disconnected (port 2)", AlertType.kWarning);
   private final LoggedNetworkNumber endgameAlert1 = new LoggedNetworkNumber("Endgame Alert #1", 30.0);
   private final LoggedNetworkNumber endgameAlert2 = new LoggedNetworkNumber("Endgame Alert #2", 15.0);
 
@@ -94,6 +102,9 @@ public class RobotContainer {
     outtake = new CatzOuttake(this);
     auto = new CatzAutonomous(this);
     selector = new TeleopPosSelector(xboxAux, this);
+
+    elevator.setOverrides(isElevatorFullManual);
+    algaePivot.setOverrides(isAlgaeEffectorFullManual);
 
     // Drive And Aux Command Mapping
     configureBindings();
@@ -225,7 +236,7 @@ public class RobotContainer {
     //------------------------------------------------------------------------------------------------------------------------------
     //  XBOX test controls
     //------------------------------------------------------------------------------------------------------------------------------
-    xboxTest.povRight().toggleOnTrue(rampPivot.Ramp_Stow_Pos().alongWith(Commands.print("pressed POV Right"))); //TBD
+    xboxTest.povRight().toggleOnTrue(algaePivot.AlgaePivot_BotTop().alongWith(Commands.print("pressed POV Right"))); //TBD
     xboxTest.povUp().toggleOnTrue(rampPivot.Ramp_Intake_Pos().alongWith(Commands.print("pressed POV Up"))); //TBD
     xboxTest.povLeft().toggleOnTrue(rampPivot.Ramp_Climb_Pos().alongWith(Commands.print("pressed POV Left")));
 
@@ -269,6 +280,7 @@ public class RobotContainer {
     leftJoystickTrigger.onTrue(rampPivot.rampPivotManual(() -> xboxTest.getLeftY()).alongWith(Commands.print("Using manual ramp pivot")));
     leftJoystickTrigger.onFalse(rampPivot.rampPivotManual(()-> 0.0).alongWith(Commands.print("Nah - ramp motor")));
 
+
     //climb.ClimbManualMode(
     rightJoystickTrigger.onTrue(climb.ClimbManualMode(() -> xboxTest.getRightY()).alongWith(Commands.print("Using manual climb")));
     rightJoystickTrigger.onFalse(climb.ClimbManualMode(()-> 0.0).alongWith(Commands.print("Nah - climb motor")));
@@ -304,10 +316,16 @@ public class RobotContainer {
   public void checkControllers() {
     disconnectedAlertDrive.set(
         !DriverStation.isJoystickConnected(xboxDrv.getHID().getPort())
-            || !DriverStation.getJoystickIsXbox(xboxDrv.getHID().getPort()));
+            || !DriverStation.getJoystickIsXbox(xboxDrv.getHID().getPort())
+    );
     disconnectedAlertAux.set(
         !DriverStation.isJoystickConnected(xboxAux.getHID().getPort())
-            || !DriverStation.getJoystickIsXbox(xboxAux.getHID().getPort()));
+            || !DriverStation.getJoystickIsXbox(xboxAux.getHID().getPort())
+    );
+    disconnectedAlertOvverride.set(
+      !overrideHID.getAuxSwitch(2)
+    );
+
   }
 
   // ---------------------------------------------------------------------------

@@ -24,13 +24,13 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.PrintCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.CatzSubsystems.CatzStateCommands;
-import frc.robot.CatzSubsystems.CatzSuperstructure.RobotAction;
 import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.*;
 import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.Drivetrain.CatzDrivetrain;
 import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.Drivetrain.DriveConstants;
 import frc.robot.Commands.CharacterizationCmds.WheelRadiusCharacterization;
 import frc.robot.Commands.CharacterizationCmds.WheelRadiusCharacterization.Direction;
-import frc.robot.Commands.DriveAndRobotOrientationCmds.DriveAndCycle;
+import frc.robot.Commands.DriveAndRobotOrientationCmds.DriveToCoralStation;
+import frc.robot.Commands.DriveAndRobotOrientationCmds.DriveToScore;
 import frc.robot.Commands.DriveAndRobotOrientationCmds.TrajectoryDriveCmd;
 import frc.robot.RobotContainer;
 import frc.robot.Utilities.AllianceFlipUtil;
@@ -170,15 +170,17 @@ public class CatzAutonomous extends SubsystemBase {
           Command command = null;
 
           if(components.length == 1){
+            // Simple Trajectory Command
             command = new TrajectoryDriveCmd(PathPlannerPath.fromPathFile(commandName), drivetrain, true, container);
           } else if(components.length == 2){
+            // Command Trajectory with Mechanisms
             String name = components[0];
             String action = components[1];
 
             if(action.equalsIgnoreCase("CS")){
-              command = new DriveAndCycle(PathPlannerPath.fromPathFile(name), m_container, RobotAction.INTAKE);
+              command = new DriveToCoralStation(PathPlannerPath.fromPathFile(name), m_container);
             } else if(action.contains("ReefL")){
-              command = new DriveAndCycle(PathPlannerPath.fromPathFile(name), m_container, RobotAction.OUTTAKE, Integer.parseInt(action.substring("ReefL".length())));
+              command = new DriveToScore(PathPlannerPath.fromPathFile(name), m_container, Integer.parseInt(action.substring("ReefL".length())));
             }
           }
 

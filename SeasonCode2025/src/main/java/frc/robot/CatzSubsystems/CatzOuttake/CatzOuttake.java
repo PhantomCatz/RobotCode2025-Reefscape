@@ -70,17 +70,17 @@ public class CatzOuttake extends SubsystemBase {
 
   /**
    *
-   * @param isOut This is the question asked. Is it out? Is it in?
+   * @param isOuttaking This is the question asked. Is it out? Is it in?
    * @return
    */
-  public boolean isDesiredCoralState(boolean isOut){
+  public boolean isDesiredCoralState(boolean isOuttaking){
     if (container.getSelector().useFakeCoral){
       return container.getSelector().hasCoralSIM;
     } else {
-      if(isOut){
+      if(isOuttaking){
         return (!inputs.bbreakBackTriggered) && (!inputs.bbreakFrntTriggered);
       }else{
-        return inputs.bbreakBackTriggered && inputs.bbreakFrntTriggered;
+        return (inputs.bbreakBackTriggered && inputs.bbreakFrntTriggered);
       }
     }
   }
@@ -131,7 +131,7 @@ public class CatzOuttake extends SubsystemBase {
         io.runMotor(0,0);
         break;
       case RAMP_EJECT:
-        io.runIntakesIntakeMotor(0.8);
+        io.runIntakesIntakeMotor(0.4);
         break;
     }
 
@@ -150,7 +150,7 @@ public class CatzOuttake extends SubsystemBase {
   private void case_adjustInit() {
 
     io.runMotor(INTAKE_SPD, INTAKE_SPD);
-    io.runIntakesIntakeMotor(INTAKE_INTAKE_SPEED);
+    io.runIntakesIntakeMotor(RAMP_INTAKE_SPEED);
 
     CatzSuperstructure.setCurrentCoralState(CoralState.CORAL_ADJUSTING);
 

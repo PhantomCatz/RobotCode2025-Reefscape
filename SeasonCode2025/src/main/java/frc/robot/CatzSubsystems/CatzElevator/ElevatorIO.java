@@ -18,14 +18,14 @@ public interface ElevatorIO {
     public boolean isFollowerMotorConnected = false;
     public boolean isBotLimitSwitched = false;
 
-    public double positionRads = 0.0;
+    public double positionInch = 0.0;
     public double absoluteEncoderPositionRads = 0.0;
     public double relativeEncoderPositionRads = 0.0;
-    public double velocityRadsPerSec = 0.0;
-    public double[] appliedVolts = new double[] {};
-    public double[] supplyCurrentAmps = new double[] {};
-    public double[] torqueCurrentAmps = new double[] {};
-    public double[] tempCelcius = new double[] {};
+    public double velocityInchPerSec = 0.0;
+    public double appliedVolts = 0.0;
+    public double supplyCurrentAmps = 0.0;
+    public double torqueCurrentAmps = 0.0;
+    public double tempCelcius = 0.0;
 
   }
 
@@ -37,15 +37,19 @@ public interface ElevatorIO {
 
   public default void runCurrent(double amps) {}
 
-  public default void setPID(double kP, double kI, double kD) {}
+  public default void setGainsSlot0(double kP, double kI, double kD, double kS, double kV, double kA, double kG) {}
+
+  public default void setGainsSlot1(double kP, double kI, double kD, double kS, double kV, double kA, double kG) {}
 
   public default void setFF(double kS, double kV, double kA) {}
 
   public default void runCharacterizationMotor(double input) {}
 
-  public default void runSetpoint(double setpointRotations, double feedforward) {}
+  public default void runSetpointUp(double setpointRotations) {}
 
-  public default void setPosition(double pos) {}
+  public default void runSetpointDown(double setpointRotations) {}
+
+  public default void resetPosition(double pos) {}
 
   public default void setBrakeMode(boolean enabled) {}
 

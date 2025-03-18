@@ -9,6 +9,7 @@ package frc.robot.CatzSubsystems.CatzElevator;
 
 import static frc.robot.CatzSubsystems.CatzElevator.ElevatorConstants.*;
 
+import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
 
@@ -22,23 +23,17 @@ import edu.wpi.first.wpilibj.DriverStation;
 import org.littletonrobotics.junction.Logger;
 
 
+
 public class CatzElevator extends SubsystemBase {
   private final ElevatorIO io;
   private final ElevatorIOInputsAutoLogged inputs = new ElevatorIOInputsAutoLogged();
-
-  static LoggedTunableNumber tunableNumber = new LoggedTunableNumber("Elevator/MotorPower", 0.1);
-  static LoggedTunableNumber kP = new LoggedTunableNumber("Elevator/kP", 0.17);
-  static LoggedTunableNumber kI = new LoggedTunableNumber("Elevator/kI", 0.0);
-  static LoggedTunableNumber kD = new LoggedTunableNumber("Elevator/kD", 0.0006);
-
-  static LoggedTunableNumber kS = new LoggedTunableNumber("Elevator/kS", 0);
-  static LoggedTunableNumber kV = new LoggedTunableNumber("Elevator/kV", 0);
-  static LoggedTunableNumber kA = new LoggedTunableNumber("Elevator/kA", 0);
 
   private double elevatorSpeed = 0.0;
   private double elevatorFeedForward = 0.0;
   private int settlingCounter = 0;
   private boolean breakModeEnabled = true;
+  private BooleanSupplier manualOverride = () -> false;
+
 
   private ElevatorPosition targetPosition = ElevatorPosition.PosStow;
   private ElevatorPosition prevTargetPositon = ElevatorPosition.PosNull;
@@ -61,7 +56,7 @@ public class CatzElevator extends SubsystemBase {
 
     private final DoubleSupplier elevatorSetpointSupplier;
 
-    private double getTargetPositionRads() {
+    private double getTargetPositionInch() {
       return elevatorSetpointSupplier.getAsDouble();
     }
   }
@@ -97,7 +92,43 @@ public class CatzElevator extends SubsystemBase {
     // Update controllers when user specifies
     //--------------------------------------------------------------------------------------------------------
     LoggedTunableNumber.ifChanged(
-        hashCode(), () -> io.setPID(kP.get(), kI.get(), kD.get()), kP, kI, kD);
+        hashCode(),
+        () -> io.setGainsSlot0(slot0_kP.get(),
+                               slot0_kI.get(),
+                               slot0_kD.get(),
+                               slot0_kS.get(),
+                               slot0_kV.get(),
+                               slot0_kA.get(),
+                               slot0_kG.get()
+        ),
+        slot0_kP,
+        slot0_kI,
+        slot0_kD,
+        slot0_kS,
+        slot0_kV,
+        slot0_kA,
+        slot0_kG
+    );
+
+    LoggedTunableNumber.ifChanged(
+        hashCode(),
+        () -> io.setGainsSlot1(slot1_kP.get(),
+                               slot1_kI.get(),
+                               slot1_kD.get(),
+                               slot1_kS.get(),
+                               slot1_kV.get(),
+                               slot1_kA.get(),
+                               slot1_kG.get()
+        ),
+        slot1_kP,
+        slot1_kI,
+        slot1_kD,
+        slot1_kS,
+        slot1_kV,
+        slot1_kA,
+        slot1_kG
+    );
+
     LoggedTunableNumber.ifChanged(hashCode(),
         ()-> io.setMotionMagicParameters(mmCruiseVelocity.get(), mmAcceleration.get(), mmJerk.get()),
         mmCruiseVelocity,
@@ -112,31 +143,8 @@ public class CatzElevator extends SubsystemBase {
     //    Limit switch position setting
     //---------------------------------------------------------------------------------------------------------------------------
     if(inputs.isBotLimitSwitched) {
-      io.setPosition(ElevatorPosition.PosLimitSwitchStow.getTargetPositionRads());
+      //io.resetPosition(ElevatorPosition.PosLimitSwitchStow.getTargetPositionRads());
     }
-
-    //---------------------------------------------------------------------------------------------------------------------------
-    //    Feed Foward
-    //---------------------------------------------------------------------------------------------------------------------------
-
-    // double additionalGain = 0.0;
-    // switch (targetPosition) {
-    //   case  PosL1:
-    //     additionalGain = 0.00;
-    //     break;
-    //   case  PosL2:
-    //     additionalGain = 0.025;
-    //     break;
-    //   case  PosL3:
-    //     additionalGain = 0.0;
-    //     break;
-    //   case  PosL4:
-    //     additionalGain = -0.2;
-    //     break;
-    //   default:
-    //     break;
-    // }
-    elevatorFeedForward = gains.kG();// + additionalGain;
 
     //---------------------------------------------------------------------------------------------------------------------------
     //    Control Mode setting
@@ -150,36 +158,36 @@ public class CatzElevator extends SubsystemBase {
       // Setpoint PID
       if(targetPosition == ElevatorPosition.PosStow) {
         // Safety Stow
-        if(getElevatorPositionRads() < 9.50) {
+        if(getElevatorPositionInch() < 4) {
           io.stop();
         } else {
-          io.runSetpoint(targetPosition.getTargetPositionRads(), elevatorFeedForward);
+          io.runSetpointDown(targetPosition.getTargetPositionInch());
         }
       } else {
         //Setpoint PID
-        io.runSetpoint(targetPosition.getTargetPositionRads(), elevatorFeedForward);
+        io.runSetpointUp(targetPosition.getTargetPositionInch());
       }
-    } else if (targetPosition == ElevatorPosition.PosManual) {
+    } else if (manualOverride.getAsBoolean() || targetPosition == ElevatorPosition.PosManual) {
       io.runMotor(elevatorSpeed);
-      // System.out.println("Running Elevator Motor");
     } else {
       // Nothing happening
-      // System.out.println("Stopping running motor");
       io.stop();
     }
 
     //----------------------------------------------------------------------------------------------------------------------------
     // Logging
     //----------------------------------------------------------------------------------------------------------------------------
-    Logger.recordOutput("Elevator/CurrentRadians", getElevatorPositionRads());
-    Logger.recordOutput("Elevator/prevtargetPosition", prevTargetPositon.getTargetPositionRads());
-    Logger.recordOutput("Elevator/logged prev targetPosition", previousLoggedPosition.getTargetPositionRads());
+
+    Logger.recordOutput("Elevator/CurrentRadians", getElevatorPositionInch());
+    Logger.recordOutput("Elevator/prevtargetPosition", prevTargetPositon.getTargetPositionInch());
+    Logger.recordOutput("Elevator/logged prev targetPosition", previousLoggedPosition.getTargetPositionInch());
     Logger.recordOutput("Elevator/isElevatorInPos", isElevatorInPosition());
-    Logger.recordOutput("Elevator/targetPosition", targetPosition.getTargetPositionRads());
+    Logger.recordOutput("Elevator/targetPosition", targetPosition.getTargetPositionInch());
 
     // Target Postioin Logging
     previousLoggedPosition = targetPosition;
   }
+
   //--------------------------------------------------------------------------------------------------------------------------
   //
   //  Elevator Setpos Commands
@@ -227,13 +235,13 @@ public class CatzElevator extends SubsystemBase {
   //
   //--------------------------------------------------------------------------
 
-  public double getElevatorPositionRads() {
-    return inputs.positionRads;
+  public double getElevatorPositionInch() {
+    return inputs.positionInch;
   }
 
   public boolean isElevatorInPosition() {
     boolean isElevatorSettled = false;
-    boolean isElevatorInPos = (Math.abs((getElevatorPositionRads() - targetPosition.getTargetPositionRads())) < 5);
+    boolean isElevatorInPos = (Math.abs((getElevatorPositionInch() - targetPosition.getTargetPositionInch())) < 5);
     if(isElevatorInPos) {
       settlingCounter++;
       if(settlingCounter >= 10) {
@@ -255,12 +263,16 @@ public class CatzElevator extends SubsystemBase {
   }
 
   public double getCharacterizationVelocity() {
-    return inputs.velocityRadsPerSec;
+    return inputs.velocityInchPerSec;
   }
 
   public void elevatorFullManual(double manualPower) {
     this.elevatorSpeed = manualPower;
     targetPosition = ElevatorPosition.PosManual;
+  }
+
+  public void setOverrides(BooleanSupplier manualOverride) {
+    this.manualOverride = manualOverride;
   }
 
   public Command elevatorFullManual(Supplier<Double> manuaSupplier) {
