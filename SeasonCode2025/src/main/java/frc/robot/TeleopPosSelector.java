@@ -270,8 +270,8 @@ public class TeleopPosSelector { //TODO split up the file. it's too big and does
 
     for (int side = 0; side < 6; side++) {
       for (LeftRight leftRight : LeftRight.values()) {
-        Pose2d reefPos = calculateReefPose(side, leftRight);
-        if (reefPos.getTranslation().getDistance(robotPos) < calculateReefPose(closestSide, closestLeftRight)
+        Pose2d reefPos = calculateReefPose(side, leftRight, false);
+        if (reefPos.getTranslation().getDistance(robotPos) < calculateReefPose(closestSide, closestLeftRight, false)
             .getTranslation().getDistance(robotPos)) {
           closestSide = side;
           closestLeftRight = leftRight;
@@ -288,8 +288,8 @@ public class TeleopPosSelector { //TODO split up the file. it's too big and does
 
     for (int side = 0; side < 6; side++) {
       for (LeftRight leftRight : LeftRight.values()) {
-        Pose2d reefPos = calculateReefPose(side, leftRight);
-        if (reefPos.getTranslation().getDistance(robotPos) < calculateReefPose(closestSide, closestLeftRight)
+        Pose2d reefPos = calculateReefPose(side, leftRight, false);
+        if (reefPos.getTranslation().getDistance(robotPos) < calculateReefPose(closestSide, closestLeftRight, false)
             .getTranslation().getDistance(robotPos)) {
           closestSide = side;
           closestLeftRight = leftRight;
@@ -300,7 +300,7 @@ public class TeleopPosSelector { //TODO split up the file. it's too big and does
   }
 
   // TODO calculate this on comptime and store it in an array
-  public Pose2d calculateReefPose(int reefAngle, LeftRight leftRightPos) {
+  public Pose2d calculateReefPose(int reefAngle, LeftRight leftRightPos, boolean isDistanced) {
     Rotation2d selectedAngle = Rotation2d.fromRotations(reefAngle / 6.0);
 
     //A unit vector with its origin placed at the center of the reef pointing orthogonally to the selected side.
@@ -311,6 +311,10 @@ public class TeleopPosSelector { //TODO split up the file. it's too big and does
 
     //This vector is now pointing at the scoring position of the robot, but not accounting for the left right distances
     Translation2d radius = unitRadius.times(Reef.reefOrthogonalRadius + Reef.scoringDistance);
+
+    if(isDistanced){
+      radius = radius.plus(unitRadius.times(Reef.backDistance));
+    }
 
     Translation2d leftRight = unitLeftRight.times(leftRightPos.NUM * Reef.leftRightDistance);
 
@@ -323,16 +327,19 @@ public class TeleopPosSelector { //TODO split up the file. it's too big and does
     return AllianceFlipUtil.apply(new Pose2d(scoringPos, selectedAngle.plus(Rotation2d.k180deg)));
   }
 
-  public Pose2d calculateReefPose(Pair<Integer, LeftRight> pair, boolean isNBA) {
+  public Pose2d calculateReefPose(Pair<Integer, LeftRight> pair, boolean isNBA, boolean isDistanced) {
     if (isNBA) {
       currentPathfindingPair = pair;
     }
     if (pair == null) {
       return null;
     } else {
-      return calculateReefPose(pair.getFirst(), pair.getSecond());
+      return calculateReefPose(pair.getFirst(), pair.getSecond(), isDistanced);
     }
   }
+
+  
+
   public PathPlannerPath getClosestNetPath(){
     PathPlannerPath path = pathfinder.getPathToNet(CatzRobotTracker.getInstance().getEstimatedPose().getTranslation(), new GoalEndState(0.0, AllianceFlipUtil.apply(Rotation2d.kZero)));
     if(path == null){
@@ -439,7 +446,7 @@ public class TeleopPosSelector { //TODO split up the file. it's too big and does
     currentDrivetrainCommand.cancel();
 
     Pose2d currentPose = tracker.getEstimatedPose();
-    Pose2d goal = calculateReefPose(new Pair<Integer, LeftRight>(currentPathfindingPair.getFirst(), leftRight), true);
+    Pose2d goal = calculateReefPose(new Pair<Integer, LeftRight>(currentPathfindingPair.getFirst(), leftRight), true, false); //TODO decide whether or not to have distanced
 
     Translation2d goalPos = goal.getTranslation();
     Translation2d currentPos = currentPose.getTranslation();
@@ -462,6 +469,12 @@ public class TeleopPosSelector { //TODO split up the file. it's too big and does
       e.printStackTrace();
       //i dunno man spamming nba causes so much problems
     }
+  }
+
+  public PathPlannerPath getMoveScorePath(){
+    Pose2d goalPose = calculateReefPose(getClosestReefPos().getFirst(), true, false);
+
+    return getStraightLinePath(CatzRobotTracker.getInstance().getEstimatedPose(), goalPose, DriveConstants.PATHFINDING_CONSTRAINTS);
   }
 
   private void runLeftRightNet(LeftRight leftRight){
@@ -552,7 +565,8 @@ public class TeleopPosSelector { //TODO split up the file. it's too big and does
       currentPathfindingPair = getClosestReefPos().getFirst();
       currentDrivetrainCommand.cancel();
       try{
-        currentDrivetrainCommand = new TrajectoryDriveCmd(getPathfindingPath(calculateReefPose(getClosestReefPos().getFirst(), true)), m_container.getCatzDrivetrain(), true, m_container)
+        //TODO add a check to see if the robot is against the wall but angled so that it runs distanced scoring
+        currentDrivetrainCommand = new TrajectoryDriveCmd(getPathfindingPath(calculateReefPose(getClosestReefPos().getFirst(), true, false)), m_container.getCatzDrivetrain(), true, m_container)
                                         .deadlineFor(new RepeatCommand(new PrintCommand("sdf" + drivetrain.getDistanceError())),new RepeatCommand(CatzStateCommands.LXElevator(m_container, superstructure.getLevel()).alongWith(new PrintCommand("elevaktorktpa!"))).onlyIf(() -> drivetrain.getDistanceError() < 0.5));
         currentDrivetrainCommand.schedule();
       }catch(Exception e){
@@ -580,7 +594,7 @@ public class TeleopPosSelector { //TODO split up the file. it's too big and does
 
     return CatzStateCommands.driveToScore(
       m_container,
-      getPathfindingPath(calculateReefPose(pair.getFirst(), false)),
+      getPathfindingPath(calculateReefPose(pair.getFirst(), false, false)),
       pair.getSecond()
     );
   }

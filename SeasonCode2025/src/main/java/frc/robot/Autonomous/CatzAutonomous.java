@@ -133,7 +133,7 @@ public class CatzAutonomous extends SubsystemBase {
         final int s = side;
 
         NamedCommands.registerCommand(letter, new SeqCmd(
-            CatzStateCommands.driveToScore(m_container, () ->selector.getPathfindingPath(()->selector.calculateReefPose(s, leftRight, true)), 4),
+            CatzStateCommands.driveToScore(m_container, () ->selector.getPathfindingPath(()->selector.calculateReefPose(s, leftRight, false)), 4),
             CatzStateCommands.driveToCoralStation(m_container, ()->selector.getPathfindingPath(()->selector.getBestCoralStation())).andThen(new PrintCommand("heheheHhahahahahah"))
           )
         );
