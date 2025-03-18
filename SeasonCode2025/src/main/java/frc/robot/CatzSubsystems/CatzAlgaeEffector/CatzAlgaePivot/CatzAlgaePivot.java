@@ -28,19 +28,11 @@ public class CatzAlgaePivot extends SubsystemBase {
   private final AlgaePivotIOInputsAutoLogged inputs = new AlgaePivotIOInputsAutoLogged();
   private BooleanSupplier manualOverride = () -> false;
 
-    private static double manualPow = 0;
+  private static double manualPow = 0;
+  private static boolean isManual = false;
+  private static int settlingCounter;
 
-    private Position targetPosition = Position.STOW;
-
-    private static int settlingCounter;
-    static LoggedTunableNumber tunnablePos = new LoggedTunableNumber("AlgaePivot/TunnablePosition", 1);
-    static LoggedTunableNumber kP = new LoggedTunableNumber("AlgaePivot/kP", 0.17);
-    static LoggedTunableNumber kI = new LoggedTunableNumber("AlgaePivot/kI", 0.0);
-    static LoggedTunableNumber kD = new LoggedTunableNumber("AlgaePivot/kD", 0.0006);
-
-    static LoggedTunableNumber kS = new LoggedTunableNumber("AlgaePivot/kS", 0);
-    static LoggedTunableNumber kV = new LoggedTunableNumber("AlgaePivot/kV", 0);
-    static LoggedTunableNumber kA = new LoggedTunableNumber("AlgaePivot/kA", 0);
+  private static double targetPosDeg = 0.0;
 
     /** Creates a new PositionSubsystem. */
 
@@ -55,7 +47,7 @@ public class CatzAlgaePivot extends SubsystemBase {
       MANUAL(() -> manualPow),
       BOTBOT(() -> -20.7),
       BOTTOP(() -> -20.1),
-      PUNCH(() -> 30),
+      PUNCH(() -> 30.0),
       TUNNABLE(tunnablePos);
 
       private final DoubleSupplier motionType;
@@ -63,7 +55,6 @@ public class CatzAlgaePivot extends SubsystemBase {
       private double getTargetMotionPosition() {
         return motionType.getAsDouble();
       }
-
     }
 
     public CatzAlgaePivot() {
@@ -88,29 +79,59 @@ public class CatzAlgaePivot extends SubsystemBase {
       }
     }
 
-    @Override
-    public void periodic() {
-      io.updateInputs(inputs);
-      Logger.processInputs("RealInputs/AlgaePivot", inputs);
-      // System.out.println(position);
-      if (DriverStation.isDisabled()) {
+  @Override
+  public void periodic() {
+    io.updateInputs(inputs);
+    Logger.processInputs("RealInputs/AlgaePivot", inputs);
 
+    //-------------------------------------------------------------------------------------------
+    //  Tunnable Numbers
+    //-------------------------------------------------------------------------------------------
+    LoggedTunableNumber.ifChanged(
+        hashCode(),
+        () -> io.setGainsSlot0(slot0_kP.get(),
+                               slot0_kI.get(),
+                               slot0_kD.get(),
+                               slot0_kS.get(),
+                               slot0_kV.get(),
+                               slot0_kA.get()
+        ),
+        slot0_kP,
+        slot0_kI,
+        slot0_kD,
+        slot0_kS,
+        slot0_kV,
+        slot0_kA
+    );
+
+    LoggedTunableNumber.ifChanged(
+        hashCode(),
+        () -> io.setPosition(zeroPos.get()),
+        zeroPos
+    );
+
+    LoggedTunableNumber.ifChanged(
+        hashCode(),
+        () -> io.runSetpoint(tunnablePos.get(), 0.0),
+        tunnablePos
+    );
+
+    //-------------------------------------------------------------------------------------------
+    //  Setpoint running
+    //-------------------------------------------------------------------------------------------
+    // System.out.println(position);
+    if (DriverStation.isDisabled()) {
+
+    } else {
+      if(manualOverride.getAsBoolean()) {
+        io.setPercentOutput(manualPow);
       } else {
-        if(manualOverride.getAsBoolean()) {
-          io.setPercentOutput(manualPow);
-        } else if(targetPosition != null) {
-          io.runSetpoint(targetPosition.getTargetMotionPosition(), 0.0);
-        } else {
-
-          System.out.println("algae no target");
-        }
+        io.runSetpoint(targetPosDeg, 0.0);
+        System.out.println("algae no target");
       }
-      Logger.recordOutput("AlgaePivot/currentPosition", getAlgaePivotPositionRads());
 
-      Logger.recordOutput("AlgaePivot/targetPosition", INITIAL_POSITION);
-
-      //System.out.println("Algae Pivot FeedFowards(" + gains.kG() + " * cos(" + getAlgaePivotPositionDeg() + "): " + algaePivotFeedFoward * gains.kG());
     }
+  }
 
     public double getAlgaePivotPositionRads() {
       return inputs.positionDegrees;
@@ -118,7 +139,7 @@ public class CatzAlgaePivot extends SubsystemBase {
 
     public boolean isAlgaePivotInPosition() {
       boolean isAlgaePivotSettled = false;
-      boolean isAlgaePivotInPos = (Math.abs(getAlgaePivotPositionRads() - INITIAL_POSITION) < 10);
+      boolean isAlgaePivotInPos = (Math.abs(getAlgaePivotPositionRads() - targetPosDeg) < 10);
       if(isAlgaePivotInPos) {
         settlingCounter++;
         if(settlingCounter >= 10) {
@@ -161,19 +182,23 @@ public class CatzAlgaePivot extends SubsystemBase {
       return runOnce(() -> setAlgaePivotPos(Position.PUNCH));
     }
 
-    public void setAlgaePivotPos(Position target) {
-       this.targetPosition = target;
-    }
+  public void setAlgaePivotPos(Position target) {
+    targetPosDeg = target.getTargetMotionPosition();
+    isManual = false;
+  }
 
-    public void algaePivotManual(Supplier<Double> manualSupplier) {
-      // INITIAL_POSITION += manualSupplier.get() * MANUAL_SCALE;
-    }
+  public void algaePivotManual(Supplier<Double> manualSupplier) {
+    targetPosDeg += manualSupplier.get() * MANUAL_SCALE;
+    isManual = true;
+    // System.out.println("algae:" +INITIAL_POSITION);
+  }
 
-    public Command AlgaePivotFullManualCommand(Supplier<Double> manualSupplier) {
-      return run(() -> manualPow = manualSupplier.get());
-    }
+  public Command AlgaePivotFullManualCommand(Supplier<Double> manualSupplier) {
+    return run(() -> algaePivotManual(manualSupplier));
+  }
 
-    public void setOverrides(BooleanSupplier manualOverride) {
-        this.manualOverride = manualOverride;
-    }
+  public void setOverrides(BooleanSupplier manualOverride) {
+      this.manualOverride = manualOverride;
+  }
+
 }

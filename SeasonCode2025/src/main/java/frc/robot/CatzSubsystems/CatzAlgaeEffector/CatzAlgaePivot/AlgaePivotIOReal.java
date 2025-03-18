@@ -85,29 +85,29 @@ public class AlgaePivotIOReal implements AlgaePivotIO {
       algaePivotMotor.setPosition(PIVOT_INITIAL_POS);
     }
 
-    @Override
-    public void updateInputs(AlgaePivotIOInputs inputs) {
-      inputs.isPositionIOMotorConnected =
-          BaseStatusSignal.refreshAll(
-                  algaePivotPosition,
-                  algaePivotVelocity,
-                  algaePivotAppliedVolts,
-                  algaePivotSupplyCurrent,
-                  algaePivotTorqueCurrent,
-                  algaePivotTempCelsius)
-              .isOK();
-      inputs.positionDegrees     = (algaePivotPosition.getValueAsDouble()/ALGAE_PIVOT_GEAR_REDUCTION) * (360.0);
-      inputs.velocityRpm       = algaePivotVelocity.getValueAsDouble() * 60.0;
-      inputs.appliedVolts      = algaePivotAppliedVolts.getValueAsDouble();
-      inputs.supplyCurrentAmps = algaePivotSupplyCurrent.getValueAsDouble();
-      inputs.torqueCurrentAmps = algaePivotTorqueCurrent.getValueAsDouble();
-      inputs.tempCelsius       = algaePivotTempCelsius.getValueAsDouble();
-    }
+  @Override
+  public void updateInputs(AlgaePivotIOInputs inputs) {
+    inputs.isPositionIOMotorConnected =
+        BaseStatusSignal.refreshAll(
+                algaePivotPosition,
+                algaePivotVelocity,
+                algaePivotAppliedVolts,
+                algaePivotSupplyCurrent,
+                algaePivotTorqueCurrent,
+                algaePivotTempCelsius)
+            .isOK();
+    inputs.positionDegrees     = (algaePivotPosition.getValueAsDouble() / ALGAE_PIVOT_GEAR_REDUCTION) * (360.0);
+    inputs.velocityRpm       = algaePivotVelocity.getValueAsDouble() * 60.0;
+    inputs.appliedVolts      = algaePivotAppliedVolts.getValueAsDouble();
+    inputs.supplyCurrentAmps = algaePivotSupplyCurrent.getValueAsDouble();
+    inputs.torqueCurrentAmps = algaePivotTorqueCurrent.getValueAsDouble();
+    inputs.tempCelsius       = algaePivotTempCelsius.getValueAsDouble();
+  }
 
-    @Override
-    public void setPosition(double pos) {// Set the motor position in mechanism rotations
-      algaePivotMotor.setPosition(pos);
-    }
+  @Override
+  public void setPosition(double pos) {// Set the motor position in mechanism rotations
+    algaePivotMotor.setPosition((pos / 360) * ALGAE_PIVOT_GEAR_REDUCTION);
+  }
 
     @Override
     public void runSetpoint(double targetDegrees, double feedforward) {
@@ -117,31 +117,31 @@ public class AlgaePivotIOReal implements AlgaePivotIO {
       // System.out.println(setpointRotations);
     }
 
-    @Override
-    public void setPID(double kP, double kI, double kD) {
-      config.Slot0.kP = kP;
-      config.Slot0.kI = kI;
-      config.Slot0.kD = kD;
-      System.out.println("kP: " + kP + " kI: " + kI + " kD: " + kD);
-      algaePivotMotor.getConfigurator().apply(config);
-    }
+  @Override
+  public void setGainsSlot0(double kP, double kI, double kD, double kS, double kV, double kA) {
+    config.Slot0.kP = kP;
+    config.Slot0.kI = kI;
+    config.Slot0.kD = kD;
+    System.out.println("kP: " + kP + " kI: " + kI + " kD: " + kD);
+    algaePivotMotor.getConfigurator().apply(config);
+  }
 
-    @Override
-    public void runCharacterizationMotor(double input) {
-      algaePivotMotor.setControl(voltageControl.withOutput(input));
-    }
+  @Override
+  public void runCharacterizationMotor(double input) {
+    algaePivotMotor.setControl(voltageControl.withOutput(input));
+  }
 
-    @Override
-    public void setFF(double kS, double kV, double kA) {
-      config.Slot0.kS = kS;
-      config.Slot0.kV = kV;
-      config.Slot0.kA = kA;
-      System.out.println("kS: " + kS + " kV: " + kV + " kA: " + kA);
-      algaePivotMotor.getConfigurator().apply(config);
-    }
+  @Override
+  public void setFF(double kS, double kV, double kA) {
+    config.Slot0.kS = kS;
+    config.Slot0.kV = kV;
+    config.Slot0.kA = kA;
+    System.out.println("kS: " + kS + " kV: " + kV + " kA: " + kA);
+    algaePivotMotor.getConfigurator().apply(config);
+  }
 
-    @Override
-    public void setPercentOutput(double percentOutput) {
-      algaePivotMotor.setControl(new DutyCycleOut(percentOutput));
-    }
+  @Override
+  public void setPercentOutput(double percentOutput) {
+    algaePivotMotor.setControl(new DutyCycleOut(percentOutput));
+  }
 }
