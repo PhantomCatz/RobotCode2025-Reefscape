@@ -25,6 +25,7 @@ import frc.robot.Utilities.GeomUtil;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.NoSuchElementException;
+import java.util.function.Supplier;
 
 import lombok.Getter;
 import lombok.experimental.ExtensionMethod;
@@ -176,7 +177,6 @@ public class CatzRobotTracker {
       // exit if not there
       return;
     }
-    Logger.recordOutput("Buffer Pose", sample.get());
 
     // print out robot position relative to april tag
     // Translation2d aprilPos = AllianceFlipUtil.apply(Reef.center).plus(new Translation2d(Reef.reefOrthogonalRadius, 0).rotateBy(Rotation2d.fromDegrees(-60)));
@@ -304,6 +304,13 @@ public class CatzRobotTracker {
     // System.out.println(initialPose.getRotation().getDegrees());
     estimatedPose = initialPose;
     odometryPose = initialPose;
+    POSE_BUFFER.clear();
+  }
+
+  public void resetPose(Supplier<Pose2d> initialPoseSupplier) {
+    // System.out.println(initialPose.getRotation().getDegrees());
+    estimatedPose = initialPoseSupplier.get();
+    odometryPose = initialPoseSupplier.get();
     POSE_BUFFER.clear();
   }
 

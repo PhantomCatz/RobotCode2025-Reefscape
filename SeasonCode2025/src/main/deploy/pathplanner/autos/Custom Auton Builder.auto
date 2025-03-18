@@ -1,0 +1,43 @@
+{
+  "version": "2025.0",
+  "command": {
+    "type": "sequential",
+    "data": {
+      "commands": [
+        {
+          "type": "named",
+          "data": {
+            "name": "StartChooser"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "ReefChooser1"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "ReefChooser2"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "ReefChooser3"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "ReefChooser4"
+          }
+        }
+      ]
+    }
+  },
+  "resetOdom": false,
+  "folder": null,
+  "choreoAuto": false
+}

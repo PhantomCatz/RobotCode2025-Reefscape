@@ -7,6 +7,8 @@
 
 package frc.robot.CatzSubsystems;
 
+import java.util.function.Supplier;
+
 import com.pathplanner.lib.path.PathPlannerPath;
 
 import edu.wpi.first.wpilibj2.command.Command;
@@ -45,6 +47,28 @@ public class CatzStateCommands {
         );
     }
 
+    public static Command driveToScore(RobotContainer robotContainer, Supplier<PathPlannerPath> pathToReadyPoseSupplier, int level){
+
+        CatzDrivetrain drivetrain = robotContainer.getCatzDrivetrain();
+
+        return new SequentialCommandGroup(
+            new TrajectoryDriveCmd(pathToReadyPoseSupplier, drivetrain, false, robotContainer),
+            LXElevator(robotContainer, level),
+            moveScore(robotContainer, level),
+            stow(robotContainer)
+        );
+    }
+
+    public static Command moveScore(RobotContainer robotContainer, int level){
+        CatzDrivetrain drivetrain = robotContainer.getCatzDrivetrain();
+        TeleopPosSelector selector = robotContainer.getSelector();
+
+        return new SequentialCommandGroup(
+            new TrajectoryDriveCmd(()->selector.getMoveScorePath(), drivetrain, true, robotContainer),
+            LXCoral(robotContainer, level)
+        );
+    }
+
     public static Command driveToCoralStation(RobotContainer robotContainer, PathPlannerPath path){
 
         CatzDrivetrain drivetrain = robotContainer.getCatzDrivetrain();
@@ -55,6 +79,20 @@ public class CatzStateCommands {
                 intakeCoralStation(robotContainer),
                 new TrajectoryDriveCmd(path, drivetrain, false, robotContainer)
             )
+        );
+    }
+
+    public static Command driveToCoralStation(RobotContainer robotContainer, Supplier<PathPlannerPath> pathSupplier){
+        final double PREDICT_DISTANCE = 1.0; //meters
+
+        CatzDrivetrain drivetrain = robotContainer.getCatzDrivetrain();
+        CatzOuttake outtake = robotContainer.getCatzOuttake();
+
+        return new SequentialCommandGroup(
+            new TrajectoryDriveCmd(pathSupplier, drivetrain, false, robotContainer).deadlineFor(
+                new RepeatCommand(intakeCoralStation(robotContainer).onlyIf(() -> drivetrain.getDistanceError() < PREDICT_DISTANCE))
+            ),
+            Commands.waitUntil(() -> outtake.isDesiredCoralState(false))
         );
     }
 

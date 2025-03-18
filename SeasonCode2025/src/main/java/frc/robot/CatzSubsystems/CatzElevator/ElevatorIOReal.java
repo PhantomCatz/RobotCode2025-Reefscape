@@ -161,18 +161,17 @@ public class ElevatorIOReal implements ElevatorIO {
     }
 
 
-    @Override
-    public void runSetpointUp(double setpointRads) {
-      double setpointRotations = Units.radiansToRotations(setpointRads);
-      leaderTalon.setControl(positionControlUp.withPosition(setpointRotations));
-    }
-
-    @Override
-    public void runSetpointDown(double setpointRads) {
-      double setpointRotations = Units.radiansToRotations(setpointRads);
-      leaderTalon.setControl(positionControlDown.withPosition(setpointRotations));
-    }
-
+  @Override
+  public void runSetpointUp(double setpointRads) {
+    double setpointRotations = Units.radiansToRotations(setpointRads);
+    leaderTalon.setControl(positionControlUp.withPosition(setpointRotations));
+  }
+  
+  @Override
+  public void runSetpointDown(double setpointRads) {
+    double setpointRotations = Units.radiansToRotations(setpointRads);
+    leaderTalon.setControl(positionControlDown.withPosition(setpointRotations));
+  }
 
   @Override
   public void stop() {

@@ -11,6 +11,7 @@ import java.util.Arrays;
 import java.util.Deque;
 import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.function.Supplier;
 
 import com.pathplanner.lib.path.GoalEndState;
 import com.pathplanner.lib.path.PathConstraints;
@@ -107,6 +108,10 @@ public class TeleopPosSelector { //TODO split up the file. it's too big and does
 
     SmartDashboard.putBoolean("Left Coral Station", leftCoralStation);
     SmartDashboard.putBoolean("Right Coral Station", rightCoralStation);
+  }
+
+  public String getPoseToLetter(String pose){
+    return poseToLetter.get(pose);
   }
 
   public void toggleLeftStation() {
@@ -353,6 +358,28 @@ public class TeleopPosSelector { //TODO split up the file. it's too big and does
       }
       currentDrivetrainCommand.schedule();
     });
+  }
+
+  public PathPlannerPath getPathfindingPath(Supplier<Pose2d> goalSupplier) {
+    Pose2d goal = goalSupplier.get();
+    if (goal == null) {
+      System.out.println("The goal is null");
+      return null;
+    }
+
+    Translation2d robotPos = tracker.getEstimatedPose().getTranslation();
+    PathPlannerPath path   = pathfinder.getPath(robotPos, goal.getTranslation(),
+        new GoalEndState(0.0, goal.getRotation()));
+
+    if (path == null) {
+      System.out.println("The path is null: " + robotPos + goal.getTranslation());
+      return null;
+    } else {
+      if (AllianceFlipUtil.shouldFlipToRed()) {
+        path = path.flipPath();
+      }
+      return path;
+    }
   }
 
   public PathPlannerPath getPathfindingPath(Pose2d goal) {
