@@ -13,6 +13,7 @@ public final class BuildConstants {
   public static final String GIT_BRANCH = "Feature/Eleator-Tunning-sn1";
   public static final String BUILD_DATE = "2025-03-17 23:39:02 EDT";
   public static final long BUILD_UNIX_TIME = 1742269142937L;
+
   public static final int DIRTY = 1;
 
   private BuildConstants(){}
