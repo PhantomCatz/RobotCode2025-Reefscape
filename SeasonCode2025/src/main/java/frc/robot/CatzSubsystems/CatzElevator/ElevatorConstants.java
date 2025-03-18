@@ -30,12 +30,12 @@ public class ElevatorConstants {
     public static final double LOWER_LIMIT_RAD = 0.0;
 
     // Elevator Heights:(Radians)
-    public static final double STOW_HEIGHT = 1.0;
-    public static final double L1_HEIGHT   = 2.0;
-    public static final double L2_HEIGHT   = 10.0;
-    public static final double L3_HEIGHT   = 20.0;//81.7;
-    public static final double L4_HEIGHT   = 27.0;
-    public static final double L4_CORAL_ADJ = 25.0;
+    public static final double STOW_HEIGHT = 3.0;
+    public static final double L1_HEIGHT   = 10.0;
+    public static final double L2_HEIGHT   = 30.0;
+    public static final double L3_HEIGHT   = 45.0;//81.7;
+    public static final double L4_HEIGHT   = 60.0;
+    public static final double L4_CORAL_ADJ = 62.0;
     public static final double BOT_BOT_ALGAE = 20.6;
     public static final double BOT_TOP_ALGAE = 22.7;
     // Motor ID

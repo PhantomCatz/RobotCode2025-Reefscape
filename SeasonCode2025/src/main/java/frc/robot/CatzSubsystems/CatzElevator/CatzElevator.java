@@ -16,10 +16,7 @@ import java.util.function.Supplier;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.CatzConstants;
-import edu.wpi.first.math.trajectory.TrapezoidProfile;
-import edu.wpi.first.math.trajectory.TrapezoidProfile.State;
 import frc.robot.Utilities.LoggedTunableNumber;
-import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import edu.wpi.first.wpilibj.DriverStation;
 
@@ -170,7 +167,7 @@ public class CatzElevator extends SubsystemBase {
       // Setpoint PID
       if(targetPosition == ElevatorPosition.PosStow) {
         // Safety Stow
-        if(getElevatorPositionInch() < 1.3) {
+        if(getElevatorPositionInch() < 4) {
           io.stop();
         } else {
           io.runSetpointDown(targetPosition.getTargetPositionInch());
