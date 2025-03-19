@@ -1,10 +1,8 @@
-// Copyright (c) 2025 FRC 2637
-// https://github.com/PhantomCatz
+//------------------------------------------------------------------------------------
 //
-// Use of this source code is governed by an MIT-style
-// license that can be found in the LICENSE file at
-// the root directory of this project.
-
+//        "6 hours of debugging can save you 5 minutes of reading documentation."
+//
+//------------------------------------------------------------------------------------
 package frc.robot.CatzSubsystems.CatzAlgaeEffector.CatzAlgaePivot;
 
 import frc.robot.CatzConstants;
@@ -28,8 +26,8 @@ public class AlgaePivotConstants {
     // Initial PIDF and motion magic assignment
     public static final Gains slot0_gains =
         switch (CatzConstants.getRobotType()) {
-            case SN2 -> new Gains(2.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0); 
-            case SN1 -> new Gains(1.0, 0.0, 0.0, 0.00, 0.0, 0.0, 0.0); 
+            case SN2 -> new Gains(2.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0);
+            case SN1 -> new Gains(1.0, 0.0, 0.0, 0.00, 0.0, 0.0, 0.0);
             case SN_TEST, SN1_2024 -> new Gains(7000.0, 0.0, 250.0, 8.4, 0.2, 0.2, 22.9);
         };
 
