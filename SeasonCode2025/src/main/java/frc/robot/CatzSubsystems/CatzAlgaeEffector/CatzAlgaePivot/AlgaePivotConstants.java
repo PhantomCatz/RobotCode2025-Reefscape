@@ -17,7 +17,7 @@ import frc.robot.Utilities.MotorUtil.Gains;
 import frc.robot.Utilities.MotorUtil.MotionMagicParameters;
 
 public class AlgaePivotConstants {
-    public static final boolean isAlgaePivotDisabled = true;
+    public static final boolean isAlgaePivotDisabled = false;
 
     // Gearbox definitions
     public static final double ALGAE_PIVOT_GEAR_REDUCTION = 6.0;
@@ -33,14 +33,14 @@ public class AlgaePivotConstants {
     public static final Gains slot0_gains =
         switch (CatzConstants.getRobotType()) {
             case SN2 -> new Gains(2.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0);
-            case SN1 -> new Gains(1.0, 0.0, 0.0, 0.00, 0.0, 0.0, 0.0);
+            case SN1 -> new Gains(10.0, 0.0, 0.0, 0.00, 0.13, 0.013, 0.4);
             case SN_TEST, SN1_2024 -> new Gains(7000.0, 0.0, 250.0, 8.4, 0.2, 0.2, 22.9);
         };
 
     public static final Gains slot1_gains =
         switch (CatzConstants.getRobotType()) {
             case SN2 -> new Gains(2.0, 0.0, 0.0, 0.175, 0.130, 0.013, 0.4);
-            case SN1 -> new Gains(1.0, 0.1, 0.0, 0.175, 0.13, 0.013, 0.4); //
+            case SN1 -> new Gains(10.0, 0.1, 0.0, 0.175, 0.13, 0.013, 0.4); //
             case SN_TEST, SN1_2024 -> new Gains(7000.0, 0.0, 250.0, 8.4, 0.2, 0.2, 22.9);
         };
 

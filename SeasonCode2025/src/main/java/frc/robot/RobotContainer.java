@@ -151,11 +151,12 @@ public class RobotContainer {
     //---------------------------------------------------------------------------------------------------------------------
     // Reset odometry
     xboxDrv.button(8).and(xboxDrv.button(7)).onTrue(new InstantCommand(() -> {
+      Rotation2d resetRot = new Rotation2d();
+
       if(AllianceFlipUtil.shouldFlipToRed()){
-        robotTracker.resetPose(new Pose2d(robotTracker.getEstimatedPose().getTranslation(), Rotation2d.k180deg));
-      }else{
-        robotTracker.resetPose(new Pose2d(robotTracker.getEstimatedPose().getTranslation(), new Rotation2d()));
+        resetRot = resetRot.plus(Rotation2d.k180deg);
       }
+      robotTracker.resetPose(new Pose2d(robotTracker.getEstimatedPose().getTranslation(), resetRot));
     }));
 
     // NBA
@@ -246,9 +247,11 @@ public class RobotContainer {
     //------------------------------------------------------------------------------------------------------------------------------
     //  XBOX test controls
     //------------------------------------------------------------------------------------------------------------------------------
-    xboxTest.povRight().toggleOnTrue(algaePivot.AlgaePivot_BotTop().alongWith(Commands.print("pressed POV Right"))); //TBD
-    xboxTest.povUp().toggleOnTrue(rampPivot.Ramp_Intake_Pos().alongWith(Commands.print("pressed POV Up"))); //TBD
-    xboxTest.povLeft().toggleOnTrue(rampPivot.Ramp_Climb_Pos().alongWith(Commands.print("pressed POV Left")));
+    xboxTest.povDown().onTrue(algaePivot.AlgaePivot_BotBot().alongWith(Commands.print("pressed POV Down"))); //TBD
+    xboxTest.povUp().onTrue(algaePivot.AlgaePivot_Stow().alongWith(Commands.print("pressed POV Up"))); //TBD
+    xboxTest.povLeft().onTrue(algaeRemover.eatAlgae().alongWith(Commands.print("pressed POV Left")));
+    xboxTest.povRight().onTrue(algaeRemover.stopAlgae().alongWith(Commands.print("pressed POV Down"))); //TBD
+
 
     // xboxTest.rightBumper().toggleOnTrue(algaePivot.AlgaePivot_Stow().alongWith(Commands.print("stow")));
     // xboxTest.leftBumper().toggleOnTrue(algaePivot.AlgaePivot_Horizontal().alongWith(Commands.print("eat")));

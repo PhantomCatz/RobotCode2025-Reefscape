@@ -10,6 +10,7 @@
 //
 //------------------------------------------------------------------------------------
 package frc.robot.CatzSubsystems.CatzAlgaeEffector.CatzAlgaeRemover;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -50,6 +51,10 @@ public class CatzAlgaeRemover extends SubsystemBase {
   public void periodic() {
     io.updateInputs(inputs);
     Logger.processInputs("RealInputs/AlgaeRemover", inputs);
+
+    if(DriverStation.isDisabled()) {
+      io.runPercentOutput(0.0);
+    }
   }
 
   //=====================================================================================
@@ -62,7 +67,7 @@ public class CatzAlgaeRemover extends SubsystemBase {
   }
 
   public Command vomitAlgae() {
-    return runOnce(() -> io.runPercentOutput(-ALGAE_REMOVER_POWER));
+    return runOnce(() -> io.runPercentOutput(-ALGAE_REMOVER_POWER)).alongWith(Commands.print("HI"));
   }
 
   public Command stopAlgae() {
