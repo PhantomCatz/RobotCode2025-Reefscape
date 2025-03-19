@@ -142,8 +142,8 @@ public class ElevatorIOReal implements ElevatorIO {
                   tempCelsius.get(1))
               .isOK();
 
-      inputs.positionRads =       Units.rotationsToRadians(internalPositionRotations.getValueAsDouble());
-      inputs.velocityRadsPerSec = Units.rotationsToRadians(velocityRps.getValueAsDouble());
+      inputs.positionInch =       internalPositionRotations.getValueAsDouble() * FINAL_RATIO;
+      inputs.velocityInchPerSec = velocityRps.getValueAsDouble() * FINAL_RATIO;
       inputs.appliedVolts =       appliedVoltage.stream()
                                                 .mapToDouble(StatusSignal::getValueAsDouble)
                                                 .toArray();
@@ -162,14 +162,14 @@ public class ElevatorIOReal implements ElevatorIO {
 
 
   @Override
-  public void runSetpointUp(double setpointRads) {
-    double setpointRotations = Units.radiansToRotations(setpointRads);
+  public void runSetpointUp(double setpointInches) {
+    double setpointRotations = setpointInches / FINAL_RATIO;
     leaderTalon.setControl(positionControlUp.withPosition(setpointRotations));
   }
   
   @Override
-  public void runSetpointDown(double setpointRads) {
-    double setpointRotations = Units.radiansToRotations(setpointRads);
+  public void runSetpointDown(double setpointInches) {
+    double setpointRotations = setpointInches / FINAL_RATIO;
     leaderTalon.setControl(positionControlDown.withPosition(setpointRotations));
   }
 

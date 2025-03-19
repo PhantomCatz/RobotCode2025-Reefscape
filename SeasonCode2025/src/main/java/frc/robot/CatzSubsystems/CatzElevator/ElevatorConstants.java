@@ -25,28 +25,25 @@ public class ElevatorConstants {
     //For every inch moved up by by the sprocket, the carriage rises by 2 inches
     public static final double FINAL_RATIO               = 2 * (T22_DIAMETER_INCHES * Math.PI) / MAXPLANETARY_GEAR_RATIO;
 
-    // Elevator Limits
-    public static final double UPPER_LIMIT_RAD = 162.0;
-    public static final double LOWER_LIMIT_RAD = 0.0;
-
     // Elevator Heights:(Radians)
-    public static final double STOW_HEIGHT = 5.0; // Raised to prevent boxtube crashing // /ELEVATOR_SPROCKET_RADIUS;
-    public static final double L1_HEIGHT   = 11.0; // 8.6    / ELEVATOR_SPROCKET_RADIUS;
-    public static final double L2_HEIGHT   = 33.0; //(25.77-5)/* 29.842*/ / ELEVATOR_SPROCKET_RADIUS; //25.77
-    public static final double L3_HEIGHT   = 81.7; //(70.1-8) /*68.8 */  / ELEVATOR_SPROCKET_RADIUS; //70.1
-    public static final double L4_HEIGHT   = 151.0; //(141)/* 133.3*/  / ELEVATOR_SPROCKET_RADIUS; //143.12
-    public static final double L4_CORAL_ADJ = 160.0;
-    public static final double BOT_BOT_ALGAE = 80.6;
-    public static final double BOT_TOP_ALGAE = 140.7;
+    // public static final double STOW_HEIGHT = 5.0; // Raised to prevent boxtube crashing // /ELEVATOR_SPROCKET_RADIUS;
+    // public static final double L1_HEIGHT   = 11.0; // 8.6    / ELEVATOR_SPROCKET_RADIUS;
+    // public static final double L2_HEIGHT   = 33.0; //(25.77-5)/* 29.842*/ / ELEVATOR_SPROCKET_RADIUS; //25.77
+    // public static final double L3_HEIGHT   = 81.7; //(70.1-8) /*68.8 */  / ELEVATOR_SPROCKET_RADIUS; //70.1
+    // public static final double L4_HEIGHT   = 151.0; //(141)/* 133.3*/  / ELEVATOR_SPROCKET_RADIUS; //143.12
+    // public static final double L4_CORAL_ADJ = 160.0;
+    // public static final double BOT_BOT_ALGAE = 80.6;
+    // public static final double BOT_TOP_ALGAE = 140.7;
   
-    //public static final double STOW_HEIGHT = 3.0;
-    //public static final double L1_HEIGHT   = 10.0;
-    //public static final double L2_HEIGHT   = 30.0;
-    //public static final double L3_HEIGHT   = 45.0;//81.7;
-    //public static final double L4_HEIGHT   = 60.0;
-    //public static final double L4_CORAL_ADJ = 62.0;
-    //public static final double BOT_BOT_ALGAE = 20.6;
-    //public static final double BOT_TOP_ALGAE = 22.7;
+    //inches TODO tune
+    public static final double STOW_HEIGHT = 3.0;
+    public static final double L1_HEIGHT   = 10.0;
+    public static final double L2_HEIGHT   = 30.0;
+    public static final double L3_HEIGHT   = 45.0;//81.7;
+    public static final double L4_HEIGHT   = 60.0;
+    public static final double L4_CORAL_ADJ = 62.0;
+    public static final double BOT_BOT_ALGAE = 20.6;
+    public static final double BOT_TOP_ALGAE = 22.7;
     // Motor ID
     public static final int LEFT_LEADER_ID  = 30;
     public static final int RIGHT_FOLLOWER_ID = 31;
@@ -62,8 +59,8 @@ public class ElevatorConstants {
 
     // Misc constants
     public static final boolean IS_LEADER_INVERTED = false;
-    public static final double  MIN_TRAVEL_RADIANS = 0.0;
-    public static final double  MAX_TRAVEL_RADIANS = 164.0;
+    public static final double  MIN_TRAVEL_INCHES = 0.0;
+    public static final double  MAX_TRAVEL_INCHES = 164.0;
     public static final Translation2d elevatorOrigin = new Translation2d(-0.238, 0.298);
     public static final double MANUAL_SCALE = 0.5;
 
@@ -111,7 +108,7 @@ public class ElevatorConstants {
     public static final LoggedTunableNumber mmCruiseVelocity = new LoggedTunableNumber("Elevator/Gains/Magic Cruise Vel", motionMagicParameters.mmCruiseVelocity());
     public static final LoggedTunableNumber mmAcceleration = new LoggedTunableNumber("Elevator/Gains/Magic Accerlation", motionMagicParameters.mmAcceleration());
     public static final LoggedTunableNumber mmJerk = new LoggedTunableNumber("Elevator/Gains/Magic Jerk", motionMagicParameters.mmJerk());
-    public static final LoggedTunableNumber lowerLimitRotations = new LoggedTunableNumber("Elevator/LowerLimitDegrees", MIN_ROTATIONS);
-    public static final LoggedTunableNumber upperLimitRotations = new LoggedTunableNumber("Elevator/UpperLimitDegrees", MAX_ROTATIONS);
+    public static final LoggedTunableNumber lowerLimitRotations = new LoggedTunableNumber("Elevator/LowerLimitInches", MIN_TRAVEL_INCHES);
+    public static final LoggedTunableNumber upperLimitRotations = new LoggedTunableNumber("Elevator/UpperLimitInches", MAX_TRAVEL_INCHES);
 
 }
