@@ -16,16 +16,14 @@ import frc.robot.Utilities.MotorUtil.MotionMagicParameters;
 
 /** Add your docs here. */
 public class ElevatorConstants {
-
     public static final boolean isElevatorDisabled = false;
 
     // Gearbox definitions
-    public static final double MAXPLANETARY_GEAR_RATIO   = 4.0 * 4.0;
-    public static final double ELEVATOR_DRIVING_PULLEY   = 24.0;
-    public static final double ELEVATOR_DRIVEN_PULLEY    = 18.0;
-    public static final double ELEVATOR_RATIO_STAGE_ONE  = ELEVATOR_DRIVING_PULLEY/ELEVATOR_DRIVEN_PULLEY;
-    public static final double FINAL_REDUCATION          = MAXPLANETARY_GEAR_RATIO * ELEVATOR_RATIO_STAGE_ONE;
-    public static final double ELEVATOR_SPROCKET_RADIUS  = 0.86; //inches
+    public static final double MAXPLANETARY_GEAR_RATIO   = 9.0;
+    public static final double T22_DIAMETER_INCHES       = 1.981;
+    //For every 9 rotations of the motor, the output shaft rotates once.
+    //For every inch moved up by by the sprocket, the carriage rises by 2 inches
+    public static final double FINAL_RATIO               = 2 * (T22_DIAMETER_INCHES * Math.PI) / MAXPLANETARY_GEAR_RATIO;
 
     // Elevator Limits
     public static final double UPPER_LIMIT_RAD = 162.0;
@@ -40,6 +38,15 @@ public class ElevatorConstants {
     public static final double L4_CORAL_ADJ = 160.0;
     public static final double BOT_BOT_ALGAE = 80.6;
     public static final double BOT_TOP_ALGAE = 140.7;
+  
+    //public static final double STOW_HEIGHT = 3.0;
+    //public static final double L1_HEIGHT   = 10.0;
+    //public static final double L2_HEIGHT   = 30.0;
+    //public static final double L3_HEIGHT   = 45.0;//81.7;
+    //public static final double L4_HEIGHT   = 60.0;
+    //public static final double L4_CORAL_ADJ = 62.0;
+    //public static final double BOT_BOT_ALGAE = 20.6;
+    //public static final double BOT_TOP_ALGAE = 22.7;
     // Motor ID
     public static final int LEFT_LEADER_ID  = 30;
     public static final int RIGHT_FOLLOWER_ID = 31;
@@ -55,27 +62,32 @@ public class ElevatorConstants {
 
     // Misc constants
     public static final boolean IS_LEADER_INVERTED = false;
-    public static final double  MIN_ROTATIONS = 0.0;
-    public static final double  MAX_ROTATIONS = 117.0;
+    public static final double  MIN_TRAVEL_RADIANS = 0.0;
+    public static final double  MAX_TRAVEL_RADIANS = 164.0;
     public static final Translation2d elevatorOrigin = new Translation2d(-0.238, 0.298);
     public static final double MANUAL_SCALE = 0.5;
+
     // Initial PIDF and motion magic assignment
     public static final Gains slot0_gains =
         switch (CatzConstants.getRobotType()) {
             case SN2 -> new Gains(4.0, 0.0, 0.0, 0.175, 0.130, 0.013, 0.4);
             case SN1 -> new Gains(3.0, 0.0, 0.0, 0.175, 0.3, 0.13, 0.4); //
+
             case SN_TEST, SN1_2024 -> new Gains(7000.0, 0.0, 250.0, 8.4, 0.2, 0.2, 22.9);
         };
 
     public static final Gains slot1_gains =
         switch (CatzConstants.getRobotType()) {
             case SN2 -> new Gains(3.0, 0.0, 0.0, 0.175, 0.130, 0.013, 0.4);
+
             case SN1 -> new Gains(75.0, 0.1, 0.0, 0.175, 0.13, 0.013, 0.4); //
             case SN_TEST, SN1_2024 -> new Gains(7000.0, 0.0, 250.0, 8.4, 0.2, 0.2, 22.9);
         };
+
     public static final MotionMagicParameters motionMagicParameters =
         switch (CatzConstants.getRobotType()) {
             case SN2, SN1 -> new MotionMagicParameters(150, 250, 2000);
+
             case SN_TEST, SN1_2024 -> new MotionMagicParameters(0.0, 0.0, 0.0);
         };
 

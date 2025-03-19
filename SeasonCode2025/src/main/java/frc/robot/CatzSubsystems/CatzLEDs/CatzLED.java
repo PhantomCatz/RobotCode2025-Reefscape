@@ -15,7 +15,6 @@ import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.Notifier;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.util.Color;
-import frc.robot.CatzConstants;
 import frc.robot.CatzSubsystems.CatzSuperstructure;
 import frc.robot.CatzSubsystems.CatzSuperstructure.CoralState;
 import frc.robot.CatzSubsystems.CatzSuperstructure.Gamepiece;
@@ -42,7 +41,7 @@ public class CatzLED extends VirtualSubsystem {
   // Robot state LED tracking
   // ----------------------------------------------------------------------------------------------
   @Getter @Setter @AutoLogOutput (key = "CatzLED/ElevatorLEDState")
-  public ControllerLEDState ControllerState = ControllerLEDState.nuhthing;
+  public ControllerLEDState controllerState = ControllerLEDState.nuhthing;
 
   @Getter @Setter @AutoLogOutput (key = "CatzLED/QueueState")
   public QueueLEDState queueLEDState = QueueLEDState.EMPTY;
@@ -68,7 +67,6 @@ public class CatzLED extends VirtualSubsystem {
     REMOVE_ALGAE,
     endgameAlert,
     sameBattery,
-    autoFinished,
     lowBatteryAlert,
     ledChecked,
     nuhthing
@@ -113,14 +111,14 @@ public class CatzLED extends VirtualSubsystem {
   // Constants
   private static final boolean paradeLeds = false;
   private static final int minLoopCycleCount = 10;
-  private static final int length = 56;
+  private static final int length = 49;
   //22 11 24
-  private static final int LED_Sidebar_Start_LT = 0;
-  private static final int LED_Sidebar_End_LT   = 18;
-  private static final int LED_Crossbar_Start   = 19;
-  private static final int LED_Crossbar_End     = 29;
-  private static final int LED_Sidebar_Start_RT = 30;
-  private static final int LED_Sidebar_End_RT   = 56;
+  private static final int LED_Sidebar_Start_RT = 0;
+  private static final int LED_Sidebar_End_RT   = 19;
+  private static final int LED_Crossbar_Start   = 20;
+  private static final int LED_Crossbar_End     = 26;
+  private static final int LED_Sidebar_Start_LT = 27;
+  private static final int LED_Sidebar_End_LT   = 49;
 
   //LED Build up constants
   private static final int LED_Sidebar_Build_LT_ONE_START   = 3;
@@ -131,14 +129,14 @@ public class CatzLED extends VirtualSubsystem {
   private static final int LED_Sidebar_Build_LT_THREE_END   = 14;
   private static final int LED_Sidebar_Build_LT_FOUR_START  = 15;
   private static final int LED_Sidebar_Build_LT_FOUR_END    = 18;
-  private static final int LED_Sidebar_Build_RT_ONE_START   = 54;
-  private static final int LED_Sidebar_Build_RT_ONE_END     = 51;
-  private static final int LED_Sidebar_Build_RT_TWO_START   = 50;
-  private static final int LED_Sidebar_Build_RT_TWO_END     = 47;
-  private static final int LED_Sidebar_Build_RT_THREE_START = 46;
-  private static final int LED_Sidebar_Build_RT_THREE_END   = 43;
-  private static final int LED_Sidebar_Build_RT_FOUR_START  = 42;
-  private static final int LED_Sidebar_Build_RT_FOUR_END    = 39;
+  private static final int LED_Sidebar_Build_RT_ONE_START   = 49;
+  private static final int LED_Sidebar_Build_RT_ONE_END     = 46;
+  private static final int LED_Sidebar_Build_RT_TWO_START   = 45;
+  private static final int LED_Sidebar_Build_RT_TWO_END     = 42;
+  private static final int LED_Sidebar_Build_RT_THREE_START = 41;
+  private static final int LED_Sidebar_Build_RT_THREE_END   = 38;
+  private static final int LED_Sidebar_Build_RT_FOUR_START  = 37;
+  private static final int LED_Sidebar_Build_RT_FOUR_END    = 34;
 
 
   private static final double strobeDuration = 0.1;
@@ -150,35 +148,32 @@ public class CatzLED extends VirtualSubsystem {
   private static final double waveFastDuration = 0.25;
   private static final double waveAllianceCycleLength = 15.0;
   private static final double waveAllianceDuration = 2.0;
-  private static final double autoFadeTime = 2.5; // 3s nominal
+  private static final double bubbleTime = 2.5;
+  private static final double autoFadeTime = 1.3; // 3s nominal
   private static final double autoFadeMaxTime = 5.0; // Return to normal
 
 
 
   private CatzLED() {
     ledStrip = new AddressableLED(LEADER_LED_PWM_PORT);
-    buffer =
-        new AddressableLEDBuffer(length); // NOTE -WPILIB doesn't support creation of 2 led objects
+    buffer = new AddressableLEDBuffer(length); // NOTE -WPILIB doesn't support creation of 2 led objects
     ledStrip.setLength(length);
     ledStrip.setData(buffer);
     ledStrip.start();
 
-    loadingNotifier =
-        new Notifier(
-            () -> {
-              synchronized (this) {
-                breath(Color.kBlack, Color.kWhite, System.currentTimeMillis() / 1000.0);
-                ledStrip.setData(buffer);
-              }
-            });
+    loadingNotifier = new Notifier(
+                            () -> {
+                              synchronized (this) {
+                                breath(Color.kBlack, Color.kBlue, System.currentTimeMillis() / 1000.0);
+                                ledStrip.setData(buffer);
+                              }
+                            }
+    );
     loadingNotifier.startPeriodic(0.02);
   }
 
   @Override
   public void periodic() {
-
-
-
     // Update alliance color
     if (DriverStation.isDSAttached()) {
       alliance = DriverStation.getAlliance();
@@ -191,7 +186,7 @@ public class CatzLED extends VirtualSubsystem {
 
     // Update auto state
     if (DriverStation.isDisabled()) {
-      // autoFinished = false;
+
     } else {
       lastEnabledAuto = DriverStation.isAutonomous();
       lastEnabledTime = Timer.getFPGATimestamp();
@@ -211,42 +206,43 @@ public class CatzLED extends VirtualSubsystem {
     // Stop loading notifier if running
     loadingNotifier.stop();
 
-    // -----------------------------------------------------------
-    // Set LED mode
-    // ----------------------------------------------------------
-    //setSolidElevatorColor(Color.kBlack); // Default to off
 
+    // -----------------------------------------------------------------------------------------------
+    // Set Elevator LED state
+    // -----------------------------------------------------------------------------------------------
     if (estopped) {
       setSolidElevatorColor(Color.kRed);
       // MODE DISABLED
     } else if (DriverStation.isDisabled()) {
-      breath(Color.kBlue, Color.kWhite, breathDuration);
-      if (lastEnabledAuto && Timer.getFPGATimestamp() - lastEnabledTime < autoFadeMaxTime) {
+      if (lastEnabledAuto && (Timer.getFPGATimestamp() - lastEnabledTime < bubbleTime)) {
         // Auto fade
-        solid(1.0 - ((Timer.getFPGATimestamp() - lastEnabledTime) / autoFadeTime), Color.kGreen);
+        bubble((int) ((((Timer.getFPGATimestamp() - lastEnabledTime) % bubbleTime)) / bubbleTime * LED_Sidebar_End_RT), Color.kAqua);
       } else {
+        breath(Color.kPurple, Color.kAqua, System.currentTimeMillis()/10000.0);
+        bubble((int) ((((Timer.getFPGATimestamp() - lastEnabledTime) % bubbleTime)) / bubbleTime * LED_Sidebar_End_RT), allianceColor);
         // APRILTAG CHECK
-        if(ControllerState == ControllerLEDState.ledChecked) {
-          setSolidElevatorColor(Color.kGreen);
+        if(controllerState == ControllerLEDState.ledChecked) {
+          bigBubble((int) ((Timer.getFPGATimestamp() / bubbleTime) * LED_Sidebar_End_RT), 4, 10, Color.kGreen);
         }
       }
       // MODE AUTON
     } else if (DriverStation.isAutonomous()) {
-      wave(Color.kGold, Color.kDarkBlue, waveFastCycleLength, waveFastDuration);
+      wave(Color.kAqua, Color.kDarkBlue, waveFastCycleLength, waveFastDuration);
       // MODE ENABLED
     } else {
-      switch(ControllerState) {
+      switch(controllerState) {
         case REMOVE_ALGAE:
           breath(Color.kAqua, Color.kRed, 0.3);
         break;
         case FULL_MANUAL:
           if(CatzSuperstructure.getCurrentCoralState() == CoralState.IN_OUTTAKE) {
-            setSolidElevatorColor(Color.kRed);
+            bigBubble((int) ((Timer.getFPGATimestamp() / bubbleTime) * LED_Sidebar_End_RT), 4, 10, Color.kAqua);
           }
         break;
         case NBA:
           if(CatzSuperstructure.getCurrentCoralState() == CoralState.IN_OUTTAKE) {
-            setSolidElevatorColor(Color.kYellow);
+            // setSolidElevatorColor(Color.kYellow);
+            rainbowElevator(rainbowCycleLength, breathDuration);
           } else {
             strobeElevator(Color.kYellow, Color.kBlack, breathDuration);
           }
@@ -286,6 +282,7 @@ public class CatzLED extends VirtualSubsystem {
           } else {
             strobeElevator(Color.kAqua, Color.kBlack, breathDuration);
           }
+
         break;
         case BALLS:
           if(CatzSuperstructure.getCurrentCoralState() == CoralState.IN_OUTTAKE) {
@@ -300,9 +297,6 @@ public class CatzLED extends VirtualSubsystem {
         case sameBattery:
           setSolidElevatorColor(Color.kDarkOrange);
         break;
-        case autoFinished:
-          setSolidElevatorColor(CatzConstants.CatzColorConstants.PHANTOM_SAPPHIRE);
-        break;
         case lowBatteryAlert:
           setSolidElevatorColor(Color.kOrange);
         break;
@@ -310,10 +304,14 @@ public class CatzLED extends VirtualSubsystem {
           break;
       }
 
+
+      //---------------------------------------------------------------------------------------------
+      // Update crossbar state
+      //---------------------------------------------------------------------------------------------
       if(CatzSuperstructure.getChosenGamepiece() == Gamepiece.ALGAE) {
         setSolidCrossbarColor(Color.kAqua);
       } else {
-        setSolidCrossbarColor(Color.kWhite);
+        setSolidCrossbarColor(Color.kGreen);
       }
     }
 
@@ -330,8 +328,8 @@ public class CatzLED extends VirtualSubsystem {
   // LED SOLID
   private void setSolidElevatorColor(Color color) {
     if (color != null) {
-      for (int i = LED_Sidebar_Start_LT; i < LED_Sidebar_End_RT; i++) {
-        if(!(LED_Sidebar_End_LT<i && i<LED_Sidebar_Start_RT)) {
+      for (int i = LED_Sidebar_Start_RT; i < LED_Sidebar_End_LT; i++) {
+        if(!(LED_Sidebar_End_RT<i && i<LED_Sidebar_Start_LT)) {
           buffer.setLED(i, color);
         }
       }
@@ -353,6 +351,40 @@ public class CatzLED extends VirtualSubsystem {
   private void solid(double percent, Color color) {
     for (int i = 0; i < MathUtil.clamp(length * percent, 0, length); i++) {
       buffer.setLED(i, color);
+    }
+    for (int i = (int) Math.ceil(MathUtil.clamp(length * percent, 0, length)); i<length; i++) {
+      buffer.setLED(i, Color.kBlack);
+    }
+  }
+
+  private void bigBubble(int colored, int bubbleLength, int bubbleInterval, Color color) {
+    // System.out.println("big bubble" + colored);
+    for (int i=0; i<LED_Crossbar_Start; i++) {
+      if (i <= colored && ((i - colored % bubbleInterval) + bubbleInterval) % bubbleInterval < bubbleLength) {
+        buffer.setLED(i, color);
+        buffer.setLED(46-i, color);
+      }
+      else {
+        buffer.setLED(i, Color.kBlack);
+        buffer.setLED(46-i, Color.kBlack);
+      }
+    }
+    buffer.setLED(47, Color.kBlack);
+    buffer.setLED(48, Color.kBlack);
+
+  }
+
+  private void bubble(int colored, Color color) {
+    // System.out.println("bubble light"+colored);
+    for (int i=0; i<LED_Crossbar_Start; i++) {
+      if (i <= colored && i % 3 == colored % 3) {
+        buffer.setLED(i, color);
+        buffer.setLED(46-i, color);
+      }
+      else {
+        buffer.setLED(i, Color.kBlack);
+        buffer.setLED(46-i, Color.kBlack);
+      }
     }
   }
 
@@ -442,7 +474,7 @@ public class CatzLED extends VirtualSubsystem {
 
   // LED BREATH
   private void breath(Color c1, Color c2) {
-    breath(c1, c2, Timer.getFPGATimestamp());
+    breath(c1, c2, System.currentTimeMillis() / 1000.0);
   }
 
   private void breath(Color c1, Color c2, double timestamp) {
@@ -460,7 +492,7 @@ public class CatzLED extends VirtualSubsystem {
     double x = (1 - ((Timer.getFPGATimestamp() / duration) % 1.0)) * 180.0;
     double xDiffPerLed = 180.0 / cycleLength;
     for (int i = 0; i < length; i++) {
-      if(!(LED_Sidebar_End_LT<i && i<LED_Sidebar_Start_RT)) {
+      if(!(LED_Sidebar_End_RT<i && i<LED_Sidebar_Start_LT)) {
         x += xDiffPerLed;
         x %= 180.0;
         buffer.setHSV(i, (int) x, 255, 255);

@@ -340,6 +340,7 @@ public class CatzStateCommands {
     //     ).unless(()-> Robot.isSimulation()).alongWith(Commands.print("Net Algae"));
     // }
 
+
     public static Command botAlgae(RobotContainer robotContainer) {
         CatzClimb climb = robotContainer.getCatzClimb();
         CatzAlgaeRemover algae = robotContainer.getCatzAlgaeRemover();
@@ -354,8 +355,8 @@ public class CatzStateCommands {
             rampPivot.Ramp_Intake_Pos(),
 
             new SequentialCommandGroup(
-                elevator.Elevator_BOT_BOT(), //TODO real height
                 algaePivot.AlgaePivot_BotBot(),
+                elevator.Elevator_BOT_BOT(), //TODO real height
                 algae.eatAlgae()
             )
         ).unless(()-> Robot.isSimulation()).alongWith(Commands.print("Bot Algae"));
@@ -375,8 +376,8 @@ public class CatzStateCommands {
             rampPivot.Ramp_Intake_Pos(),
 
             new SequentialCommandGroup(
-                elevator.Elevator_BOT_TOP().withTimeout(2), //TODO real height
                 algaePivot.AlgaePivot_BotTop(),
+                elevator.Elevator_BOT_TOP().withTimeout(2), //TODO real height
                 algae.eatAlgae()
             )
         ).unless(()-> Robot.isSimulation()).alongWith(Commands.print("Top Algae"));

@@ -18,6 +18,7 @@ import lombok.RequiredArgsConstructor;
 
 import static frc.robot.CatzSubsystems.CatzRampPivot.RampPivotConstants.*;
 
+import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
 
@@ -30,9 +31,11 @@ public class CatzRampPivot extends SubsystemBase {
 
   private RampPivotPositions rampPivotPositions = RampPivotPositions.PosStow;
   private double rampPower = 0.0;
-  public double targetPos = RampPivotPositions.PosStow.getTargetPositionRot();
-  public double RampPivotFeedForward = 0.0;
-  public static boolean isManual = false;
+
+  private double targetPos = RampPivotPositions.PosStow.getTargetPositionRot();
+  private double RampPivotFeedForward = 0.0;
+  private static boolean isManual = false;
+  private BooleanSupplier manualSupplier = ()-> false;
 
   public NeutralMode currentNeutralMode = NeutralMode.COAST;
   public NeutralMode prevNeutralMode = NeutralMode.COAST;
@@ -78,25 +81,15 @@ public class CatzRampPivot extends SubsystemBase {
     io.updateInputs(inputs);
     Logger.processInputs("RealInputs/RampPivot", inputs);
 
-    // Neutral Mode setting
-    if(DriverStation.isEnabled()) {
-      if (currentNeutralMode != NeutralMode.BRAKE) {
-        io.setNeutralMode(NeutralMode.BRAKE);
-        currentNeutralMode = NeutralMode.BRAKE;
-      }
-    } else {
-      if (currentNeutralMode != NeutralMode.COAST) {
-        io.setNeutralMode(NeutralMode.COAST);
-        currentNeutralMode = NeutralMode.COAST;
-      }
-    }
-
 
     if(DriverStation.isDisabled()) {
       // Disabled
       io.stop();
       targetPos = RampPivotPositions.PosIntake.getTargetPositionRot();
-     // io.setNeutralMode(NeutralMode.COAST);
+
+
+    } else if (manualSupplier.getAsBoolean() || rampPivotPositions == RampPivotPositions.PosManual) {
+      io.runMotor(rampPower);
 
     } else if(rampPivotPositions != RampPivotPositions.PosNull &&
               rampPivotPositions != RampPivotPositions.PosManual){
@@ -104,8 +97,6 @@ public class CatzRampPivot extends SubsystemBase {
       //System.out.println("RaMp_PiVoT TaRgEt: " + targetPos);
       io.setPosition(targetPos, 0);
 
-    } else if (rampPivotPositions == RampPivotPositions.PosManual) {
-      io.runMotor(rampPower);
     } else {
       System.out.println("no power");
       io.stop();
@@ -119,6 +110,10 @@ public class CatzRampPivot extends SubsystemBase {
 
   public Command rampPivotPosManual(Supplier<Double> manualSupplier) {
     return runOnce(() -> rampPivotPosManual(manualSupplier.get())).alongWith(Commands.print("pos manual"));
+  }
+
+  public void setNeutralMode(NeutralMode mode) {
+    io.setNeutralMode(mode);
   }
 
   public void rampPivotSetManual(double manualSupplier) {
@@ -148,5 +143,9 @@ public class CatzRampPivot extends SubsystemBase {
 
   public Command Ramp_Climb_Pos() {
     return runOnce(() -> setRampPos(RampPivotPositions.PosClimb));
+  }
+
+  public void setOverride(BooleanSupplier manualSupplier) {
+    this.manualSupplier = manualSupplier;
   }
 }

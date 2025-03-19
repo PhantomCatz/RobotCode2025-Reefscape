@@ -7,6 +7,7 @@
 
 package frc.robot.CatzSubsystems.CatzAlgaeEffector.CatzAlgaeRemover;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.CatzConstants;
 
@@ -53,7 +54,7 @@ public class CatzAlgaeRemover extends SubsystemBase {
   //
   //=====================================================================================
   public Command eatAlgae() {
-    return runOnce(() -> io.runPercentOutput(ALGAE_REMOVER_POWER));
+    return runOnce(() -> io.runPercentOutput(ALGAE_REMOVER_POWER)).alongWith(Commands.print("Hello"));
   }
 
   public Command vomitAlgae() {

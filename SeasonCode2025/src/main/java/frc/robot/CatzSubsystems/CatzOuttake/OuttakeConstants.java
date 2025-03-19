@@ -37,5 +37,5 @@ public class OuttakeConstants {
     static double ADJ_SPD = 0.1;
     static double OUTTAKE_L1_RT = 0.05;
     static double OUTTAKE_L1_LT = 1.0;
-    static double INTAKE_INTAKE_SPEED = -0.4;
+    static double RAMP_INTAKE_SPEED = -0.2;
 }

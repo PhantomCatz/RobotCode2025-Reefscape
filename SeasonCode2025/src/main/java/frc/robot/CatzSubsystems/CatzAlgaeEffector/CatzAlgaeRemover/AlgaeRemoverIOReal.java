@@ -37,7 +37,7 @@ public class AlgaeRemoverIOReal implements AlgaeRemoverIO {
 
   public AlgaeRemoverIOReal() {
     algaeRemoverMotor = new TalonFXS(ALGAE_REMOVER_MOTOR_ID);
-
+    
     config.CurrentLimits.SupplyCurrentLimit = STALL_CURRENT_LIMIT;
     config.CurrentLimits.SupplyCurrentLimitEnable = true;
     config.MotorOutput.NeutralMode = NeutralModeValue.Brake;
@@ -62,7 +62,7 @@ public class AlgaeRemoverIOReal implements AlgaeRemoverIO {
                 algaeRemoverTorqueCurrent,
                 algaeRemoverTempCelsius)
             .isOK();
-    inputs.positionMechs =     algaeRemoverPosition.getValueAsDouble();
+    inputs.positionMechs     = algaeRemoverPosition.getValueAsDouble();
     inputs.appliedVolts      = algaeRemoverAppliedVolts.getValueAsDouble();
     inputs.supplyCurrentAmps = algaeRemoverSupplyCurrent.getValueAsDouble();
     inputs.torqueCurrentAmps = algaeRemoverTorqueCurrent.getValueAsDouble();

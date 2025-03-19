@@ -13,6 +13,7 @@ public final class BuildConstants {
   public static final String GIT_BRANCH = "constant-tracking-score";
   public static final String BUILD_DATE = "2025-03-17 19:29:03 EDT";
   public static final long BUILD_UNIX_TIME = 1742254143093L;
+
   public static final int DIRTY = 1;
 
   private BuildConstants(){}
