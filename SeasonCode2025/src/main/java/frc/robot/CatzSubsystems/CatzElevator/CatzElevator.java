@@ -14,6 +14,7 @@ import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
 
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.CatzConstants;
 import frc.robot.Utilities.LoggedTunableNumber;
@@ -38,6 +39,8 @@ public class CatzElevator extends SubsystemBase {
   private ElevatorPosition targetPosition = ElevatorPosition.PosStow;
   private ElevatorPosition prevTargetPositon = ElevatorPosition.PosNull;
   private ElevatorPosition previousLoggedPosition = ElevatorPosition.PosNull;
+
+  private boolean isElevatorInPos = false;
 
   @RequiredArgsConstructor
   public static enum ElevatorPosition {
@@ -87,6 +90,8 @@ public class CatzElevator extends SubsystemBase {
   public void periodic() {
     io.updateInputs(inputs);
     Logger.processInputs("RealInputs/Elevator", inputs);
+
+    isElevatorInPos = isElevatorInPosition();
 
     //--------------------------------------------------------------------------------------------------------
     // Update controllers when user specifies
@@ -147,6 +152,7 @@ public class CatzElevator extends SubsystemBase {
     }
 
     //---------------------------------------------------------------------------------------------------------------------------
+
     //    Control Mode setting
     //---------------------------------------------------------------------------------------------------------------------------
     if(DriverStation.isDisabled()) {
@@ -158,6 +164,7 @@ public class CatzElevator extends SubsystemBase {
       // Setpoint PID
       if(targetPosition == ElevatorPosition.PosStow) {
         // Safety Stow
+
         if(getElevatorPositionInch() < 4) {
           io.stop();
         } else {
@@ -178,6 +185,7 @@ public class CatzElevator extends SubsystemBase {
     // Logging
     //----------------------------------------------------------------------------------------------------------------------------
 
+
     Logger.recordOutput("Elevator/CurrentRadians", getElevatorPositionInch());
     Logger.recordOutput("Elevator/prevtargetPosition", prevTargetPositon.getTargetPositionInch());
     Logger.recordOutput("Elevator/logged prev targetPosition", previousLoggedPosition.getTargetPositionInch());
@@ -193,6 +201,30 @@ public class CatzElevator extends SubsystemBase {
   //  Elevator Setpos Commands
   //
   //--------------------------------------------------------------------------------------------------------------------------
+  public Command Elevator_LX(int level){
+    switch (level){
+      case 1:
+        return Elevator_L1();
+
+      case 2:
+        return Elevator_L2();
+
+      case 3:
+        return Elevator_L3();
+
+      case 4:
+        return Elevator_L4();
+
+      default:
+        System.out.println("Invalid elevator level!");
+        return new InstantCommand();
+    }
+  }
+
+  public boolean isElevatorInPos(){
+    return isElevatorInPos;
+  }
+
   public Command Elevator_Stow() {
     return runOnce(() -> setElevatorPos(ElevatorPosition.PosStow));
   }
@@ -239,7 +271,7 @@ public class CatzElevator extends SubsystemBase {
     return inputs.positionInch;
   }
 
-  public boolean isElevatorInPosition() {
+  private boolean isElevatorInPosition() {
     boolean isElevatorSettled = false;
     boolean isElevatorInPos = (Math.abs((getElevatorPositionInch() - targetPosition.getTargetPositionInch())) < 5);
     if(isElevatorInPos) {

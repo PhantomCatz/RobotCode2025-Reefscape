@@ -31,6 +31,7 @@ public class CatzRampPivot extends SubsystemBase {
 
   private RampPivotPositions rampPivotPositions = RampPivotPositions.PosStow;
   private double rampPower = 0.0;
+
   private double targetPos = RampPivotPositions.PosStow.getTargetPositionRot();
   private double RampPivotFeedForward = 0.0;
   private static boolean isManual = false;
@@ -86,6 +87,7 @@ public class CatzRampPivot extends SubsystemBase {
       io.stop();
       targetPos = RampPivotPositions.PosIntake.getTargetPositionRot();
 
+
     } else if (manualSupplier.getAsBoolean() || rampPivotPositions == RampPivotPositions.PosManual) {
       io.runMotor(rampPower);
 
@@ -125,6 +127,10 @@ public class CatzRampPivot extends SubsystemBase {
 
    public void setRampPos(RampPivotPositions target) {
     this.targetPos = target.getTargetPositionRot();
+  }
+
+  public boolean isSafeToRaiseElevator(){
+    return inputs.positionMechs >= 5;
   }
 
   public Command Ramp_Stow_Pos() {

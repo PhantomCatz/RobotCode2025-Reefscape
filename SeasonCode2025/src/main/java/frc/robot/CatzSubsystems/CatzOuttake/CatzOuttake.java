@@ -75,12 +75,16 @@ public class CatzOuttake extends SubsystemBase {
    */
   public boolean isDesiredCoralState(boolean isOuttaking){
     if (container.getSelector().useFakeCoral){
-      return container.getSelector().hasCoralSIM;
+      if(isOuttaking){
+        return !container.getSelector().hasCoralSIM;
+      }else{
+        return container.getSelector().hasCoralSIM;
+      }
     } else {
       if(isOuttaking){
-        return (!inputs.bbreakBackTriggered) && (!inputs.bbreakFrntTriggered);
+        return (!inputs.bbreakBackTriggered) && (!inputs.bbreakFrntTriggered); //both beam breaks must be off to be out of the coral effector
       }else{
-        return (inputs.bbreakBackTriggered && inputs.bbreakFrntTriggered);
+        return (inputs.bbreakBackTriggered || inputs.bbreakFrntTriggered); //only one of the beambreak must be triggered to be considered inside the coral effector
       }
     }
   }
@@ -97,6 +101,7 @@ public class CatzOuttake extends SubsystemBase {
     }
 
     if(currentState != previousState) {
+      System.out.println("changed outtake state!");
       interationCounter = 0;
       intakeIterationCoutner = 0;
     }
@@ -150,6 +155,7 @@ public class CatzOuttake extends SubsystemBase {
   private void case_adjustInit() {
 
     io.runMotor(INTAKE_SPD, INTAKE_SPD);
+
     io.runIntakesIntakeMotor(RAMP_INTAKE_SPEED);
 
     CatzSuperstructure.setCurrentCoralState(CoralState.CORAL_ADJUSTING);

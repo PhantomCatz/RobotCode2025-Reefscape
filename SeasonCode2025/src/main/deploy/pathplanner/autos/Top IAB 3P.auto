@@ -7,25 +7,37 @@
         {
           "type": "named",
           "data": {
-            "name": "testy1+ReefL2"
+            "name": "Top IAB 1+ReefL4"
           }
         },
         {
           "type": "named",
           "data": {
-            "name": "testy2+CS"
+            "name": "Top IAB 2+CS"
           }
         },
         {
           "type": "named",
           "data": {
-            "name": "testy3+ReefL2"
+            "name": "Top IAB 3+ReefL4"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Top IAB 4+CS"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Top IAB 5+ReefL4"
           }
         }
       ]
     }
   },
   "resetOdom": false,
-  "folder": null,
+  "folder": "3 Piece Auto",
   "choreoAuto": false
 }

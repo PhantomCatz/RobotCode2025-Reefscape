@@ -15,13 +15,13 @@ import com.pathplanner.lib.trajectory.PathPlannerTrajectoryState;
 import com.pathplanner.lib.util.PPLibTelemetry;
 import com.pathplanner.lib.util.PathPlannerLogging;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
-import edu.wpi.first.wpilibj.XboxController;
-import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.FieldConstants;
 import frc.robot.Robot;
@@ -30,9 +30,8 @@ import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.CatzRobotTracker;
 import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.Drivetrain.CatzDrivetrain;
 import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.Drivetrain.DriveConstants;
 import frc.robot.Utilities.AllianceFlipUtil;
-import java.util.Collections;
 import java.util.NoSuchElementException;
-import java.util.Set;
+import java.util.function.Supplier;
 
 import org.littletonrobotics.junction.Logger;
 
@@ -51,10 +50,11 @@ public class TrajectoryDriveCmd extends Command {
   public static final double ALLOWABLE_POSE_ERROR = 0.05;
   public static final double ALLOWABLE_AUTOAIM_ERROR = 0.02;
   public static final double ALLOWABLE_ROTATION_ERROR = 1.0;
-  public static final double ALLOWABLE_VEL_ERROR = 0.05;
+  public static final double ALLOWABLE_VEL_ERROR = 0.12;
   public static final double ALLOWABLE_OMEGA_ERROR = 1.0;
   private static final double TIMEOUT_SCALAR = 3.0;
   private static final double CONVERGE_DISTANCE = 0.02;
+  private static final double FACE_REEF_DIST = 2.0;
   private final double ALLOWABLE_VISION_ADJUST = 4e-3; //TODO tune
 
   // Subsystems
@@ -66,6 +66,8 @@ public class TrajectoryDriveCmd extends Command {
   private HolonomicDriveController hocontroller;
   private PathPlannerTrajectory trajectory;
   private PathPlannerPath path;
+  private Supplier<PathPlannerPath> pathSupplier;
+
   private double pathTimeOut = -999.0;
   private Timer timer = new Timer();
   private boolean autoalign = false;
@@ -78,8 +80,6 @@ public class TrajectoryDriveCmd extends Command {
   // Event Command variables
   private final EventScheduler eventScheduler;
   private boolean isEventCommandRunning = false;
-
-  private final XboxController xboxDrv;
 
   private boolean isBugged = false;
 
@@ -94,35 +94,20 @@ public class TrajectoryDriveCmd extends Command {
     this.autoalign = autoalign;
     this.container = container;
     this.eventScheduler = new EventScheduler();
-    xboxDrv = null;
     addRequirements(m_driveTrain);
-
-    // Add all event scheduler requirements to this command's requirements
-    var eventReqs = EventScheduler.getSchedulerRequirements(this.path);
-    if (!Collections.disjoint(Set.of(m_driveTrain), eventReqs)) {
-      throw new IllegalArgumentException(
-          "Events that are triggered during path following cannot require the drive subsystem");
-    }
-    addRequirements(eventReqs);
   }
 
-  //For NBA. Used to rumble the controller when done driving
-  public TrajectoryDriveCmd(PathPlannerPath newPath, CatzDrivetrain drivetrain, boolean autoalign, RobotContainer container, XboxController xboxDrv) {
-    this.path = newPath;
+  public TrajectoryDriveCmd(Supplier<PathPlannerPath> newPathSupplier, CatzDrivetrain drivetrain, boolean autoalign, RobotContainer container) {
+    this.pathSupplier = newPathSupplier;
     this.m_driveTrain = drivetrain;
     this.autoalign = autoalign;
     this.container = container;
     this.eventScheduler = new EventScheduler();
-    this.xboxDrv = xboxDrv;
     addRequirements(m_driveTrain);
+  }
 
-    // Add all event scheduler requirements to this command's requirements
-    var eventReqs = EventScheduler.getSchedulerRequirements(this.path);
-    if (!Collections.disjoint(Set.of(m_driveTrain), eventReqs)) {
-      throw new IllegalArgumentException(
-          "Events that are triggered during path following cannot require the drive subsystem");
-    }
-    addRequirements(eventReqs);
+  public void setPath(PathPlannerPath path){
+    this.path = path;
   }
 
   // ---------------------------------------------------------------------------------------------
@@ -135,7 +120,13 @@ public class TrajectoryDriveCmd extends Command {
     try{
       // Flip path if necessary
       System.out.println("trajec start");
-      PathPlannerPath usePath = path;
+      PathPlannerPath usePath;
+      if(pathSupplier != null){
+        path = pathSupplier.get();
+        usePath = path;
+      }else{
+        usePath = path;
+      }
       if (AllianceFlipUtil.shouldFlipToRed()) {
         usePath = path.flipPath();
         System.out.println("Path flipped!!!!!");
@@ -155,24 +146,28 @@ public class TrajectoryDriveCmd extends Command {
       // Collect current drive state
       ChassisSpeeds currentSpeeds = DriveConstants.SWERVE_KINEMATICS.toChassisSpeeds(tracker.getCurrentModuleStates());
 
-      // Construct trajectory
-      if(autoalign){
+      try{
+        // Construct trajectory
         this.trajectory = new PathPlannerTrajectory(
           usePath,
           currentSpeeds, //TODO make it not zero if its a thing thingy y esdpoifi
           tracker.getEstimatedPose().getRotation(),
           DriveConstants.TRAJ_ROBOT_CONFIG
         );
-      }else{
+      }catch (Error e){
+        e.printStackTrace();
+        //for some reason if you spam NBA current rotation gets bugged.
         this.trajectory = new PathPlannerTrajectory(
           usePath,
-
           currentSpeeds, //TODO make it not zero if its a thing thingy y esdpoifi
-          tracker.getEstimatedPose().getRotation(),
+          new Rotation2d(),
           DriveConstants.TRAJ_ROBOT_CONFIG
         );
       }
-
+      if(trajectory == null) {
+        isBugged = true;
+        return;
+      }
 
       hocontroller = DriveConstants.getNewHolController();
       pathTimeOut = trajectory.getTotalTimeSeconds() * TIMEOUT_SCALAR;
@@ -195,7 +190,7 @@ public class TrajectoryDriveCmd extends Command {
       e.printStackTrace();
     }
 
-    System.out.println("timeoutt::" + trajectory.getTotalTimeSeconds());
+    // System.out.println("timeoutt::" + trajectory.getTotalTimeSeconds());
     //
   } // end of initialize()
 
@@ -236,16 +231,17 @@ public class TrajectoryDriveCmd extends Command {
         0.0
     );
 
+    System.out.println("speed:"+state.velocityMetersPerSecond);
+
     // construct chassisspeeds
-    adjustedSpeeds = hocontroller.calculate(currentPose, state, goal.pose.getRotation());
-    // System.out.println("bv: " + Math.hypot(adjustedSpeeds.vxMetersPerSecond, adjustedSpeeds.vyMetersPerSecond));
+    if (autoalign && translationError > FACE_REEF_DIST) {
+      Translation2d reef = AllianceFlipUtil.apply(FieldConstants.Reef.center);
+      adjustedSpeeds = hocontroller.calculate(currentPose, state, Rotation2d.fromRadians(Math.atan2(reef.getY() - currentPose.getY(),reef.getX() - currentPose.getX())));
+    }else{
+      adjustedSpeeds = hocontroller.calculate(currentPose, state, goal.pose.getRotation());
+    }
 
     adjustedSpeeds = applyCusp(adjustedSpeeds, translationError, CONVERGE_DISTANCE);
-
-    // if(currentTime < 0.7){
-    //   adjustedSpeeds = adjustedSpeeds.times(7);
-    // }
-    // System.out.println("av: " + Math.hypot(adjustedSpeeds.vxMetersPerSecond, adjustedSpeeds.vyMetersPerSecond));
 
     // Logging
     Logger.recordOutput("CatzRobotTracker/Desired Auto Pose", goal.pose);
@@ -265,6 +261,8 @@ public class TrajectoryDriveCmd extends Command {
 
     // send to drivetrain
     m_driveTrain.drive(adjustedSpeeds);
+
+    m_driveTrain.setDistanceError(translationError);
 
     // Named Commands
     eventScheduler.execute(currentTime);
@@ -295,54 +293,45 @@ public class TrajectoryDriveCmd extends Command {
     eventScheduler.end();
     if (interrupted) {
       System.out.println("OH NO I WAS INTERRUPTED HOW RUDE");
-    }else{
-      //Rumble the controller for NBA when auto aiming is done
-      if(xboxDrv != null){
-        xboxDrv.setRumble(RumbleType.kBothRumble, 0.7);
-        Timer.delay(0.2);
-        xboxDrv.setRumble(RumbleType.kBothRumble, 0.0);
-      }
     }
+
+    m_driveTrain.setDistanceError(9999999.9);
   }
 
   @Override
   public boolean isFinished() {
-    // System.out.println("vision: "
-    // +tracker.getDEstimatedPose().getTranslation().getNorm() );
     if(isBugged){
       System.out.println("Path Bugged");
       return true;
     }
     // Event Command or timeout
     if (timer.hasElapsed(pathTimeOut)) {
-      System.out.println("timed out!!@)!*()*!)(#*)");
+      System.out.println("path timed out!");
       return true;
     }
-    // System.out.println("vision: " + (tracker.getVisionPoseShift().getNorm()) + " pose: " + translationError);
 
     if (container.getCatzVision().isSeeingApriltag() && autoalign && tracker.getVisionPoseShift().getNorm() > ALLOWABLE_VISION_ADJUST) {
       // If trailing pose is within margin
-      // System.out.println("vision is not true");
+      // System.out.println("not visioning");
       return false;
     }
     // Finish command if the total time the path takes is over
 
     // Autonomous vs Autoalign margins
     if (autoalign) {
-      // System.out.println("passed vision check!!!@)*)(*)(@*#()*@)#(*)");
       return isAtGoalState(ALLOWABLE_AUTOAIM_ERROR);
     } else {
-      // System.out.println("not auto align!@!@!");
       return isAtGoalState(ALLOWABLE_POSE_ERROR);
     }
   }
 
-  private ChassisSpeeds applyCusp(ChassisSpeeds speeds, double distance, double threshold) {
+  private ChassisSpeeds applyCusp(ChassisSpeeds speeds, double distance, final double threshold) {
     // graph 1 / (1+x) on desmos
     double x = distance / threshold;
     double omega = speeds.omegaRadiansPerSecond;
 
     ChassisSpeeds s = speeds.times(Math.min(2 * x / (1 + x), 1.0));
+    //don't apply cusp to angle
     s.omegaRadiansPerSecond = omega;
     return s;
 

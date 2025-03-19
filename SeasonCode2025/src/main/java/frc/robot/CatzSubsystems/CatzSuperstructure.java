@@ -156,7 +156,7 @@ public class CatzSuperstructure extends VirtualSubsystem {
                         case 4:
                             currentRobotState = RobotState.NET_ALGAE;
                             System.out.println("Net Algae");
-                            robotActionCommand = CatzStateCommands.netAlgae(container);
+                            // robotActionCommand = CatzStateCommands.netAlgae(container);
                             break;
                         default:
                             robotActionCommand = Commands.none();
@@ -170,25 +170,22 @@ public class CatzSuperstructure extends VirtualSubsystem {
             case AIMING:
 
                 if(chosenGamepiece == Gamepiece.CORAL) {
+                    robotActionCommand = CatzStateCommands.LXElevator(container, level);
                     switch (level) {
                         case 1:
                         currentRobotState = RobotState.L1_AIMING;
-                        robotActionCommand = CatzStateCommands.L1Elevator(container);
                         break;
 
                         case 2:
                         currentRobotState = RobotState.L2_AIMING;
-                        robotActionCommand =  CatzStateCommands.L2Elevator(container);
                         break;
 
                         case 3:
                         currentRobotState = RobotState.L3_AIMING;
-                        robotActionCommand = CatzStateCommands.L3Elevator(container);
                         break;
 
                         case 4:
                         currentRobotState = RobotState.L4_AIMING;
-                        robotActionCommand = CatzStateCommands.L4Elevator(container);
                         break;
                     }
                 } else {
@@ -239,10 +236,6 @@ public class CatzSuperstructure extends VirtualSubsystem {
                  }
                  break;
 
-            // Sets All Mechanisms to Base Positions
-            case L4_AUTO_OUTTAKE:
-                 robotActionCommand = CatzStateCommands.L4CoralAuto(container);
-                 break;
             default:
             case STOW:
                 currentRobotState = RobotState.STOW;

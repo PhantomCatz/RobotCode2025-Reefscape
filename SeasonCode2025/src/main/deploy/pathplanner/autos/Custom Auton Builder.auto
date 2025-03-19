@@ -7,19 +7,31 @@
         {
           "type": "named",
           "data": {
-            "name": "testy1+ReefL2"
+            "name": "StartChooser"
           }
         },
         {
           "type": "named",
           "data": {
-            "name": "testy2+CS"
+            "name": "ReefChooser1"
           }
         },
         {
           "type": "named",
           "data": {
-            "name": "testy3+ReefL2"
+            "name": "ReefChooser2"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "ReefChooser3"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "ReefChooser4"
           }
         }
       ]

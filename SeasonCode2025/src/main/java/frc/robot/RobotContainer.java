@@ -15,6 +15,8 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Autonomous.CatzAutonomous;
@@ -96,12 +98,13 @@ public class RobotContainer {
   // -------------------------------------------------------------------------------------------------------------------
   // Auto Declaration
   // ---------------------------------------------------------------------------------------------------------------------
+
   private CatzAutonomous auto;
 
   public RobotContainer() {
     outtake = new CatzOuttake(this);
-    auto = new CatzAutonomous(this);
     selector = new TeleopPosSelector(xboxAux, this);
+    auto = new CatzAutonomous(this);
 
     elevator.setOverrides(isElevatorFullManual);
     algaePivot.setOverrides(isAlgaeEffectorFullManual);
@@ -156,16 +159,19 @@ public class RobotContainer {
     xboxDrv.rightTrigger().onFalse(selector.cancelCurrentDrivetrainCommand().alongWith(Commands.runOnce(()->led.setControllerState(ControllerLEDState.FULL_MANUAL))));
 
     // BALLS
-    // xboxDrv.y().onTrue(selector.runCoralStationCommand());
-    // xboxDrv.y().onFalse(selector.cancelCurrentDrivetrainCommand());
+    xboxDrv.y().onTrue(selector.runToNetCommand());
+    xboxDrv.y().onFalse(selector.cancelCurrentDrivetrainCommand());
 
     // AQUA
-    // xboxDrv.a().onTrue(new InstantCommand(() -> selector.runAutoCommand().schedule()));
-    // xboxDrv.a().onFalse(selector.cancelAutoCommand());
+    xboxDrv.a().onTrue(new InstantCommand(() -> selector.runAutoCommand().schedule()));
+    xboxDrv.a().onFalse(selector.cancelAutoCommand());
 
     // Left Right
     xboxDrv.leftBumper().onTrue(new InstantCommand(() -> selector.runLeftRight(LeftRight.LEFT)));
     xboxDrv.rightBumper().onTrue(new InstantCommand(() -> selector.runLeftRight(LeftRight.RIGHT)));
+
+    xboxDrv.leftBumper().onFalse(new InstantCommand(() -> selector.cancelCurrentDrivetrainCommand().schedule()));
+    xboxDrv.rightBumper().onFalse(new InstantCommand(() -> selector.cancelCurrentDrivetrainCommand().schedule()));
 
     // Climb
     xboxDrv.back().and(xboxDrv.b()).onTrue(CatzStateCommands.climb(this)); // Setup Climb
@@ -175,7 +181,7 @@ public class RobotContainer {
     xboxDrv.back().and(xboxDrv.leftStick()).onTrue(climb.ClimbManualMode(() -> xboxDrv.getLeftY()).alongWith(Commands.print("Using manual climb")));
 
     //TODO Score
-    // xboxDrv.leftTrigger(SCORE_TRIGGER_THRESHHOLD).onTrue(new InstantCommand(() -> superstructure.setCurrentRobotAction(RobotAction.OUTTAKE, superstructure.getLevel())));
+    // xboxDrv.leftTrigger(SCORE_TRIGGER_THRESHHOLD).onTrue(new InstantCommand(() -> CatzStateCommands.moveScore(this, superstructure.getLevel()).schedule()));
 
     // Default driving
     Trigger escapeTrajectory = new Trigger(()->(xboxDrv.getLeftY() > 0.8));
@@ -312,6 +318,22 @@ public class RobotContainer {
         });
   }
 
+  public Command rumbleDrvController(double strength, double duration){
+    return new SequentialCommandGroup(
+      new InstantCommand(() ->xboxDrv.getHID().setRumble(RumbleType.kBothRumble, strength)),
+      new WaitCommand(duration),
+      new InstantCommand(() ->xboxDrv.getHID().setRumble(RumbleType.kBothRumble, 0.0))
+    );
+  }
+
+  public Command rumbleAuxController(double strength, double duration){
+    return new SequentialCommandGroup(
+      new InstantCommand(() ->xboxAux.getHID().setRumble(RumbleType.kBothRumble, strength)),
+      new WaitCommand(duration),
+      new InstantCommand(() ->xboxAux.getHID().setRumble(RumbleType.kBothRumble, 0.0))
+    );
+  }
+
   /** Updates the alerts for disconnected controllers. */
   public void checkControllers() {
     disconnectedAlertDrive.set(
@@ -327,6 +349,7 @@ public class RobotContainer {
     );
 
   }
+
 
   // ---------------------------------------------------------------------------
   //

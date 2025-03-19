@@ -33,6 +33,8 @@ import frc.robot.Utilities.Alert;
 import frc.robot.Utilities.EqualsUtil;
 import frc.robot.Utilities.SwerveSetpoint;
 import frc.robot.Utilities.SwerveSetpointGenerator;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.util.Arrays;
 import org.littletonrobotics.junction.AutoLogOutput;
@@ -40,6 +42,8 @@ import org.littletonrobotics.junction.Logger;
 
 // Drive train subsystem for swerve drive implementation
 public class CatzDrivetrain extends SubsystemBase {
+  @Getter @Setter
+  private double distanceError = 999999.9; //meters
 
   // Gyro input/output interface
   private final GyroIO gyroIO;
@@ -142,6 +146,8 @@ public class CatzDrivetrain extends SubsystemBase {
     for (CatzSwerveModule module : m_swerveModules) {
       module.periodic();
     }
+
+    Logger.recordOutput("Drive/DistanceError", distanceError);
 
     pose = pose.interpolate(tracker.getEstimatedPose(), 0.05);
     Logger.recordOutput("CatzRobotTracker/interlated pose", pose);

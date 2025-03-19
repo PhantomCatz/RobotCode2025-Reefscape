@@ -64,8 +64,8 @@ public class DriveConstants {
 
   public static final DriveConfig TRAJECTORY_CONFIG =
     DriveConfig.builder()
-      .maxLinearVelocity(3.5)
-      .maxLinearAcceleration(5)
+      .maxLinearVelocity(4.5)
+      .maxLinearAcceleration(5.5)
       .maxAngularVelocity(Units.degreesToRadians(540))
       .maxAngularAcceleration(Units.degreesToRadians(720))
       .build();
@@ -165,16 +165,23 @@ public class DriveConstants {
   //      Drivebase controller/object definements
   //
   // -----------------------------------------------------------------------------------------------------------------------------
-  public static final PathConstraints PATHFINDING_CONSTRAINTS = new PathConstraints( // 540 // 720
+  public static final PathConstraints PATHFINDING_CONSTRAINTS = new PathConstraints(
     TRAJECTORY_CONFIG.maxLinearVelocity,
     TRAJECTORY_CONFIG.maxLinearAcceleration,
     TRAJECTORY_CONFIG.maxAngularVelocity,
     TRAJECTORY_CONFIG.maxAngularAcceleration
   );
 
-  public static final PathConstraints LEFT_RIGHT_CONSTRAINTS = new PathConstraints( // 540 // 720
+  public static final PathConstraints LEFT_RIGHT_CONSTRAINTS = new PathConstraints(
     2,
     2,
+    TRAJECTORY_CONFIG.maxAngularVelocity,
+    TRAJECTORY_CONFIG.maxAngularAcceleration
+  );
+
+  public static final PathConstraints LEFT_RIGHT_NET_CONSTRAINTS = new PathConstraints(
+    1,
+    4,
     TRAJECTORY_CONFIG.maxAngularVelocity,
     TRAJECTORY_CONFIG.maxAngularAcceleration
   );
