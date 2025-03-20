@@ -31,7 +31,7 @@ public class DriveConstants {
   // ---------------------------------------------------------------------------------------------------------------
   // Disabled flag for testing
   // ---------------------------------------------------------------------------------------------------------------
-  public static final boolean IS_DRIVE_DISABLED = true; //bruh
+  public static final boolean IS_DRIVE_DISABLED = false; //bruh
 
   // ---------------------------------------------------------------------------------------------------------------
   // Module organizations
@@ -68,8 +68,8 @@ public class DriveConstants {
 
   public static final DriveConfig TRAJECTORY_CONFIG =
     DriveConfig.builder()
-      .maxLinearVelocity(4.5)
-      .maxLinearAcceleration(5.5)
+      .maxLinearVelocity(4.0)
+      .maxLinearAcceleration(5.0)
       .maxAngularVelocity(Units.degreesToRadians(540))
       .maxAngularAcceleration(Units.degreesToRadians(720))
       .build();
@@ -212,41 +212,30 @@ public class DriveConstants {
       new PIDController(4.5, 0.0, 0.0),
       new PIDController(4.5, 0.0, 0.0),
       new ProfiledPIDController(
-        4.0,
+        6.5,
         0.0,
-        0.012,
+        0.0,
         new TrapezoidProfile.Constraints(TRAJECTORY_CONFIG.maxAngularVelocity, TRAJECTORY_CONFIG.maxAngularAcceleration)
       )
     );
   }
 
-  private static final double CARPET_COEF_FRICTION = 8.0;
+
+
+  private static final double CARPET_COEF_FRICTION = 800000.0;
   private static final double DRIVE_CURRENT_LIMIT = 400.0;
   public static final double DRIVE_VELOCITY_DEADBAND = 1e-9;
   public static final ChassisSpeeds NON_ZERO_CHASSIS_SPEED = new ChassisSpeeds(1, 1, 0); //TODO should this be smaller?
 
   public static final double ROBOT_MASS = 60.0;
   public static final double ROBOT_MOI = (2.0 / 12.0) * ROBOT_MASS * (Math.pow(DRIVE_CONFIG.bumperWidthX(), 2));
-  public static final RobotConfig SCORING_ROBOT_CONFIG = new RobotConfig(
-    ROBOT_MASS,
-    ROBOT_MOI,
-    new ModuleConfig(
-      DRIVE_CONFIG.wheelRadius(),
-      TRAJECTORY_CONFIG.maxLinearVelocity(),
-      CARPET_COEF_FRICTION,
-      DCMotor.getKrakenX60(1).withReduction(MODULE_GAINS_AND_RATIOS.driveReduction()),
-      DRIVE_CURRENT_LIMIT,
-      1
-    ),
-    MODULE_TRANSLATIONS
-  );
 
   public static final RobotConfig TRAJ_ROBOT_CONFIG = new RobotConfig(
     ROBOT_MASS,
     ROBOT_MOI,
     new ModuleConfig(
       DRIVE_CONFIG.wheelRadius(),
-      3.0,
+      TRAJECTORY_CONFIG.maxLinearVelocity,
       CARPET_COEF_FRICTION,
       DCMotor.getKrakenX60(1).withReduction(MODULE_GAINS_AND_RATIOS.driveReduction()),
       DRIVE_CURRENT_LIMIT,

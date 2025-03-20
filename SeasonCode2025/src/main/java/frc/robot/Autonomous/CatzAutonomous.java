@@ -200,7 +200,7 @@ public class CatzAutonomous extends SubsystemBase {
       tracker::getRobotChassisSpeeds,
       container.getCatzDrivetrain()::d,
       null,
-      DriveConstants.SCORING_ROBOT_CONFIG,
+      DriveConstants.TRAJ_ROBOT_CONFIG,
       shouldFlip,
       container.getCatzDrivetrain()
     );

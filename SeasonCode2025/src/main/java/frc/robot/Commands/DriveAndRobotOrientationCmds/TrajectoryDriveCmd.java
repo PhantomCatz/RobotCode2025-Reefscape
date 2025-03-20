@@ -14,13 +14,13 @@ package frc.robot.Commands.DriveAndRobotOrientationCmds;
 import com.pathplanner.lib.commands.PathPlannerAuto;
 import com.pathplanner.lib.events.EventScheduler;
 import com.pathplanner.lib.path.PathPlannerPath;
+import com.pathplanner.lib.path.PathPoint;
 import com.pathplanner.lib.trajectory.PathPlannerTrajectory;
 import com.pathplanner.lib.trajectory.PathPlannerTrajectoryState;
 import com.pathplanner.lib.util.PPLibTelemetry;
 import com.pathplanner.lib.util.PathPlannerLogging;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.math.util.Units;
@@ -34,6 +34,8 @@ import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.CatzRobotTracker;
 import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.Drivetrain.CatzDrivetrain;
 import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.Drivetrain.DriveConstants;
 import frc.robot.Utilities.AllianceFlipUtil;
+
+import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.function.Supplier;
 
@@ -54,7 +56,7 @@ public class TrajectoryDriveCmd extends Command {
   public static final double ALLOWABLE_POSE_ERROR = 0.05;
   public static final double ALLOWABLE_AUTOAIM_ERROR = 0.02;
   public static final double ALLOWABLE_ROTATION_ERROR = 1.0;
-  public static final double ALLOWABLE_VEL_ERROR = 0.12;
+  public static final double ALLOWABLE_VEL_ERROR = 0.3;
   public static final double ALLOWABLE_OMEGA_ERROR = 1.0;
   private static final double TIMEOUT_SCALAR = 3.0;
   private static final double CONVERGE_DISTANCE = 0.02;
@@ -136,7 +138,6 @@ public class TrajectoryDriveCmd extends Command {
         System.out.println("Path flipped!!!!!");
       }
 
-
       // Pose Reseting
       if (Robot.isFirstPath && DriverStation.isAutonomous()) {
         try {
@@ -149,13 +150,14 @@ public class TrajectoryDriveCmd extends Command {
 
       // Collect current drive state
       ChassisSpeeds currentSpeeds = DriveConstants.SWERVE_KINEMATICS.toChassisSpeeds(tracker.getCurrentModuleStates());
+      List<PathPoint> pathPoints = usePath.getAllPathPoints();
 
       try{
         // Construct trajectory
         this.trajectory = new PathPlannerTrajectory(
           usePath,
           currentSpeeds, //TODO make it not zero if its a thing thingy y esdpoifi
-          tracker.getEstimatedPose().getRotation(),
+          pathPoints.get(1).position.minus(pathPoints.get(0).position).getAngle(),
           DriveConstants.TRAJ_ROBOT_CONFIG
         );
       }catch (Error e){
@@ -215,7 +217,6 @@ public class TrajectoryDriveCmd extends Command {
     ChassisSpeeds currentSpeeds = DriveConstants.SWERVE_KINEMATICS.toChassisSpeeds(m_driveTrain.getModuleStates());
     double currentVel = Math.hypot(currentSpeeds.vxMetersPerSecond, currentSpeeds.vyMetersPerSecond);
 
-
     // -------------------------------------------------------------------------------------
     // Convert PP trajectory into a wpilib trajectory type
     // Only takes in the current robot position
@@ -235,15 +236,13 @@ public class TrajectoryDriveCmd extends Command {
         0.0
     );
 
-    System.out.println("speed:"+state.velocityMetersPerSecond);
-
     // construct chassisspeeds
-    if (autoalign && translationError > FACE_REEF_DIST) {
-      Translation2d reef = AllianceFlipUtil.apply(FieldConstants.Reef.center);
-      adjustedSpeeds = hocontroller.calculate(currentPose, state, Rotation2d.fromRadians(Math.atan2(reef.getY() - currentPose.getY(),reef.getX() - currentPose.getX())));
-    }else{
-      adjustedSpeeds = hocontroller.calculate(currentPose, state, goal.pose.getRotation());
-    }
+    adjustedSpeeds = hocontroller.calculate(currentPose, state, goal.pose.getRotation());
+    // if (autoalign && translationError > FACE_REEF_DIST) {
+    //   Translation2d reef = AllianceFlipUtil.apply(FieldConstants.Reef.center);
+    //   adjustedSpeeds = hocontroller.calculate(currentPose, state, Rotation2d.fromRadians(Math.atan2(reef.getY() - currentPose.getY(),reef.getX() - currentPose.getX())));
+    // }else{
+    // }
 
     adjustedSpeeds = applyCusp(adjustedSpeeds, translationError, CONVERGE_DISTANCE);
 
