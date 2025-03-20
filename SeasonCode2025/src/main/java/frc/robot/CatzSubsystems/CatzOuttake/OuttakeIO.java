@@ -35,8 +35,6 @@ public interface OuttakeIO {
 
   public default void updateInputs(OuttakeIOInputs inputs) {}
 
-  public default void runIntakesIntakeMotor(double speed) {}
-
   public default void runMotor(double Speed, double speed2) {}
 
   public default void setPIDF(double kP, double kI, double kD, double kF) {}

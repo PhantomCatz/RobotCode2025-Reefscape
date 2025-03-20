@@ -98,7 +98,7 @@ public class CatzRampPivot extends SubsystemBase {
     } else if(rampPivotPositions != RampPivotPositions.PosNull &&
               rampPivotPositions != RampPivotPositions.PosManual){
 
-      //System.out.println("RaMp_PiVoT TaRgEt: " + targetPos);
+     // System.out.println("RaMp_PiVoT TaRgEt: " + targetPos);
       io.setPosition(targetPos, 0);
 
     } else {
@@ -106,6 +106,8 @@ public class CatzRampPivot extends SubsystemBase {
       io.stop();
     }
     Logger.recordOutput("RampPivot/targetPos", targetPos);
+    Logger.recordOutput("RampPivot/targetPosEnum", rampPivotPositions.toString());
+
   }
 
   public Command rampPivotManual(Supplier<Double> manualSupplier) {

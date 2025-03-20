@@ -101,7 +101,6 @@ public class CatzOuttake extends SubsystemBase {
     if(DriverStation.isDisabled()) {
       currentState = outtakeStates.STOP;
       io.runMotor(0.0, 0.0);
-      io.runIntakesIntakeMotor(0.0);
     }
 
     if(currentState != previousState) {
@@ -136,11 +135,7 @@ public class CatzOuttake extends SubsystemBase {
         case_shootL4();
         break;
       case STOP:
-        io.runIntakesIntakeMotor(0.0);
         io.runMotor(0,0);
-        break;
-      case RAMP_EJECT:
-        io.runIntakesIntakeMotor(0.4);
         break;
     }
 
@@ -159,8 +154,6 @@ public class CatzOuttake extends SubsystemBase {
   private void case_adjustInit() {
 
     io.runMotor(INTAKE_SPD, INTAKE_SPD);
-
-    io.runIntakesIntakeMotor(RAMP_INTAKE_SPEED);
 
     CatzSuperstructure.setCurrentCoralState(CoralState.CORAL_ADJUSTING);
 
@@ -199,7 +192,6 @@ public class CatzOuttake extends SubsystemBase {
 
 
   private void case_shoot() {
-    io.runIntakesIntakeMotor(0.0);
     io.runMotor(OUTTAKE_LT, OUTTAKE_RT);
     interationCounter++;
     if(!inputs.bbreakFrntTriggered && interationCounter >= 25) { //0.02s per iteration
@@ -210,7 +202,6 @@ public class CatzOuttake extends SubsystemBase {
   }
 
   private void case_shootL1() {
-    io.runIntakesIntakeMotor(0.0);
     io.runMotor(OUTTAKE_L1_LT, OUTTAKE_L1_RT);
     interationCounter++;
     if(!inputs.bbreakFrntTriggered&& interationCounter >= 50) {
