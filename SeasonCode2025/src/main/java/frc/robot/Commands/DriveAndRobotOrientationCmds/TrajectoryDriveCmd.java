@@ -56,7 +56,7 @@ public class TrajectoryDriveCmd extends Command {
   public static final double ALLOWABLE_POSE_ERROR = 0.05;
   public static final double ALLOWABLE_AUTOAIM_ERROR = 0.02;
   public static final double ALLOWABLE_ROTATION_ERROR = 1.0;
-  public static final double ALLOWABLE_VEL_ERROR = 0.3;
+  public static final double ALLOWABLE_VEL_ERROR = 0.05;
   public static final double ALLOWABLE_OMEGA_ERROR = 1.0;
   private static final double TIMEOUT_SCALAR = 3.0;
   private static final double CONVERGE_DISTANCE = 0.02;

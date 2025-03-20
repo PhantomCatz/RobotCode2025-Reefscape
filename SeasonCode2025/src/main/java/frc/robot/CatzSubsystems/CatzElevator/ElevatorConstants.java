@@ -23,7 +23,7 @@ public class ElevatorConstants {
     public static final boolean isElevatorDisabled = false;
 
     // Gearbox definitions
-    public static final double MAXPLANETARY_GEAR_RATIO   = 9.0;
+    public static final double MAXPLANETARY_GEAR_RATIO   = 5.0;
     public static final double T22_DIAMETER_INCHES       = 1.981;
     //For every 9 rotations of the motor, the output shaft rotates once.
     //For every inch moved up by by the sprocket, the carriage rises by 2 inches
@@ -41,11 +41,11 @@ public class ElevatorConstants {
 
     //inches TODO tune
     public static final double STOW_HEIGHT = 3.0;
-    public static final double L1_HEIGHT   = 10.0;
-    public static final double L2_HEIGHT   = 30.0;
-    public static final double L3_HEIGHT   = 45.0;//81.7;
-    public static final double L4_HEIGHT   = 60.0;
-    public static final double L4_CORAL_ADJ = 62.0;
+    public static final double L1_HEIGHT   = 6.6;
+    public static final double L2_HEIGHT   = 14.0;
+    public static final double L3_HEIGHT   = 33.0;//81.7;
+    public static final double L4_HEIGHT   = 61.4;
+    public static final double L4_CORAL_ADJ = 64.0;
     public static final double BOT_BOT_ALGAE = 20.6;
     public static final double BOT_TOP_ALGAE = 22.7;
     // Motor ID
