@@ -24,13 +24,14 @@ import edu.wpi.first.wpilibj.DigitalInput;
 
 public class IntakeRollersIOReal implements IntakeRollersIO{
 
-    private final TalonFXS IntakeCoralMtr;
-    public final DigitalInput RampBeamBreak = new DigitalInput(RAMP_BB_PORT);
+    private final DigitalInput beamBreakBack;
+    private final DigitalInput beamBreakFrnt;
 
+    private final TalonFXS IntakeCoralMtr;
     private final TalonFXSConfiguration config = new TalonFXSConfiguration();
 
     public IntakeRollersIOReal() {
-        IntakeCoralMtr = new TalonFXS(INTAKE_CORAL_ID);
+        IntakeCoralMtr = new TalonFXS(INTAKE_RAMP_ID);
 
         // config.Slot0.kS = gains.kS();
         // config.Slot0.kV = gains.kV();
@@ -44,15 +45,24 @@ public class IntakeRollersIOReal implements IntakeRollersIO{
         IntakeCoralMtr.setPosition(0);
         IntakeCoralMtr.getConfigurator().apply(config, 1.0);
 
+
+        beamBreakBack = new DigitalInput(RAMP_BB_BACK_PORT);
+        beamBreakFrnt = new DigitalInput(RAMP_BB_FRNT_PORT);
     }
 
     @Override
     public void updateInputs(IntakeRollersIOInputs inputs) {
-        inputs.bbreakRampTriggered = RampBeamBreak.get();
+        inputs.bbreakRampBackTriggered = !beamBreakBack.get();
+        inputs.bbreakRampFrntTriggered = !beamBreakFrnt.get();
     }
 
     @Override
-    public void runIntakesIntakeMotor(double speed) {
+    public void runIntakeRampMotor(double speed) {
       IntakeCoralMtr.setControl(new DutyCycleOut(speed));
+    }
+
+    @Override
+    public void adjustIntakeRamp(double pos) {
+        IntakeCoralMtr.setPosition(pos);
     }
 }

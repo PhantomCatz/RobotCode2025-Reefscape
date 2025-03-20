@@ -19,8 +19,6 @@ import com.revrobotics.spark.SparkLowLevel.MotorType;
 import static frc.robot.CatzSubsystems.CatzOuttake.OuttakeConstants.*;
 
 import com.ctre.phoenix6.configs.TalonFXSConfiguration;
-import com.ctre.phoenix6.controls.DutyCycleOut;
-import com.ctre.phoenix6.hardware.TalonFXS;
 import com.ctre.phoenix6.signals.MotorArrangementValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.revrobotics.spark.SparkMax;
@@ -37,7 +35,6 @@ public class OuttakeIOReal implements OuttakeIO {
 
   private final SparkMax OuttakeLeftMtr;
   private final SparkMax OuttakeRightMtr;
-  private final TalonFXS IntakeCoralMtr;
 
   private final TalonFXSConfiguration config = new TalonFXSConfiguration();
   private SparkMaxConfig globalConfig = new SparkMaxConfig();
@@ -46,7 +43,6 @@ public class OuttakeIOReal implements OuttakeIO {
 
     OuttakeLeftMtr = new SparkMax(LEFT_OUTTAKE_ID, MotorType.kBrushless);
     OuttakeRightMtr = new SparkMax(RIGHT_OUTTAKE_ID, MotorType.kBrushless);
-    IntakeCoralMtr = new TalonFXS(INTAKE_CORAL_ID);
 
     globalConfig.smartCurrentLimit(20);
     globalConfig.idleMode(IdleMode.kBrake);
@@ -61,9 +57,6 @@ public class OuttakeIOReal implements OuttakeIO {
     config.Slot0.kD = gains.kD();
     config.Commutation.MotorArrangement = MotorArrangementValue.Minion_JST;
     config.MotorOutput.NeutralMode = NeutralModeValue.Brake;
-
-    IntakeCoralMtr.setPosition(0);
-    IntakeCoralMtr.getConfigurator().apply(config, 1.0);
 
     beamBreakBck = new DigitalInput(BACK_BEAM_BREAK_ID);
     beamBreakFrnt = new DigitalInput(FRONT_BEAM_BREAK_ID);
@@ -93,11 +86,6 @@ public class OuttakeIOReal implements OuttakeIO {
   public void runMotor(double speed, double speed2) {
     OuttakeLeftMtr.set(speed);
     OuttakeRightMtr.set(-speed2);
-  }
-
-  @Override
-  public void runIntakesIntakeMotor(double speed) {
-    IntakeCoralMtr.setControl(new DutyCycleOut(speed));
   }
 
   @Override

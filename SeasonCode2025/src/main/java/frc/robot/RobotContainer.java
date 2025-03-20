@@ -39,6 +39,7 @@ import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.Drivetrain.CatzDriv
 import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.Vision.CatzVision;
 import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.Vision.VisionIOLimelight;
 import frc.robot.CatzSubsystems.CatzElevator.*;
+import frc.robot.CatzSubsystems.CatzIntakeRollers.CatzIntakeRollers;
 import frc.robot.CatzSubsystems.CatzLEDs.CatzLED;
 import frc.robot.CatzSubsystems.CatzLEDs.CatzLED.ControllerLEDState;
 import frc.robot.CatzSubsystems.CatzOuttake.CatzOuttake;
@@ -73,6 +74,7 @@ public class RobotContainer {
   private CatzAlgaeRemover algaeRemover = new CatzAlgaeRemover();
   private CatzAlgaePivot algaePivot = new CatzAlgaePivot();
   private CatzRampPivot rampPivot = new CatzRampPivot();
+  private CatzIntakeRollers intakeRollers = new CatzIntakeRollers();
   private CatzSuperstructure superstructure = new CatzSuperstructure(this);
 
   // ------------------------------------------------------------------------------------------------------------------
@@ -402,6 +404,10 @@ public class RobotContainer {
 
   public CatzRampPivot getCatzRampPivot() {
     return rampPivot;
+  }
+
+  public CatzIntakeRollers getIntakeRollers() {
+    return intakeRollers;
   }
 
   public CatzSuperstructure getSuperstructure(){

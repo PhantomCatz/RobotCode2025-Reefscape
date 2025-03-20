@@ -28,14 +28,18 @@ public interface IntakeRollersIO {
         public double leftCurrentAmps = 0.0;
         public double rightCurrentAmps = 0.0;
         public double tempCelsius = 0.0;
-        public boolean bbreakRampTriggered;
+
+        public boolean bbreakRampFrntTriggered;
+        public boolean bbreakRampBackTriggered;
 
     }
 
     public default void updateInputs(IntakeRollersIOInputs inputs) {}
 
-    public default void runIntakesIntakeMotor(double speed) {}
-    
+    public default void runIntakeRampMotor(double speed) {}
+
     public default void setPIDF(double kP, double kI, double kD, double kF) {}
+
+    public default void adjustIntakeRamp(double setpointRotations) {}
 
 }
