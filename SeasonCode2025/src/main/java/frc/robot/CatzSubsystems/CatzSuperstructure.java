@@ -39,7 +39,7 @@ public class CatzSuperstructure extends VirtualSubsystem {
     private RobotAction currentRobotAction = RobotAction.STOW;
 
     @Getter @AutoLogOutput(key = "CatzSuperstructure/IsClimbing")
-    private ClimbState climbState = ClimbState.CLIMB;
+    private ClimbState climbState = ClimbState.NOT_CLIMBING;
 
     @Getter @Setter @AutoLogOutput(key = "CatzSuperstructure/CurrentCoralState")
     private static CoralState currentCoralState = CoralState.IN_OUTTAKE;
@@ -147,7 +147,7 @@ public class CatzSuperstructure extends VirtualSubsystem {
             case OUTTAKE:
                 if(climbState == ClimbState.CLIMB) {
                     currentRobotState = RobotState.EXTENDING_CLIMB;
-                    System.out.println("EXTENDING CLIMB");
+                    System.out.println("Extending Climb");
                     robotActionCommand = CatzStateCommands.extendClimb(container);
 
                 } else {
@@ -231,7 +231,7 @@ public class CatzSuperstructure extends VirtualSubsystem {
 
                 if(climbState == ClimbState.CLIMB) {
                     currentRobotState = RobotState.CLIMBING;
-                    System.out.println("CLIMBINGINIGINGINGING");
+                    System.out.println("!Climbing!");
                     robotActionCommand = CatzStateCommands.fullClimb(container);
 
                 } else {

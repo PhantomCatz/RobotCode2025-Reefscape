@@ -193,11 +193,13 @@ public class CatzStateCommands {
 
             new SequentialCommandGroup(
                 elevator.Elevator_L1(),
+                Commands.print("elevator moving"),
                 Commands.waitUntil(() -> elevator.isElevatorInPos()),
+                Commands.print("elevator good"),
                 outtake.outtakeL1()
             ).withTimeout(1.0)
         )//.onlyIf(() -> CatzSuperstructure.getCurrentCoralState() == CoralState.IN_OUTTAKE)
-         .unless(()-> Robot.isSimulation()).alongWith(Commands.print("L1 Scoring State"));
+        .unless(()-> Robot.isSimulation()).alongWith(Commands.print("L1 Scoring State"));
     }
 
     public static Command L2Coral(RobotContainer robotContainer) {
@@ -433,7 +435,7 @@ public class CatzStateCommands {
             ).alongWith(Commands.waitSeconds(0.0)), //TBD TESITNG
 
             climb.extendClimb()
-        ).unless(()-> Robot.isSimulation()).alongWith(Commands.print("JOUSTINGINGINIGNING/////////////////////////////"));
+        ).unless(()-> Robot.isSimulation()).alongWith(Commands.print("EXTENDING CLIMB/////////////////////////////"));
     }
 
     public static Command fullClimb(RobotContainer robotContainer) {
@@ -454,6 +456,6 @@ public class CatzStateCommands {
             ).alongWith(Commands.waitSeconds(0.0)), //TBD TESTSETSING
 
             climb.fullClimb()
-        ).unless(()-> Robot.isSimulation()).alongWith(Commands.print("Climb/////////////////////////////"));
+        ).unless(()-> Robot.isSimulation()).alongWith(Commands.print("CLIMBING/////////////////////////////"));
     }
 }

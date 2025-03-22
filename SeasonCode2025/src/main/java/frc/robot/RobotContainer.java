@@ -236,7 +236,7 @@ public class RobotContainer {
     xboxAux.povDown().onTrue(Commands.runOnce(() -> {superstructure.setLevel(4); SmartDashboard.putNumber("Reef Level", 4);}));
 
     xboxAux.a().onTrue(Commands.runOnce(() -> System.out.println("L:"+superstructure.getLevel()+", "+superstructure.getChosenGamepiece())));
-    xboxAux.start().onTrue(outtake.startOuttake());
+    //xboxAux.start().onTrue(outtake.startOuttake());
 
     // // Climb
     // xboxAux.back().and(xboxAux.b()).onTrue(CatzStateCommands.climb(this).alongWith(Commands.print("climb mode"))); // Setup Climb
