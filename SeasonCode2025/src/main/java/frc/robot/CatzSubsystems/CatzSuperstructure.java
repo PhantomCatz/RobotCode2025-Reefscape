@@ -12,6 +12,7 @@
 package frc.robot.CatzSubsystems;
 
 import org.littletonrobotics.junction.AutoLogOutput;
+import org.littletonrobotics.junction.Logger;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -37,6 +38,9 @@ public class CatzSuperstructure extends VirtualSubsystem {
     @Getter @AutoLogOutput(key = "CatzSuperstructure/CurrentRobotAction")
     private RobotAction currentRobotAction = RobotAction.STOW;
 
+    @Getter @AutoLogOutput(key = "CatzSuperstructure/IsClimbing")
+    private ClimbState climbState = ClimbState.CLIMB;
+
     @Getter @Setter @AutoLogOutput(key = "CatzSuperstructure/CurrentCoralState")
     private static CoralState currentCoralState = CoralState.IN_OUTTAKE;
 
@@ -50,6 +54,10 @@ public class CatzSuperstructure extends VirtualSubsystem {
         ALGAE
     }
 
+    public enum ClimbState {
+        CLIMB,
+        NOT_CLIMBING
+    }
 
     public enum CoralState{
         IN_OUTTAKE,
@@ -75,7 +83,8 @@ public class CatzSuperstructure extends VirtualSubsystem {
         NET_ALGAE,
         BOT_ALGAE,
         TOP_ALGAE,
-        CLIMB
+        CLIMBING,
+        EXTENDING_CLIMB
     }
 
     public enum RobotAction {
@@ -87,7 +96,6 @@ public class CatzSuperstructure extends VirtualSubsystem {
         L4_AUTO_OUTTAKE
     }
 
-
     public enum LeftRight{
         LEFT(1),
         RIGHT(-1);
@@ -97,7 +105,7 @@ public class CatzSuperstructure extends VirtualSubsystem {
         private LeftRight(int num){
           this.NUM  = num;
         }
-      }
+    }
 
     public CatzSuperstructure(RobotContainer container) {
         this.container = container;
@@ -120,6 +128,16 @@ public class CatzSuperstructure extends VirtualSubsystem {
         }
     }
 
+    public void toggleClimbMode() {
+        if(climbState == ClimbState.CLIMB) {
+            climbState = ClimbState.NOT_CLIMBING;
+            System.out.println("RobotAction: Disable Climb Mode");
+        } else {
+            climbState = ClimbState.CLIMB;
+            System.out.println("RobotAction: Enable Climb Mode");
+        }
+    }
+
     public void setCurrentRobotAction(RobotAction action, int level) {
         robotActionCommand = Commands.print("No robot Action Selected");
         this.currentRobotAction = action;
@@ -127,47 +145,54 @@ public class CatzSuperstructure extends VirtualSubsystem {
         switch(currentRobotAction) {
             // Outtaking Algae or Coral
             case OUTTAKE:
-                if(chosenGamepiece == Gamepiece.CORAL) {
-                    System.out.println("Outtake Coral at L"+level);
-                    switch (level) {
-                        case 1:
-                        currentRobotState = RobotState.L1_CORAL;
-                        robotActionCommand = CatzStateCommands.L1Coral(container);
-                        break;
+                if(climbState == ClimbState.CLIMB) {
+                    currentRobotState = RobotState.EXTENDING_CLIMB;
+                    System.out.println("EXTENDING CLIMB");
+                    robotActionCommand = CatzStateCommands.extendClimb(container);
 
-                        case 2:
-                        currentRobotState = RobotState.L2_CORAL;
-                        robotActionCommand = CatzStateCommands.L2Coral(container);
-                        break;
-
-                        case 3:
-                        currentRobotState = RobotState.L3_CORAL;
-                        robotActionCommand = CatzStateCommands.L3Coral(container);
-                        break;
-
-                        case 4:
-                        currentRobotState = RobotState.L4_CORAL;
-                        robotActionCommand = CatzStateCommands.L4Coral(container);
-                        break;
-                    }
                 } else {
-                    switch(level) {
-                        case 2:
-                            currentRobotState = RobotState.PROCESSOR;
-                            System.out.println("Processor");
-                            robotActionCommand = CatzStateCommands.processor(container);
+                    if(chosenGamepiece == Gamepiece.CORAL && climbState == ClimbState.NOT_CLIMBING) {
+                        System.out.println("Outtake Coral at L"+level);
+                        switch (level) {
+                            case 1:
+                            currentRobotState = RobotState.L1_CORAL;
+                            robotActionCommand = CatzStateCommands.L1Coral(container);
                             break;
-                        case 4:
-                            currentRobotState = RobotState.NET_ALGAE;
-                            System.out.println("Net Algae");
-                            // robotActionCommand = CatzStateCommands.netAlgae(container);
-                            break;
-                        default:
-                            robotActionCommand = Commands.none();
-                            break;
-                    }
-                    // System.out.println("Processor");
 
+                            case 2:
+                            currentRobotState = RobotState.L2_CORAL;
+                            robotActionCommand = CatzStateCommands.L2Coral(container);
+                            break;
+
+                            case 3:
+                            currentRobotState = RobotState.L3_CORAL;
+                            robotActionCommand = CatzStateCommands.L3Coral(container);
+                            break;
+
+                            case 4:
+                            currentRobotState = RobotState.L4_CORAL;
+                            robotActionCommand = CatzStateCommands.L4Coral(container);
+                            break;
+                        }
+                    } else {
+                        switch(level) {
+                            case 2:
+                                currentRobotState = RobotState.PROCESSOR;
+                                System.out.println("Processor");
+                                robotActionCommand = CatzStateCommands.processor(container);
+                                break;
+                            case 4:
+                                currentRobotState = RobotState.NET_ALGAE;
+                                System.out.println("Net Algae");
+                                // robotActionCommand = CatzStateCommands.netAlgae(container);
+                                break;
+                            default:
+                                robotActionCommand = Commands.none();
+                                break;
+                        }
+                        // System.out.println("Processor");
+
+                    }
                 }
                 break;
 
@@ -198,27 +223,36 @@ public class CatzSuperstructure extends VirtualSubsystem {
                     // System.out.println("Processor");
 
                 }
+
                 break;
 
             // Intake Algae From Reef or Coral from Coral Substation
             case INTAKE:
-                if(chosenGamepiece == Gamepiece.CORAL) {
-                    currentRobotState = RobotState.INTAKE_CORAL_STATION;
-                    robotActionCommand = CatzStateCommands.intakeCoralStation(container);
+
+                if(climbState == ClimbState.CLIMB) {
+                    currentRobotState = RobotState.CLIMBING;
+                    System.out.println("CLIMBINGINIGINGINGING");
+                    robotActionCommand = CatzStateCommands.fullClimb(container);
+
                 } else {
-                    switch (level) {
-                        case 2:
-                            currentRobotState = RobotState.TOP_ALGAE;
-                            System.out.println("TOP algae");
-                            robotActionCommand = CatzStateCommands.botAlgae(container);
-                            break;
-                        case 4:
-                            currentRobotState = RobotState.BOT_ALGAE;
-                            System.out.println("BOT algae");
-                            robotActionCommand = CatzStateCommands.topAlgae(container);
-                            break;
-                        default:
-                            break;
+                    if(chosenGamepiece == Gamepiece.CORAL && climbState == ClimbState.NOT_CLIMBING) {
+                        currentRobotState = RobotState.INTAKE_CORAL_STATION;
+                        robotActionCommand = CatzStateCommands.intakeCoralStation(container);
+                    } else {
+                        switch (level) {
+                            case 2:
+                                currentRobotState = RobotState.TOP_ALGAE;
+                                System.out.println("TOP algae");
+                                robotActionCommand = CatzStateCommands.botAlgae(container);
+                                break;
+                            case 4:
+                                currentRobotState = RobotState.BOT_ALGAE;
+                                System.out.println("BOT algae");
+                                robotActionCommand = CatzStateCommands.topAlgae(container);
+                                break;
+                            default:
+                                break;
+                        }
                     }
                 }
                 break;
@@ -238,13 +272,15 @@ public class CatzSuperstructure extends VirtualSubsystem {
                     robotActionCommand = container.getAlgaePivot().AlgaePivot_Punch();
 
                  }
-                 break;
+            break;
 
             default:
             case STOW:
                 currentRobotState = RobotState.STOW;
                 robotActionCommand = CatzStateCommands.stow(container);
                 break;
+
+
 
 
         }
@@ -254,6 +290,9 @@ public class CatzSuperstructure extends VirtualSubsystem {
             robotActionCommand.schedule();
         }
         previousAction = robotActionCommand;
+
+        Logger.recordOutput("CurrentRobotState/CurrentRobotState", currentRobotState);
+
     }
 
 
