@@ -1,6 +1,6 @@
 {
-  "robotWidth": 0.8128,
-  "robotLength": 0.8128,
+  "robotWidth": 0.9,
+  "robotLength": 0.9,
   "holonomicMode": true,
   "pathFolders": [
     "Bottom L4 FDC Paths",
@@ -11,6 +11,7 @@
     "L4 H Paths",
     "L4 I Paths",
     "L4 J Paths",
+    "Top JLKA Paths",
     "Straight Paths",
     "Test Paths",
     "Testy Folder",
@@ -23,8 +24,8 @@
     "4 Piece Auto",
     "Straight Auto"
   ],
-  "defaultMaxVel": 4.5,
-  "defaultMaxAccel": 5.5,
+  "defaultMaxVel": 4.2,
+  "defaultMaxAccel": 4.0,
   "defaultMaxAngVel": 540.0,
   "defaultMaxAngAccel": 720.0,
   "defaultNominalVoltage": 12.0,

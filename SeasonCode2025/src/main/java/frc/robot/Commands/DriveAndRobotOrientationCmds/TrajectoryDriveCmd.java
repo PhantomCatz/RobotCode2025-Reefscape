@@ -55,8 +55,8 @@ public class TrajectoryDriveCmd extends Command {
   // Trajectory constants
   public static final double ALLOWABLE_POSE_ERROR = 0.05;
   public static final double ALLOWABLE_AUTOAIM_ERROR = 0.02;
-  public static final double ALLOWABLE_ROTATION_ERROR = 1.0;
-  public static final double ALLOWABLE_VEL_ERROR = 0.05;
+  public static final double ALLOWABLE_ROTATION_ERROR = 3.0;
+  public static final double ALLOWABLE_VEL_ERROR = 0.15;
   public static final double ALLOWABLE_OMEGA_ERROR = 1.0;
   private static final double TIMEOUT_SCALAR = 3.0;
   private static final double CONVERGE_DISTANCE = 0.02;
@@ -227,7 +227,7 @@ public class TrajectoryDriveCmd extends Command {
     // target velocity is used as a ff
     // -------------------------------------------------------------------------------------
     PathPlannerTrajectoryState goal = trajectory.sample(Math.min(currentTime, trajectory.getTotalTimeSeconds()));
-    // System.out.println("goallspeed:" + goal.linearVelocity);
+    PathPlannerTrajectoryState endGoal = trajectory.sample(trajectory.getTotalTimeSeconds());
     Trajectory.State state = new Trajectory.State(
         currentTime,
         goal.linearVelocity,
@@ -237,7 +237,7 @@ public class TrajectoryDriveCmd extends Command {
     );
 
     // construct chassisspeeds
-    adjustedSpeeds = hocontroller.calculate(currentPose, state, goal.pose.getRotation());
+    adjustedSpeeds = hocontroller.calculate(currentPose, state, endGoal.pose.getRotation());
     // if (autoalign && translationError > FACE_REEF_DIST) {
     //   Translation2d reef = AllianceFlipUtil.apply(FieldConstants.Reef.center);
     //   adjustedSpeeds = hocontroller.calculate(currentPose, state, Rotation2d.fromRadians(Math.atan2(reef.getY() - currentPose.getY(),reef.getX() - currentPose.getX())));
@@ -292,6 +292,7 @@ public class TrajectoryDriveCmd extends Command {
     PathPlannerAuto.currentPathName = "";
     PathPlannerAuto.setCurrentTrajectory(null);
     PathPlannerLogging.logActivePath(null);
+    Logger.recordOutput("CatzRobotTracker/Desired Auto Pose", new Pose2d());
 
     eventScheduler.end();
     if (interrupted) {
@@ -315,7 +316,7 @@ public class TrajectoryDriveCmd extends Command {
 
     if (container.getCatzVision().isSeeingApriltag() && autoalign && tracker.getVisionPoseShift().getNorm() > ALLOWABLE_VISION_ADJUST) {
       // If trailing pose is within margin
-      // System.out.println("not visioning");
+      System.out.println("not visioning");
       return false;
     }
     // Finish command if the total time the path takes is over
@@ -356,7 +357,8 @@ public class TrajectoryDriveCmd extends Command {
       rotationError = 360 - rotationError;
     }
     // System.out.println("rotationerr: " + (rotationError < ALLOWABLE_OMEGA_ERROR));
-    // System.out.println("speederr: " + currentMPS);
+    // System.out.println("omegaerr: " + (currentRPS < ALLOWABLE_OMEGA_ERROR));
+    // System.out.println("speederr: " + (currentMPS < ALLOWABLE_VEL_ERROR));
 
     return isPoseWithinThreshold(poseError) && rotationError < ALLOWABLE_ROTATION_ERROR &&
     (desiredMPS != 0.0 || (currentMPS < ALLOWABLE_VEL_ERROR && currentRPS < ALLOWABLE_OMEGA_ERROR));
@@ -379,7 +381,7 @@ public class TrajectoryDriveCmd extends Command {
     translationError = Math.hypot(xError, yError);
 
     // System.out.println("poseerr:" + ((xError < poseError) &&(yError < poseError)));
-    // System.out.println("transerr: " + translationError);
+    System.out.println("transerr: " + (translationError < poseError));
     // System.out.println("pose errr: " + poseError);
     return translationError < poseError;
   }

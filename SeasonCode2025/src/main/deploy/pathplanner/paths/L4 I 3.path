@@ -4,12 +4,12 @@
     {
       "anchor": {
         "x": 1.5104508196721311,
-        "y": 7.423514344262295
+        "y": 7.483452868852458
       },
       "prevControl": null,
       "nextControl": {
         "x": 2.5133790426248477,
-        "y": 7.265754490883045
+        "y": 7.325693015473208
       },
       "isLocked": false,
       "linkedName": "Coral-Top"
@@ -33,8 +33,8 @@
   "pointTowardsZones": [],
   "eventMarkers": [],
   "globalConstraints": {
-    "maxVelocity": 4.5,
-    "maxAcceleration": 5.5,
+    "maxVelocity": 4.2,
+    "maxAcceleration": 4.0,
     "maxAngularVelocity": 540.0,
     "maxAngularAcceleration": 720.0,
     "nominalVoltage": 12.0,

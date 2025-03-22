@@ -41,10 +41,10 @@ public class ElevatorConstants {
 
     //inches TODO tune
     public static final double STOW_HEIGHT = 3.0;
-    public static final double L1_HEIGHT   = 6.6;
-    public static final double L2_HEIGHT   = 14.0;
-    public static final double L3_HEIGHT   = 33.0;//81.7;
-    public static final double L4_HEIGHT   = 61.4;
+    public static final double L1_HEIGHT   = 5.6;
+    public static final double L2_HEIGHT   = 13.0;
+    public static final double L3_HEIGHT   = 32.0;//81.7;
+    public static final double L4_HEIGHT   = 60.4;
     public static final double L4_CORAL_ADJ = 64.0;
     public static final double BOT_BOT_ALGAE = 20.6;
     public static final double BOT_TOP_ALGAE = 22.7;

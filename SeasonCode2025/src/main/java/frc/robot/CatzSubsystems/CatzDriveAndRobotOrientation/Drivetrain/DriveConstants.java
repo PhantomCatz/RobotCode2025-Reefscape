@@ -60,7 +60,7 @@ public class DriveConstants {
         .robotWidthY(Units.inchesToMeters(24.2))
         .bumperWidthX(Units.inchesToMeters(32))
         .bumperWidthY(Units.inchesToMeters(32))
-        .maxLinearVelocity(4)
+        .maxLinearVelocity(4.2)
         .maxLinearAcceleration(120)
         .maxAngularVelocity(Units.degreesToRadians(540))
         .maxAngularAcceleration(Units.degreesToRadians(720))
@@ -68,8 +68,8 @@ public class DriveConstants {
 
   public static final DriveConfig TRAJECTORY_CONFIG =
     DriveConfig.builder()
-      .maxLinearVelocity(4.0)
-      .maxLinearAcceleration(5.0)
+      .maxLinearVelocity(4.2)
+      .maxLinearAcceleration(4.0)
       .maxAngularVelocity(Units.degreesToRadians(540))
       .maxAngularAcceleration(Units.degreesToRadians(720))
       .build();
@@ -209,12 +209,12 @@ public class DriveConstants {
   // -----------------------------------------------------------------------------------------------------------------------------
   public static HolonomicDriveController getNewHolController() {
     return new HolonomicDriveController(
-      new PIDController(4.5, 0.0, 0.0),
-      new PIDController(4.5, 0.0, 0.0),
+      new PIDController(8, 0.0, 0.3),
+      new PIDController(8, 0.0, 0.3),
       new ProfiledPIDController(
         6.5,
         0.0,
-        0.0,
+        0.3,
         new TrapezoidProfile.Constraints(TRAJECTORY_CONFIG.maxAngularVelocity, TRAJECTORY_CONFIG.maxAngularAcceleration)
       )
     );
