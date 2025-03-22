@@ -14,14 +14,10 @@ package frc.robot.CatzSubsystems.CatzLEDs;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.AddressableLED;
 import edu.wpi.first.wpilibj.AddressableLEDBuffer;
-import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.Notifier;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.util.Color;
-import frc.robot.CatzSubsystems.CatzSuperstructure;
-import frc.robot.CatzSubsystems.CatzSuperstructure.CoralState;
-import frc.robot.CatzSubsystems.CatzSuperstructure.Gamepiece;
 import frc.robot.Utilities.VirtualSubsystem;
 import lombok.Getter;
 import lombok.Setter;
@@ -179,148 +175,148 @@ public class CatzLED extends VirtualSubsystem {
   @Override
   public void periodic() {
     // Update alliance color
-    if (DriverStation.isDSAttached()) {
-      alliance = DriverStation.getAlliance();
-      allianceColor =
-          alliance
-              .map(alliance -> alliance == Alliance.Blue ? Color.kBlue : Color.kRed)
-              .orElse(Color.kPurple);
-      secondaryDisabledColor = alliance.isPresent() ? Color.kYellow : Color.kBlack;
-    }
+    // if (DriverStation.isDSAttached()) {
+    //   alliance = DriverStation.getAlliance();
+    //   allianceColor =
+    //       alliance
+    //           .map(alliance -> alliance == Alliance.Blue ? Color.kBlue : Color.kRed)
+    //           .orElse(Color.kPurple);
+    //   secondaryDisabledColor = alliance.isPresent() ? Color.kYellow : Color.kBlack;
+    // }
 
-    // Update auto state
-    if (DriverStation.isDisabled()) {
+    // // Update auto state
+    // if (DriverStation.isDisabled()) {
 
-    } else {
-      lastEnabledAuto = DriverStation.isAutonomous();
-      lastEnabledTime = Timer.getFPGATimestamp();
-    }
+    // } else {
+    //   lastEnabledAuto = DriverStation.isAutonomous();
+    //   lastEnabledTime = Timer.getFPGATimestamp();
+    // }
 
-    // Update estop state
-    if (DriverStation.isEStopped()) {
-      estopped = true;
-    }
+    // // Update estop state
+    // if (DriverStation.isEStopped()) {
+    //   estopped = true;
+    // }
 
-    // Exit during initial cycles
-    loopCycleCount += 1;
-    if (loopCycleCount < minLoopCycleCount) {
-      return;
-    }
+    // // Exit during initial cycles
+    // loopCycleCount += 1;
+    // if (loopCycleCount < minLoopCycleCount) {
+    //   return;
+    // }
 
-    // Stop loading notifier if running
-    loadingNotifier.stop();
-
-
-    // -----------------------------------------------------------------------------------------------
-    // Set Elevator LED state
-    // -----------------------------------------------------------------------------------------------
-    if (estopped) {
-      setSolidElevatorColor(Color.kRed);
-      // MODE DISABLED
-    } else if (DriverStation.isDisabled()) {
-      if (lastEnabledAuto && (Timer.getFPGATimestamp() - lastEnabledTime < bubbleTime)) {
-        // Auto fade
-        bubble((int) ((((Timer.getFPGATimestamp() - lastEnabledTime) % bubbleTime)) / bubbleTime * LED_Sidebar_End_RT), Color.kAqua);
-      } else {
-        breath(Color.kPurple, Color.kAqua, System.currentTimeMillis()/10000.0);
-        bubble((int) ((((Timer.getFPGATimestamp() - lastEnabledTime) % bubbleTime)) / bubbleTime * LED_Sidebar_End_RT), allianceColor);
-        // APRILTAG CHECK
-        if(controllerState == ControllerLEDState.ledChecked) {
-          bigBubble((int) ((Timer.getFPGATimestamp() / bubbleTime) * LED_Sidebar_End_RT), 4, 10, Color.kGreen);
-        }
-      }
-      // MODE AUTON
-    } else if (DriverStation.isAutonomous()) {
-      wave(Color.kAqua, Color.kDarkBlue, waveFastCycleLength, waveFastDuration);
-      // MODE ENABLED
-    } else {
-      switch(controllerState) {
-        case REMOVE_ALGAE:
-          breath(Color.kAqua, Color.kRed, 0.3);
-        break;
-        case FULL_MANUAL:
-          if(CatzSuperstructure.getCurrentCoralState() == CoralState.IN_OUTTAKE) {
-            bigBubble((int) ((Timer.getFPGATimestamp() / bubbleTime) * LED_Sidebar_End_RT), 4, 10, Color.kAqua);
-          }
-        break;
-        case NBA:
-          if(CatzSuperstructure.getCurrentCoralState() == CoralState.IN_OUTTAKE) {
-            // setSolidElevatorColor(Color.kYellow);
-            rainbowElevator(rainbowCycleLength, breathDuration);
-          } else {
-            strobeElevator(Color.kYellow, Color.kBlack, breathDuration);
-          }
-        break;
-        case AQUA:
-          Color aquaColorONE   = Color.kBlack;
-          Color aquaColorTWO   = Color.kBlack;
-          Color aquaColorTHREE = Color.kBlack;
-          Color aquaColorFOUR  = Color.kBlack;
-
-          if(queueLEDState == QueueLEDState.ONE_CORAL) {
-            aquaColorONE   = Color.kRed;
-            aquaColorTWO   = Color.kBlack;
-            aquaColorTHREE = Color.kBlack;
-            aquaColorFOUR  = Color.kBlack;
-          } else if(queueLEDState == QueueLEDState.TWO_CORAL) {
-            aquaColorONE   = Color.kRed;
-            aquaColorTWO   = Color.kGold;
-            aquaColorTHREE = Color.kBlack;
-            aquaColorFOUR  = Color.kBlack;
-          } else if(queueLEDState == QueueLEDState.THREE_CORAL) {
-            aquaColorONE   = Color.kRed;
-            aquaColorONE   = Color.kGold;
-            aquaColorTHREE = Color.kBeige;
-            aquaColorFOUR  = Color.kBlack;
-          } else if(queueLEDState == QueueLEDState.FOUR_CORAL) {
-            aquaColorONE   = Color.kRed;
-            aquaColorONE   = Color.kGold;
-            aquaColorTHREE = Color.kBeige;
-            aquaColorFOUR  = Color.kPurple;
-          } else {
-            aquaColorONE = Color.kBlack;
-          }
-
-          if(CatzSuperstructure.getCurrentCoralState() == CoralState.IN_OUTTAKE) {
-            buildElevator(aquaColorONE, aquaColorTWO, aquaColorTHREE, aquaColorFOUR);
-          } else {
-            strobeElevator(Color.kAqua, Color.kBlack, breathDuration);
-          }
-
-        break;
-        case BALLS:
-          if(CatzSuperstructure.getCurrentCoralState() == CoralState.IN_OUTTAKE) {
-            setSolidElevatorColor(Color.kWhite);
-          } else {
-            strobeElevator(Color.kWhite, Color.kBlack, breathDuration);
-          }
-        break;
-        case CLIMB:
-          rainbowCrossbar(rainbowCycleLength, rainbowDuration);
-        break;
-        case sameBattery:
-          setSolidElevatorColor(Color.kDarkOrange);
-        break;
-        case lowBatteryAlert:
-          setSolidElevatorColor(Color.kOrange);
-        break;
-        default:
-          break;
-      }
+    // // Stop loading notifier if running
+    // loadingNotifier.stop();
 
 
-      //---------------------------------------------------------------------------------------------
-      // Update crossbar state
-      //---------------------------------------------------------------------------------------------
-      if(CatzSuperstructure.getChosenGamepiece() == Gamepiece.ALGAE) {
-        setSolidCrossbarColor(Color.kAqua);
-      } else {
-        setSolidCrossbarColor(Color.kGreen);
-      }
-    }
+    // // -----------------------------------------------------------------------------------------------
+    // // Set Elevator LED state
+    // // -----------------------------------------------------------------------------------------------
+    // if (estopped) {
+    //   setSolidElevatorColor(Color.kRed);
+    //   // MODE DISABLED
+    // } else if (DriverStation.isDisabled()) {
+    //   if (lastEnabledAuto && (Timer.getFPGATimestamp() - lastEnabledTime < bubbleTime)) {
+    //     // Auto fade
+    //     bubble((int) ((((Timer.getFPGATimestamp() - lastEnabledTime) % bubbleTime)) / bubbleTime * LED_Sidebar_End_RT), Color.kAqua);
+    //   } else {
+    //     breath(Color.kPurple, Color.kAqua, System.currentTimeMillis()/10000.0);
+    //     bubble((int) ((((Timer.getFPGATimestamp() - lastEnabledTime) % bubbleTime)) / bubbleTime * LED_Sidebar_End_RT), allianceColor);
+    //     // APRILTAG CHECK
+    //     if(controllerState == ControllerLEDState.ledChecked) {
+    //       bigBubble((int) ((Timer.getFPGATimestamp() / bubbleTime) * LED_Sidebar_End_RT), 4, 10, Color.kGreen);
+    //     }
+    //   }
+    //   // MODE AUTON
+    // } else if (DriverStation.isAutonomous()) {
+    //   wave(Color.kAqua, Color.kDarkBlue, waveFastCycleLength, waveFastDuration);
+    //   // MODE ENABLED
+    // } else {
+    //   switch(controllerState) {
+    //     case REMOVE_ALGAE:
+    //       breath(Color.kAqua, Color.kRed, 0.3);
+    //     break;
+    //     case FULL_MANUAL:
+    //       if(CatzSuperstructure.getCurrentCoralState() == CoralState.IN_OUTTAKE) {
+    //         bigBubble((int) ((Timer.getFPGATimestamp() / bubbleTime) * LED_Sidebar_End_RT), 4, 10, Color.kAqua);
+    //       }
+    //     break;
+    //     case NBA:
+    //       if(CatzSuperstructure.getCurrentCoralState() == CoralState.IN_OUTTAKE) {
+    //         // setSolidElevatorColor(Color.kYellow);
+    //         rainbowElevator(rainbowCycleLength, breathDuration);
+    //       } else {
+    //         strobeElevator(Color.kYellow, Color.kBlack, breathDuration);
+    //       }
+    //     break;
+    //     case AQUA:
+    //       Color aquaColorONE   = Color.kBlack;
+    //       Color aquaColorTWO   = Color.kBlack;
+    //       Color aquaColorTHREE = Color.kBlack;
+    //       Color aquaColorFOUR  = Color.kBlack;
 
-    // Update LEDs
-    ledStrip.setData(buffer);
+    //       if(queueLEDState == QueueLEDState.ONE_CORAL) {
+    //         aquaColorONE   = Color.kRed;
+    //         aquaColorTWO   = Color.kBlack;
+    //         aquaColorTHREE = Color.kBlack;
+    //         aquaColorFOUR  = Color.kBlack;
+    //       } else if(queueLEDState == QueueLEDState.TWO_CORAL) {
+    //         aquaColorONE   = Color.kRed;
+    //         aquaColorTWO   = Color.kGold;
+    //         aquaColorTHREE = Color.kBlack;
+    //         aquaColorFOUR  = Color.kBlack;
+    //       } else if(queueLEDState == QueueLEDState.THREE_CORAL) {
+    //         aquaColorONE   = Color.kRed;
+    //         aquaColorONE   = Color.kGold;
+    //         aquaColorTHREE = Color.kBeige;
+    //         aquaColorFOUR  = Color.kBlack;
+    //       } else if(queueLEDState == QueueLEDState.FOUR_CORAL) {
+    //         aquaColorONE   = Color.kRed;
+    //         aquaColorONE   = Color.kGold;
+    //         aquaColorTHREE = Color.kBeige;
+    //         aquaColorFOUR  = Color.kPurple;
+    //       } else {
+    //         aquaColorONE = Color.kBlack;
+    //       }
+
+    //       if(CatzSuperstructure.getCurrentCoralState() == CoralState.IN_OUTTAKE) {
+    //         buildElevator(aquaColorONE, aquaColorTWO, aquaColorTHREE, aquaColorFOUR);
+    //       } else {
+    //         strobeElevator(Color.kAqua, Color.kBlack, breathDuration);
+    //       }
+
+    //     break;
+    //     case BALLS:
+    //       if(CatzSuperstructure.getCurrentCoralState() == CoralState.IN_OUTTAKE) {
+    //         setSolidElevatorColor(Color.kWhite);
+    //       } else {
+    //         strobeElevator(Color.kWhite, Color.kBlack, breathDuration);
+    //       }
+    //     break;
+    //     case CLIMB:
+    //       rainbowCrossbar(rainbowCycleLength, rainbowDuration);
+    //     break;
+    //     case sameBattery:
+    //       setSolidElevatorColor(Color.kDarkOrange);
+    //     break;
+    //     case lowBatteryAlert:
+    //       setSolidElevatorColor(Color.kOrange);
+    //     break;
+    //     default:
+    //       break;
+    //   }
+
+
+    //   //---------------------------------------------------------------------------------------------
+    //   // Update crossbar state
+    //   //---------------------------------------------------------------------------------------------
+    //   if(CatzSuperstructure.getChosenGamepiece() == Gamepiece.ALGAE) {
+    //     setSolidCrossbarColor(Color.kAqua);
+    //   } else {
+    //     setSolidCrossbarColor(Color.kGreen);
+    //   }
+    // }
+
+    // // Update LEDs
+    // ledStrip.setData(buffer);
   } // end of periodic()
 
 

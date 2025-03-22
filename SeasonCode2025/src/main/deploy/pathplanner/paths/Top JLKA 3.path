@@ -3,29 +3,29 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 2.0,
-        "y": 7.0
+        "x": 1.5104508196721311,
+        "y": 7.483452868852458
       },
       "prevControl": null,
       "nextControl": {
-        "x": 3.0,
-        "y": 7.0
+        "x": 2.2048248276463203,
+        "y": 6.7200867718661055
       },
       "isLocked": false,
-      "linkedName": null
+      "linkedName": "Coral-Top"
     },
     {
       "anchor": {
-        "x": 7.756045081967213,
-        "y": 4.606
+        "x": 3.6802254098360656,
+        "y": 5.0499487704918025
       },
       "prevControl": {
-        "x": 6.756045081967213,
-        "y": 4.606
+        "x": 3.315222346616369,
+        "y": 5.456913276063904
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": null
+      "linkedName": "Reef-L"
     }
   ],
   "rotationTargets": [],
@@ -33,8 +33,8 @@
   "pointTowardsZones": [],
   "eventMarkers": [],
   "globalConstraints": {
-    "maxVelocity": 4.5,
-    "maxAcceleration": 5.5,
+    "maxVelocity": 4.2,
+    "maxAcceleration": 4.0,
     "maxAngularVelocity": 540.0,
     "maxAngularAcceleration": 720.0,
     "nominalVoltage": 12.0,
@@ -42,13 +42,13 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 0.0
+    "rotation": -58.43772133704708
   },
   "reversed": false,
-  "folder": null,
+  "folder": "Top JLKA Paths",
   "idealStartingState": {
     "velocity": 0,
-    "rotation": 0.0
+    "rotation": -53.67317404787977
   },
   "useDefaultConstraints": true
 }

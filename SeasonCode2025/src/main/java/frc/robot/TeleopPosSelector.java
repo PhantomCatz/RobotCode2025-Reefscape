@@ -571,7 +571,8 @@ public class TeleopPosSelector { //TODO split up the file. it's too big and does
       try{
         //TODO add a check to see if the robot is against the wall but angled so that it runs distanced scoring
         currentDrivetrainCommand = new TrajectoryDriveCmd(getPathfindingPath(calculateReefPose(getClosestReefPos().getFirst(), true, false)), m_container.getCatzDrivetrain(), true, m_container)
-                                        .deadlineFor(new RepeatCommand(new PrintCommand("sdf" + drivetrain.getDistanceError())),new RepeatCommand(CatzStateCommands.LXElevator(m_container, superstructure.getLevel()).alongWith(new PrintCommand("elevaktorktpa!"))).onlyIf(() -> drivetrain.getDistanceError() < 0.5));
+                                        .deadlineFor(new RepeatCommand(CatzStateCommands.LXElevator(m_container, superstructure.getLevel()).alongWith(new PrintCommand("elevaktorktpa!")).onlyIf(() -> drivetrain.getDistanceError() < 0.5)))
+                                        .andThen(m_container.rumbleDrvController(1.0, 0.2).alongWith(m_container.rumbleAuxController(1.0, 0.2)));
         currentDrivetrainCommand.schedule();
       }catch(Exception e){
         e.printStackTrace();
