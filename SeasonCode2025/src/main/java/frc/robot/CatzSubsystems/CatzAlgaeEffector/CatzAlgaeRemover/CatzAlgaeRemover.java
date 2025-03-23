@@ -58,11 +58,11 @@ public class CatzAlgaeRemover extends SubsystemBase {
   //
   //=====================================================================================
   public Command eatAlgae() {
-    return runOnce(() -> io.runPercentOutput(ALGAE_REMOVER_POWER)).alongWith(Commands.print("Hello"));
+    return runOnce(() -> io.runPercentOutput(ALGAE_EAT)).alongWith(Commands.print("Hello"));
   }
 
   public Command vomitAlgae() {
-    return runOnce(() -> io.runPercentOutput(-ALGAE_REMOVER_POWER));
+    return runOnce(() -> io.runPercentOutput(ALGAE_VOMIT));
   }
 
   public Command stopAlgae() {

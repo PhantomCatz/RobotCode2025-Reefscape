@@ -39,9 +39,9 @@ public class CatzAlgaePivot extends SubsystemBase {
 
   @RequiredArgsConstructor
   public enum AlgaePivotPosition { //In degrees
-    STOW(() -> 60.0),
+    STOW(() -> 90.0),
     HORIZONTAL(() -> -15.0), // TBD
-    NetAlgae(() -> 80.0), // TBD
+    NetAlgae(() -> 60.0), // 80.0TBD
     MANUAL(() -> manualPow),
     BOTBOT(() -> 0.7),
     BOTTOP(() -> 0.1),
@@ -129,13 +129,16 @@ public class CatzAlgaePivot extends SubsystemBase {
       targetPosition = AlgaePivotPosition.NULL;
     } else {
       io.setVoltage(tunnablePos.get());
-      // if(manualOverride.getAsBoolean()) {
-      //   io.setPercentOutput(manualPow);
-      // } else if(targetPosition != AlgaePivotPosition.NULL) {
-      //   io.runSetpoint(targetPosition.getTargetAngle(), calculateArmFeedFoward());
-      // } else {
+      if(manualOverride.getAsBoolean() || targetPosition == AlgaePivotPosition.MANUAL) {
+        io.setPercentOutput(manualPow);
 
-      // }
+      } else if(targetPosition != AlgaePivotPosition.NULL) {
+        System.out.println("algae pivot position null");
+         io.runSetpointUp(targetPosition.getTargetAngle(), calculateArmFeedFoward());
+
+      } else {
+
+      }
     }
 
     // Logging
@@ -152,7 +155,7 @@ public class CatzAlgaePivot extends SubsystemBase {
 
   public double calculateArmFeedFoward() {
     double result = 0.0;
-    result = slot0_gains.kG() * Math.cos(getAlgaePivotDeg());
+    result = slot0_gains.kG() * Math.cos(Math.toRadians(getAlgaePivotDeg()));
     return result;
   }
 
@@ -174,8 +177,8 @@ public class CatzAlgaePivot extends SubsystemBase {
   }
 
   public void algaePivotManual(Supplier<Double> manualSupplier) {
-    // targetPosDeg += manualSupplier.get() * MANUAL_SCALE;
-    //  System.out.println("algae:" +INITIAL_POSITION);
+    manualPow += manualSupplier.get() * MANUAL_SCALE;
+    // System.out.println("algae:" +INITIAL_POSITION);
   }
 
   public Command AlgaePivotFullManualCommand(Supplier<Double> manualSupplier) {
