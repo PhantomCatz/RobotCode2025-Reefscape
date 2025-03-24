@@ -29,6 +29,7 @@ public interface ModuleIO {
     public boolean isSteerMotorConnected;
     public double steerAbsoluteInitPosition;
 
+    public boolean isAbsEncoderConnected;
     public Rotation2d rawAbsEncPosition = new Rotation2d();
     public double rawAbsEncValueRotation;
     public Rotation2d steerAbsPosition = new Rotation2d();
