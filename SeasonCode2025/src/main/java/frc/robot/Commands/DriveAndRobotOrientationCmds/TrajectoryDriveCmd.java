@@ -11,8 +11,6 @@
 //------------------------------------------------------------------------------------
 package frc.robot.Commands.DriveAndRobotOrientationCmds;
 
-import com.pathplanner.lib.commands.PathPlannerAuto;
-import com.pathplanner.lib.events.EventScheduler;
 import com.pathplanner.lib.path.PathPlannerPath;
 import com.pathplanner.lib.path.PathPoint;
 import com.pathplanner.lib.trajectory.PathPlannerTrajectory;
@@ -54,10 +52,10 @@ import org.littletonrobotics.junction.Logger;
 public class TrajectoryDriveCmd extends Command {
   // Trajectory constants
   public static final double ALLOWABLE_POSE_ERROR = 0.05;
-  public static final double ALLOWABLE_AUTOAIM_ERROR = 0.02;
+  public static final double ALLOWABLE_AUTOAIM_ERROR = 0.025;
   public static final double ALLOWABLE_ROTATION_ERROR = 3.0;
-  public static final double ALLOWABLE_VEL_ERROR = 0.15;
-  public static final double ALLOWABLE_OMEGA_ERROR = 1.0;
+  public static final double ALLOWABLE_VEL_ERROR = 0.80; // m/s
+  public static final double ALLOWABLE_OMEGA_ERROR = 10.0;
   private static final double TIMEOUT_SCALAR = 3.0;
   private static final double CONVERGE_DISTANCE = 0.02;
   private static final double FACE_REEF_DIST = 2.0;
@@ -84,8 +82,8 @@ public class TrajectoryDriveCmd extends Command {
 
 
   // Event Command variables
-  private final EventScheduler eventScheduler;
-  private boolean isEventCommandRunning = false;
+  // private final EventScheduler eventScheduler;
+  // private boolean isEventCommandRunning = false;
 
   private boolean isBugged = false;
 
@@ -99,7 +97,7 @@ public class TrajectoryDriveCmd extends Command {
     this.m_driveTrain = drivetrain;
     this.autoalign = autoalign;
     this.container = container;
-    this.eventScheduler = new EventScheduler();
+    // this.eventScheduler = new EventScheduler();
     addRequirements(m_driveTrain);
   }
 
@@ -108,7 +106,7 @@ public class TrajectoryDriveCmd extends Command {
     this.m_driveTrain = drivetrain;
     this.autoalign = autoalign;
     this.container = container;
-    this.eventScheduler = new EventScheduler();
+    // this.eventScheduler = new EventScheduler();
     addRequirements(m_driveTrain);
   }
 
@@ -157,7 +155,7 @@ public class TrajectoryDriveCmd extends Command {
         this.trajectory = new PathPlannerTrajectory(
           usePath,
           currentSpeeds, //TODO make it not zero if its a thing thingy y esdpoifi
-          pathPoints.get(1).position.minus(pathPoints.get(0).position).getAngle(),
+          autoalign ? pathPoints.get(1).position.minus(pathPoints.get(0).position).getAngle() : pathPoints.get(1).position.minus(pathPoints.get(0).position).getAngle().plus(Rotation2d.k180deg),
           DriveConstants.TRAJ_ROBOT_CONFIG
         );
       }catch (Error e){
@@ -179,7 +177,7 @@ public class TrajectoryDriveCmd extends Command {
       pathTimeOut = trajectory.getTotalTimeSeconds() * TIMEOUT_SCALAR;
 
       // Event marker initialize
-      eventScheduler.initialize(trajectory);
+      // eventScheduler.initialize(trajectory);
 
       // System.out.println("current " + tracker.getEstimatedPose());
       // System.out.println("start " + this.trajectory.getInitialPose());
@@ -207,15 +205,17 @@ public class TrajectoryDriveCmd extends Command {
   // Execute
   //
   // ---------------------------------------------------------------------------------------------
+  private double exeTime = 0.0;
   @Override
   public void execute() {
     if(this.trajectory == null || isBugged) return;
+    exeTime = Timer.getFPGATimestamp();
 
     // Collect instananous variables
     double currentTime = timer.get();
     Pose2d currentPose = tracker.getEstimatedPose();
-    ChassisSpeeds currentSpeeds = DriveConstants.SWERVE_KINEMATICS.toChassisSpeeds(m_driveTrain.getModuleStates());
-    double currentVel = Math.hypot(currentSpeeds.vxMetersPerSecond, currentSpeeds.vyMetersPerSecond);
+    // ChassisSpeeds currentSpeeds = DriveConstants.SWERVE_KINEMATICS.toChassisSpeeds(m_driveTrain.getModuleStates());
+    // double currentVel = Math.hypot(currentSpeeds.vxMetersPerSecond, currentSpeeds.vyMetersPerSecond);
 
     // -------------------------------------------------------------------------------------
     // Convert PP trajectory into a wpilib trajectory type
@@ -248,19 +248,20 @@ public class TrajectoryDriveCmd extends Command {
 
     // Logging
     Logger.recordOutput("CatzRobotTracker/Desired Auto Pose", goal.pose);
+    // Logger.recordOutput("CatzRobotTracker/Desired Chassis Speeds", adjustedSpeeds);
 
-    PPLibTelemetry.setCurrentPose(currentPose);
-    PathPlannerLogging.logCurrentPose(currentPose);
+    // PPLibTelemetry.setCurrentPose(currentPose);
+    // PathPlannerLogging.logCurrentPose(currentPose);
 
-    PPLibTelemetry.setTargetPose(goal.pose);
-    PathPlannerLogging.logTargetPose(goal.pose);
+    // PPLibTelemetry.setTargetPose(goal.pose);
+    // PathPlannerLogging.logTargetPose(goal.pose);
 
-    PPLibTelemetry.setVelocities(
-        currentVel,
-        goal.linearVelocity,
-        currentSpeeds.omegaRadiansPerSecond,
-        goal.heading.getRadians()
-    );
+    // PPLibTelemetry.setVelocities(
+    //     currentVel,
+    //     goal.linearVelocity,
+    //     currentSpeeds.omegaRadiansPerSecond,
+    //     goal.heading.getRadians()
+    // );
 
     // send to drivetrain
     m_driveTrain.drive(adjustedSpeeds);
@@ -268,10 +269,12 @@ public class TrajectoryDriveCmd extends Command {
     m_driveTrain.setDistanceError(translationError);
 
     // Named Commands
-    eventScheduler.execute(currentTime);
+    // eventScheduler.execute(currentTime);
 
     // Logging
-    debugLogsTrajectory();
+    // debugLogsTrajectory();
+
+    System.out.println("traj exe: " + (Timer.getFPGATimestamp() - exeTime));
   } // end of execute
 
   // ---------------------------------------------------------------------------------------------
@@ -289,12 +292,12 @@ public class TrajectoryDriveCmd extends Command {
     timer.stop(); // Stop timer
     m_driveTrain.stopDriving();
 
-    PathPlannerAuto.currentPathName = "";
-    PathPlannerAuto.setCurrentTrajectory(null);
-    PathPlannerLogging.logActivePath(null);
-    Logger.recordOutput("CatzRobotTracker/Desired Auto Pose", new Pose2d());
+    // PathPlannerAuto.currentPathName = "";
+    // PathPlannerAuto.setCurrentTrajectory(null);
+    // PathPlannerLogging.logActivePath(null);
+    // Logger.recordOutput("CatzRobotTracker/Desired Auto Pose", new Pose2d());
 
-    eventScheduler.end();
+    // eventScheduler.end();
     if (interrupted) {
       System.out.println("OH NO I WAS INTERRUPTED HOW RUDE");
     }
@@ -302,8 +305,11 @@ public class TrajectoryDriveCmd extends Command {
     m_driveTrain.setDistanceError(9999999.9);
   }
 
+  private double finTime = 0.0;
+
   @Override
   public boolean isFinished() {
+    finTime = Timer.getFPGATimestamp();
     if(isBugged){
       System.out.println("Path Bugged");
       return true;
@@ -356,9 +362,9 @@ public class TrajectoryDriveCmd extends Command {
     if (rotationError > 180) {
       rotationError = 360 - rotationError;
     }
-    // System.out.println("rotationerr: " + (rotationError < ALLOWABLE_OMEGA_ERROR));
-    // System.out.println("omegaerr: " + (currentRPS < ALLOWABLE_OMEGA_ERROR));
-    // System.out.println("speederr: " + (currentMPS < ALLOWABLE_VEL_ERROR));
+    System.out.println("rotationerr: " + (rotationError));
+    System.out.println("omegaerr: " + (currentRPS));
+    System.out.println("speederr: " + (currentMPS));
 
     return isPoseWithinThreshold(poseError) && rotationError < ALLOWABLE_ROTATION_ERROR &&
     (desiredMPS != 0.0 || (currentMPS < ALLOWABLE_VEL_ERROR && currentRPS < ALLOWABLE_OMEGA_ERROR));
@@ -381,7 +387,8 @@ public class TrajectoryDriveCmd extends Command {
     translationError = Math.hypot(xError, yError);
 
     // System.out.println("poseerr:" + ((xError < poseError) &&(yError < poseError)));
-    System.out.println("transerr: " + (translationError < poseError));
+    System.out.println("transerr: " + (translationError));
+    System.out.println("fin time: " + (Timer.getFPGATimestamp() - finTime));
     // System.out.println("pose errr: " + poseError);
     return translationError < poseError;
   }

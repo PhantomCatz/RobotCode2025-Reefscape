@@ -14,13 +14,11 @@ package frc.robot.CatzSubsystems.CatzIntakeRollers;
 import static frc.robot.CatzSubsystems.CatzIntakeRollers.IntakeRollersConstants.*;
 
 import com.ctre.phoenix6.configs.TalonFXSConfiguration;
-import com.ctre.phoenix6.controls.VoltageOut;
+import com.ctre.phoenix6.controls.DutyCycleOut;
 import com.ctre.phoenix6.hardware.TalonFXS;
 import com.ctre.phoenix6.signals.MotorArrangementValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 
-import edu.wpi.first.units.VoltageUnit;
-import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj.DigitalInput;
 
 
@@ -60,8 +58,7 @@ public class IntakeRollersIOReal implements IntakeRollersIO{
 
     @Override
     public void runIntakeRampMotor(double speed) {
-        double volts = speed * 12.0;
-      IntakeCoralMtr.setControl(new VoltageOut(volts));
+      IntakeCoralMtr.setControl(new DutyCycleOut(speed));
     }
 
     @Override

@@ -262,6 +262,7 @@ public class CatzElevator extends SubsystemBase {
   }
 
   public void setElevatorPos(ElevatorPosition target) {
+    System.out.println("set elevator pose to: " + target);
     settlingCounter = 0;
     this.targetPosition = target;
   }
@@ -282,7 +283,7 @@ public class CatzElevator extends SubsystemBase {
     if(isElevatorInPos) {
       settlingCounter++;
       if(settlingCounter >= 2) {
-        isElevatorSettled = true;
+         isElevatorSettled = true;
         // settlingCounter = 0;
          //System.out.println("////////////ELEVATOR SETTLED FOR .2 SECONDS///////////////////");
       }

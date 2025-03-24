@@ -19,6 +19,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.CatzConstants;
 import frc.robot.RobotContainer;
+import frc.robot.CatzSubsystems.CatzOuttake.CatzOuttake;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -84,17 +85,17 @@ public class CatzIntakeRollers extends SubsystemBase {
 
         switch (currentState) {
             case INTAKE:
-                run_rampIntakeIn();
+                case_rampRollersIn();
             break;
             case ANTIJAM:
                 // adj_rampIntake(ANTIJAM_ROLLER_ROTATIONS);
-                adjusting_rampIntake();
+                case_rampRollersAntiJam();
             break;
             case OUTTAKE:
-                run_rampIntakeOut();
+                case_rampRollersOut();
             break;
             case STOP:
-                run_rampIntakeOff();
+                case_rampRollersStop();
             break;
         }
 
@@ -107,7 +108,7 @@ public class CatzIntakeRollers extends SubsystemBase {
         return inputs.positionMechs;
     }
 
-    private void run_rampIntakeIn() {
+    private void case_rampRollersIn() {
         io.runIntakeRampMotor(RAMP_INTAKE_SPEED);
 
         if(inputs.bbreakRampFrntTriggered && inputs.bbreakRampBackTriggered) {
@@ -117,9 +118,13 @@ public class CatzIntakeRollers extends SubsystemBase {
                 currentState = intakeRollersStates.ANTIJAM;
             }
         }
+        if(CatzOuttake.currentState == CatzOuttake.outtakeStates.STOP) {
+            System.out.println("detected!!!11-1--120-3-oieisdjisddhcjsujgjhkishghjikhghjklhgvhjkgvhkjhgsjsghdughsjdhd");
+            currentState = intakeRollersStates.STOP;
+        }
     }
 
-    private void run_rampIntakeOut() {
+    private void case_rampRollersOut() {
         io.runIntakeRampMotor(RAMP_OUTAKE_SPEED);
 
     }
@@ -128,7 +133,7 @@ public class CatzIntakeRollers extends SubsystemBase {
     //     io.adjustIntakeRamp(target);
     // }
 
-    public void adjusting_rampIntake() {
+    public void case_rampRollersAntiJam() {
         io.runIntakeRampMotor(RAMP_ADJUST_SPEED);
 
         if(!(inputs.bbreakRampFrntTriggered && inputs.bbreakRampBackTriggered)) {
@@ -140,7 +145,7 @@ public class CatzIntakeRollers extends SubsystemBase {
         }
     }
 
-    private void run_rampIntakeOff() {
+    private void case_rampRollersStop() {
         io.runIntakeRampMotor(0.0);
     }
 

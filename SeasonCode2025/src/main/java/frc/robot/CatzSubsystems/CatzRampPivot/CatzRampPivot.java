@@ -136,7 +136,7 @@ public class CatzRampPivot extends SubsystemBase {
   }
 
   public boolean isSafeToRaiseElevator(){
-    return inputs.positionMechs >= 5;
+    return inputs.positionMechs >= RampPivotConstants.RAMP_INTAKE-0.2;
   }
 
   public Command Ramp_Stow_Pos() {

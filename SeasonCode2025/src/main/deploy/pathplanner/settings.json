@@ -24,8 +24,8 @@
     "4 Piece Auto",
     "Straight Auto"
   ],
-  "defaultMaxVel": 4.2,
-  "defaultMaxAccel": 4.0,
+  "defaultMaxVel": 4.3,
+  "defaultMaxAccel": 4.3,
   "defaultMaxAngVel": 540.0,
   "defaultMaxAngAccel": 720.0,
   "defaultNominalVoltage": 12.0,

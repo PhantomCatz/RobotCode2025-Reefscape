@@ -45,7 +45,7 @@ public class CatzOuttake extends SubsystemBase {
   }
 
   @Setter @Getter
-  private outtakeStates currentState = outtakeStates.STOP;
+  public static outtakeStates currentState = outtakeStates.STOP;
   private outtakeStates previousState = outtakeStates.STOP;
 
   public CatzOuttake(RobotContainer container) {
@@ -160,7 +160,7 @@ public class CatzOuttake extends SubsystemBase {
     if(inputs.bbreakFrntTriggered) {
       io.runMotor(0.0, 0.0);
       intakeIterationCoutner++;
-      if(intakeIterationCoutner >= 20) {
+      if(intakeIterationCoutner >= 1) {
         if(inputs.bbreakBackTriggered) {
           intakeIterationCoutner = 0;
           currentState = outtakeStates.ADJ_FWD;

@@ -31,7 +31,7 @@ public class DriveConstants {
   // ---------------------------------------------------------------------------------------------------------------
   // Disabled flag for testing
   // ---------------------------------------------------------------------------------------------------------------
-  public static final boolean IS_DRIVE_DISABLED = false; //bruh
+  public static final boolean IS_DRIVE_DISABLED = true; //bruh
 
   // ---------------------------------------------------------------------------------------------------------------
   // Module organizations
@@ -68,8 +68,8 @@ public class DriveConstants {
 
   public static final DriveConfig TRAJECTORY_CONFIG =
     DriveConfig.builder()
-      .maxLinearVelocity(4.2)
-      .maxLinearAcceleration(4.0)
+      .maxLinearVelocity(4.3)
+      .maxLinearAcceleration(4.3)
       .maxAngularVelocity(Units.degreesToRadians(540))
       .maxAngularAcceleration(Units.degreesToRadians(720))
       .build();
@@ -209,8 +209,8 @@ public class DriveConstants {
   // -----------------------------------------------------------------------------------------------------------------------------
   public static HolonomicDriveController getNewHolController() {
     return new HolonomicDriveController(
-      new PIDController(8, 0.0, 0.3),
-      new PIDController(8, 0.0, 0.3),
+      new PIDController(7, 0.0, 0.3),
+      new PIDController(7, 0.0, 0.3),
       new ProfiledPIDController(
         6.5,
         0.0,

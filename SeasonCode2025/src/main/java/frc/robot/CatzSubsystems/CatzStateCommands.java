@@ -41,14 +41,14 @@ import frc.robot.Utilities.waituntil;
 public class CatzStateCommands {
 
     public static Command driveToScore(RobotContainer robotContainer, PathPlannerPath pathToReadyPose, int level){
-        final double PREDICT_DISTANCE = 1.50; //meters
+        final double PREDICT_DISTANCE = 1.60; //meters
 
         CatzDrivetrain drivetrain = robotContainer.getCatzDrivetrain();
         CatzOuttake outtake = robotContainer.getCatzOuttake();
 
         return new SequentialCommandGroup(
             new TrajectoryDriveCmd(pathToReadyPose, drivetrain, true, robotContainer).deadlineFor(
-                new RepeatCommand(LXElevator(robotContainer, level).onlyIf(() -> drivetrain.getDistanceError() < PREDICT_DISTANCE && !outtake.isDesiredCoralState(true)))
+                new RepeatCommand(LXElevator(robotContainer, level).alongWith(new PrintCommand("elevavavava")).onlyIf(() -> drivetrain.getDistanceError() < PREDICT_DISTANCE && !outtake.isDesiredCoralState(true)))
             ),
             new WaitUntilCommand(() -> !outtake.isDesiredCoralState(true)),
             LXCoral(robotContainer, level),
@@ -84,10 +84,10 @@ public class CatzStateCommands {
         CatzOuttake outtake = robotContainer.getCatzOuttake();
 
         return new SequentialCommandGroup(
-            Commands.waitUntil(()->outtake.isDesiredCoralState(false)).deadlineFor(
-                intakeCoralStation(robotContainer),
-                new TrajectoryDriveCmd(path, drivetrain, false, robotContainer)
-            )
+            intakeCoralStation(robotContainer),
+            new TrajectoryDriveCmd(path, drivetrain, false, robotContainer)
+            // Commands.waitUntil(()->outtake.isDesiredCoralState(false)).deadlineFor(
+            // )
         );
     }
 
@@ -317,7 +317,9 @@ public class CatzStateCommands {
             algaePivot.AlgaePivot_Stow(),
             rampPivot.Ramp_Intake_Pos(),
             intakeRollers.stopIntaking(),
-            Commands.waitUntil(() -> rampPivot.isSafeToRaiseElevator()),
+            new PrintCommand("not yet"),
+            // Commands.waitUntil(() -> rampPivot.isSafeToRaiseElevator()),
+            new PrintCommand("safe to raise elevator!!"),
             elevator.Elevator_LX(level)
         ).unless(()-> Robot.isSimulation()).alongWith(Commands.print("L" + level+" Elevator Raise")).unless(()-> Robot.isSimulation());
     }
