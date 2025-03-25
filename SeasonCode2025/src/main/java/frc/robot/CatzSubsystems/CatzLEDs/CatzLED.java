@@ -50,9 +50,6 @@ public class CatzLED extends VirtualSubsystem {
   @Getter @Setter @AutoLogOutput (key = "CatzLED/QueueState")
   public QueueLEDState queueLEDState = QueueLEDState.EMPTY;
 
-  @Getter @Setter @AutoLogOutput (key = "CatzLED/CrossbarLEDState")
-  public LocationState CrossbarState = LocationState.nuhthing;
-
   public enum QueueLEDState {
     EMPTY,
     ONE_CORAL,
@@ -73,22 +70,6 @@ public class CatzLED extends VirtualSubsystem {
     sameBattery,
     lowBatteryAlert,
     ledChecked,
-    nuhthing
-  }
-
-  public enum LocationState {
-    A,
-    B,
-    C,
-    D,
-    E,
-    F,
-    G,
-    H,
-    I,
-    J,
-    K,
-    L,
     nuhthing
   }
 

@@ -24,13 +24,13 @@ import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Autonomous.CatzAutonomous;
-
-
+import frc.robot.CatzSubsystems.CatzStateCommands;
 import frc.robot.CatzSubsystems.CatzSuperstructure;
 import frc.robot.CatzSubsystems.CatzAlgaeEffector.CatzAlgaePivot.CatzAlgaePivot;
 import frc.robot.CatzSubsystems.CatzAlgaeEffector.CatzAlgaeRemover.CatzAlgaeRemover;
 import frc.robot.CatzSubsystems.CatzSuperstructure.Gamepiece;
 import frc.robot.CatzSubsystems.CatzSuperstructure.LeftRight;
+import frc.robot.CatzSubsystems.CatzSuperstructure.RobotAction;
 import frc.robot.CatzSubsystems.CatzClimb.CatzClimb;
 import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.CatzRobotTracker;
 import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.Drivetrain.CatzDrivetrain;
@@ -84,11 +84,10 @@ public class RobotContainer {
   private final Trigger isElevatorFullManual = overrideHID.auxSwitch(0);
   private final Trigger isAlgaeEffectorFullManual = overrideHID.auxSwitch(0);
   private final Trigger isRampPivotFullManual = overrideHID.auxSwitch(0);
-  private final Trigger isClimbFullManual = overrideHID.driverSwitch(1);
+  private final Trigger isClimbEnabled = overrideHID.driverSwitch(1);
 
   private CommandXboxController xboxTest = new CommandXboxController(3);
   private TeleopPosSelector selector;
-
 
   // -------------------------------------------------------------------------------------------------------------------
   // Alert Declaration
@@ -110,8 +109,7 @@ public class RobotContainer {
     selector = new TeleopPosSelector(xboxAux, this);
     auto = new CatzAutonomous(this);
 
-    elevator.setOverrides(isElevatorFullManual);
-    algaePivot.setOverrides(isAlgaeEffectorFullManual);
+    superstructure.setClimbOverride(isClimbEnabled);
 
     // Drive And Aux Command Mapping
     configureBindings();
@@ -177,18 +175,11 @@ public class RobotContainer {
     xboxDrv.leftBumper().onFalse(new InstantCommand(() -> selector.cancelCurrentDrivetrainCommand().schedule()));
     xboxDrv.rightBumper().onFalse(new InstantCommand(() -> selector.cancelCurrentDrivetrainCommand().schedule()));
 
-    //TODO Score
-    // xboxDrv.leftTrigger(SCORE_TRIGGER_THRESHHOLD).onTrue(new InstantCommand(() -> CatzStateCommands.moveScore(this, superstructure.getLevel()).schedule()));
-
     // Default driving
     Trigger escapeTrajectory = new Trigger(()->(xboxDrv.getLeftY() > 0.8));
     escapeTrajectory.onTrue(selector.cancelCurrentDrivetrainCommand().alongWith(selector.cancelAutoCommand()));
 
     drive.setDefaultCommand(new TeleopDriveCmd(() -> xboxDrv.getLeftX(), () -> xboxDrv.getLeftY(), () -> xboxDrv.getRightX(), drive));
-
-    // Manual Ramp Pivot Control
-    // xboxDrv.povUp().onTrue(rampPivot.rampPivotPosManual(() -> 0.5).alongWith(Commands.print("Using manual ramp pivot")));
-    // xboxDrv.povDown().onTrue(rampPivot.rampPivotPosManual(() -> -0.5).alongWith(Commands.print("Using manual ramp pivot")));
     //---------------------------------------------------------------------------------------------------------------------
     // XBOX AUX
     //---------------------------------------------------------------------------------------------------------------------
@@ -203,8 +194,9 @@ public class RobotContainer {
     xboxAux.rightStick().onTrue(Commands.runOnce(() -> selector.pathQueueClear()).unless(()->xboxAux.leftStick().getAsBoolean())
                                         .alongWith(Commands.runOnce(() -> led.setControllerState(ControllerLEDState.AQUA))));
 
-    xboxAux.leftStick().and(xboxAux.rightStick()).onTrue(elevator.elevatorFullManual(() -> -xboxAux.getLeftY()));
-    xboxAux.leftStick().and(xboxAux.rightStick()).onTrue(algaePivot.AlgaePivotFullManualCommand(()->xboxAux.getRightY()));
+    // Full Manual
+    xboxAux.leftStick().and(xboxAux.rightStick()).or(isElevatorFullManual).onTrue(elevator.elevatorFullManual(() -> -xboxAux.getLeftY())); // TODO make an override button for comp
+    xboxAux.leftStick().and(xboxAux.rightStick()).or(isAlgaeEffectorFullManual).onTrue(algaePivot.AlgaePivotFullManualCommand(()->xboxAux.getRightY()));
 
 
     // Coral Station Run Back
@@ -215,14 +207,22 @@ public class RobotContainer {
     xboxAux.leftTrigger().onTrue(Commands.runOnce(()-> superstructure.cycleGamePieceSelection()));
 
     // Scoring Action
-    // xboxAux.y().onTrue(Commands.runOnce(() -> superstructure.setCurrentRobotAction(RobotAction.OUTTAKE, "container")).alongWith(Commands.print("OUTTAKE L" + superstructure.getLevel())));
-    // xboxAux.x().onTrue(Commands.runOnce(() -> superstructure.setCurrentRobotAction(RobotAction.INTAKE, "container")).alongWith(Commands.print("INTAKE")));
+    xboxAux.y().onTrue(Commands.runOnce(() -> superstructure.setCurrentRobotAction(RobotAction.OUTTAKE, "container")).alongWith(Commands.print("OUTTAKE L" + superstructure.getLevel())));
+    xboxAux.x().onTrue(Commands.runOnce(() -> superstructure.setCurrentRobotAction(RobotAction.INTAKE, "container")).alongWith(Commands.print("INTAKE")));
 
-    // xboxAux.b().onTrue(Commands.runOnce(() -> intakeRollers.outtake()).alongWith(Commands.print("ramp eject")));
-    // xboxAux.a().onTrue(Commands.runOnce(() -> superstructure.setCurrentRobotAction(RobotAction.STOW, "container")).alongWith(Commands.print("STOWWW")));
+    xboxAux.b().onTrue(Commands.runOnce(() -> intakeRollers.outtake()).alongWith(Commands.print("ramp eject")));
+    xboxAux.a().onTrue(Commands.runOnce(() -> superstructure.setCurrentRobotAction(RobotAction.STOW, "container")).alongWith(Commands.print("STOWWW")));
 
-    // xboxAux.b().toggleOnTrue(intakeRollers.outtake().alongWith(Commands.print("pressed b"))); //TBD
-    // xboxAux.a().toggleOnTrue(intakeRollers.intake().alongWith(Commands.print("pressed a"))); //TBD
+    xboxAux.b().toggleOnTrue(intakeRollers.outtake().alongWith(Commands.print("pressed b"))); //TBD
+    xboxAux.a().toggleOnTrue(intakeRollers.intake().alongWith(Commands.print("pressed a"))); //TBD
+
+    // Climb Action
+    xboxAux.y().and(isClimbEnabled).onTrue(CatzStateCommands.extendClimb(this));
+    xboxAux.b().and(isClimbEnabled).onTrue(CatzStateCommands.fullClimb(this));
+        // Manual Climb Control
+    xboxAux.back().and(xboxAux.start()).onTrue(climb.ClimbManualMode(()->0.0).alongWith(Commands.print("climb manual")));
+    xboxAux.back().and(xboxAux.leftStick()).onTrue(climb.ClimbManualMode(() -> xboxAux.getLeftY()).alongWith(Commands.print("Using manual climb")));
+
 
     // algae punch
     DoublePressTracker.createTrigger(xboxAux.x())
@@ -238,19 +238,9 @@ public class RobotContainer {
     xboxAux.povDown().onTrue(Commands.runOnce(() -> {superstructure.setLevel(4); SmartDashboard.putNumber("Reef Level", 4);}));
 
     xboxAux.a().onTrue(Commands.runOnce(() -> System.out.println("L:"+superstructure.getLevel()+", "+superstructure.getChosenGamepiece())));
-    //xboxAux.start().onTrue(outtake.startOuttake());
-
-    // // Climb
-    // xboxAux.back().and(xboxAux.b()).onTrue(CatzStateCommands.climb(this).alongWith(Commands.print("climb mode"))); // Setup Climb
-    // xboxAux.back().and(xboxAux.x()).onTrue(climb.Climb_Retract());
-    xboxAux.back().onTrue(Commands.runOnce(() -> superstructure.toggleClimbMode()));
-    xboxAux.back().and(xboxAux.start()).onTrue(climb.ClimbManualMode(()->0.0).alongWith(Commands.print("climb manual")));
-    // Manual Climb Control
-    xboxAux.back().and(xboxAux.leftStick()).onTrue(climb.ClimbManualMode(() -> xboxAux.getLeftY()).alongWith(Commands.print("Using manual climb")));
-
     //------------------------------------------------------------------------------------------------------------------------------
     //  XBOX test controls
-    // //------------------------------------------------------------------------------------------------------------------------------
+    //------------------------------------------------------------------------------------------------------------------------------
     // xboxTest.povRight().toggleOnTrue(algaePivot.AlgaePivot_BotTop().alongWith(Commands.print("pressed POV Right"))); //TBD
 
     // xboxTest.povUp().toggleOnTrue(rampPivot.Ramp_Intake_Pos().alongWith(Commands.print("pressed POV Up"))); //TBD
