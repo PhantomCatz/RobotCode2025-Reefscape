@@ -26,6 +26,7 @@ import frc.robot.CatzSubsystems.CatzLEDs.CatzLED.ControllerLEDState;
 import frc.robot.Utilities.Alert;
 import frc.robot.Utilities.Alert.AlertType;
 import frc.robot.Utilities.MotorUtil.NeutralMode;
+import lombok.Getter;
 import frc.robot.Utilities.VirtualSubsystem;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -69,7 +70,9 @@ public class Robot extends LoggedRobot {
   private double teleStart;
   private double autoStart;
   private boolean autoMessagePrinted;
+  @Getter
   private static double teleElapsedTime = 0.0;
+  @Getter
   private static double autoElapsedTime = 0.0;
 
   // --------------------------------------------------------------------------------------------------------

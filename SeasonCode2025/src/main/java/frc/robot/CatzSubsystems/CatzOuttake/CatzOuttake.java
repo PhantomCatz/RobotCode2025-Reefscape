@@ -160,7 +160,7 @@ public class CatzOuttake extends SubsystemBase {
     if(inputs.bbreakFrntTriggered) {
       io.runMotor(0.0, 0.0);
       intakeIterationCoutner++;
-      if(intakeIterationCoutner >= 1) {
+      if(intakeIterationCoutner >= 10) {
         if(inputs.bbreakBackTriggered) {
           intakeIterationCoutner = 0;
           currentState = outtakeStates.ADJ_FWD;
@@ -248,7 +248,7 @@ public class CatzOuttake extends SubsystemBase {
 
   public Command outtakeL4() {
 
-    return runOnce(() -> {currentState = outtakeStates.SCORE_L4;interationCounter = 0;});
+    return runOnce(() -> {currentState = outtakeStates.SCORE_L4; interationCounter = 0;});
   }
 
   public Command stopOuttake() {

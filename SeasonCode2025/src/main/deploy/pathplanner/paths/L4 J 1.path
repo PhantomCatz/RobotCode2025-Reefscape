@@ -3,13 +3,13 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 7.204610655737704,
-        "y": 5.073924180327869
+        "x": 7.08825,
+        "y": 5.25373975409836
       },
       "prevControl": null,
       "nextControl": {
-        "x": 7.1686475409836055,
-        "y": 6.128842213114752
+        "x": 7.052286885245902,
+        "y": 6.308657786885243
       },
       "isLocked": false,
       "linkedName": "Start3"
@@ -48,7 +48,7 @@
   "folder": "L4 J Paths",
   "idealStartingState": {
     "velocity": 0,
-    "rotation": 180.0
+    "rotation": 179.52266860968942
   },
   "useDefaultConstraints": true
 }

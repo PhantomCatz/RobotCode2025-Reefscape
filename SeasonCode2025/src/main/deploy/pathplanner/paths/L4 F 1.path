@@ -3,13 +3,13 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 7.204610655737704,
-        "y": 5.073924180327869
+        "x": 7.08825,
+        "y": 5.25373975409836
       },
       "prevControl": null,
       "nextControl": {
-        "x": 5.969877049180327,
-        "y": 5.157838114754099
+        "x": 5.853516393442623,
+        "y": 5.33765368852459
       },
       "isLocked": false,
       "linkedName": "Start3"
@@ -48,7 +48,7 @@
   "folder": "L4 F Paths",
   "idealStartingState": {
     "velocity": 0,
-    "rotation": 180.0
+    "rotation": 179.52266860968942
   },
   "useDefaultConstraints": true
 }

@@ -362,6 +362,13 @@ public class TrajectoryDriveCmd extends Command {
     if (rotationError > 180) {
       rotationError = 360 - rotationError;
     }
+
+    // Desperate Throwing
+    if(Robot.getAutoElapsedTime() >= 14.50) {
+      rotationError = 0.0;
+      System.out.println("THROW");
+    }
+
     System.out.println("rotationerr: " + (rotationError));
     System.out.println("omegaerr: " + (currentRPS));
     System.out.println("speederr: " + (currentMPS));
@@ -385,6 +392,12 @@ public class TrajectoryDriveCmd extends Command {
     double yError = Math.abs(desiredPosY - currentPosY);
 
     translationError = Math.hypot(xError, yError);
+
+    // Desperate Throwing
+    if(Robot.getAutoElapsedTime() >= 14.50) {
+      translationError = 0.0;
+      System.out.println("THROW");
+    }
 
     // System.out.println("poseerr:" + ((xError < poseError) &&(yError < poseError)));
     System.out.println("transerr: " + (translationError));

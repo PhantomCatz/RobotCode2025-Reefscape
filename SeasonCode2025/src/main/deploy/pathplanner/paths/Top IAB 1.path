@@ -3,13 +3,13 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 7.204610655737704,
-        "y": 5.073924180327869
+        "x": 7.08825,
+        "y": 5.25373975409836
       },
       "prevControl": null,
       "nextControl": {
-        "x": 6.641188524590164,
-        "y": 5.145850409836064
+        "x": 6.52482786885246,
+        "y": 5.325665983606555
       },
       "isLocked": false,
       "linkedName": "Start3"
@@ -48,7 +48,7 @@
   "folder": "Top IAB Paths",
   "idealStartingState": {
     "velocity": 0,
-    "rotation": 180.0
+    "rotation": 179.52266860968942
   },
   "useDefaultConstraints": true
 }
