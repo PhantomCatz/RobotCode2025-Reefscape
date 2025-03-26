@@ -1,0 +1,54 @@
+{
+  "version": "2025.0",
+  "waypoints": [
+    {
+      "anchor": {
+        "x": 3.6802254098360656,
+        "y": 5.0499487704918025
+      },
+      "prevControl": null,
+      "nextControl": {
+        "x": 3.926324163194559,
+        "y": 5.00595554833889
+      },
+      "isLocked": false,
+      "linkedName": "Reef-L"
+    },
+    {
+      "anchor": {
+        "x": 1.443,
+        "y": 7.515499999999999
+      },
+      "prevControl": {
+        "x": 1.1807511794917407,
+        "y": 7.752170261834664
+      },
+      "nextControl": null,
+      "isLocked": false,
+      "linkedName": "Coral-Top"
+    }
+  ],
+  "rotationTargets": [],
+  "constraintZones": [],
+  "pointTowardsZones": [],
+  "eventMarkers": [],
+  "globalConstraints": {
+    "maxVelocity": 4.3,
+    "maxAcceleration": 4.3,
+    "maxAngularVelocity": 540.0,
+    "maxAngularAcceleration": 720.0,
+    "nominalVoltage": 12.0,
+    "unlimited": false
+  },
+  "goalEndState": {
+    "velocity": 0,
+    "rotation": -53.67317404787977
+  },
+  "reversed": false,
+  "folder": "Coral Station Practice Paths",
+  "idealStartingState": {
+    "velocity": 0,
+    "rotation": -58.43772133704708
+  },
+  "useDefaultConstraints": true
+}

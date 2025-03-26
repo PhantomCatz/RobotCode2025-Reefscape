@@ -80,11 +80,6 @@ public class TrajectoryDriveCmd extends Command {
   // Swerve Drive Variables
   private ChassisSpeeds adjustedSpeeds = new ChassisSpeeds();
 
-
-  // Event Command variables
-  // private final EventScheduler eventScheduler;
-  // private boolean isEventCommandRunning = false;
-
   private boolean isBugged = false;
 
   // ---------------------------------------------------------------------------------------------
@@ -97,7 +92,6 @@ public class TrajectoryDriveCmd extends Command {
     this.m_driveTrain = drivetrain;
     this.autoalign = autoalign;
     this.container = container;
-    // this.eventScheduler = new EventScheduler();
     addRequirements(m_driveTrain);
   }
 
@@ -106,7 +100,6 @@ public class TrajectoryDriveCmd extends Command {
     this.m_driveTrain = drivetrain;
     this.autoalign = autoalign;
     this.container = container;
-    // this.eventScheduler = new EventScheduler();
     addRequirements(m_driveTrain);
   }
 
@@ -123,17 +116,15 @@ public class TrajectoryDriveCmd extends Command {
   public void initialize() {
     try{
       // Flip path if necessary
-      System.out.println("trajec start");
       PathPlannerPath usePath;
-      if(pathSupplier != null){
+      if(pathSupplier != null) {
         path = pathSupplier.get();
         usePath = path;
-      }else{
+      } else {
         usePath = path;
       }
-      if (AllianceFlipUtil.shouldFlipToRed()) {
+      if(AllianceFlipUtil.shouldFlipToRed()) {
         usePath = path.flipPath();
-        System.out.println("Path flipped!!!!!");
       }
 
       // Pose Reseting
@@ -150,7 +141,7 @@ public class TrajectoryDriveCmd extends Command {
       ChassisSpeeds currentSpeeds = DriveConstants.SWERVE_KINEMATICS.toChassisSpeeds(tracker.getCurrentModuleStates());
       List<PathPoint> pathPoints = usePath.getAllPathPoints();
 
-      try{
+      try {
         // Construct trajectory
         this.trajectory = new PathPlannerTrajectory(
           usePath,
@@ -158,7 +149,7 @@ public class TrajectoryDriveCmd extends Command {
           autoalign ? pathPoints.get(1).position.minus(pathPoints.get(0).position).getAngle() : pathPoints.get(1).position.minus(pathPoints.get(0).position).getAngle().plus(Rotation2d.k180deg),
           DriveConstants.TRAJ_ROBOT_CONFIG
         );
-      }catch (Error e){
+      } catch (Error e){
         e.printStackTrace();
         //for some reason if you spam NBA current rotation gets bugged.
         this.trajectory = new PathPlannerTrajectory(
@@ -176,9 +167,6 @@ public class TrajectoryDriveCmd extends Command {
       hocontroller = DriveConstants.getNewHolController();
       pathTimeOut = trajectory.getTotalTimeSeconds() * TIMEOUT_SCALAR;
 
-      // Event marker initialize
-      // eventScheduler.initialize(trajectory);
-
       // System.out.println("current " + tracker.getEstimatedPose());
       // System.out.println("start " + this.trajectory.getInitialPose());
       // System.out.println("end " + this.trajectory.getEndState().pose);
@@ -189,13 +177,12 @@ public class TrajectoryDriveCmd extends Command {
 
       this.timer.reset();
       this.timer.start();
-    }catch(Exception e){
+    } catch(Exception e) {
       isBugged = true;
       e.printStackTrace();
     }
 
     // System.out.println("timeoutt::" + trajectory.getTotalTimeSeconds());
-    //
   } // end of initialize()
 
 
@@ -268,9 +255,6 @@ public class TrajectoryDriveCmd extends Command {
 
     m_driveTrain.setDistanceError(translationError);
 
-    // Named Commands
-    // eventScheduler.execute(currentTime);
-
     // Logging
     // debugLogsTrajectory();
 
@@ -293,11 +277,8 @@ public class TrajectoryDriveCmd extends Command {
     m_driveTrain.stopDriving();
 
     // PathPlannerAuto.currentPathName = "";
-    // PathPlannerAuto.setCurrentTrajectory(null);
-    // PathPlannerLogging.logActivePath(null);
     // Logger.recordOutput("CatzRobotTracker/Desired Auto Pose", new Pose2d());
 
-    // eventScheduler.end();
     if (interrupted) {
       System.out.println("OH NO I WAS INTERRUPTED HOW RUDE");
     }
@@ -335,6 +316,9 @@ public class TrajectoryDriveCmd extends Command {
     }
   }
 
+  //---------------------------------------------------------------------------------------------------------------
+  //  Trajectory Factory Methods
+  //---------------------------------------------------------------------------------------------------------------
   private ChassisSpeeds applyCusp(ChassisSpeeds speeds, double distance, final double threshold) {
     // graph 1 / (1+x) on desmos
     double x = distance / threshold;
@@ -369,9 +353,9 @@ public class TrajectoryDriveCmd extends Command {
       System.out.println("THROW");
     }
 
-    System.out.println("rotationerr: " + (rotationError));
-    System.out.println("omegaerr: " + (currentRPS));
-    System.out.println("speederr: " + (currentMPS));
+    // System.out.println("rotationerr: " + (rotationError));
+    // System.out.println("omegaerr: " + (currentRPS));
+    // System.out.println("speederr: " + (currentMPS));
 
     return isPoseWithinThreshold(poseError) && rotationError < ALLOWABLE_ROTATION_ERROR &&
     (desiredMPS != 0.0 || (currentMPS < ALLOWABLE_VEL_ERROR && currentRPS < ALLOWABLE_OMEGA_ERROR));
@@ -394,10 +378,10 @@ public class TrajectoryDriveCmd extends Command {
     translationError = Math.hypot(xError, yError);
 
     // Desperate Throwing
-    if(Robot.getAutoElapsedTime() >= 14.50) {
-      translationError = 0.0;
-      System.out.println("THROW");
-    }
+    // if(Robot.getAutoElapsedTime() >= 14.50) {
+    //   translationError = 0.0;
+    //   System.out.println("THROW");
+    // }
 
     // System.out.println("poseerr:" + ((xError < poseError) &&(yError < poseError)));
     System.out.println("transerr: " + (translationError));
