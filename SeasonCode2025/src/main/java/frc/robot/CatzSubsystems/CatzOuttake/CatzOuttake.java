@@ -233,11 +233,6 @@ public class CatzOuttake extends SubsystemBase {
     return runOnce(() -> currentState = outtakeStates.ADJ_INIT).alongWith(Commands.print("Commanded: startIntaking"));
   }
 
-
-  public Command rampEject() {
-    return runOnce(() -> currentState = outtakeStates.RAMP_EJECT);
-  }
-
   public Command startOuttake() {
     return runOnce(() -> currentState = outtakeStates.SCORE);
   }

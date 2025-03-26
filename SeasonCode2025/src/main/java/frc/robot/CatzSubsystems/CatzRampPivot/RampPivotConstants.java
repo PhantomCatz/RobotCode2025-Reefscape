@@ -26,7 +26,7 @@ public class RampPivotConstants {
     public static final int STALL_CURRENT_LIMIT = 30; //TODO
 
     public static final double RAMP_STOW = 0;
-    public static final double RAMP_INTAKE = 6;
+    public static final double RAMP_INTAKE = 4.140625;//(28) //2.774414(28) //1.7949218(32) //6; //
 
     public static final double RAMP_CLIMB = 47.810546;
     public static final double RAMP_L1_SCORE = 20.0;
@@ -36,7 +36,8 @@ public class RampPivotConstants {
     public static final Gains gains =
         switch (CatzConstants.getRobotType()) {
             case SN2 -> new Gains(1.75, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0);
-            case SN1 -> new Gains(0.015, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0);
+                                // v 0.15 v
+            case SN1 -> new Gains(1.75, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0);
             case SN_TEST, SN1_2024 -> new Gains(7000.0, 0.0, 250.0, 8.4, 0.2, 0.2, 22.9);
         };
 

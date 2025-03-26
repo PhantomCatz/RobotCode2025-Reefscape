@@ -33,8 +33,8 @@ import edu.wpi.first.wpilibj.DigitalInput;
 
 public class ElevatorIOReal implements ElevatorIO {
   // Motor Instantiation
-  TalonFX leaderTalon = new TalonFX(LEFT_LEADER_ID);
-  TalonFX followerTalon = new TalonFX(RIGHT_FOLLOWER_ID);
+  TalonFX leaderTalon = new TalonFX(RIGHT_FOLLOWER_ID);
+  TalonFX followerTalon = new TalonFX(LEFT_LEADER_ID);
 
   // Motor configuration
   private final TalonFXConfiguration config = new TalonFXConfiguration();
@@ -104,7 +104,7 @@ public class ElevatorIOReal implements ElevatorIO {
     config.MotionMagic.MotionMagicCruiseVelocity = motionMagicParameters.mmCruiseVelocity();
     config.MotionMagic.MotionMagicAcceleration = motionMagicParameters.mmAcceleration();
     config.MotionMagic.MotionMagicJerk = motionMagicParameters.mmJerk();
-    config.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
+    config.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
 
     // Encoder Resetting
     leaderTalon.setPosition(0);
@@ -147,18 +147,6 @@ public class ElevatorIOReal implements ElevatorIO {
 
       inputs.positionInch =       internalPositionRotations.getValueAsDouble() * FINAL_RATIO;
       inputs.velocityInchPerSec = velocityRps.getValueAsDouble() * FINAL_RATIO;
-      inputs.appliedVolts =       appliedVoltage.stream()
-                                                .mapToDouble(StatusSignal::getValueAsDouble)
-                                                .toArray();
-      inputs.supplyCurrentAmps =  supplyCurrent.stream()
-                                                .mapToDouble(StatusSignal::getValueAsDouble)
-                                                .toArray();
-      inputs.torqueCurrentAmps =  torqueCurrent.stream()
-                                              .mapToDouble(StatusSignal::getValueAsDouble)
-                                              .toArray();
-      inputs.tempCelcius =        tempCelsius.stream()
-                                            .mapToDouble(StatusSignal::getValueAsDouble)
-                                            .toArray();
 
       inputs.isBotLimitSwitched = m_elevatorLimitBot.get();
     }

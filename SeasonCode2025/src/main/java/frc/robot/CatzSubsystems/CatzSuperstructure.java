@@ -11,7 +11,10 @@
 //------------------------------------------------------------------------------------
 package frc.robot.CatzSubsystems;
 
+import java.util.function.BooleanSupplier;
+
 import org.littletonrobotics.junction.AutoLogOutput;
+import org.littletonrobotics.junction.Logger;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -37,6 +40,9 @@ public class CatzSuperstructure extends VirtualSubsystem {
     @Getter @AutoLogOutput(key = "CatzSuperstructure/CurrentRobotAction")
     private RobotAction currentRobotAction = RobotAction.STOW;
 
+    @Getter @AutoLogOutput(key = "CatzSuperstructure/IsClimbEnabled")
+    private boolean isClimbEnabled;
+
     @Getter @Setter @AutoLogOutput(key = "CatzSuperstructure/CurrentCoralState")
     private static CoralState currentCoralState = CoralState.IN_OUTTAKE;
 
@@ -49,7 +55,6 @@ public class CatzSuperstructure extends VirtualSubsystem {
         CORAL,
         ALGAE
     }
-
 
     public enum CoralState{
         IN_OUTTAKE,
@@ -75,7 +80,8 @@ public class CatzSuperstructure extends VirtualSubsystem {
         NET_ALGAE,
         BOT_ALGAE,
         TOP_ALGAE,
-        CLIMB
+        CLIMBING,
+        EXTENDING_CLIMB
     }
 
     public enum RobotAction {
@@ -87,7 +93,6 @@ public class CatzSuperstructure extends VirtualSubsystem {
         L4_AUTO_OUTTAKE
     }
 
-
     public enum LeftRight{
         LEFT(1),
         RIGHT(-1);
@@ -97,7 +102,7 @@ public class CatzSuperstructure extends VirtualSubsystem {
         private LeftRight(int num){
           this.NUM  = num;
         }
-      }
+    }
 
     public CatzSuperstructure(RobotContainer container) {
         this.container = container;
@@ -120,9 +125,17 @@ public class CatzSuperstructure extends VirtualSubsystem {
         }
     }
 
+    public void setClimbOverride(BooleanSupplier isClimbEnabled) {
+        this.isClimbEnabled = isClimbEnabled.getAsBoolean();
+    }
+
     public void setCurrentRobotAction(RobotAction action, int level) {
         robotActionCommand = Commands.print("No robot Action Selected");
         this.currentRobotAction = action;
+
+        if(isClimbEnabled) {
+            return;
+        } 
 
         switch(currentRobotAction) {
             // Outtaking Algae or Coral
@@ -198,6 +211,7 @@ public class CatzSuperstructure extends VirtualSubsystem {
                     // System.out.println("Processor");
 
                 }
+
                 break;
 
             // Intake Algae From Reef or Coral from Coral Substation
@@ -206,21 +220,21 @@ public class CatzSuperstructure extends VirtualSubsystem {
                     currentRobotState = RobotState.INTAKE_CORAL_STATION;
                     robotActionCommand = CatzStateCommands.intakeCoralStation(container);
                 } else {
-                    switch (level) {
-                        case 2:
-                            currentRobotState = RobotState.TOP_ALGAE;
-                            System.out.println("TOP algae");
-                            robotActionCommand = CatzStateCommands.botAlgae(container);
-                            break;
-                        case 4:
-                            currentRobotState = RobotState.BOT_ALGAE;
-                            System.out.println("BOT algae");
-                            robotActionCommand = CatzStateCommands.topAlgae(container);
-                            break;
-                        default:
-                            break;
-                    }
+                switch (level) {
+                    case 2:
+                        currentRobotState = RobotState.TOP_ALGAE;
+                        System.out.println("TOP algae");
+                        robotActionCommand = CatzStateCommands.botAlgae(container);
+                        break;
+                    case 4:
+                        currentRobotState = RobotState.BOT_ALGAE;
+                        System.out.println("BOT algae");
+                        robotActionCommand = CatzStateCommands.topAlgae(container);
+                        break;
+                    default:
+                        break;
                 }
+            }
                 break;
 
             // Intake Algae Ground or Coral Ground
@@ -237,8 +251,8 @@ public class CatzSuperstructure extends VirtualSubsystem {
                     System.out.println("Gob algae");
                     robotActionCommand = container.getAlgaePivot().AlgaePivot_Punch();
 
-                 }
-                 break;
+                }
+            break;
 
             default:
             case STOW:
@@ -246,14 +260,17 @@ public class CatzSuperstructure extends VirtualSubsystem {
                 robotActionCommand = CatzStateCommands.stow(container);
                 break;
 
-
         }
+        
 
         System.out.println("acton: " + currentRobotState);
         if(previousAction != robotActionCommand){
             robotActionCommand.schedule();
         }
         previousAction = robotActionCommand;
+
+        Logger.recordOutput("CurrentRobotState/CurrentRobotState", currentRobotState);
+
     }
 
 
