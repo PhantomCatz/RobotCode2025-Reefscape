@@ -345,30 +345,30 @@ public class CatzStateCommands {
         ).unless(()-> Robot.isSimulation()).alongWith(Commands.print("processor"));
     }
 
-    // public static Command netAlgae(RobotContainer robotContainer) {
-    //     CatzClimb climb = robotContainer.getCatzClimb();
-    //     CatzAlgaeRemover algae = robotContainer.getCatzAlgaeRemover();
-    //     CatzOuttake outtake = robotContainer.getCatzOuttake();
-    //     CatzElevator elevator = robotContainer.getCatzElevator();
-    //     CatzAlgaePivot algaePivot = robotContainer.getAlgaePivot();
-    //     CatzRampPivot rampPivot = robotContainer.getCatzRampPivot();
-    //     CatzIntakeRollers intakeRollers = robotContainer.getIntakeRollers();
+    public static Command netAlgae(RobotContainer robotContainer) {
+        CatzClimb climb = robotContainer.getCatzClimb();
+        CatzAlgaeRemover algae = robotContainer.getCatzAlgaeRemover();
+        CatzOuttake outtake = robotContainer.getCatzOuttake();
+        CatzElevator elevator = robotContainer.getCatzElevator();
+        CatzAlgaePivot algaePivot = robotContainer.getAlgaePivot();
+        CatzRampPivot rampPivot = robotContainer.getCatzRampPivot();
+        CatzIntakeRollers intakeRollers = robotContainer.getIntakeRollers();
 
-    //     return new ParallelCommandGroup(
-    //         climb.Climb_Retract(),
-    //         outtake.stopOuttake(),
-    //         rampPivot.Ramp_Intake_Pos(),
+        return new ParallelCommandGroup(
+            climb.Climb_Home(),
+            outtake.stopOuttake(),
+            rampPivot.Ramp_Intake_Pos(),
 
-    //         new SequentialCommandGroup(
-    //             elevator.Elevator_L4(),
-    //             Commands.waitUntil(() -> elevator.getElevatorPositionInch() > 55.0),
-    //             new ParallelCommandGroup(
-    //                 algaePivot.AlgaePivot_NetAlgae(),
-    //                 algae.vomitAlgae()
-    //             )
-    //         )
-    //     ).unless(()-> Robot.isSimulation()).alongWith(Commands.print("Net Algae"));
-    // }
+            new SequentialCommandGroup(
+                elevator.Elevator_L4(),
+                Commands.waitUntil(() -> elevator.getElevatorPositionInch() > 55.0),
+                new ParallelCommandGroup(
+                    algaePivot.AlgaePivot_NetAlgae(),
+                    algae.vomitAlgae()
+                )
+            )
+        ).unless(()-> Robot.isSimulation()).alongWith(Commands.print("Net Algae"));
+    }
 
 
     public static Command botAlgae(RobotContainer robotContainer) {
