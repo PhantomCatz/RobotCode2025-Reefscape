@@ -200,7 +200,7 @@ public class CatzAutonomous extends SubsystemBase {
       tracker::getRobotChassisSpeeds,
       container.getCatzDrivetrain()::d,
       null,
-      DriveConstants.SCORING_ROBOT_CONFIG,
+      DriveConstants.TRAJ_ROBOT_CONFIG,
       shouldFlip,
       container.getCatzDrivetrain()
     );
@@ -250,12 +250,12 @@ public class CatzAutonomous extends SubsystemBase {
     autoProgramChooser.addOption("Wheel Characterization", new PathPlannerAuto("Wheel Characterization"));
   }
 
-
+  PathPlannerAuto selectedProgram;
   @Override
   public void periodic() {
 
     // Update the list of questions
-    PathPlannerAuto selectedProgram = autoProgramChooser.get();
+    selectedProgram = autoProgramChooser.get();
     if (selectedProgram == null
         || selectedProgram.equals(lastProgram)
         || (DriverStation.isAutonomousEnabled() && lastProgram != null)) {
@@ -300,8 +300,8 @@ public class CatzAutonomous extends SubsystemBase {
 
   /** Getter for final autonomous Program */
   public Command getCommand() {
-
-    return lastProgram;
+    System.out.println("program name: " + selectedProgram.getName());
+    return selectedProgram;
   }
 
   // ---------------------------------------------------------------------------------------------------------

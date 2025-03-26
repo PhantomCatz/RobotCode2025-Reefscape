@@ -323,7 +323,7 @@ public class RobotContainer {
   public void updateAlerts() {}
 
   /** Creates a controller rumble command with specified rumble and controllers */
-  private Command controllerRumbleCommand() {
+  public Command controllerRumbleCommand() {
     return Commands.startEnd(
         () -> {
           xboxDrv.getHID().setRumble(RumbleType.kBothRumble, 1.0);

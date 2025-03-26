@@ -21,7 +21,6 @@ import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.util.Color;
 import frc.robot.CatzSubsystems.CatzSuperstructure;
 import frc.robot.CatzSubsystems.CatzSuperstructure.CoralState;
-import frc.robot.CatzSubsystems.CatzSuperstructure.Gamepiece;
 import frc.robot.Utilities.VirtualSubsystem;
 import lombok.Getter;
 import lombok.Setter;
@@ -232,78 +231,79 @@ public class CatzLED extends VirtualSubsystem {
             strobeElevator(Color.kYellow, Color.kBlack, breathDuration);
           }
         break;
-        case AQUA:
-          Color aquaColorONE   = Color.kBlack;
-          Color aquaColorTWO   = Color.kBlack;
-          Color aquaColorTHREE = Color.kBlack;
-          Color aquaColorFOUR  = Color.kBlack;
+      //   case AQUA:
+      //     Color aquaColorONE   = Color.kBlack;
+      //     Color aquaColorTWO   = Color.kBlack;
+      //     Color aquaColorTHREE = Color.kBlack;
+      //     Color aquaColorFOUR  = Color.kBlack;
 
-          if(queueLEDState == QueueLEDState.ONE_CORAL) {
-            aquaColorONE   = Color.kRed;
-            aquaColorTWO   = Color.kBlack;
-            aquaColorTHREE = Color.kBlack;
-            aquaColorFOUR  = Color.kBlack;
-          } else if(queueLEDState == QueueLEDState.TWO_CORAL) {
-            aquaColorONE   = Color.kRed;
-            aquaColorTWO   = Color.kGold;
-            aquaColorTHREE = Color.kBlack;
-            aquaColorFOUR  = Color.kBlack;
-          } else if(queueLEDState == QueueLEDState.THREE_CORAL) {
-            aquaColorONE   = Color.kRed;
-            aquaColorONE   = Color.kGold;
-            aquaColorTHREE = Color.kBeige;
-            aquaColorFOUR  = Color.kBlack;
-          } else if(queueLEDState == QueueLEDState.FOUR_CORAL) {
-            aquaColorONE   = Color.kRed;
-            aquaColorONE   = Color.kGold;
-            aquaColorTHREE = Color.kBeige;
-            aquaColorFOUR  = Color.kPurple;
-          } else {
-            aquaColorONE = Color.kBlack;
-          }
+      //     if(queueLEDState == QueueLEDState.ONE_CORAL) {
+      //       aquaColorONE   = Color.kRed;
+      //       aquaColorTWO   = Color.kBlack;
+      //       aquaColorTHREE = Color.kBlack;
+      //       aquaColorFOUR  = Color.kBlack;
+      //     } else if(queueLEDState == QueueLEDState.TWO_CORAL) {
+      //       aquaColorONE   = Color.kRed;
+      //       aquaColorTWO   = Color.kGold;
+      //       aquaColorTHREE = Color.kBlack;
+      //       aquaColorFOUR  = Color.kBlack;
+      //     } else if(queueLEDState == QueueLEDState.THREE_CORAL) {
+      //       aquaColorONE   = Color.kRed;
+      //       aquaColorONE   = Color.kGold;
+      //       aquaColorTHREE = Color.kBeige;
+      //       aquaColorFOUR  = Color.kBlack;
+      //     } else if(queueLEDState == QueueLEDState.FOUR_CORAL) {
+      //       aquaColorONE   = Color.kRed;
+      //       aquaColorONE   = Color.kGold;
+      //       aquaColorTHREE = Color.kBeige;
+      //       aquaColorFOUR  = Color.kPurple;
+      //     } else {
+      //       aquaColorONE = Color.kBlack;
+      //     }
 
-          if(CatzSuperstructure.getCurrentCoralState() == CoralState.IN_OUTTAKE) {
-            buildElevator(aquaColorONE, aquaColorTWO, aquaColorTHREE, aquaColorFOUR);
-          } else {
-            strobeElevator(Color.kAqua, Color.kBlack, breathDuration);
-          }
+      //     if(CatzSuperstructure.getCurrentCoralState() == CoralState.IN_OUTTAKE) {
+      //       buildElevator(aquaColorONE, aquaColorTWO, aquaColorTHREE, aquaColorFOUR);
+      //     } else {
+      //       strobeElevator(Color.kAqua, Color.kBlack, breathDuration);
+      //     }
 
-        break;
-        case BALLS:
-          if(CatzSuperstructure.getCurrentCoralState() == CoralState.IN_OUTTAKE) {
-            setSolidElevatorColor(Color.kWhite);
-          } else {
-            strobeElevator(Color.kWhite, Color.kBlack, breathDuration);
-          }
-        break;
-        case CLIMB:
-          rainbowCrossbar(rainbowCycleLength, rainbowDuration);
-        break;
-        case sameBattery:
-          setSolidElevatorColor(Color.kDarkOrange);
-        break;
-        case lowBatteryAlert:
-          setSolidElevatorColor(Color.kOrange);
-        break;
-        default:
-          break;
-      }
+      //   break;
+      //   case BALLS:
+      //     if(CatzSuperstructure.getCurrentCoralState() == CoralState.IN_OUTTAKE) {
+      //       setSolidElevatorColor(Color.kWhite);
+      //     } else {
+      //       strobeElevator(Color.kWhite, Color.kBlack, breathDuration);
+      //     }
+      //   break;
+      //   case CLIMB:
+      //     rainbowCrossbar(rainbowCycleLength, rainbowDuration);
+      //   break;
+      //   case sameBattery:
+      //     setSolidElevatorColor(Color.kDarkOrange);
+      //   break;
+      //   case lowBatteryAlert:
+      //     setSolidElevatorColor(Color.kOrange);
+      //   break;
+      //   default:
+      //     break;
+      // }
 
 
       //---------------------------------------------------------------------------------------------
       // Update crossbar state
       //---------------------------------------------------------------------------------------------
-      if(CatzSuperstructure.getChosenGamepiece() == Gamepiece.ALGAE) {
-        setSolidCrossbarColor(Color.kAqua);
-      } else {
-        setSolidCrossbarColor(Color.kGreen);
-      }
+      // if(CatzSuperstructure.getChosenGamepiece() == Gamepiece.ALGAE) {
+      //   setSolidCrossbarColor(Color.kAqua);
+      // } else {
+      //   setSolidCrossbarColor(Color.kGreen);
+      // }
     }
+    rainbowElevator(rainbowCycleLength, breathDuration);
 
     // Update LEDs
     ledStrip.setData(buffer);
   } // end of periodic()
-
+}
 
   //-------------------------------------------------------------------------------------------------------
   //

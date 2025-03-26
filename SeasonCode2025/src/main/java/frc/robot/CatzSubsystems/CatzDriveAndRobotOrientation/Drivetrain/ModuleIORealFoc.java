@@ -130,7 +130,7 @@ public class ModuleIORealFoc implements ModuleIO {
     steerTalonConfig.TorqueCurrent.PeakReverseTorqueCurrent = -40.0;
     steerTalonConfig.ClosedLoopRamps.TorqueClosedLoopRampPeriod = 0.02;
 
-    steerTalonConfig.MotorOutput.NeutralMode = NeutralModeValue.Coast; // Change back to break
+    steerTalonConfig.MotorOutput.NeutralMode = NeutralModeValue.Coast; // TODO Change back to break
 
     // Gain Setting
     steerTalonConfig.Slot0.kP = MODULE_GAINS_AND_RATIOS.steerkP();
@@ -160,6 +160,7 @@ public class ModuleIORealFoc implements ModuleIO {
         System.out.println("Failed to Configure CAN ID" + config.steerID());
     }
 
+    steerTalon.setPosition((encoder.getPosition().getValueAsDouble() - absoluteEncoderOffset.getRotations()) / MODULE_GAINS_AND_RATIOS.steerReduction());
   }
 
   @Override
@@ -183,6 +184,8 @@ public class ModuleIORealFoc implements ModuleIO {
                 steerTorqueCurrent)
             .isOK();
 
+    inputs.isAbsEncoderConnected = encoder.isConnected();
+
     // Refresh drive motor values
     inputs.drivePositionUnits     = drivePosition.getValueAsDouble();
     inputs.driveVelocityRPS       = driveVelocity.getValueAsDouble();
@@ -192,7 +195,12 @@ public class ModuleIORealFoc implements ModuleIO {
 
     // Refresh steer Motor Values
     inputs.rawAbsEncValueRotation = encoder.getPosition().getValueAsDouble();
-    inputs.steerAbsPosition       = Rotation2d.fromRotations(inputs.rawAbsEncValueRotation - absoluteEncoderOffset.getRotations());
+    inputs.steerAbsPosition       =
+            inputs.isAbsEncoderConnected
+              ? Rotation2d.fromRotations(inputs.rawAbsEncValueRotation - absoluteEncoderOffset.getRotations())
+              : Rotation2d.fromRotations(
+                      (steerPosition.getValueAsDouble() * DriveConstants.MODULE_GAINS_AND_RATIOS.steerReduction()) - absoluteEncoderOffset.getRotations()
+                );
 
     inputs.steerVelocityRadsPerSec = Units.rotationsToRadians(steerVelocity.getValueAsDouble());
     inputs.steerSupplyCurrentAmps  = steerSupplyCurrent.getValueAsDouble();

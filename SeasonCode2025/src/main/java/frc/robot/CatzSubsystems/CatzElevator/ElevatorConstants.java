@@ -23,7 +23,7 @@ public class ElevatorConstants {
     public static final boolean isElevatorDisabled = true;
 
     // Gearbox definitions
-    public static final double MAXPLANETARY_GEAR_RATIO   = 9.0;
+    public static final double MAXPLANETARY_GEAR_RATIO   = 5.0;
     public static final double T22_DIAMETER_INCHES       = 1.981;
     //For every 9 rotations of the motor, the output shaft rotates once.
     //For every inch moved up by by the sprocket, the carriage rises by 2 inches
@@ -41,11 +41,11 @@ public class ElevatorConstants {
 
     //inches TODO tune
     public static final double STOW_HEIGHT = 3.0;
-    public static final double L1_HEIGHT   = 10.0;
-    public static final double L2_HEIGHT   = 30.0;
-    public static final double L3_HEIGHT   = 45.0;//81.7;
-    public static final double L4_HEIGHT   = 60.0;
-    public static final double L4_CORAL_ADJ = 62.0;
+    public static final double L1_HEIGHT   = 5.6;
+    public static final double L2_HEIGHT   = 13.0;
+    public static final double L3_HEIGHT   = 32.0;//81.7;
+    public static final double L4_HEIGHT   = 60.4;
+    public static final double L4_CORAL_ADJ = 64.0;
     public static final double BOT_BOT_ALGAE = 20.6;
     public static final double BOT_TOP_ALGAE = 22.7;
     // Motor ID
@@ -71,7 +71,7 @@ public class ElevatorConstants {
     // Initial PIDF and motion magic assignment
     public static final Gains slot0_gains =
         switch (CatzConstants.getRobotType()) {
-            case SN2 -> new Gains(4.0, 0.0, 0.0, 0.175, 0.130, 0.013, 0.4);
+            case SN2 -> new Gains(8.0, 0.0, 0.0, 0.175, 0.230, 0.013, 0.4);
             case SN1 -> new Gains(3.0, 0.0, 0.0, 0.175, 0.3, 0.13, 0.4); //
 
             case SN_TEST, SN1_2024 -> new Gains(7000.0, 0.0, 250.0, 8.4, 0.2, 0.2, 22.9);

@@ -1,0 +1,79 @@
+{
+  "version": "2025.0",
+  "command": {
+    "type": "sequential",
+    "data": {
+      "commands": [
+        {
+          "type": "named",
+          "data": {
+            "name": "Practice 1+CS"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Practice 2+ReefL1"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Practice 1+CS"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Practice 1+ReefL1"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Practice 1+CS"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Practice 1+ReefL1"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Practice 1+CS"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Practice 1+ReefL1"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Practice 1+CS"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Practice 1+ReefL1"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Practice 1+CS"
+          }
+        }
+      ]
+    }
+  },
+  "resetOdom": false,
+  "folder": null,
+  "choreoAuto": false
+}

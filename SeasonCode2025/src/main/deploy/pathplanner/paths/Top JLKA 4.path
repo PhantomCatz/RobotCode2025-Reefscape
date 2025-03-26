@@ -3,29 +3,29 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 2.62530737704918,
-        "y": 4.330686475409836
+        "x": 3.6802254098360656,
+        "y": 5.0499487704918025
       },
       "prevControl": null,
       "nextControl": {
-        "x": 3.6253073770491793,
-        "y": 4.330686475409836
+        "x": 3.9477630594419786,
+        "y": 4.959743628956383
       },
       "isLocked": false,
-      "linkedName": null
+      "linkedName": "Reef-L"
     },
     {
       "anchor": {
-        "x": 4.159733606557378,
-        "y": 4.330686475409836
+        "x": 1.443,
+        "y": 7.515499999999999
       },
       "prevControl": {
-        "x": 3.159733606557378,
-        "y": 4.330686475409836
+        "x": 1.9694999999999998,
+        "y": 6.920749999999999
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": null
+      "linkedName": "Coral-Top"
     }
   ],
   "rotationTargets": [],
@@ -42,13 +42,13 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 0.0
+    "rotation": -53.67317404787977
   },
   "reversed": false,
-  "folder": "Testy Folder",
+  "folder": "Top JLKA Paths",
   "idealStartingState": {
     "velocity": 0,
-    "rotation": 0.0
+    "rotation": -58.43772133704708
   },
   "useDefaultConstraints": true
 }

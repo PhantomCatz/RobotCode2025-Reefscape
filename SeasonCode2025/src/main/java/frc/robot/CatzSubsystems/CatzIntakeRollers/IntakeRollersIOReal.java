@@ -42,6 +42,9 @@ public class IntakeRollersIOReal implements IntakeRollersIO{
         config.Commutation.MotorArrangement = MotorArrangementValue.Minion_JST;
         config.MotorOutput.NeutralMode = NeutralModeValue.Brake;
 
+        config.CurrentLimits.SupplyCurrentLimit = 30.0;
+        config.CurrentLimits.SupplyCurrentLimitEnable = true;
+
         IntakeCoralMtr.setPosition(0);
         IntakeCoralMtr.getConfigurator().apply(config, 1.0);
 

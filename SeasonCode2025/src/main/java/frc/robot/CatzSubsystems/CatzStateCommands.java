@@ -19,9 +19,11 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
+import edu.wpi.first.wpilibj2.command.PrintCommand;
 import edu.wpi.first.wpilibj2.command.RepeatCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
+import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import frc.robot.Robot;
 import frc.robot.RobotContainer;
 import frc.robot.TeleopPosSelector;
@@ -39,14 +41,16 @@ import frc.robot.Utilities.waituntil;
 public class CatzStateCommands {
 
     public static Command driveToScore(RobotContainer robotContainer, PathPlannerPath pathToReadyPose, int level){
-        final double PREDICT_DISTANCE = 0.5; //meters
+        final double PREDICT_DISTANCE = 1.60; //meters
 
         CatzDrivetrain drivetrain = robotContainer.getCatzDrivetrain();
+        CatzOuttake outtake = robotContainer.getCatzOuttake();
 
         return new SequentialCommandGroup(
             new TrajectoryDriveCmd(pathToReadyPose, drivetrain, true, robotContainer).deadlineFor(
-                new RepeatCommand(LXElevator(robotContainer, level).onlyIf(() -> drivetrain.getDistanceError() < PREDICT_DISTANCE))
+                new RepeatCommand(LXElevator(robotContainer, level).alongWith(new PrintCommand("elevavavava")).onlyIf(() -> drivetrain.getDistanceError() < PREDICT_DISTANCE && !outtake.isDesiredCoralState(true)))
             ),
+            new WaitUntilCommand(() -> !outtake.isDesiredCoralState(true)),
             LXCoral(robotContainer, level),
             stow(robotContainer)
         );
@@ -80,10 +84,10 @@ public class CatzStateCommands {
         CatzOuttake outtake = robotContainer.getCatzOuttake();
 
         return new SequentialCommandGroup(
-            Commands.waitUntil(() -> outtake.isDesiredCoralState(false)).deadlineFor(
-                intakeCoralStation(robotContainer),
-                new TrajectoryDriveCmd(path, drivetrain, false, robotContainer)
-            )
+            intakeCoralStation(robotContainer),
+            new TrajectoryDriveCmd(path, drivetrain, false, robotContainer)
+            // Commands.waitUntil(()->outtake.isDesiredCoralState(false)).deadlineFor(
+            // )
         );
     }
 
@@ -221,6 +225,7 @@ public class CatzStateCommands {
             new SequentialCommandGroup(
                 elevator.Elevator_L2(),
                 new waituntil(() -> elevator.isElevatorInPos()),
+                new PrintCommand("outake l22"),
                 outtake.startOuttake()
             ).withTimeout(1.0)
         )//.onlyIf(() -> CatzSuperstructure.getCurrentCoralState() == CoralState.IN_OUTTAKE)
@@ -316,7 +321,9 @@ public class CatzStateCommands {
             algaePivot.AlgaePivot_Stow(),
             rampPivot.Ramp_Intake_Pos(),
             intakeRollers.stopIntaking(),
-            Commands.waitUntil(() -> rampPivot.isSafeToRaiseElevator()),
+            new PrintCommand("not yet"),
+            // Commands.waitUntil(() -> rampPivot.isSafeToRaiseElevator()),
+            new PrintCommand("safe to raise elevator!!"),
             elevator.Elevator_LX(level)
         ).unless(()-> Robot.isSimulation()).alongWith(Commands.print("L" + level+" Elevator Raise")).unless(()-> Robot.isSimulation());
     }
