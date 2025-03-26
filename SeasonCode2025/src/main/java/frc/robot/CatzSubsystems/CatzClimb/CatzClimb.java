@@ -47,9 +47,9 @@ public class CatzClimb extends SubsystemBase {
 
   @RequiredArgsConstructor
   public enum ClimbPosition { //In Rotations //TBD
-    RETRACT(() -> -46),
-    HOME(() -> 0.0),
-    FULLTURN(() -> -320.0),
+    RETRACT(() -> 46), //TBD
+    HOME(() -> 0.0), //TBD
+    EXTENDING(() -> -150.0), //TBD
     MANUAL(() -> manualPow),
     FULL_MANUAL(() -> 0.0),
     TUNNABLE(tunnablePos);
@@ -99,26 +99,26 @@ public class CatzClimb extends SubsystemBase {
         io.setPosition(position);
         // System.out.println("semi");
       } else if(targetPosition != ClimbPosition.MANUAL && targetPosition != ClimbPosition.FULL_MANUAL) {
-        // System.out.println("Target");
+        //System.out.println("Target + " + position);
         io.setPosition(position);
       } else {
         io.setPower(0.0);
       }
     }
 
-    Logger.recordOutput("Position/targetPosition", position);
+    Logger.recordOutput("Climb/targetPosition", position);
   }
 
   public Command Climb_Home() {
     return runOnce(() -> setClimbPos(ClimbPosition.HOME));
   }
 
-  public Command Climb_Retract() {
+  public Command fullClimb() {
     return runOnce(() -> setClimbPos(ClimbPosition.RETRACT));
   }
 
-  public Command Climb_Full() {
-    return runOnce(() -> setClimbPos(ClimbPosition.FULLTURN));
+  public Command extendClimb() {
+    return runOnce(() -> setClimbPos(ClimbPosition.EXTENDING));
   }
 
   public Command Climb_Tunnable() {

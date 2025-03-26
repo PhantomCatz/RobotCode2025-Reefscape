@@ -49,9 +49,6 @@ public class CatzLED extends VirtualSubsystem {
   @Getter @Setter @AutoLogOutput (key = "CatzLED/QueueState")
   public QueueLEDState queueLEDState = QueueLEDState.EMPTY;
 
-  @Getter @Setter @AutoLogOutput (key = "CatzLED/CrossbarLEDState")
-  public LocationState CrossbarState = LocationState.nuhthing;
-
   public enum QueueLEDState {
     EMPTY,
     ONE_CORAL,
@@ -72,22 +69,6 @@ public class CatzLED extends VirtualSubsystem {
     sameBattery,
     lowBatteryAlert,
     ledChecked,
-    nuhthing
-  }
-
-  public enum LocationState {
-    A,
-    B,
-    C,
-    D,
-    E,
-    F,
-    G,
-    H,
-    I,
-    J,
-    K,
-    L,
     nuhthing
   }
 
@@ -416,64 +397,64 @@ public class CatzLED extends VirtualSubsystem {
   //LED Build
   private void buildElevator(Color c1, Color c2, Color c3, Color c4) {
     // BUILD ONE
-    if (c1 != null) {
-      for (int i = LED_Sidebar_Build_LT_ONE_START; i <= LED_Sidebar_Build_LT_ONE_END; i++) {
-        if(!(LED_Sidebar_Build_LT_ONE_START < i && i < LED_Sidebar_Build_LT_ONE_END)) {
-          buffer.setLED(i, c1);
-        }
-      }
+    // if (c1 != null) {
+    //   for (int i = LED_Sidebar_Build_LT_ONE_START; i <= LED_Sidebar_Build_LT_ONE_END; i++) {
+    //     if(!(LED_Sidebar_Build_LT_ONE_START < i && i < LED_Sidebar_Build_LT_ONE_END)) {
+    //       buffer.setLED(i, c1);
+    //     }
+    //   }
 
-      for (int i = LED_Sidebar_Build_RT_ONE_END; i <= LED_Sidebar_Build_RT_ONE_START; i++) {
-        if(!(LED_Sidebar_Build_LT_ONE_END < i && i < LED_Sidebar_Build_LT_ONE_START)) {
-          buffer.setLED(i, c1);
-        }
-      }
-    }
+    //   for (int i = LED_Sidebar_Build_RT_ONE_END; i <= LED_Sidebar_Build_RT_ONE_START; i++) {
+    //     if(!(LED_Sidebar_Build_LT_ONE_END < i && i < LED_Sidebar_Build_LT_ONE_START)) {
+    //       buffer.setLED(i, c1);
+    //     }
+    //   }
+    // }
 
-    // BUILD TWO
-    if (c2 != null) {
-      for (int i = LED_Sidebar_Build_LT_TWO_START; i <= LED_Sidebar_Build_LT_TWO_END; i++) {
-        if(!(LED_Sidebar_Build_LT_TWO_START < i && i < LED_Sidebar_Build_LT_TWO_END)) {
-          buffer.setLED(i, c2);
-        }
-      }
+    // // BUILD TWO
+    // if (c2 != null) {
+    //   for (int i = LED_Sidebar_Build_LT_TWO_START; i <= LED_Sidebar_Build_LT_TWO_END; i++) {
+    //     if(!(LED_Sidebar_Build_LT_TWO_START < i && i < LED_Sidebar_Build_LT_TWO_END)) {
+    //       buffer.setLED(i, c2);
+    //     }
+    //   }
 
-      for (int i = LED_Sidebar_Build_RT_TWO_END; i <= LED_Sidebar_Build_RT_TWO_START; i++) {
-        if(!(LED_Sidebar_Build_RT_TWO_END < i && i < LED_Sidebar_Build_RT_TWO_START)) {
-          buffer.setLED(i, c2);
-        }
-      }
-    }
+    //   for (int i = LED_Sidebar_Build_RT_TWO_END; i <= LED_Sidebar_Build_RT_TWO_START; i++) {
+    //     if(!(LED_Sidebar_Build_RT_TWO_END < i && i < LED_Sidebar_Build_RT_TWO_START)) {
+    //       buffer.setLED(i, c2);
+    //     }
+    //   }
+    // }
 
-    // BUILD THREE
-    if (c3 != null) {
-      for (int i = LED_Sidebar_Build_LT_THREE_START; i <= LED_Sidebar_Build_LT_THREE_END; i++) {
-        if(!(LED_Sidebar_Build_LT_THREE_START < i && i < LED_Sidebar_Build_LT_THREE_END)) {
-          buffer.setLED(i, c3);
-        }
-      }
+    // // BUILD THREE
+    // if (c3 != null) {
+    //   for (int i = LED_Sidebar_Build_LT_THREE_START; i <= LED_Sidebar_Build_LT_THREE_END; i++) {
+    //     if(!(LED_Sidebar_Build_LT_THREE_START < i && i < LED_Sidebar_Build_LT_THREE_END)) {
+    //       buffer.setLED(i, c3);
+    //     }
+    //   }
 
-      for (int i = LED_Sidebar_Build_RT_THREE_END; i <= LED_Sidebar_Build_RT_THREE_START; i++) {
-        if(!(LED_Sidebar_Build_RT_THREE_END < i && i < LED_Sidebar_Build_RT_THREE_START)) {
-          buffer.setLED(i, c3);
-        }
-      }
-    }
+    //   for (int i = LED_Sidebar_Build_RT_THREE_END; i <= LED_Sidebar_Build_RT_THREE_START; i++) {
+    //     if(!(LED_Sidebar_Build_RT_THREE_END < i && i < LED_Sidebar_Build_RT_THREE_START)) {
+    //       buffer.setLED(i, c3);
+    //     }
+    //   }
+    // }
 
-    // BUILD FOUR
-    if (c4 != null) {
-      for (int i = LED_Sidebar_Build_LT_FOUR_START; i <= LED_Sidebar_Build_LT_FOUR_END; i++) {
-        if(!(LED_Sidebar_Build_LT_FOUR_START < i && i < LED_Sidebar_Build_LT_FOUR_END)) {
-          buffer.setLED(i, c4);
-        }
-      }
+    // // BUILD FOUR
+    // if (c4 != null) {
+    //   for (int i = LED_Sidebar_Build_LT_FOUR_START; i <= LED_Sidebar_Build_LT_FOUR_END; i++) {
+    //     if(!(LED_Sidebar_Build_LT_FOUR_START < i && i < LED_Sidebar_Build_LT_FOUR_END)) {
+    //       buffer.setLED(i, c4);
+    //     }
+    //   }
 
-      for (int i = LED_Sidebar_Build_RT_FOUR_END; i <= LED_Sidebar_Build_RT_FOUR_START; i++) {
-        if(!(LED_Sidebar_Build_RT_FOUR_END < i && i < LED_Sidebar_Build_RT_FOUR_START)) {
-          buffer.setLED(i, c3);
-        }
-      }
-    }
+    //   for (int i = LED_Sidebar_Build_RT_FOUR_END; i <= LED_Sidebar_Build_RT_FOUR_START; i++) {
+    //     if(!(LED_Sidebar_Build_RT_FOUR_END < i && i < LED_Sidebar_Build_RT_FOUR_START)) {
+    //       buffer.setLED(i, c3);
+    //     }
+    //   }
+    // }
   }
 
   // LED BREATH

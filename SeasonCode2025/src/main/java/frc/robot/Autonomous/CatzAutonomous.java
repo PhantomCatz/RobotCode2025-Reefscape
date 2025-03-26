@@ -114,7 +114,7 @@ public class CatzAutonomous extends SubsystemBase {
     NamedCommands.registerCommand("Processor", CatzStateCommands.processor(container));
     NamedCommands.registerCommand("BotAlgae", CatzStateCommands.intakeCoralGround(container));
     NamedCommands.registerCommand("TopAlgae", CatzStateCommands.topAlgae(container));
-    NamedCommands.registerCommand("Climb", CatzStateCommands.climb(container));
+    NamedCommands.registerCommand("Climb", CatzStateCommands.fullClimb(container));
     NamedCommands.registerCommand("RestPose", Commands.runOnce(()->tracker.resetPose(new Pose2d())));
     NamedCommands.registerCommand("WheelCharacterization", new WheelRadiusCharacterization(drivetrain, Direction.CLOCKWISE));
 

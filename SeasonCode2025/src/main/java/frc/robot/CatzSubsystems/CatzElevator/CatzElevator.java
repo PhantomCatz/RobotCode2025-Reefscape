@@ -37,8 +37,6 @@ public class CatzElevator extends SubsystemBase {
   private double elevatorFeedForward = 0.0;
   private int settlingCounter = 0;
   private boolean breakModeEnabled = true;
-  private BooleanSupplier manualOverride = () -> false;
-
 
   private ElevatorPosition targetPosition = ElevatorPosition.PosStow;
   private ElevatorPosition prevTargetPositon = ElevatorPosition.PosNull;
@@ -178,7 +176,7 @@ public class CatzElevator extends SubsystemBase {
         //Setpoint PID
         io.runSetpointUp(targetPosition.getTargetPositionInch());
       }
-    } else if (manualOverride.getAsBoolean() || targetPosition == ElevatorPosition.PosManual) {
+    } else if (targetPosition == ElevatorPosition.PosManual) {
       io.runMotor(elevatorSpeed);
     } else {
       // Nothing happening
@@ -307,10 +305,6 @@ public class CatzElevator extends SubsystemBase {
   public void elevatorFullManual(double manualPower) {
     this.elevatorSpeed = manualPower;
     targetPosition = ElevatorPosition.PosManual;
-  }
-
-  public void setOverrides(BooleanSupplier manualOverride) {
-    this.manualOverride = manualOverride;
   }
 
   public Command elevatorFullManual(Supplier<Double> manuaSupplier) {
