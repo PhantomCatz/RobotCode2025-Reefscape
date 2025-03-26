@@ -23,15 +23,15 @@ public final class CatzConstants {
   //  Robot Modes
   //
   // --------------------------------------------------/
-  public static final RobotSenario robotSenario = RobotSenario.TUNING;
-  public static final RobotHardwareMode hardwareMode = RobotHardwareMode.REAL;
-  private static RobotID robotType = RobotID.SN2;
+  public static final RobotScenario robotScenario = RobotScenario.TUNING;
+  public static final RobotHardwareMode hardwareMode = RobotHardwareMode.SIM;
+  private static RobotID robotType = RobotID.SN_TEST;
   private static AlertPriority alertWarningPriority = AlertPriority.ONE;
   public static boolean disableHAL = false;
 
   public static final double LOOP_TIME = 0.02;
 
-  public static enum RobotSenario {
+  public static enum RobotScenario {
     TUNING, // In PID enviroment with logged tunable numbers
     PRACTICE, // Driver Practice + Testing
     COMPETITION // Competition Setting
@@ -71,7 +71,7 @@ public final class CatzConstants {
   /** Checks that the default robot is selected and tuning mode is disabled. */
   public static class CheckPullRequest {
     public static void main(String... args) {
-      if (robotType != RobotID.SN_TEST || robotSenario == RobotSenario.TUNING) {
+      if (robotType != RobotID.SN_TEST || robotScenario == RobotScenario.TUNING) {
         System.err.println("Do not merge, non-default constants are configured.");
         System.exit(1);
       }

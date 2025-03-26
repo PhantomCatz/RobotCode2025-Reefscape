@@ -12,7 +12,7 @@
 package frc.robot.Utilities;
 
 import frc.robot.CatzConstants;
-import frc.robot.CatzConstants.RobotSenario;
+import frc.robot.CatzConstants.RobotScenario;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
@@ -62,7 +62,7 @@ public class LoggedTunableNumber implements DoubleSupplier {
     if (!hasDefault) {
       hasDefault = true;
       this.defaultValue = defaultValue;
-      if (CatzConstants.robotSenario == RobotSenario.TUNING) {
+      if (CatzConstants.robotScenario == RobotScenario.TUNING) {
         dashboardNumber = new LoggedNetworkNumber(key, defaultValue);
       }
     }
@@ -77,7 +77,7 @@ public class LoggedTunableNumber implements DoubleSupplier {
     if (!hasDefault) {
       return 0.0;
     } else {
-      return CatzConstants.robotSenario == RobotSenario.TUNING
+      return CatzConstants.robotScenario == RobotScenario.TUNING
           ? dashboardNumber.get()
           : defaultValue;
     }

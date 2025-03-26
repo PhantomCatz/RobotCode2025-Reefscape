@@ -106,14 +106,20 @@ public class TrajectoryDriveCmd extends Command {
   public void setPath(PathPlannerPath path){
     this.path = path;
   }
-
+  private double prevTime;
   // ---------------------------------------------------------------------------------------------
   //
   // Initialize
   //
   // ---------------------------------------------------------------------------------------------
+  void printTime(String tag){
+    double curTime = Timer.getFPGATimestamp();
+    System.out.println(tag + (curTime-prevTime));
+    prevTime = curTime;
+  }
   @Override
   public void initialize() {
+    prevTime = Timer.getFPGATimestamp();
     try{
       // Flip path if necessary
       PathPlannerPath usePath;
@@ -126,6 +132,7 @@ public class TrajectoryDriveCmd extends Command {
       if(AllianceFlipUtil.shouldFlipToRed()) {
         usePath = path.flipPath();
       }
+      printTime("uno");
 
       // Pose Reseting
       if (Robot.isFirstPath && DriverStation.isAutonomous()) {
@@ -137,9 +144,13 @@ public class TrajectoryDriveCmd extends Command {
         }
       }
 
+      printTime("dos");
+
       // Collect current drive state
       ChassisSpeeds currentSpeeds = DriveConstants.SWERVE_KINEMATICS.toChassisSpeeds(tracker.getCurrentModuleStates());
       List<PathPoint> pathPoints = usePath.getAllPathPoints();
+
+      printTime("tres");
 
       try {
         // Construct trajectory
@@ -149,6 +160,7 @@ public class TrajectoryDriveCmd extends Command {
           autoalign ? pathPoints.get(1).position.minus(pathPoints.get(0).position).getAngle() : pathPoints.get(1).position.minus(pathPoints.get(0).position).getAngle().plus(Rotation2d.k180deg),
           DriveConstants.TRAJ_ROBOT_CONFIG
         );
+        printTime("cuatro");
       } catch (Error e){
         e.printStackTrace();
         //for some reason if you spam NBA current rotation gets bugged.
@@ -159,11 +171,13 @@ public class TrajectoryDriveCmd extends Command {
           DriveConstants.TRAJ_ROBOT_CONFIG
         );
       }
+      printTime("sdfioj");
       if(trajectory == null) {
         isBugged = true;
         return;
       }
 
+      printTime("cinco");
       hocontroller = DriveConstants.getNewHolController();
       pathTimeOut = trajectory.getTotalTimeSeconds() * TIMEOUT_SCALAR;
 
@@ -201,6 +215,7 @@ public class TrajectoryDriveCmd extends Command {
     // Collect instananous variables
     double currentTime = timer.get();
     Pose2d currentPose = tracker.getEstimatedPose();
+    printTime("seis");
     // ChassisSpeeds currentSpeeds = DriveConstants.SWERVE_KINEMATICS.toChassisSpeeds(m_driveTrain.getModuleStates());
     // double currentVel = Math.hypot(currentSpeeds.vxMetersPerSecond, currentSpeeds.vyMetersPerSecond);
 
@@ -215,6 +230,7 @@ public class TrajectoryDriveCmd extends Command {
     // -------------------------------------------------------------------------------------
     PathPlannerTrajectoryState goal = trajectory.sample(Math.min(currentTime, trajectory.getTotalTimeSeconds()));
     PathPlannerTrajectoryState endGoal = trajectory.sample(trajectory.getTotalTimeSeconds());
+    printTime("siete");
     Trajectory.State state = new Trajectory.State(
         currentTime,
         goal.linearVelocity,
@@ -223,6 +239,8 @@ public class TrajectoryDriveCmd extends Command {
         0.0
     );
 
+    printTime("ocho");
+
     // construct chassisspeeds
     adjustedSpeeds = hocontroller.calculate(currentPose, state, endGoal.pose.getRotation());
     // if (autoalign && translationError > FACE_REEF_DIST) {
@@ -230,28 +248,16 @@ public class TrajectoryDriveCmd extends Command {
     //   adjustedSpeeds = hocontroller.calculate(currentPose, state, Rotation2d.fromRadians(Math.atan2(reef.getY() - currentPose.getY(),reef.getX() - currentPose.getX())));
     // }else{
     // }
+    printTime("nueve");
 
     adjustedSpeeds = applyCusp(adjustedSpeeds, translationError, CONVERGE_DISTANCE);
 
     // Logging
     Logger.recordOutput("CatzRobotTracker/Desired Auto Pose", goal.pose);
-    // Logger.recordOutput("CatzRobotTracker/Desired Chassis Speeds", adjustedSpeeds);
-
-    // PPLibTelemetry.setCurrentPose(currentPose);
-    // PathPlannerLogging.logCurrentPose(currentPose);
-
-    // PPLibTelemetry.setTargetPose(goal.pose);
-    // PathPlannerLogging.logTargetPose(goal.pose);
-
-    // PPLibTelemetry.setVelocities(
-    //     currentVel,
-    //     goal.linearVelocity,
-    //     currentSpeeds.omegaRadiansPerSecond,
-    //     goal.heading.getRadians()
-    // );
 
     // send to drivetrain
     m_driveTrain.drive(adjustedSpeeds);
+    printTime("diez");
 
     m_driveTrain.setDistanceError(translationError);
 
@@ -286,11 +292,9 @@ public class TrajectoryDriveCmd extends Command {
     m_driveTrain.setDistanceError(9999999.9);
   }
 
-  private double finTime = 0.0;
 
   @Override
   public boolean isFinished() {
-    finTime = Timer.getFPGATimestamp();
     if(isBugged){
       System.out.println("Path Bugged");
       return true;
@@ -352,6 +356,7 @@ public class TrajectoryDriveCmd extends Command {
       rotationError = 0.0;
       System.out.println("THROW");
     }
+    printTime("once");
 
     // System.out.println("rotationerr: " + (rotationError));
     // System.out.println("omegaerr: " + (currentRPS));
@@ -384,8 +389,8 @@ public class TrajectoryDriveCmd extends Command {
     // }
 
     // System.out.println("poseerr:" + ((xError < poseError) &&(yError < poseError)));
+    printTime("doce");
     System.out.println("transerr: " + (translationError));
-    System.out.println("fin time: " + (Timer.getFPGATimestamp() - finTime));
     // System.out.println("pose errr: " + poseError);
     return translationError < poseError;
   }

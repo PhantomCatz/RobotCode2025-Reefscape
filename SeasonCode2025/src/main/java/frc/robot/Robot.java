@@ -199,7 +199,7 @@ public class Robot extends LoggedRobot {
     RobotController.setBrownoutVoltage(6.3);
 
     // Print out Catz Constant enums
-    System.out.println("Enviroment: " + CatzConstants.robotSenario.toString());
+    System.out.println("Enviroment: " + CatzConstants.robotScenario.toString());
     System.out.println("Mode: " + CatzConstants.hardwareMode.toString());
     System.out.println("Type: " + CatzConstants.getRobotType().toString());
 
