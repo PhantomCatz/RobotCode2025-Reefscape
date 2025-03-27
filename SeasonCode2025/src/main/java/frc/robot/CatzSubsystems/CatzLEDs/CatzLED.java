@@ -21,6 +21,7 @@ import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.util.Color;
 import frc.robot.CatzSubsystems.CatzSuperstructure;
 import frc.robot.CatzSubsystems.CatzSuperstructure.CoralState;
+import frc.robot.CatzSubsystems.CatzSuperstructure.Gamepiece;
 import frc.robot.Utilities.VirtualSubsystem;
 import lombok.Getter;
 import lombok.Setter;
@@ -253,24 +254,24 @@ public class CatzLED extends VirtualSubsystem {
         break;
         default:
           break;
-      }
+        }
 
 
       //---------------------------------------------------------------------------------------------
       // Update crossbar state
       //---------------------------------------------------------------------------------------------
-      // if(CatzSuperstructure.getChosenGamepiece() == Gamepiece.ALGAE) {
-      //   setSolidCrossbarColor(Color.kAqua);
-      // } else {
-      //   setSolidCrossbarColor(Color.kGreen);
-      // }
+      if(CatzSuperstructure.getChosenGamepiece() == Gamepiece.ALGAE) {
+        setSolidCrossbarColor(Color.kAqua);
+      } else {
+        setSolidCrossbarColor(Color.kGreen);
+      }
     }
     rainbowElevator(rainbowCycleLength, breathDuration);
 
     // Update LEDs
     ledStrip.setData(buffer);
   } // end of periodic()
-}
+
 
   //-------------------------------------------------------------------------------------------------------
   //
