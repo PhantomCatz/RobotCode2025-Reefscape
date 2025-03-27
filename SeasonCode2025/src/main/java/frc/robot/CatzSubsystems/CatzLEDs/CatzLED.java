@@ -226,67 +226,34 @@ public class CatzLED extends VirtualSubsystem {
         case NBA:
           if(CatzSuperstructure.getCurrentCoralState() == CoralState.IN_OUTTAKE) {
             // setSolidElevatorColor(Color.kYellow);
-            rainbowElevator(rainbowCycleLength, breathDuration);
+            wave(Color.kRed, Color.kBlack, waveFastCycleLength, waveFastDuration);
           } else {
             strobeElevator(Color.kYellow, Color.kBlack, breathDuration);
           }
         break;
-      //   case AQUA:
-      //     Color aquaColorONE   = Color.kBlack;
-      //     Color aquaColorTWO   = Color.kBlack;
-      //     Color aquaColorTHREE = Color.kBlack;
-      //     Color aquaColorFOUR  = Color.kBlack;
+        case AQUA:
+          setWaveElevatorColor(Color.kAqua, Color.kDarkBlue, waveFastCycleLength, waveFastDuration);
+        break;
 
-      //     if(queueLEDState == QueueLEDState.ONE_CORAL) {
-      //       aquaColorONE   = Color.kRed;
-      //       aquaColorTWO   = Color.kBlack;
-      //       aquaColorTHREE = Color.kBlack;
-      //       aquaColorFOUR  = Color.kBlack;
-      //     } else if(queueLEDState == QueueLEDState.TWO_CORAL) {
-      //       aquaColorONE   = Color.kRed;
-      //       aquaColorTWO   = Color.kGold;
-      //       aquaColorTHREE = Color.kBlack;
-      //       aquaColorFOUR  = Color.kBlack;
-      //     } else if(queueLEDState == QueueLEDState.THREE_CORAL) {
-      //       aquaColorONE   = Color.kRed;
-      //       aquaColorONE   = Color.kGold;
-      //       aquaColorTHREE = Color.kBeige;
-      //       aquaColorFOUR  = Color.kBlack;
-      //     } else if(queueLEDState == QueueLEDState.FOUR_CORAL) {
-      //       aquaColorONE   = Color.kRed;
-      //       aquaColorONE   = Color.kGold;
-      //       aquaColorTHREE = Color.kBeige;
-      //       aquaColorFOUR  = Color.kPurple;
-      //     } else {
-      //       aquaColorONE = Color.kBlack;
-      //     }
-
-      //     if(CatzSuperstructure.getCurrentCoralState() == CoralState.IN_OUTTAKE) {
-      //       buildElevator(aquaColorONE, aquaColorTWO, aquaColorTHREE, aquaColorFOUR);
-      //     } else {
-      //       strobeElevator(Color.kAqua, Color.kBlack, breathDuration);
-      //     }
-
-      //   break;
-      //   case BALLS:
-      //     if(CatzSuperstructure.getCurrentCoralState() == CoralState.IN_OUTTAKE) {
-      //       setSolidElevatorColor(Color.kWhite);
-      //     } else {
-      //       strobeElevator(Color.kWhite, Color.kBlack, breathDuration);
-      //     }
-      //   break;
-      //   case CLIMB:
-      //     rainbowCrossbar(rainbowCycleLength, rainbowDuration);
-      //   break;
-      //   case sameBattery:
-      //     setSolidElevatorColor(Color.kDarkOrange);
-      //   break;
-      //   case lowBatteryAlert:
-      //     setSolidElevatorColor(Color.kOrange);
-      //   break;
-      //   default:
-      //     break;
-      // }
+        case BALLS:
+          if(CatzSuperstructure.getCurrentCoralState() == CoralState.IN_OUTTAKE) {
+            setSolidElevatorColor(Color.kWhite);
+          } else {
+            strobeElevator(Color.kWhite, Color.kBlack, breathDuration);
+          }
+        break;
+        case CLIMB:
+          rainbowCrossbar(rainbowCycleLength, rainbowDuration);
+        break;
+        case sameBattery:
+          setSolidElevatorColor(Color.kDarkOrange);
+        break;
+        case lowBatteryAlert:
+          setSolidElevatorColor(Color.kOrange);
+        break;
+        default:
+          break;
+      }
 
 
       //---------------------------------------------------------------------------------------------
@@ -318,6 +285,26 @@ public class CatzLED extends VirtualSubsystem {
           buffer.setLED(i, color);
         }
       }
+    }
+  }
+
+  private void setWaveElevatorColor(Color c1, Color c2, double cycleLength, double duration) {
+    double x = (1 - ((Timer.getFPGATimestamp() % duration) / duration)) * 2.0 * Math.PI;
+    double xDiffPerLed = (2.0 * Math.PI) / cycleLength;
+    for (int i = 0; i < length; i++) {
+      if(!(LED_Sidebar_End_RT<i && i<LED_Sidebar_Start_LT)) {
+        x += xDiffPerLed;
+        double ratio = (Math.pow(Math.sin(x), waveExponent) + 1.0) / 2.0;
+        if (Double.isNaN(ratio)) {
+          ratio = (-Math.pow(Math.sin(x + Math.PI), waveExponent) + 1.0) / 2.0;
+        }
+        if (Double.isNaN(ratio)) {
+          ratio = 0.5;
+        }
+        double red = (c1.red * (1 - ratio)) + (c2.red * ratio);
+        double green = (c1.green * (1 - ratio)) + (c2.green * ratio);
+        double blue = (c1.blue * (1 - ratio)) + (c2.blue * ratio);
+        buffer.setLED(i, new Color(red, green, blue));      }
     }
   }
 
