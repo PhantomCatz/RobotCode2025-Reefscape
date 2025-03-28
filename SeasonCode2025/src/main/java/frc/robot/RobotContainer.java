@@ -84,7 +84,7 @@ public class RobotContainer {
   private final Trigger isElevatorFullManual = overrideHID.auxSwitch(0);
   private final Trigger isAlgaeEffectorFullManual = overrideHID.auxSwitch(0);
   private final Trigger isRampPivotFullManual = overrideHID.auxSwitch(0);
-  private final Trigger isClimbEnabled = overrideHID.driverSwitch(1);
+  private final Trigger isClimbEnabled = overrideHID.auxSwitch(2);
 
   private CommandXboxController xboxTest = new CommandXboxController(3);
   private TeleopPosSelector selector;
@@ -109,7 +109,6 @@ public class RobotContainer {
     selector = new TeleopPosSelector(xboxAux, this);
     auto = new CatzAutonomous(this);
 
-    superstructure.setClimbOverride(isClimbEnabled);
 
     // Drive And Aux Command Mapping
     configureBindings();
@@ -219,10 +218,13 @@ public class RobotContainer {
     // Climb Action
     xboxAux.y().and(isClimbEnabled).onTrue(CatzStateCommands.extendClimb(this));
     xboxAux.b().and(isClimbEnabled).onTrue(CatzStateCommands.fullClimb(this));
-        // Manual Climb Control
-    xboxAux.back().and(xboxAux.start()).onTrue(climb.ClimbManualMode(()->0.0).alongWith(Commands.print("climb manual")));
-    xboxAux.back().and(xboxAux.leftStick()).onTrue(climb.ClimbManualMode(() -> xboxAux.getLeftY()).alongWith(Commands.print("Using manual climb")));
 
+    isClimbEnabled.onTrue(Commands.runOnce(() -> superstructure.setClimbOverride(()->true)));
+    isClimbEnabled.onFalse(Commands.runOnce(() -> superstructure.setClimbOverride(()->false)));
+
+        // Manual Climb Control
+    xboxAux.back().onFalse(climb.CancelClimb());
+    xboxAux.back().onTrue(climb.ClimbManualMode(() -> xboxAux.getLeftY()).alongWith(Commands.print("Using manual climb")));
 
     // algae punch
     DoublePressTracker.createTrigger(xboxAux.x())

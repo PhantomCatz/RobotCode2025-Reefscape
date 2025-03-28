@@ -33,7 +33,7 @@ public class OverrideSwitch {
       throw new RuntimeException(
           "Invalid driver override index " + Integer.toString(index) + ". Must be 0-2.");
     }
-    return joystick.getRawButton(index + 1);
+    return joystick.getRawButton(index);
   }
 
   /** Gets the state of an operator-side switch (0-4 from left to right). */
@@ -42,7 +42,7 @@ public class OverrideSwitch {
       throw new RuntimeException(
           "Invalid operator override index " + Integer.toString(index) + ". Must be 0-4.");
     }
-    return joystick.getRawButton(index + 8);
+    return joystick.getRawButton(index);
   }
 
   /** Gets the state of the multi-directional switch. */

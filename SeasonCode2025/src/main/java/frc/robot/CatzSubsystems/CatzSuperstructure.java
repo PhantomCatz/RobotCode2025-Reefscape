@@ -41,7 +41,7 @@ public class CatzSuperstructure extends VirtualSubsystem {
     private RobotAction currentRobotAction = RobotAction.STOW;
 
     @Getter @AutoLogOutput(key = "CatzSuperstructure/IsClimbEnabled")
-    private boolean isClimbEnabled;
+    private static boolean isClimbEnabled = false;
 
     @Getter @Setter @AutoLogOutput(key = "CatzSuperstructure/CurrentCoralState")
     private static CoralState currentCoralState = CoralState.IN_OUTTAKE;
@@ -126,7 +126,8 @@ public class CatzSuperstructure extends VirtualSubsystem {
     }
 
     public void setClimbOverride(BooleanSupplier isClimbEnabled) {
-        this.isClimbEnabled = isClimbEnabled.getAsBoolean();
+        CatzSuperstructure.isClimbEnabled = isClimbEnabled.getAsBoolean();
+        System.out.println("CLimb Enabled" + isClimbEnabled);
     }
 
     public void setCurrentRobotAction(RobotAction action, int level) {
@@ -134,8 +135,9 @@ public class CatzSuperstructure extends VirtualSubsystem {
         this.currentRobotAction = action;
 
         if(isClimbEnabled) {
+            System.out.println("HI");
             return;
-        } 
+        }
 
         switch(currentRobotAction) {
             // Outtaking Algae or Coral
@@ -261,7 +263,7 @@ public class CatzSuperstructure extends VirtualSubsystem {
                 break;
 
         }
-        
+
 
         System.out.println("acton: " + currentRobotState);
         if(previousAction != robotActionCommand){
@@ -276,6 +278,7 @@ public class CatzSuperstructure extends VirtualSubsystem {
 
     @Override
     public void periodic() {
+
         //----------------------------------------------------------------------------------
         // Logging
         //----------------------------------------------------------------------------------
@@ -284,6 +287,7 @@ public class CatzSuperstructure extends VirtualSubsystem {
         getCurrentRobotState();
         getCurrentRobotAction();
         getCurrentCoralState();
+        isClimbEnabled();
 
     }
 
