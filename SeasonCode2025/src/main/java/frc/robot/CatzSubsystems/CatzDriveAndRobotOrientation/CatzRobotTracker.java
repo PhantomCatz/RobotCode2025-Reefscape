@@ -81,7 +81,7 @@ public class CatzRobotTracker {
   @AutoLogOutput(key = "CatzRobotTracker/TxTyPose")
   private Pose2d txTyPose = new Pose2d();
 
-  
+
 
   private final TimeInterpolatableBuffer<Pose2d> POSE_BUFFER =
       TimeInterpolatableBuffer.createBuffer(POSE_BUFFER_SIZE_SEC);

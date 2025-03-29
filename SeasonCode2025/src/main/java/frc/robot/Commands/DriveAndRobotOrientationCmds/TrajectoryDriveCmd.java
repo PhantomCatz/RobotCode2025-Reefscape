@@ -229,8 +229,8 @@ public class TrajectoryDriveCmd extends Command {
     // target velocity is used as a ff
     // -------------------------------------------------------------------------------------
     PathPlannerTrajectoryState goal = trajectory.sample(Math.min(currentTime, trajectory.getTotalTimeSeconds()));
-    PathPlannerTrajectoryState endGoal = trajectory.sample(trajectory.getTotalTimeSeconds()); // TODO we can optimize 
-    
+    PathPlannerTrajectoryState endGoal = trajectory.sample(trajectory.getTotalTimeSeconds()); // TODO we can optimize
+
     printTime("siete");
     Trajectory.State state = new Trajectory.State(
         currentTime,
