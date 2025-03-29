@@ -81,6 +81,13 @@ public class TeleopPosSelector { //TODO split up the file. it's too big and does
   private boolean isNetAiming = false;
   private boolean isNBALeftRight = false;
 
+  public enum CancellationSource{
+    NBA,
+    NET,
+    AQUA,
+    NA
+  }
+
   public TeleopPosSelector(CommandXboxController aux, RobotContainer container) {
     this.xboxAux = aux;
     this.m_container = container;
@@ -456,16 +463,15 @@ public class TeleopPosSelector { //TODO split up the file. it's too big and does
     Translation2d currentPos = currentPose.getTranslation();
     Translation2d direction = goalPos.minus(currentPos).div(2.0);
 
-    //if too far from reef side, then don't NBA
-    if (currentPose.getTranslation().getDistance(goal.getTranslation()) > Reef.leftRightDistance * 3
-        || direction.getNorm() <= 1e-3) {
-      return;
-    }
+    // if (direction.getNorm() <= 1e-3) {
+    //   return;
+    // }
     isNBALeftRight = true;
 
-    PathPlannerPath path = getStraightLinePath(currentPose, goal, DriveConstants.LEFT_RIGHT_CONSTRAINTS);
+    PathPlannerPath path = getStraightLinePath(currentPose, goal, DriveConstants.PATHFINDING_CONSTRAINTS); //TODO might need to scale constraints based off of distance from reef?
 
-    currentDrivetrainCommand = new TrajectoryDriveCmd(path, drivetrain, true, m_container).andThen(new InstantCommand(() -> isNBALeftRight = false));
+
+    currentDrivetrainCommand = new TrajectoryDriveCmd(path, drivetrain, true, m_container).andThen(m_container.rumbleDrvAuxController(1.0, 0.2)).andThen(new InstantCommand(() -> isNBALeftRight = false));
 
     try{
       currentDrivetrainCommand.schedule();
@@ -569,6 +575,7 @@ public class TeleopPosSelector { //TODO split up the file. it's too big and does
       currentPathfindingPair = getClosestReefPos().getFirst();
       currentDrivetrainCommand.cancel();
       try{
+        System.out.println("run nba!!!");
         //TODO add a check to see if the robot is against the wall but angled so that it runs distanced scoring
         currentDrivetrainCommand = new TrajectoryDriveCmd(getPathfindingPath(calculateReefPose(getClosestReefPos().getFirst(), true, false)), m_container.getCatzDrivetrain(), true, m_container)
                                         .deadlineFor(new RepeatCommand(CatzStateCommands.LXElevator(m_container, superstructure.getLevel()).alongWith(new PrintCommand("elevaktorktpa!")).onlyIf(() -> drivetrain.getDistanceError() < 1.5)))
@@ -604,11 +611,16 @@ public class TeleopPosSelector { //TODO split up the file. it's too big and does
     );
   }
 
-  public Command cancelCurrentDrivetrainCommand() {
+  public Command cancelCurrentDrivetrainCommand(CancellationSource source) {
     return new InstantCommand(() -> {
-      System.out.println("cancelling!");
-      if(isNBALeftRight) return;
-
+      if(source == CancellationSource.NBA){
+        isNBALeftRight = false;
+      }
+      if(isNBALeftRight) {
+        System.out.println("you dont want to cancel!");
+        return;
+      } //you want to be able to cancel leftright with NBA
+      System.out.println("want to cancell!" + source);
 
       currentDrivetrainCommand.cancel();
     });

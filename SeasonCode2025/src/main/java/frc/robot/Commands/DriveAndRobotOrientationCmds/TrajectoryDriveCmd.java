@@ -114,7 +114,7 @@ public class TrajectoryDriveCmd extends Command {
   // ---------------------------------------------------------------------------------------------
   void printTime(String tag){
     double curTime = Timer.getFPGATimestamp();
-    System.out.println(tag + (curTime-prevTime));
+    // System.out.println(tag + (curTime-prevTime));
     prevTime = curTime;
   }
   @Override
@@ -152,12 +152,21 @@ public class TrajectoryDriveCmd extends Command {
 
       printTime("tres");
 
+      boolean shouldChangeStartRot = Math.abs(tracker.getEstimatedPose().getRotation().minus(pathPoints.get(pathPoints.size()-1).rotationTarget.rotation()).getDegrees()) > 5.0;
+      Rotation2d startRot = tracker.getEstimatedPose().getRotation();
+      if(shouldChangeStartRot){
+        //if you are trying to auto align and the change in rotation is kind of big, then you want to set your starting rotation to the starting heading of path because for some mysterious reason
+        //trajectory speed gets very slow when it needs to account for rotation. the only case where this wouldn't be auto align is if you are going to coral station
+        //during autonomous, where you want to be facing backwards, so +180 for this case
+        //i really dont like this fix either but i cant find the source of the issue so ¯\_(ツ)_/¯
+        startRot = autoalign ? pathPoints.get(1).position.minus(pathPoints.get(0).position).getAngle() : pathPoints.get(1).position.minus(pathPoints.get(0).position).getAngle().plus(Rotation2d.k180deg);
+      }
       try {
         // Construct trajectory
         this.trajectory = new PathPlannerTrajectory(
           usePath,
           currentSpeeds, //TODO make it not zero if its a thing thingy y esdpoifi
-          autoalign ? pathPoints.get(1).position.minus(pathPoints.get(0).position).getAngle() : pathPoints.get(1).position.minus(pathPoints.get(0).position).getAngle().plus(Rotation2d.k180deg),
+          startRot,
           DriveConstants.TRAJ_ROBOT_CONFIG
         );
         printTime("cuatro");
@@ -267,7 +276,7 @@ public class TrajectoryDriveCmd extends Command {
     // Logging
     // debugLogsTrajectory();
 
-    System.out.println("traj exe: " + (Timer.getFPGATimestamp() - exeTime));
+    // System.out.println("traj exe: " + (Timer.getFPGATimestamp() - exeTime));
   } // end of execute
 
   // ---------------------------------------------------------------------------------------------
@@ -393,7 +402,7 @@ public class TrajectoryDriveCmd extends Command {
 
     // System.out.println("poseerr:" + ((xError < poseError) &&(yError < poseError)));
     printTime("doce");
-    System.out.println("transerr: " + (translationError));
+    // System.out.println("transerr: " + (translationError));
     // System.out.println("pose errr: " + poseError);
     return translationError < poseError;
   }

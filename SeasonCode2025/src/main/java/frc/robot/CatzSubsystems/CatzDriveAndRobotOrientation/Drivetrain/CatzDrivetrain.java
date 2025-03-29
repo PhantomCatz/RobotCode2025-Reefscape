@@ -213,6 +213,7 @@ public class CatzDrivetrain extends SubsystemBase {
   //
   // --------------------------------------------------------------------------------------------------------------------------
   public void drive(ChassisSpeeds chassisSpeeds) {
+    // System.out.println("speeed; " + chassisSpeeds);
     ChassisSpeeds descreteSpeeds = ChassisSpeeds.discretize(chassisSpeeds, CatzConstants.LOOP_TIME);
     // --------------------------------------------------------
     // Convert chassis speeds to individual module states and set module states
