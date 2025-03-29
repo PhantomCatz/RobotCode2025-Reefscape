@@ -17,6 +17,8 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.function.Supplier;
 
+import org.littletonrobotics.junction.Logger;
+
 import com.pathplanner.lib.path.GoalEndState;
 import com.pathplanner.lib.path.PathConstraints;
 import com.pathplanner.lib.path.PathPlannerPath;
@@ -469,6 +471,8 @@ public class TeleopPosSelector { //TODO split up the file. it's too big and does
     Translation2d currentPos = currentPose.getTranslation();
     Translation2d direction = goalPos.minus(currentPos).div(2.0);
 
+    Logger.recordOutput("LeftRightGoal", goal);
+
     // if (direction.getNorm() <= 1e-3) {
     //   return;
     // }
@@ -583,10 +587,12 @@ public class TeleopPosSelector { //TODO split up the file. it's too big and does
       try{
         //TODO add a check to see if the robot is against the wall but angled so that it runs distanced scoring
         Command prematureCommand = superstructure.getChosenGamepiece() == Gamepiece.CORAL ? CatzStateCommands.LXElevator(m_container, superstructure.getLevel()) : CatzStateCommands.XAlgae(m_container, superstructure.getLevel());
+        // PathPlannerPath path = getPathfindingPath(calculateReefPose(getClosestReefPos().getFirst(), true, false));
+        PathPlannerPath path = getStraightLinePath(tracker.getEstimatedPose(), calculateReefPose(getClosestReefPos().getFirst(), true, false), DriveConstants.PATHFINDING_CONSTRAINTS);
 
-        currentDrivetrainCommand = new TrajectoryDriveCmd(getPathfindingPath(calculateReefPose(getClosestReefPos().getFirst(), true, false)), m_container.getCatzDrivetrain(), true, m_container)
+        currentDrivetrainCommand = new TrajectoryDriveCmd(path, m_container.getCatzDrivetrain(), true, m_container)
                                         .deadlineFor(new RepeatCommand(prematureCommand).alongWith(new PrintCommand("elevaktorktpa!")).onlyIf(() -> drivetrain.getDistanceError() < 1.5))
-                                        .andThen(m_container.controllerRumbleCommand());
+                                        .andThen(m_container.rumbleDrvAuxController(1.0, 0.2));
         currentDrivetrainCommand.schedule();
       }catch(Exception e){
         e.printStackTrace();
@@ -624,10 +630,8 @@ public class TeleopPosSelector { //TODO split up the file. it's too big and does
         isNBALeftRight = false;
       }
       if(isNBALeftRight) {
-        System.out.println("you dont want to cancel!");
         return;
       } //you want to be able to cancel leftright with NBA
-      System.out.println("want to cancell!" + source);
 
       currentDrivetrainCommand.cancel();
     });

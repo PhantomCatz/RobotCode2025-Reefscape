@@ -13,12 +13,14 @@ package frc.robot.Commands.DriveAndRobotOrientationCmds;
 
 import com.pathplanner.lib.path.PathPlannerPath;
 import com.pathplanner.lib.path.PathPoint;
+import com.pathplanner.lib.path.RotationTarget;
 import com.pathplanner.lib.trajectory.PathPlannerTrajectory;
 import com.pathplanner.lib.trajectory.PathPlannerTrajectoryState;
 import com.pathplanner.lib.util.PPLibTelemetry;
 import com.pathplanner.lib.util.PathPlannerLogging;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.math.util.Units;
@@ -33,6 +35,7 @@ import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.Drivetrain.CatzDriv
 import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.Drivetrain.DriveConstants;
 import frc.robot.Utilities.AllianceFlipUtil;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.function.Supplier;
@@ -56,7 +59,7 @@ public class TrajectoryDriveCmd extends Command {
   public static final double ALLOWABLE_ROTATION_ERROR = 3.0;
   public static final double ALLOWABLE_VEL_ERROR = 0.80; // m/s
   public static final double ALLOWABLE_OMEGA_ERROR = 10.0;
-  private static final double TIMEOUT_SCALAR = 3.0;
+  private static final double TIMEOUT_SCALAR = 2.0;
   private static final double CONVERGE_DISTANCE = 0.02;
   private static final double FACE_REEF_DIST = 2.0;
   private final double ALLOWABLE_VISION_ADJUST = 4e-3; //TODO tune
@@ -132,7 +135,9 @@ public class TrajectoryDriveCmd extends Command {
       if(AllianceFlipUtil.shouldFlipToRed()) {
         usePath = path.flipPath();
       }
+      Logger.recordOutput("BefoPopopo", new Pose2d(usePath.getAllPathPoints().get(usePath.getAllPathPoints().size()-1).position, usePath.getGoalEndState().rotation()));
       printTime("uno");
+      System.out.println("num of posts: " + usePath.getAllPathPoints());
 
       // Pose Reseting
       if (Robot.isFirstPath && DriverStation.isAutonomous()) {
@@ -150,6 +155,21 @@ public class TrajectoryDriveCmd extends Command {
       ChassisSpeeds currentSpeeds = DriveConstants.SWERVE_KINEMATICS.toChassisSpeeds(tracker.getCurrentModuleStates());
       List<PathPoint> pathPoints = usePath.getAllPathPoints();
 
+
+      if(pathPoints.size() == 2){
+        System.out.println("too shortt!!");
+        Pose2d p1 = new Pose2d(pathPoints.get(0).position, new Rotation2d());
+        Pose2d p2 = new Pose2d(pathPoints.get(1).position, new Rotation2d());
+
+        Pose2d mid = p1.plus(new Transform2d(p1, p2).div(2));
+        Logger.recordOutput("midd", mid);
+
+        List<PathPoint> newPathPoints = new ArrayList<>();
+        newPathPoints.add(pathPoints.get(0));
+        newPathPoints.add(new PathPoint(mid.getTranslation(), new RotationTarget(0.0, mid.getRotation())));
+        newPathPoints.add(pathPoints.get(1));
+        usePath = PathPlannerPath.fromPathPoints(newPathPoints, DriveConstants.PATHFINDING_CONSTRAINTS, usePath.getGoalEndState());
+      }
       printTime("tres");
 
       boolean shouldChangeStartRot = Math.abs(tracker.getEstimatedPose().getRotation().minus(pathPoints.get(pathPoints.size()-1).rotationTarget.rotation()).getDegrees()) > 5.0;
@@ -163,25 +183,28 @@ public class TrajectoryDriveCmd extends Command {
       }
       try {
         // Construct trajectory
-        this.trajectory = new PathPlannerTrajectory(
-          usePath,
-          currentSpeeds, //TODO make it not zero if its a thing thingy y esdpoifi
-          startRot,
-          DriveConstants.TRAJ_ROBOT_CONFIG
-        );
+        this.trajectory = usePath.generateTrajectory(currentSpeeds, startRot, DriveConstants.TRAJ_ROBOT_CONFIG);
+        // this.trajectory = new PathPlannerTrajectory(
+        //   usePath,
+        //   currentSpeeds, //TODO make it not zero if its a thing thingy y esdpoifi
+        //   startRot,
+        //   DriveConstants.TRAJ_ROBOT_CONFIG
+        // );
         printTime("cuatro");
       } catch (Error e){
         e.printStackTrace();
         //for some reason if you spam NBA current rotation gets bugged.
-        this.trajectory = new PathPlannerTrajectory(
-          usePath,
-          currentSpeeds, //TODO make it not zero if its a thing thingy y esdpoifi
-          new Rotation2d(),
-          DriveConstants.TRAJ_ROBOT_CONFIG
-        );
+        this.trajectory = usePath.generateTrajectory(currentSpeeds, new Rotation2d(), DriveConstants.TRAJ_ROBOT_CONFIG);
+        // this.trajectory = new PathPlannerTrajectory(
+        //   usePath,
+        //   currentSpeeds, //TODO make it not zero if its a thing thingy y esdpoifi
+        //   new Rotation2d(),
+        //   DriveConstants.TRAJ_ROBOT_CONFIG
+        // );
       }
       printTime("sdfioj");
       if(trajectory == null) {
+        System.out.println("bugged!!!!!!!");
         isBugged = true;
         return;
       }
@@ -189,6 +212,7 @@ public class TrajectoryDriveCmd extends Command {
       printTime("cinco");
       hocontroller = DriveConstants.getNewHolController();
       pathTimeOut = trajectory.getTotalTimeSeconds() * TIMEOUT_SCALAR;
+
 
       // System.out.println("current " + tracker.getEstimatedPose());
       // System.out.println("start " + this.trajectory.getInitialPose());
@@ -200,9 +224,11 @@ public class TrajectoryDriveCmd extends Command {
 
       this.timer.reset();
       this.timer.start();
+      Logger.recordOutput("Goal Position", trajectory.sample(trajectory.getTotalTimeSeconds()).pose);
     } catch(Exception e) {
       isBugged = true;
       e.printStackTrace();
+
     }
 
     // System.out.println("timeoutt::" + trajectory.getTotalTimeSeconds());
@@ -293,6 +319,7 @@ public class TrajectoryDriveCmd extends Command {
 
     timer.stop(); // Stop timer
     m_driveTrain.stopDriving();
+    m_driveTrain.drive(new ChassisSpeeds());
 
     // PathPlannerAuto.currentPathName = "";
     // Logger.recordOutput("CatzRobotTracker/Desired Auto Pose", new Pose2d());

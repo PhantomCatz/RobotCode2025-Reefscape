@@ -53,6 +53,7 @@ import frc.robot.Utilities.Alert.AlertType;
 
 import org.littletonrobotics.junction.networktables.LoggedNetworkNumber;
 
+
 public class RobotContainer {
 
   private final double SCORE_TRIGGER_THRESHHOLD = 0.8;
@@ -182,7 +183,8 @@ public class RobotContainer {
 
     // Default driving
     Trigger escapeTrajectory = new Trigger(()->(xboxDrv.getLeftY() > 0.8));
-    escapeTrajectory.onTrue(selector.cancelCurrentDrivetrainCommand(CancellationSource.NA).alongWith(selector.cancelAutoCommand()));
+
+    escapeTrajectory.onTrue(getCatzDrivetrain().cancelTrajectory());
 
     drive.setDefaultCommand(new TeleopDriveCmd(() -> xboxDrv.getLeftX(), () -> xboxDrv.getLeftY(), () -> xboxDrv.getRightX(), drive));
     //---------------------------------------------------------------------------------------------------------------------

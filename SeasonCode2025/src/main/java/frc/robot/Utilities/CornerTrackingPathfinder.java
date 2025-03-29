@@ -286,33 +286,33 @@ public class CornerTrackingPathfinder{
     }
     // Visualize path
 
-    // for (int row = nodesY - 1; row >= 0; row--) {
-    //   for (int col = 0; col < nodesX; col++) {
-    //     if(start.equals(new GridPosition(col, row))){
-    //       //starting point
-    //       System.out.print("s");
-    //     }
-    //     else if(g.equals(new GridPosition(col, row))){
-    //       System.out.print("e");
-    //     }
-    //     else if (obstacles.contains(new GridPosition(col, row))){
-    //       //wall
-    //       System.out.print("#");
-    //     }
-    //     else if(path.contains(new GridPosition(col, row))){
-    //       //goal points
-    //       System.out.print("@");
-    //     }
-    //     else if (lastCorner.keySet().contains(new GridPosition(col, row))){
-    //       //areas flood filled
-    //       System.out.print("+");
-    //     }
-    //     else {
-    //       System.out.print("_");
-    //     }
-    //   }
-    //   System.out.println();
-    // }
+    for (int row = nodesY - 1; row >= 0; row--) {
+      for (int col = 0; col < nodesX; col++) {
+        if(start.equals(new GridPosition(col, row))){
+          //starting point
+          System.out.print("s");
+        }
+        else if(g.equals(new GridPosition(col, row))){
+          System.out.print("e");
+        }
+        else if (obstacles.contains(new GridPosition(col, row))){
+          //wall
+          System.out.print("#");
+        }
+        else if(path.contains(new GridPosition(col, row))){
+          //goal points
+          System.out.print("@");
+        }
+        else if (lastCorner.keySet().contains(new GridPosition(col, row))){
+          //areas flood filled
+          System.out.print("+");
+        }
+        else {
+          System.out.print("_");
+        }
+      }
+      System.out.println();
+    }
 
     return path;
   }
