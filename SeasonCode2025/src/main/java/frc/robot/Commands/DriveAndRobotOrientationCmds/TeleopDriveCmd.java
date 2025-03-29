@@ -20,6 +20,7 @@ import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.Drivetrain.DriveCon
 import frc.robot.Utilities.AllianceFlipUtil;
 import java.util.function.Supplier;
 import org.littletonrobotics.junction.Logger;
+import frc.robot.CatzSubsystems.CatzSuperstructure;
 
 /**************************************************************************************************
  *
@@ -104,7 +105,15 @@ public class TeleopDriveCmd extends Command {
             ? turningVelocity * DriveConstants.DRIVE_CONFIG.maxAngularVelocity()
             : 0.0;
 
+    if(CatzSuperstructure.isClimbEnabled()) {
+      m_headingAndVelocity_X *= 0.2;
+      m_headingAndVelocity_Y *= 0.2;
+      turningVelocity *= 0.2;
+      System.out.println("low speed");
+    }
+
     // Construct desired chassis speeds
+
     chassisSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(m_headingAndVelocity_X,
                                                           m_headingAndVelocity_Y,
                                                           turningVelocity,

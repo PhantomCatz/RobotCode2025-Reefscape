@@ -81,10 +81,10 @@ public class RobotContainer {
   private final CommandXboxController xboxDrv = new CommandXboxController(0);
   private final CommandXboxController xboxAux = new CommandXboxController(1);
   private final OverrideSwitch overrideHID = new OverrideSwitch(2);
-  private final Trigger isElevatorFullManual = overrideHID.auxSwitch(0);
-  private final Trigger isAlgaeEffectorFullManual = overrideHID.auxSwitch(0);
-  private final Trigger isRampPivotFullManual = overrideHID.auxSwitch(0);
-  private final Trigger isClimbEnabled = overrideHID.driverSwitch(1);
+  private final Trigger isElevatorFullManual = overrideHID.auxSwitch(2);
+  private final Trigger isAlgaeEffectorFullManual = overrideHID.auxSwitch(3);
+  private final Trigger isClimbEnabled = overrideHID.auxSwitch(1);
+  private final Trigger isRampPivotFullManual = overrideHID.auxSwitch(4);
 
   private CommandXboxController xboxTest = new CommandXboxController(3);
   private TeleopPosSelector selector;
@@ -109,7 +109,6 @@ public class RobotContainer {
     selector = new TeleopPosSelector(xboxAux, this);
     auto = new CatzAutonomous(this);
 
-    superstructure.setClimbOverride(isClimbEnabled);
 
     // Drive And Aux Command Mapping
     configureBindings();
@@ -148,7 +147,7 @@ public class RobotContainer {
     // XBOX Drive
     //---------------------------------------------------------------------------------------------------------------------
     // Reset odometry
-    xboxDrv.button(8).and(xboxDrv.button(7)).onTrue(new InstantCommand(() -> {
+    DoublePressTracker.createTrigger(xboxDrv.button(8).and(xboxDrv.button(7))).onTrue(new InstantCommand(() -> {
       if(AllianceFlipUtil.shouldFlipToRed()){
         robotTracker.resetPose(new Pose2d(robotTracker.getEstimatedPose().getTranslation(), Rotation2d.k180deg));
       }else{
@@ -175,6 +174,10 @@ public class RobotContainer {
     xboxDrv.leftBumper().onFalse(new InstantCommand(() -> selector.cancelCurrentDrivetrainCommand().schedule()));
     xboxDrv.rightBumper().onFalse(new InstantCommand(() -> selector.cancelCurrentDrivetrainCommand().schedule()));
 
+    // Coral Station Run Back
+    xboxDrv.button(7).onTrue(new InstantCommand(() -> selector.toggleLeftStation()).alongWith(Commands.runOnce(() -> led.setControllerState(ControllerLEDState.BALLS))));
+    xboxDrv.button(8).onTrue(new InstantCommand(() -> selector.toggleRightStation()).alongWith(Commands.runOnce(() -> led.setControllerState(ControllerLEDState.BALLS))));
+
     // Default driving
     Trigger escapeTrajectory = new Trigger(()->(xboxDrv.getLeftY() > 0.8));
     escapeTrajectory.onTrue(selector.cancelCurrentDrivetrainCommand().alongWith(selector.cancelAutoCommand()));
@@ -197,11 +200,8 @@ public class RobotContainer {
     // Full Manual
     xboxAux.leftStick().and(xboxAux.rightStick()).or(isElevatorFullManual).onTrue(elevator.elevatorFullManual(() -> -xboxAux.getLeftY())); // TODO make an override button for comp
     xboxAux.leftStick().and(xboxAux.rightStick()).or(isAlgaeEffectorFullManual).onTrue(algaePivot.AlgaePivotFullManualCommand(()->xboxAux.getRightY()));
+    isRampPivotFullManual.onTrue(rampPivot.rampPivotManual(()->xboxAux.getLeftY()));
 
-
-    // Coral Station Run Back
-    xboxAux.button(7).onTrue(new InstantCommand(() -> selector.toggleLeftStation()).alongWith(Commands.runOnce(() -> led.setControllerState(ControllerLEDState.BALLS))));
-    xboxAux.button(8).onTrue(new InstantCommand(() -> selector.toggleRightStation()).alongWith(Commands.runOnce(() -> led.setControllerState(ControllerLEDState.BALLS))));
 
     // Gamepiece Selection
     xboxAux.leftTrigger().onTrue(Commands.runOnce(()-> superstructure.cycleGamePieceSelection()));
@@ -219,10 +219,13 @@ public class RobotContainer {
     // Climb Action
     xboxAux.y().and(isClimbEnabled).onTrue(CatzStateCommands.extendClimb(this));
     xboxAux.b().and(isClimbEnabled).onTrue(CatzStateCommands.fullClimb(this));
-        // Manual Climb Control
-    xboxAux.back().and(xboxAux.start()).onTrue(climb.ClimbManualMode(()->0.0).alongWith(Commands.print("climb manual")));
-    xboxAux.back().and(xboxAux.leftStick()).onTrue(climb.ClimbManualMode(() -> xboxAux.getLeftY()).alongWith(Commands.print("Using manual climb")));
 
+    isClimbEnabled.onTrue(Commands.runOnce(() -> superstructure.setClimbOverride(()->true)));
+    isClimbEnabled.onFalse(Commands.runOnce(() -> superstructure.setClimbOverride(()->false)));
+
+        // Manual Climb Control
+    xboxAux.back().onFalse(climb.CancelClimb());
+    xboxAux.back().onTrue(climb.ClimbManualMode(() -> xboxAux.getLeftY()).alongWith(Commands.print("Using manual climb")));
 
     // algae punch
     DoublePressTracker.createTrigger(xboxAux.x())

@@ -18,9 +18,6 @@ import com.revrobotics.spark.SparkLowLevel.MotorType;
 
 import static frc.robot.CatzSubsystems.CatzOuttake.OuttakeConstants.*;
 
-import com.ctre.phoenix6.configs.TalonFXSConfiguration;
-import com.ctre.phoenix6.signals.MotorArrangementValue;
-import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkMaxConfig;
@@ -36,7 +33,6 @@ public class OuttakeIOReal implements OuttakeIO {
   private final SparkMax OuttakeLeftMtr;
   private final SparkMax OuttakeRightMtr;
 
-  private final TalonFXSConfiguration config = new TalonFXSConfiguration();
   private SparkMaxConfig globalConfig = new SparkMaxConfig();
 
   public OuttakeIOReal() {
@@ -48,15 +44,6 @@ public class OuttakeIOReal implements OuttakeIO {
     globalConfig.idleMode(IdleMode.kBrake);
     globalConfig.voltageCompensation(12);
     updateConfig();
-
-    config.Slot0.kS = gains.kS();
-    config.Slot0.kV = gains.kV();
-    config.Slot0.kA = gains.kA();
-    config.Slot0.kP = gains.kP();
-    config.Slot0.kI = gains.kI();
-    config.Slot0.kD = gains.kD();
-    config.Commutation.MotorArrangement = MotorArrangementValue.Minion_JST;
-    config.MotorOutput.NeutralMode = NeutralModeValue.Brake;
 
     beamBreakBck = new DigitalInput(BACK_BEAM_BREAK_ID);
     beamBreakFrnt = new DigitalInput(FRONT_BEAM_BREAK_ID);

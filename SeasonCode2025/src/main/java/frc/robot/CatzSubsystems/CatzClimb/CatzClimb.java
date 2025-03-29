@@ -14,6 +14,7 @@ package frc.robot.CatzSubsystems.CatzClimb;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.CatzConstants;
 import frc.robot.Utilities.LoggedTunableNumber;
@@ -149,7 +150,14 @@ public class CatzClimb extends SubsystemBase {
     return run(() -> climbFullManual(manualSupplier.get())).alongWith(Commands.print("hi"));
   }
 
+  public Command CancelClimb() {
+    Command cancel = new InstantCommand().alongWith(Commands.runOnce(()->io.setPower(0.0)));
+    cancel.addRequirements(this);
+    return cancel;
+  }
+
   public void setOverrides(Supplier<Boolean> booleanSupplier) {
     isManual = booleanSupplier.get();
   }
+
 }

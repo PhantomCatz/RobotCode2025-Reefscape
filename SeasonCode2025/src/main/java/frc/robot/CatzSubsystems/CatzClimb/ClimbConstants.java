@@ -23,6 +23,8 @@ public class ClimbConstants {
     public static final double CLIMB_RETRACT = 0.0;
     public static final double CLIMB_CATCH = 0.0;
 
+    // Positive is winching in negative is winching out
+
     public static final Gains gains =
         switch (CatzConstants.getRobotType()) {
             //(100.0, 0.0, 0.0, 0.25, 0.12, 0.01, 0.0);

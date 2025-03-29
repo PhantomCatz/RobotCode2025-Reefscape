@@ -229,7 +229,8 @@ public class TrajectoryDriveCmd extends Command {
     // target velocity is used as a ff
     // -------------------------------------------------------------------------------------
     PathPlannerTrajectoryState goal = trajectory.sample(Math.min(currentTime, trajectory.getTotalTimeSeconds()));
-    PathPlannerTrajectoryState endGoal = trajectory.sample(trajectory.getTotalTimeSeconds());
+    PathPlannerTrajectoryState endGoal = trajectory.sample(trajectory.getTotalTimeSeconds()); // TODO we can optimize
+
     printTime("siete");
     Trajectory.State state = new Trajectory.State(
         currentTime,
@@ -260,6 +261,8 @@ public class TrajectoryDriveCmd extends Command {
     printTime("diez");
 
     m_driveTrain.setDistanceError(translationError);
+
+    CatzRobotTracker.getInstance().setCoralStationTrajectoryRemaining(trajectory.getTotalTimeSeconds()-currentTime);
 
     // Logging
     // debugLogsTrajectory();

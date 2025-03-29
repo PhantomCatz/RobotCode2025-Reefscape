@@ -40,6 +40,11 @@ import frc.robot.Utilities.waituntil;
 
 public class CatzStateCommands {
 
+    //------------------------------------------------------------------------------------------------------------------------------------
+    //
+    //      Autonomous State COmmands
+    //
+    //------------------------------------------------------------------------------------------------------------------------------------
     public static Command driveToScore(RobotContainer robotContainer, PathPlannerPath pathToReadyPose, int level){
         final double PREDICT_DISTANCE = 1.60; //meters
 
@@ -105,6 +110,11 @@ public class CatzStateCommands {
         );
     }
 
+    //------------------------------------------------------------------------------------------------------------------------------------
+    //
+    //      MISC State Commands
+    //
+    //------------------------------------------------------------------------------------------------------------------------------------
     public static Command stow(RobotContainer robotContainer) {
 
         CatzClimb climb = robotContainer.getCatzClimb();
@@ -179,6 +189,11 @@ public class CatzStateCommands {
         ).unless(()-> Robot.isSimulation()).alongWith(Commands.print("intakeAlgae"));
     }
 
+    //------------------------------------------------------------------------------------------------------------------------------------
+    //
+    //      Scoring State COmmands
+    //
+    //------------------------------------------------------------------------------------------------------------------------------------
     public static Command L1Coral(RobotContainer robotContainer) {
         CatzClimb climb = robotContainer.getCatzClimb();
         CatzAlgaeRemover algae = robotContainer.getCatzAlgaeRemover();
@@ -307,6 +322,11 @@ public class CatzStateCommands {
         }
     }
 
+    //------------------------------------------------------------------------------------------------------------------------------------
+    //
+    //      Preraise elevator
+    //
+    //------------------------------------------------------------------------------------------------------------------------------------
     public static Command LXElevator(RobotContainer robotContainer, int level){
         CatzClimb climb = robotContainer.getCatzClimb();
         CatzAlgaeRemover algae = robotContainer.getCatzAlgaeRemover();
@@ -328,6 +348,11 @@ public class CatzStateCommands {
         ).unless(()-> Robot.isSimulation()).alongWith(Commands.print("L" + level+" Elevator Raise")).unless(()-> Robot.isSimulation());
     }
 
+    //------------------------------------------------------------------------------------------------------------------------------------
+    //
+    //      Algae State COmmands
+    //
+    //------------------------------------------------------------------------------------------------------------------------------------
     public static Command processor(RobotContainer robotContainer) {
         CatzClimb climb = robotContainer.getCatzClimb();
         CatzAlgaeRemover algae = robotContainer.getCatzAlgaeRemover();
@@ -424,6 +449,11 @@ public class CatzStateCommands {
         ).unless(()-> Robot.isSimulation()).alongWith(Commands.print("Top Algae"));
     }
 
+    //------------------------------------------------------------------------------------------------------------------------------------
+    //
+    //      Climb Commands
+    //
+    //------------------------------------------------------------------------------------------------------------------------------------
     public static Command extendClimb(RobotContainer robotContainer) {
         CatzClimb climb = robotContainer.getCatzClimb();
         CatzAlgaeRemover algae = robotContainer.getCatzAlgaeRemover();
