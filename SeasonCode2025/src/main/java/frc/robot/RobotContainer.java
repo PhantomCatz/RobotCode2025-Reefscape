@@ -81,10 +81,10 @@ public class RobotContainer {
   private final CommandXboxController xboxDrv = new CommandXboxController(0);
   private final CommandXboxController xboxAux = new CommandXboxController(1);
   private final OverrideSwitch overrideHID = new OverrideSwitch(2);
-  private final Trigger isElevatorFullManual = overrideHID.auxSwitch(0);
-  private final Trigger isAlgaeEffectorFullManual = overrideHID.auxSwitch(0);
-  private final Trigger isRampPivotFullManual = overrideHID.auxSwitch(0);
-  private final Trigger isClimbEnabled = overrideHID.auxSwitch(2);
+  private final Trigger isElevatorFullManual = overrideHID.auxSwitch(1);
+  private final Trigger isAlgaeEffectorFullManual = overrideHID.auxSwitch(2);
+  private final Trigger isClimbEnabled = overrideHID.auxSwitch(0);
+  private final Trigger isRampPivotFullManual = overrideHID.auxSwitch(3);
 
   private CommandXboxController xboxTest = new CommandXboxController(3);
   private TeleopPosSelector selector;
@@ -200,6 +200,7 @@ public class RobotContainer {
     // Full Manual
     xboxAux.leftStick().and(xboxAux.rightStick()).or(isElevatorFullManual).onTrue(elevator.elevatorFullManual(() -> -xboxAux.getLeftY())); // TODO make an override button for comp
     xboxAux.leftStick().and(xboxAux.rightStick()).or(isAlgaeEffectorFullManual).onTrue(algaePivot.AlgaePivotFullManualCommand(()->xboxAux.getRightY()));
+    isRampPivotFullManual.onTrue(rampPivot.rampPivotManual(()->xboxAux.getLeftY()));
 
 
     // Gamepiece Selection

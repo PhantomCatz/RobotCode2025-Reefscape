@@ -276,10 +276,10 @@ public class CatzElevator extends SubsystemBase {
 
   private boolean isElevatorInPosition() {
     boolean isElevatorSettled = false;
-    boolean isElevatorInPos = (Math.abs((getElevatorPositionInch() - targetPosition.getTargetPositionInch())) < 1);
+    boolean isElevatorInPos = (Math.abs((getElevatorPositionInch() - targetPosition.getTargetPositionInch())) < 1.0);
     if(isElevatorInPos) {
       settlingCounter++;
-      if(settlingCounter >= 2) {
+      if(settlingCounter >= 1) {
          isElevatorSettled = true;
         // settlingCounter = 0;
          //System.out.println("////////////ELEVATOR SETTLED FOR .2 SECONDS///////////////////");

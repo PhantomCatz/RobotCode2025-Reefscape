@@ -32,6 +32,7 @@ import java.util.NoSuchElementException;
 import java.util.function.Supplier;
 
 import lombok.Getter;
+import lombok.Setter;
 import lombok.experimental.ExtensionMethod;
 import org.littletonrobotics.junction.AutoLogOutput;
 
@@ -80,6 +81,8 @@ public class CatzRobotTracker {
   @AutoLogOutput(key = "CatzRobotTracker/TxTyPose")
   private Pose2d txTyPose = new Pose2d();
 
+  
+
   private final TimeInterpolatableBuffer<Pose2d> POSE_BUFFER =
       TimeInterpolatableBuffer.createBuffer(POSE_BUFFER_SIZE_SEC);
   private final Matrix<N3, N1> TRACKER_STD_DEVS = new Matrix<>(Nat.N3(), Nat.N1());
@@ -109,6 +112,9 @@ public class CatzRobotTracker {
   private Twist2d trajectoryVelocity = new Twist2d();
   private ChassisSpeeds m_lastChassisSpeeds = new ChassisSpeeds();
   private Translation2d visionPoseShift = new Translation2d();
+
+  @Getter @Setter @AutoLogOutput(key = "CatzRobotTracker/trajectory completed")
+  private double coralStationTrajectoryRemaining;
 
   // ------------------------------------------------------------------------------------------------------
   //

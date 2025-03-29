@@ -20,6 +20,7 @@ import edu.wpi.first.wpilibj.Notifier;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.util.Color;
 import frc.robot.CatzSubsystems.CatzSuperstructure;
+import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.CatzRobotTracker;
 import frc.robot.CatzSubsystems.CatzSuperstructure.CoralState;
 import frc.robot.CatzSubsystems.CatzSuperstructure.Gamepiece;
 import frc.robot.Utilities.VirtualSubsystem;
@@ -136,8 +137,9 @@ public class CatzLED extends VirtualSubsystem {
   private static final double bubbleTime = 2.5;
   private static final double autoFadeTime = 1.3; // 3s nominal
   private static final double autoFadeMaxTime = 5.0; // Return to normal
+  private static final double coralThrowTime = 0.5; // tune
 
-
+  private static final Color[] autonCountdownColors = {Color.kGreen, Color.kYellow, Color.kRed, Color.kWhite};
 
   private CatzLED() {
     ledStrip = new AddressableLED(LEADER_LED_PWM_PORT);
@@ -212,7 +214,9 @@ public class CatzLED extends VirtualSubsystem {
       }
       // MODE AUTON
     } else if (DriverStation.isAutonomous()) {
-      wave(Color.kAqua, Color.kDarkBlue, waveFastCycleLength, waveFastDuration);
+      double timeLeft = CatzRobotTracker.getInstance().getCoralStationTrajectoryRemaining();
+      // count down to coral drop time with in half second intervals. Drop right when it turns green. If there is more than 1 second white.
+      setSolidElevatorColor(autonCountdownColors[(int) Math.max(Math.min(Math.ceil((timeLeft-coralThrowTime)/0.5), 3.0), 0.0)]);
       // MODE ENABLED
     } else {
       switch(controllerState) {
