@@ -58,7 +58,7 @@ public class VisionConstants {
       };
 
   public static final boolean USE_MEGATAG1 = false; // megatag 1 3d solve allows robot to fly
-  public static final double EXTRA_LATENCY_MS = 135;
+  public static final double EXTRA_LATENCY_MS = 0;
 
   // Multipliers to apply for MegaTag 2 observations
   public static final double LINEAR_STD_DEV_MEGATAG2_SCALE_FACTOR = 1.0; // More stable than full 3D solve

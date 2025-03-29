@@ -60,9 +60,10 @@ public class TrajectoryDriveCmd extends Command {
   public static final double ALLOWABLE_VEL_ERROR = 0.80; // m/s
   public static final double ALLOWABLE_OMEGA_ERROR = 10.0;
   private static final double TIMEOUT_SCALAR = 2.0;
-  private static final double CONVERGE_DISTANCE = 0.02;
+  private static final double CONVERGE_DISTANCE = 0.04;
+  private static final double CONVERGE_ANGLE = 1.0;
   private static final double FACE_REEF_DIST = 2.0;
-  private final double ALLOWABLE_VISION_ADJUST = 4e-3; //TODO tune
+  private final double ALLOWABLE_VISION_ADJUST = 5e-3; //TODO tune
 
   // Subsystems
   private CatzDrivetrain m_driveTrain;
@@ -224,7 +225,7 @@ public class TrajectoryDriveCmd extends Command {
 
       this.timer.reset();
       this.timer.start();
-      Logger.recordOutput("Goal Position", trajectory.sample(trajectory.getTotalTimeSeconds()).pose);
+      Logger.recordOutput("Goal Position", trajectory.getEndState().pose);
     } catch(Exception e) {
       isBugged = true;
       e.printStackTrace();
@@ -286,7 +287,7 @@ public class TrajectoryDriveCmd extends Command {
     // }
     printTime("nueve");
 
-    adjustedSpeeds = applyCusp(adjustedSpeeds, translationError, CONVERGE_DISTANCE);
+    adjustedSpeeds = applyCusp(adjustedSpeeds, translationError, endGoal.pose.getRotation().minus(currentPose.getRotation()).getDegrees(), CONVERGE_DISTANCE, CONVERGE_ANGLE);
 
     // Logging
     Logger.recordOutput("CatzRobotTracker/Desired Auto Pose", goal.pose);
@@ -362,13 +363,16 @@ public class TrajectoryDriveCmd extends Command {
   //---------------------------------------------------------------------------------------------------------------
   //  Trajectory Factory Methods
   //---------------------------------------------------------------------------------------------------------------
-  private ChassisSpeeds applyCusp(ChassisSpeeds speeds, double distance, final double threshold) {
+  private ChassisSpeeds applyCusp(ChassisSpeeds speeds, double distance, double angle, final double thresholdDist, final double thresholdAngle) {
     // graph 1 / (1+x) on desmos
-    double x = distance / threshold;
+    double x = distance / thresholdDist;
     double omega = speeds.omegaRadiansPerSecond;
 
+    double x2 = angle / thresholdAngle;
+    omega = omega * Math.min(2*x2 / (1+x2), 1.0);
+
     ChassisSpeeds s = speeds.times(Math.min(2 * x / (1 + x), 1.0));
-    //don't apply cusp to angle
+
     s.omegaRadiansPerSecond = omega;
     return s;
 
