@@ -35,6 +35,7 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.FieldConstants.Reef;
 import frc.robot.Utilities.AllianceFlipUtil;
 import frc.robot.Utilities.CornerTrackingPathfinder;
+import frc.robot.CatzSubsystems.CatzSuperstructure.Gamepiece;
 import frc.robot.CatzSubsystems.CatzSuperstructure.LeftRight;
 import frc.robot.CatzSubsystems.CatzStateCommands;
 import frc.robot.CatzSubsystems.CatzSuperstructure;
@@ -311,6 +312,7 @@ public class TeleopPosSelector { //TODO split up the file. it's too big and does
   }
 
   // TODO calculate this on comptime and store it in an array
+  @SuppressWarnings("static-access")
   public Pose2d calculateReefPose(int reefAngle, LeftRight leftRightPos, boolean isDistanced) {
     Rotation2d selectedAngle = Rotation2d.fromRotations(reefAngle / 6.0);
 
@@ -332,6 +334,10 @@ public class TeleopPosSelector { //TODO split up the file. it's too big and does
     //Left right changes depending on whether the selected side is the upper or lower half of the reef.
     if (unitLeftRight.getY() < 0) {
       leftRight = leftRight.times(-1);
+    }
+
+    if(superstructure.getChosenGamepiece() == Gamepiece.ALGAE){
+      leftRight = new Translation2d();
     }
 
     Translation2d scoringPos = radius.plus(leftRight).plus(Reef.center);
@@ -575,10 +581,11 @@ public class TeleopPosSelector { //TODO split up the file. it's too big and does
       currentPathfindingPair = getClosestReefPos().getFirst();
       currentDrivetrainCommand.cancel();
       try{
-        System.out.println("run nba!!!");
         //TODO add a check to see if the robot is against the wall but angled so that it runs distanced scoring
+        Command prematureCommand = superstructure.getChosenGamepiece() == Gamepiece.CORAL ? CatzStateCommands.LXElevator(m_container, superstructure.getLevel()) : CatzStateCommands.XAlgae(m_container, superstructure.getLevel());
+
         currentDrivetrainCommand = new TrajectoryDriveCmd(getPathfindingPath(calculateReefPose(getClosestReefPos().getFirst(), true, false)), m_container.getCatzDrivetrain(), true, m_container)
-                                        .deadlineFor(new RepeatCommand(CatzStateCommands.LXElevator(m_container, superstructure.getLevel()).alongWith(new PrintCommand("elevaktorktpa!")).onlyIf(() -> drivetrain.getDistanceError() < 1.5)))
+                                        .deadlineFor(new RepeatCommand(prematureCommand).alongWith(new PrintCommand("elevaktorktpa!")).onlyIf(() -> drivetrain.getDistanceError() < 1.5))
                                         .andThen(m_container.controllerRumbleCommand());
         currentDrivetrainCommand.schedule();
       }catch(Exception e){

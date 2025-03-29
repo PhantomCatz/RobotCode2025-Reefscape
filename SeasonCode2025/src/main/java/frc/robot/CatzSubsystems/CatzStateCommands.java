@@ -384,7 +384,6 @@ public class CatzStateCommands {
         CatzElevator elevator = robotContainer.getCatzElevator();
         CatzAlgaePivot algaePivot = robotContainer.getAlgaePivot();
         CatzRampPivot rampPivot = robotContainer.getCatzRampPivot();
-        CatzIntakeRollers intakeRollers = robotContainer.getIntakeRollers();
 
         return new ParallelCommandGroup(
             climb.Climb_Home(),
@@ -402,6 +401,18 @@ public class CatzStateCommands {
         ).unless(()-> Robot.isSimulation()).alongWith(Commands.print("Net Algae"));
     }
 
+    public static Command XAlgae(RobotContainer robotContainer, int level){
+        switch(level){
+            case 2:
+            return topAlgae(robotContainer);
+
+            case 4:
+            return botAlgae(robotContainer);
+
+            default:
+            return new PrintCommand("Invalid Algae Level!");
+        }
+    }
 
     public static Command botAlgae(RobotContainer robotContainer) {
         CatzClimb climb = robotContainer.getCatzClimb();
