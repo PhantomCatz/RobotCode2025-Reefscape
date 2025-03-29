@@ -151,7 +151,7 @@ public class CatzClimb extends SubsystemBase {
   }
 
   public Command CancelClimb() {
-    Command cancel = new InstantCommand();
+    Command cancel = new InstantCommand().alongWith(Commands.runOnce(()->io.setPower(0.0)));
     cancel.addRequirements(this);
     return cancel;
   }
