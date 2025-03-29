@@ -17,6 +17,8 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.CatzConstants;
+import frc.robot.CatzSubsystems.CatzLEDs.CatzLED;
+import frc.robot.CatzSubsystems.CatzLEDs.CatzLED.WinchingState;
 import frc.robot.Utilities.LoggedTunableNumber;
 
 import static frc.robot.CatzSubsystems.CatzClimb.ClimbConstants.*;
@@ -104,6 +106,14 @@ public class CatzClimb extends SubsystemBase {
         io.setPosition(position);
       } else {
         io.setPower(0.0);
+      }
+
+      if(inputs.commandedOutput > 0.1) {
+        CatzLED.getInstance().setClimbDirection(WinchingState.EXTENDING);
+      } else if(inputs.commandedOutput < -0.1) {
+        CatzLED.getInstance().setClimbDirection(WinchingState.RETRACTING);
+      } else {
+        CatzLED.getInstance().setClimbDirection(WinchingState.IDLE);
       }
     }
 

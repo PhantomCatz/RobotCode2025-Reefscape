@@ -82,8 +82,8 @@ public class RobotContainer {
   private final CommandXboxController xboxAux = new CommandXboxController(1);
   private final OverrideSwitch overrideHID = new OverrideSwitch(2);
   private final Trigger isElevatorFullManual = overrideHID.auxSwitch(1);
-  private final Trigger isAlgaeEffectorFullManual = overrideHID.auxSwitch(2);
-  private final Trigger isClimbEnabled = overrideHID.auxSwitch(0);
+  private final Trigger isAlgaePivotFullManual = overrideHID.auxSwitch(2);
+  private final Trigger isClimbFullManualEnabled = overrideHID.auxSwitch(0);
   private final Trigger isRampPivotFullManual = overrideHID.auxSwitch(3);
 
   private CommandXboxController xboxTest = new CommandXboxController(3);
@@ -188,23 +188,24 @@ public class RobotContainer {
     //---------------------------------------------------------------------------------------------------------------------
 
     // Scoring Level Aqua determination
-    xboxAux.rightTrigger().onTrue(Commands.runOnce(() -> selector.pathQueueAddBack(selector.getXBoxReefPos(), superstructure.getLevel()))
-                                          .alongWith(Commands.runOnce(() -> led.setControllerState(ControllerLEDState.AQUA))));
-    xboxAux.leftBumper().onTrue(Commands.runOnce(() -> selector.pathQueuePopFront())
-                                        .alongWith(Commands.runOnce(() -> led.setControllerState(ControllerLEDState.AQUA))));
-    xboxAux.rightBumper().onTrue(Commands.runOnce(() -> selector.pathQueuePopBack())
-                                         .alongWith(Commands.runOnce(() -> led.setControllerState(ControllerLEDState.AQUA))));
-    xboxAux.rightStick().onTrue(Commands.runOnce(() -> selector.pathQueueClear()).unless(()->xboxAux.leftStick().getAsBoolean())
-                                        .alongWith(Commands.runOnce(() -> led.setControllerState(ControllerLEDState.AQUA))));
+    // xboxAux.rightTrigger().onTrue(Commands.runOnce(() -> selector.pathQueueAddBack(selector.getXBoxReefPos(), superstructure.getLevel()))
+    //                                       .alongWith(Commands.runOnce(() -> led.setControllerState(ControllerLEDState.AQUA))));
+    // xboxAux.leftBumper().onTrue(Commands.runOnce(() -> selector.pathQueuePopFront())
+    //                                     .alongWith(Commands.runOnce(() -> led.setControllerState(ControllerLEDState.AQUA))));
+    // xboxAux.rightBumper().onTrue(Commands.runOnce(() -> selector.pathQueuePopBack())
+    //                                      .alongWith(Commands.runOnce(() -> led.setControllerState(ControllerLEDState.AQUA))));
+    // xboxAux.rightStick().onTrue(Commands.runOnce(() -> selector.pathQueueClear()).unless(()->xboxAux.leftStick().getAsBoolean())
+    //                                     .alongWith(Commands.runOnce(() -> led.setControllerState(ControllerLEDState.AQUA))));
 
     // Full Manual
     xboxAux.leftStick().and(xboxAux.rightStick()).or(isElevatorFullManual).onTrue(elevator.elevatorFullManual(() -> -xboxAux.getLeftY())); // TODO make an override button for comp
-    xboxAux.leftStick().and(xboxAux.rightStick()).or(isAlgaeEffectorFullManual).onTrue(algaePivot.AlgaePivotFullManualCommand(()->xboxAux.getRightY()));
+    xboxAux.leftStick().and(xboxAux.rightStick()).or(isAlgaePivotFullManual).onTrue(algaePivot.AlgaePivotFullManualCommand(()->xboxAux.getRightY()));
     isRampPivotFullManual.onTrue(rampPivot.rampPivotManual(()->xboxAux.getLeftY()));
 
 
     // Gamepiece Selection
-    xboxAux.leftTrigger().onTrue(Commands.runOnce(()-> superstructure.cycleGamePieceSelection()));
+    xboxAux.leftTrigger().onTrue(Commands.runOnce(()-> CatzSuperstructure.setChosenGamepiece(Gamepiece.CORAL)));
+    xboxAux.rightTrigger().onTrue(Commands.runOnce(()-> CatzSuperstructure.setChosenGamepiece(Gamepiece.ALGAE)));
 
     // Scoring Action
     xboxAux.y().onTrue(Commands.runOnce(() -> superstructure.setCurrentRobotAction(RobotAction.OUTTAKE, "container")).alongWith(Commands.print("OUTTAKE L" + superstructure.getLevel())));
@@ -213,15 +214,14 @@ public class RobotContainer {
     xboxAux.b().onTrue(Commands.runOnce(() -> intakeRollers.outtake()).alongWith(Commands.print("ramp eject")));
     xboxAux.a().onTrue(Commands.runOnce(() -> superstructure.setCurrentRobotAction(RobotAction.STOW, "container")).alongWith(Commands.print("STOWWW")));
 
-    xboxAux.b().toggleOnTrue(intakeRollers.outtake().alongWith(Commands.print("pressed b"))); //TBD
-    xboxAux.a().toggleOnTrue(intakeRollers.intake().alongWith(Commands.print("pressed a"))); //TBD
-
     // Climb Action
-    xboxAux.y().and(isClimbEnabled).onTrue(CatzStateCommands.extendClimb(this));
-    xboxAux.b().and(isClimbEnabled).onTrue(CatzStateCommands.fullClimb(this));
+    Trigger climbOverride = new Trigger(xboxAux.leftStick().and(xboxAux.rightStick()));
 
-    isClimbEnabled.onTrue(Commands.runOnce(() -> superstructure.setClimbOverride(()->true)));
-    isClimbEnabled.onFalse(Commands.runOnce(() -> superstructure.setClimbOverride(()->false)));
+    xboxAux.y().and(climbOverride).onTrue(CatzStateCommands.extendClimb(this));
+    xboxAux.b().and(climbOverride).onTrue(CatzStateCommands.fullClimb(this));
+
+    isClimbFullManualEnabled.and(climbOverride).onTrue(Commands.runOnce(() -> superstructure.setClimbOverride(()->true)));
+    isClimbFullManualEnabled.and(climbOverride).onFalse(Commands.runOnce(() -> superstructure.setClimbOverride(()->false)));
 
         // Manual Climb Control
     xboxAux.back().onFalse(climb.CancelClimb());
@@ -229,7 +229,7 @@ public class RobotContainer {
 
     // algae punch
     DoublePressTracker.createTrigger(xboxAux.x())
-                      .onTrue(algaePivot.AlgaePivot_Punch()
+                      .onTrue(algaePivot.AlgaePivot_Stow()
                                         .onlyIf(()->CatzSuperstructure.getChosenGamepiece() == Gamepiece.ALGAE)
                                         .alongWith(Commands.print("Algae Punch"))
     );
@@ -240,7 +240,7 @@ public class RobotContainer {
     xboxAux.povLeft().onTrue(Commands.runOnce(() -> {superstructure.setLevel(3); SmartDashboard.putNumber("Reef Level", 3);}));
     xboxAux.povDown().onTrue(Commands.runOnce(() -> {superstructure.setLevel(4); SmartDashboard.putNumber("Reef Level", 4);}));
 
-    xboxAux.a().onTrue(Commands.runOnce(() -> System.out.println("L:"+superstructure.getLevel()+", "+superstructure.getChosenGamepiece())));
+    xboxAux.a().onTrue(Commands.runOnce(() -> System.out.println("L:"+superstructure.getLevel()+", "+CatzSuperstructure.getChosenGamepiece())));
     //------------------------------------------------------------------------------------------------------------------------------
     //  XBOX test controls
     //------------------------------------------------------------------------------------------------------------------------------
