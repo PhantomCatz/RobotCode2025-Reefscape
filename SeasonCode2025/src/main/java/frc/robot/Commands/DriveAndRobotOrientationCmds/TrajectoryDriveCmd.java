@@ -13,14 +13,12 @@ package frc.robot.Commands.DriveAndRobotOrientationCmds;
 
 import com.pathplanner.lib.path.PathPlannerPath;
 import com.pathplanner.lib.path.PathPoint;
-import com.pathplanner.lib.path.RotationTarget;
 import com.pathplanner.lib.trajectory.PathPlannerTrajectory;
 import com.pathplanner.lib.trajectory.PathPlannerTrajectoryState;
 import com.pathplanner.lib.util.PPLibTelemetry;
 import com.pathplanner.lib.util.PathPlannerLogging;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.math.util.Units;
@@ -35,7 +33,6 @@ import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.Drivetrain.CatzDriv
 import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.Drivetrain.DriveConstants;
 import frc.robot.Utilities.AllianceFlipUtil;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.function.Supplier;
@@ -79,6 +76,7 @@ public class TrajectoryDriveCmd extends Command {
   private double pathTimeOut = -999.0;
   private Timer timer = new Timer();
   private boolean autoalign = false;
+  private boolean isTwoPathPoints = false;
   private double translationError = FieldConstants.FIELD_LENGTH_MTRS * 2;
 
   // Swerve Drive Variables
@@ -136,7 +134,6 @@ public class TrajectoryDriveCmd extends Command {
       if(AllianceFlipUtil.shouldFlipToRed()) {
         usePath = path.flipPath();
       }
-      Logger.recordOutput("BefoPopopo", new Pose2d(usePath.getAllPathPoints().get(usePath.getAllPathPoints().size()-1).position, usePath.getGoalEndState().rotation()));
       printTime("uno");
       System.out.println("num of posts: " + usePath.getAllPathPoints());
 
@@ -159,21 +156,11 @@ public class TrajectoryDriveCmd extends Command {
 
       if(pathPoints.size() == 2){
         System.out.println("too shortt!!");
-        Pose2d p1 = new Pose2d(pathPoints.get(0).position, new Rotation2d());
-        Pose2d p2 = new Pose2d(pathPoints.get(1).position, new Rotation2d());
-
-        Pose2d mid = p1.plus(new Transform2d(p1, p2).div(2));
-        Logger.recordOutput("midd", mid);
-
-        List<PathPoint> newPathPoints = new ArrayList<>();
-        newPathPoints.add(pathPoints.get(0));
-        newPathPoints.add(new PathPoint(mid.getTranslation(), new RotationTarget(0.0, mid.getRotation())));
-        newPathPoints.add(pathPoints.get(1));
-        usePath = PathPlannerPath.fromPathPoints(newPathPoints, DriveConstants.PATHFINDING_CONSTRAINTS, usePath.getGoalEndState());
+        isTwoPathPoints = true;
       }
       printTime("tres");
 
-      boolean shouldChangeStartRot = Math.abs(tracker.getEstimatedPose().getRotation().minus(pathPoints.get(pathPoints.size()-1).rotationTarget.rotation()).getDegrees()) > 5.0;
+      boolean shouldChangeStartRot = tracker.getEstimatedPose().getTranslation().minus(pathPoints.get(pathPoints.size()-1).position).getNorm() > 0.50;
       Rotation2d startRot = tracker.getEstimatedPose().getRotation();
       if(shouldChangeStartRot){
         //if you are trying to auto align and the change in rotation is kind of big, then you want to set your starting rotation to the starting heading of path because for some mysterious reason
@@ -185,12 +172,6 @@ public class TrajectoryDriveCmd extends Command {
       try {
         // Construct trajectory
         this.trajectory = usePath.generateTrajectory(currentSpeeds, startRot, DriveConstants.TRAJ_ROBOT_CONFIG);
-        // this.trajectory = new PathPlannerTrajectory(
-        //   usePath,
-        //   currentSpeeds, //TODO make it not zero if its a thing thingy y esdpoifi
-        //   startRot,
-        //   DriveConstants.TRAJ_ROBOT_CONFIG
-        // );
         printTime("cuatro");
       } catch (Error e){
         e.printStackTrace();
@@ -251,6 +232,9 @@ public class TrajectoryDriveCmd extends Command {
     // Collect instananous variables
     double currentTime = timer.get();
     Pose2d currentPose = tracker.getEstimatedPose();
+    if(isTwoPathPoints){
+      currentTime = trajectory.getTotalTimeSeconds();
+    }
     printTime("seis");
     // ChassisSpeeds currentSpeeds = DriveConstants.SWERVE_KINEMATICS.toChassisSpeeds(m_driveTrain.getModuleStates());
     // double currentVel = Math.hypot(currentSpeeds.vxMetersPerSecond, currentSpeeds.vyMetersPerSecond);

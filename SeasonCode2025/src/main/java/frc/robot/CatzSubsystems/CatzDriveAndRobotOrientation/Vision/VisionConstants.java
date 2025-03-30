@@ -16,6 +16,7 @@ import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
+import edu.wpi.first.math.geometry.Translation2d;
 
 public class VisionConstants {
 
@@ -56,6 +57,11 @@ public class VisionConstants {
         1.0, // Camera 0
         1.0 // Camera 1
       };
+
+  public static Translation2d[] LIMELIGHT_ERROR = {
+    new Translation2d(-0.0290867, 0.070948).div(1.2907317),
+    new Translation2d(0.04282, 0.0833).div(1.2907317)
+  };
 
   public static final boolean USE_MEGATAG1 = false; // megatag 1 3d solve allows robot to fly
   public static final double EXTRA_LATENCY_MS = 0;

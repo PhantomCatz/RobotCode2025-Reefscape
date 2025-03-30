@@ -235,7 +235,6 @@ public class CatzRobotTracker {
     visionPoseShift = scaledTransform.getTranslation();
 
     estimatedPose = estimateAtTime.plus(scaledTransform).plus(sampleToOdometryTransform);
-
   } // end of addVisionObservation(OdometryObservation observation)
 
   //-----------------------------------------------------------------------------------------------
@@ -375,7 +374,7 @@ public class CatzRobotTracker {
       Rotation2d gyroAngle,
       double timestamp) {}
 
-  public record VisionObservation(Pose2d visionPose, double timestamp, Matrix<N3, N1> stdDevs) {}
+  public record VisionObservation(String name, Pose2d visionPose, double timestamp, Matrix<N3, N1> stdDevs) {}
 
   public record TxTyObservation(
       int tagId, int camera, double tx, double ty, double distance, double timestamp) {}

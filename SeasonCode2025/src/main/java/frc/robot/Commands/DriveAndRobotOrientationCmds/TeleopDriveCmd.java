@@ -85,11 +85,16 @@ public class TeleopDriveCmd extends Command {
     m_headingAndVelocity_Y = -m_headingPctOutput_X.get();
     turningVelocity        = -m_angVelocityPctOutput.get(); // alliance flip shouldn't change for turing speed when switching alliances
 
-    // Flip Directions for left joystick if alliance is red
+    // Flip Directions for left joystick if alliance is red\[]
+
     if (AllianceFlipUtil.shouldFlipToRed()) {
       m_headingAndVelocity_X = -m_headingAndVelocity_X;
       m_headingAndVelocity_Y = -m_headingAndVelocity_Y;
     }
+
+    m_headingAndVelocity_X = m_headingAndVelocity_X * m_headingAndVelocity_X * Math.signum(m_headingAndVelocity_X);
+    m_headingAndVelocity_Y = m_headingAndVelocity_Y * m_headingAndVelocity_Y * Math.signum(m_headingAndVelocity_Y);
+    turningVelocity = turningVelocity * turningVelocity * Math.signum(turningVelocity);
 
     // Apply deadbands to prevent modules from receiving unintentional pwr due to joysticks having offset
     m_headingAndVelocity_X =

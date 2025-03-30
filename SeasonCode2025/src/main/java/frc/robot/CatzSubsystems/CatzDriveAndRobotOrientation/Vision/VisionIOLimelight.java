@@ -47,6 +47,8 @@ public class VisionIOLimelight implements VisionIO {
   private final DoubleArraySubscriber megatag1Subscriber;
   private final DoubleArraySubscriber megatag2Subscriber;
 
+  public final String name;
+
   /**
    * Creates a new VisionIOLimelight.
    *
@@ -54,6 +56,7 @@ public class VisionIOLimelight implements VisionIO {
    * @param rotationSupplier Supplier for the current estimated rotation, used for MegaTag 2.
    */
   public VisionIOLimelight(String name) {
+    this.name = name;
     var table            = NetworkTableInstance.getDefault().getTable(name);
     orientationPublisher = table.getDoubleArrayTopic("robot_orientation_set").publish();
     latencySubscriber    = table.getDoubleTopic("tl").subscribe(0.0);
@@ -178,7 +181,7 @@ public class VisionIOLimelight implements VisionIO {
 
     // Save tag IDs to inputs objects
 
-    if(tagIDSubscriber.exists()){
+    if(tagIDSubscriber.exists() && tagIDSubscriber.get() >= 0){
       tagIds.add((int) tagIDSubscriber.get());
     }
 
@@ -187,6 +190,8 @@ public class VisionIOLimelight implements VisionIO {
     for (int id : tagIds) {
       inputs.tagIds[i++] = id;
     }
+
+    inputs.name = name;
   }
 
   /** Parses the 3D pose from a Limelight botpose array. */
