@@ -384,6 +384,7 @@ public class CatzStateCommands {
         CatzElevator elevator = robotContainer.getCatzElevator();
         CatzAlgaePivot algaePivot = robotContainer.getAlgaePivot();
         CatzRampPivot rampPivot = robotContainer.getCatzRampPivot();
+        CatzIntakeRollers intakeRollers = robotContainer.getIntakeRollers();
 
         return new ParallelCommandGroup(
             climb.Climb_Home(),

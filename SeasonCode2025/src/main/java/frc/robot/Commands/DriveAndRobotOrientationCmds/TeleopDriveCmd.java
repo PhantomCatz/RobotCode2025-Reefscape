@@ -92,10 +92,6 @@ public class TeleopDriveCmd extends Command {
       m_headingAndVelocity_Y = -m_headingAndVelocity_Y;
     }
 
-    m_headingAndVelocity_X = m_headingAndVelocity_X * m_headingAndVelocity_X * Math.signum(m_headingAndVelocity_X);
-    m_headingAndVelocity_Y = m_headingAndVelocity_Y * m_headingAndVelocity_Y * Math.signum(m_headingAndVelocity_Y);
-    turningVelocity = turningVelocity * turningVelocity * Math.signum(turningVelocity);
-
     // Apply deadbands to prevent modules from receiving unintentional pwr due to joysticks having offset
     m_headingAndVelocity_X =
         Math.abs(m_headingAndVelocity_X) > XboxInterfaceConstants.kDeadband

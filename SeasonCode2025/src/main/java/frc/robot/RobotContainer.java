@@ -161,16 +161,16 @@ public class RobotContainer {
     // NBA
 
     xboxDrv.rightTrigger().onTrue(selector.runToNearestBranch().alongWith(Commands.runOnce(()->led.setControllerState(ControllerLEDState.NBA))));
-    xboxDrv.rightTrigger().onFalse(selector.cancelCurrentDrivetrainCommand().alongWith(Commands.runOnce(()->led.setControllerState(ControllerLEDState.FULL_MANUAL))));
+    xboxDrv.rightTrigger().onFalse(selector.cancelCurrentDrivetrainCommand(CancellationSource.NBA).alongWith(Commands.runOnce(()->led.setControllerState(ControllerLEDState.FULL_MANUAL))));
 
     // NBA Barge
     xboxDrv.leftTrigger().onTrue(selector.runToNetCommand().alongWith(Commands.runOnce(()->led.setControllerState(ControllerLEDState.NBA))));
-    xboxDrv.leftTrigger().onFalse(selector.cancelCurrentDrivetrainCommand().alongWith(Commands.runOnce(()->led.setControllerState(ControllerLEDState.FULL_MANUAL))));
+    xboxDrv.leftTrigger().onFalse(selector.cancelCurrentDrivetrainCommand(CancellationSource.NET).alongWith(Commands.runOnce(()->led.setControllerState(ControllerLEDState.FULL_MANUAL))));
 
     // BALLS
 
     xboxDrv.y().onTrue(selector.runCoralStationCommand());
-    xboxDrv.y().onFalse(selector.cancelCurrentDrivetrainCommand());
+    xboxDrv.y().onFalse(selector.cancelCurrentDrivetrainCommand(CancellationSource.NA));
 
     // AQUA
     xboxDrv.a().onTrue(new InstantCommand(() -> selector.runAutoCommand().schedule()));
