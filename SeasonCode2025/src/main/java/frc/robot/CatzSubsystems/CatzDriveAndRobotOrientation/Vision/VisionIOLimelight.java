@@ -21,6 +21,7 @@ import edu.wpi.first.networktables.DoubleArraySubscriber;
 import edu.wpi.first.networktables.DoubleSubscriber;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.Timer;
+import frc.robot.FieldConstants;
 import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.CatzRobotTracker;
 
 
@@ -47,6 +48,8 @@ public class VisionIOLimelight implements VisionIO {
   private final DoubleArraySubscriber megatag1Subscriber;
   private final DoubleArraySubscriber megatag2Subscriber;
 
+  public final String name;
+
   /**
    * Creates a new VisionIOLimelight.
    *
@@ -54,6 +57,7 @@ public class VisionIOLimelight implements VisionIO {
    * @param rotationSupplier Supplier for the current estimated rotation, used for MegaTag 2.
    */
   public VisionIOLimelight(String name) {
+    this.name = name;
     var table            = NetworkTableInstance.getDefault().getTable(name);
     orientationPublisher = table.getDoubleArrayTopic("robot_orientation_set").publish();
     latencySubscriber    = table.getDoubleTopic("tl").subscribe(0.0);
@@ -177,11 +181,18 @@ public class VisionIOLimelight implements VisionIO {
     }
 
     // Save tag IDs to inputs objects
-    inputs.tagIds = new int[tagIds.size()];
+
+    if(tagIDSubscriber.exists() && tagIDSubscriber.get() >= 1 && tagIDSubscriber.get() <= FieldConstants.APRILTAG_LAYOUT.getTags().size()){
+      tagIds.add((int) tagIDSubscriber.get());
+    }
+
     int i = 0;
+    inputs.tagIds = new int[tagIds.size()];
     for (int id : tagIds) {
       inputs.tagIds[i++] = id;
     }
+
+    inputs.name = name;
   }
 
   /** Parses the 3D pose from a Limelight botpose array. */

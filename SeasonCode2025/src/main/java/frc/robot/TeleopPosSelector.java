@@ -17,6 +17,8 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.function.Supplier;
 
+import org.littletonrobotics.junction.Logger;
+
 import com.pathplanner.lib.path.GoalEndState;
 import com.pathplanner.lib.path.PathConstraints;
 import com.pathplanner.lib.path.PathPlannerPath;
@@ -35,6 +37,7 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.FieldConstants.Reef;
 import frc.robot.Utilities.AllianceFlipUtil;
 import frc.robot.Utilities.CornerTrackingPathfinder;
+import frc.robot.CatzSubsystems.CatzSuperstructure.Gamepiece;
 import frc.robot.CatzSubsystems.CatzSuperstructure.LeftRight;
 import frc.robot.CatzSubsystems.CatzStateCommands;
 import frc.robot.CatzSubsystems.CatzSuperstructure;
@@ -80,6 +83,13 @@ public class TeleopPosSelector { //TODO split up the file. it's too big and does
 
   private boolean isNetAiming = false;
   private boolean isNBALeftRight = false;
+
+  public enum CancellationSource{
+    NBA,
+    NET,
+    AQUA,
+    NA
+  }
 
   public TeleopPosSelector(CommandXboxController aux, RobotContainer container) {
     this.xboxAux = aux;
@@ -304,6 +314,7 @@ public class TeleopPosSelector { //TODO split up the file. it's too big and does
   }
 
   // TODO calculate this on comptime and store it in an array
+  @SuppressWarnings("static-access")
   public Pose2d calculateReefPose(int reefAngle, LeftRight leftRightPos, boolean isDistanced) {
     Rotation2d selectedAngle = Rotation2d.fromRotations(reefAngle / 6.0);
 
@@ -325,6 +336,10 @@ public class TeleopPosSelector { //TODO split up the file. it's too big and does
     //Left right changes depending on whether the selected side is the upper or lower half of the reef.
     if (unitLeftRight.getY() < 0) {
       leftRight = leftRight.times(-1);
+    }
+
+    if(superstructure.getChosenGamepiece() == Gamepiece.ALGAE){
+      leftRight = new Translation2d();
     }
 
     Translation2d scoringPos = radius.plus(leftRight).plus(Reef.center);
@@ -456,16 +471,17 @@ public class TeleopPosSelector { //TODO split up the file. it's too big and does
     Translation2d currentPos = currentPose.getTranslation();
     Translation2d direction = goalPos.minus(currentPos).div(2.0);
 
-    //if too far from reef side, then don't NBA
-    if (currentPose.getTranslation().getDistance(goal.getTranslation()) > Reef.leftRightDistance * 3
-        || direction.getNorm() <= 1e-3) {
-      return;
-    }
+    Logger.recordOutput("LeftRightGoal", goal);
+
+    // if (direction.getNorm() <= 1e-3) {
+    //   return;
+    // }
     isNBALeftRight = true;
 
-    PathPlannerPath path = getStraightLinePath(currentPose, goal, DriveConstants.LEFT_RIGHT_CONSTRAINTS);
+    PathPlannerPath path = getStraightLinePath(currentPose, goal, DriveConstants.PATHFINDING_CONSTRAINTS); //TODO might need to scale constraints based off of distance from reef?
 
-    currentDrivetrainCommand = new TrajectoryDriveCmd(path, drivetrain, true, m_container).andThen(new InstantCommand(() -> isNBALeftRight = false));
+
+    currentDrivetrainCommand = new TrajectoryDriveCmd(path, drivetrain, true, m_container).andThen(m_container.rumbleDrvAuxController(1.0, 0.2)).andThen(new InstantCommand(() -> isNBALeftRight = false));
 
     try{
       currentDrivetrainCommand.schedule();
@@ -570,9 +586,13 @@ public class TeleopPosSelector { //TODO split up the file. it's too big and does
       currentDrivetrainCommand.cancel();
       try{
         //TODO add a check to see if the robot is against the wall but angled so that it runs distanced scoring
-        currentDrivetrainCommand = new TrajectoryDriveCmd(getPathfindingPath(calculateReefPose(getClosestReefPos().getFirst(), true, false)), m_container.getCatzDrivetrain(), true, m_container)
-                                        .deadlineFor(new RepeatCommand(CatzStateCommands.LXElevator(m_container, superstructure.getLevel()).alongWith(new PrintCommand("elevaktorktpa!")).onlyIf(() -> drivetrain.getDistanceError() < 1.5)))
-                                        .andThen(m_container.controllerRumbleCommand());
+        Command prematureCommand = superstructure.getChosenGamepiece() == Gamepiece.CORAL ? CatzStateCommands.LXElevator(m_container, superstructure.getLevel()) : CatzStateCommands.XAlgae(m_container, superstructure.getLevel());
+        // PathPlannerPath path = getPathfindingPath(calculateReefPose(getClosestReefPos().getFirst(), true, false));
+        PathPlannerPath path = getStraightLinePath(tracker.getEstimatedPose(), calculateReefPose(getClosestReefPos().getFirst(), true, false), DriveConstants.PATHFINDING_CONSTRAINTS);
+
+        currentDrivetrainCommand = new TrajectoryDriveCmd(path, m_container.getCatzDrivetrain(), true, m_container)
+                                        .deadlineFor(new RepeatCommand(prematureCommand).alongWith(new PrintCommand("elevaktorktpa!")).onlyIf(() -> drivetrain.getDistanceError() < 1.5))
+                                        .andThen(m_container.rumbleDrvAuxController(1.0, 0.2));
         currentDrivetrainCommand.schedule();
       }catch(Exception e){
         e.printStackTrace();
@@ -604,11 +624,14 @@ public class TeleopPosSelector { //TODO split up the file. it's too big and does
     );
   }
 
-  public Command cancelCurrentDrivetrainCommand() {
+  public Command cancelCurrentDrivetrainCommand(CancellationSource source) {
     return new InstantCommand(() -> {
-      System.out.println("cancelling!");
-      if(isNBALeftRight) return;
-
+      if(source == CancellationSource.NBA){
+        isNBALeftRight = false;
+      }
+      if(isNBALeftRight) {
+        return;
+      } //you want to be able to cancel leftright with NBA
 
       currentDrivetrainCommand.cancel();
     });

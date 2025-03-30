@@ -56,10 +56,11 @@ public class TrajectoryDriveCmd extends Command {
   public static final double ALLOWABLE_ROTATION_ERROR = 3.0;
   public static final double ALLOWABLE_VEL_ERROR = 0.80; // m/s
   public static final double ALLOWABLE_OMEGA_ERROR = 10.0;
-  private static final double TIMEOUT_SCALAR = 3.0;
-  private static final double CONVERGE_DISTANCE = 0.02;
+  private static final double TIMEOUT_SCALAR = 2.0;
+  private static final double CONVERGE_DISTANCE = 0.04;
+  private static final double CONVERGE_ANGLE = 1.0;
   private static final double FACE_REEF_DIST = 2.0;
-  private final double ALLOWABLE_VISION_ADJUST = 4e-3; //TODO tune
+  private final double ALLOWABLE_VISION_ADJUST = 5e-3; //TODO tune
 
   // Subsystems
   private CatzDrivetrain m_driveTrain;
@@ -75,6 +76,7 @@ public class TrajectoryDriveCmd extends Command {
   private double pathTimeOut = -999.0;
   private Timer timer = new Timer();
   private boolean autoalign = false;
+  private boolean isTwoPathPoints = false;
   private double translationError = FieldConstants.FIELD_LENGTH_MTRS * 2;
 
   // Swerve Drive Variables
@@ -114,7 +116,7 @@ public class TrajectoryDriveCmd extends Command {
   // ---------------------------------------------------------------------------------------------
   void printTime(String tag){
     double curTime = Timer.getFPGATimestamp();
-    System.out.println(tag + (curTime-prevTime));
+    // System.out.println(tag + (curTime-prevTime));
     prevTime = curTime;
   }
   @Override
@@ -133,6 +135,7 @@ public class TrajectoryDriveCmd extends Command {
         usePath = path.flipPath();
       }
       printTime("uno");
+      System.out.println("num of posts: " + usePath.getAllPathPoints());
 
       // Pose Reseting
       if (Robot.isFirstPath && DriverStation.isAutonomous()) {
@@ -150,29 +153,40 @@ public class TrajectoryDriveCmd extends Command {
       ChassisSpeeds currentSpeeds = DriveConstants.SWERVE_KINEMATICS.toChassisSpeeds(tracker.getCurrentModuleStates());
       List<PathPoint> pathPoints = usePath.getAllPathPoints();
 
+
+      if(pathPoints.size() == 2){
+        System.out.println("too shortt!!");
+        isTwoPathPoints = true;
+      }
       printTime("tres");
 
+      boolean shouldChangeStartRot = tracker.getEstimatedPose().getTranslation().minus(pathPoints.get(pathPoints.size()-1).position).getNorm() > 0.50;
+      Rotation2d startRot = tracker.getEstimatedPose().getRotation();
+      if(shouldChangeStartRot){
+        //if you are trying to auto align and the change in rotation is kind of big, then you want to set your starting rotation to the starting heading of path because for some mysterious reason
+        //trajectory speed gets very slow when it needs to account for rotation. the only case where this wouldn't be auto align is if you are going to coral station
+        //during autonomous, where you want to be facing backwards, so +180 for this case
+        //i really dont like this fix either but i cant find the source of the issue so ¯\_(ツ)_/¯
+        startRot = autoalign ? pathPoints.get(1).position.minus(pathPoints.get(0).position).getAngle() : pathPoints.get(1).position.minus(pathPoints.get(0).position).getAngle().plus(Rotation2d.k180deg);
+      }
       try {
         // Construct trajectory
-        this.trajectory = new PathPlannerTrajectory(
-          usePath,
-          currentSpeeds, //TODO make it not zero if its a thing thingy y esdpoifi
-          autoalign ? pathPoints.get(1).position.minus(pathPoints.get(0).position).getAngle() : pathPoints.get(1).position.minus(pathPoints.get(0).position).getAngle().plus(Rotation2d.k180deg),
-          DriveConstants.TRAJ_ROBOT_CONFIG
-        );
+        this.trajectory = usePath.generateTrajectory(currentSpeeds, startRot, DriveConstants.TRAJ_ROBOT_CONFIG);
         printTime("cuatro");
       } catch (Error e){
         e.printStackTrace();
         //for some reason if you spam NBA current rotation gets bugged.
-        this.trajectory = new PathPlannerTrajectory(
-          usePath,
-          currentSpeeds, //TODO make it not zero if its a thing thingy y esdpoifi
-          new Rotation2d(),
-          DriveConstants.TRAJ_ROBOT_CONFIG
-        );
+        this.trajectory = usePath.generateTrajectory(currentSpeeds, new Rotation2d(), DriveConstants.TRAJ_ROBOT_CONFIG);
+        // this.trajectory = new PathPlannerTrajectory(
+        //   usePath,
+        //   currentSpeeds, //TODO make it not zero if its a thing thingy y esdpoifi
+        //   new Rotation2d(),
+        //   DriveConstants.TRAJ_ROBOT_CONFIG
+        // );
       }
       printTime("sdfioj");
       if(trajectory == null) {
+        System.out.println("bugged!!!!!!!");
         isBugged = true;
         return;
       }
@@ -180,6 +194,7 @@ public class TrajectoryDriveCmd extends Command {
       printTime("cinco");
       hocontroller = DriveConstants.getNewHolController();
       pathTimeOut = trajectory.getTotalTimeSeconds() * TIMEOUT_SCALAR;
+
 
       // System.out.println("current " + tracker.getEstimatedPose());
       // System.out.println("start " + this.trajectory.getInitialPose());
@@ -191,9 +206,11 @@ public class TrajectoryDriveCmd extends Command {
 
       this.timer.reset();
       this.timer.start();
+      Logger.recordOutput("Goal Position", trajectory.getEndState().pose);
     } catch(Exception e) {
       isBugged = true;
       e.printStackTrace();
+
     }
 
     // System.out.println("timeoutt::" + trajectory.getTotalTimeSeconds());
@@ -215,6 +232,9 @@ public class TrajectoryDriveCmd extends Command {
     // Collect instananous variables
     double currentTime = timer.get();
     Pose2d currentPose = tracker.getEstimatedPose();
+    if(isTwoPathPoints){
+      currentTime = trajectory.getTotalTimeSeconds();
+    }
     printTime("seis");
     // ChassisSpeeds currentSpeeds = DriveConstants.SWERVE_KINEMATICS.toChassisSpeeds(m_driveTrain.getModuleStates());
     // double currentVel = Math.hypot(currentSpeeds.vxMetersPerSecond, currentSpeeds.vyMetersPerSecond);
@@ -251,7 +271,7 @@ public class TrajectoryDriveCmd extends Command {
     // }
     printTime("nueve");
 
-    adjustedSpeeds = applyCusp(adjustedSpeeds, translationError, CONVERGE_DISTANCE);
+    adjustedSpeeds = applyCusp(adjustedSpeeds, translationError, endGoal.pose.getRotation().minus(currentPose.getRotation()).getDegrees(), CONVERGE_DISTANCE, CONVERGE_ANGLE);
 
     // Logging
     Logger.recordOutput("CatzRobotTracker/Desired Auto Pose", goal.pose);
@@ -267,7 +287,7 @@ public class TrajectoryDriveCmd extends Command {
     // Logging
     // debugLogsTrajectory();
 
-    System.out.println("traj exe: " + (Timer.getFPGATimestamp() - exeTime));
+    // System.out.println("traj exe: " + (Timer.getFPGATimestamp() - exeTime));
   } // end of execute
 
   // ---------------------------------------------------------------------------------------------
@@ -284,6 +304,7 @@ public class TrajectoryDriveCmd extends Command {
 
     timer.stop(); // Stop timer
     m_driveTrain.stopDriving();
+    m_driveTrain.drive(new ChassisSpeeds());
 
     // PathPlannerAuto.currentPathName = "";
     // Logger.recordOutput("CatzRobotTracker/Desired Auto Pose", new Pose2d());
@@ -326,13 +347,16 @@ public class TrajectoryDriveCmd extends Command {
   //---------------------------------------------------------------------------------------------------------------
   //  Trajectory Factory Methods
   //---------------------------------------------------------------------------------------------------------------
-  private ChassisSpeeds applyCusp(ChassisSpeeds speeds, double distance, final double threshold) {
+  private ChassisSpeeds applyCusp(ChassisSpeeds speeds, double distance, double angle, final double thresholdDist, final double thresholdAngle) {
     // graph 1 / (1+x) on desmos
-    double x = distance / threshold;
+    double x = distance / thresholdDist;
     double omega = speeds.omegaRadiansPerSecond;
 
+    double x2 = angle / thresholdAngle;
+    omega = omega * Math.min(2*x2 / (1+x2), 1.0);
+
     ChassisSpeeds s = speeds.times(Math.min(2 * x / (1 + x), 1.0));
-    //don't apply cusp to angle
+
     s.omegaRadiansPerSecond = omega;
     return s;
 
@@ -393,7 +417,7 @@ public class TrajectoryDriveCmd extends Command {
 
     // System.out.println("poseerr:" + ((xError < poseError) &&(yError < poseError)));
     printTime("doce");
-    System.out.println("transerr: " + (translationError));
+    // System.out.println("transerr: " + (translationError));
     // System.out.println("pose errr: " + poseError);
     return translationError < poseError;
   }

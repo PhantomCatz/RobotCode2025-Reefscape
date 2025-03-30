@@ -15,7 +15,6 @@ import edu.wpi.first.math.geometry.Pose3d;
 import org.littletonrobotics.junction.AutoLog;
 
 public interface VisionIO {
-
   @AutoLog
   public static class VisionIOInputs {
     public boolean connected = false;
@@ -23,6 +22,7 @@ public interface VisionIO {
     public PoseObservation[] poseObservations = new PoseObservation[0];
     public int[] tagIds = new int[0];
     public double ta = 0.0;
+    public String name;
   }
 
   /** Represents the angle to a simple target, not used for pose estimation. */

@@ -60,6 +60,8 @@ public class CornerTrackingPathfinder{
   private int nodesX = (int) Math.ceil(fieldLength / nodeSize);
   private int nodesY = (int) Math.ceil(fieldWidth / nodeSize);
 
+  private int numNodes = nodesX*nodesY;
+
   private final Set<GridPosition> walls = new HashSet<>();
   private final HashMap<GridPosition, Integer> corners = new HashMap<>();
 
@@ -224,12 +226,19 @@ public class CornerTrackingPathfinder{
     lastCorner.put(start, start);
     ghostWalls.put(start, new HashSet<>());
 
+    int limit = 0;
+
     while(frontier.size() > 0){
+      limit++;
       PathfindingPosition currentPathfindingPos = frontier.poll();
       GridPosition currentPos = currentPathfindingPos.position;
       GridPosition currentCorner = currentPathfindingPos.corner;
       double currentCornerDistance = currentPathfindingPos.cornerDistancesTraveled;
       if(currentPos.compareTo(goal) == 0){
+        break;
+      }
+
+      if(limit >= numNodes){
         break;
       }
 
@@ -277,33 +286,33 @@ public class CornerTrackingPathfinder{
     }
     // Visualize path
 
-    // for (int row = nodesY - 1; row >= 0; row--) {
-    //   for (int col = 0; col < nodesX; col++) {
-    //     if(start.equals(new GridPosition(col, row))){
-    //       //starting point
-    //       System.out.print("s");
-    //     }
-    //     else if(g.equals(new GridPosition(col, row))){
-    //       System.out.print("e");
-    //     }
-    //     else if (obstacles.contains(new GridPosition(col, row))){
-    //       //wall
-    //       System.out.print("#");
-    //     }
-    //     else if(path.contains(new GridPosition(col, row))){
-    //       //goal points
-    //       System.out.print("@");
-    //     }
-    //     else if (lastCorner.keySet().contains(new GridPosition(col, row))){
-    //       //areas flood filled
-    //       System.out.print("+");
-    //     }
-    //     else {
-    //       System.out.print("_");
-    //     }
-    //   }
-    //   System.out.println();
-    // }
+    for (int row = nodesY - 1; row >= 0; row--) {
+      for (int col = 0; col < nodesX; col++) {
+        if(start.equals(new GridPosition(col, row))){
+          //starting point
+          System.out.print("s");
+        }
+        else if(g.equals(new GridPosition(col, row))){
+          System.out.print("e");
+        }
+        else if (obstacles.contains(new GridPosition(col, row))){
+          //wall
+          System.out.print("#");
+        }
+        else if(path.contains(new GridPosition(col, row))){
+          //goal points
+          System.out.print("@");
+        }
+        else if (lastCorner.keySet().contains(new GridPosition(col, row))){
+          //areas flood filled
+          System.out.print("+");
+        }
+        else {
+          System.out.print("_");
+        }
+      }
+      System.out.println();
+    }
 
     return path;
   }
@@ -327,7 +336,11 @@ public class CornerTrackingPathfinder{
     lastCorner.put(start, start);
     ghostWalls.put(start, new HashSet<>());
 
+    int limit = 0;
+
     while(frontier.size() > 0){
+      limit++;
+
       PathfindingPosition currentPathfindingPos = frontier.poll();
       GridPosition currentPos = currentPathfindingPos.position;
       GridPosition currentCorner = currentPathfindingPos.corner;
@@ -337,6 +350,9 @@ public class CornerTrackingPathfinder{
         break;
       }
 
+      if(limit >= numNodes){
+        break;
+      }
 
       //if a corner is found, draw an imaginary line from the previous corner to this corner
       //now all cells propagating from this corner identifies as this corner (if that makes sense)

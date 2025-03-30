@@ -19,6 +19,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
@@ -43,6 +44,7 @@ import frc.robot.CatzSubsystems.CatzLEDs.CatzLED.ControllerLEDState;
 import frc.robot.CatzSubsystems.CatzOuttake.CatzOuttake;
 import frc.robot.CatzSubsystems.CatzRampPivot.CatzRampPivot;
 import frc.robot.Commands.DriveAndRobotOrientationCmds.TeleopDriveCmd;
+import frc.robot.TeleopPosSelector.CancellationSource;
 import frc.robot.Utilities.Alert;
 import frc.robot.Utilities.AllianceFlipUtil;
 import frc.robot.Utilities.DoublePressTracker;
@@ -50,6 +52,7 @@ import frc.robot.Utilities.OverrideSwitch;
 import frc.robot.Utilities.Alert.AlertType;
 
 import org.littletonrobotics.junction.networktables.LoggedNetworkNumber;
+
 
 public class RobotContainer {
 
@@ -64,8 +67,8 @@ public class RobotContainer {
   // Assistance Subsystem declaration
   private CatzLED led = CatzLED.getInstance();
   private CatzRobotTracker robotTracker = CatzRobotTracker.getInstance();
-  private CatzVision vision = new CatzVision(new VisionIOLimelight("limelight-tempura"),
-                                             new VisionIOLimelight("limelight-gyoza"));
+  private CatzVision vision = new CatzVision(new VisionIOLimelight("limelight-udon"),
+                                             new VisionIOLimelight("limelight-soba"));
   private CatzOuttake outtake;
   private CatzElevator elevator = new CatzElevator();
   private CatzClimb climb = new CatzClimb();
@@ -156,16 +159,18 @@ public class RobotContainer {
     }));
 
     // NBA
+
     xboxDrv.rightTrigger().onTrue(selector.runToNearestBranch().alongWith(Commands.runOnce(()->led.setControllerState(ControllerLEDState.NBA))));
-    xboxDrv.rightTrigger().onFalse(selector.cancelCurrentDrivetrainCommand().alongWith(Commands.runOnce(()->led.setControllerState(ControllerLEDState.FULL_MANUAL))));
+    xboxDrv.rightTrigger().onFalse(selector.cancelCurrentDrivetrainCommand(CancellationSource.NBA).alongWith(Commands.runOnce(()->led.setControllerState(ControllerLEDState.FULL_MANUAL))));
 
     // NBA Barge
     xboxDrv.leftTrigger().onTrue(selector.runToNetCommand().alongWith(Commands.runOnce(()->led.setControllerState(ControllerLEDState.NBA))));
-    xboxDrv.leftTrigger().onFalse(selector.cancelCurrentDrivetrainCommand().alongWith(Commands.runOnce(()->led.setControllerState(ControllerLEDState.FULL_MANUAL))));
+    xboxDrv.leftTrigger().onFalse(selector.cancelCurrentDrivetrainCommand(CancellationSource.NET).alongWith(Commands.runOnce(()->led.setControllerState(ControllerLEDState.FULL_MANUAL))));
 
     // BALLS
+
     xboxDrv.y().onTrue(selector.runCoralStationCommand());
-    xboxDrv.y().onFalse(selector.cancelCurrentDrivetrainCommand());
+    xboxDrv.y().onFalse(selector.cancelCurrentDrivetrainCommand(CancellationSource.NA));
 
     // AQUA
     xboxDrv.a().onTrue(new InstantCommand(() -> selector.runAutoCommand().schedule()));
@@ -175,8 +180,8 @@ public class RobotContainer {
     xboxDrv.leftBumper().onTrue(new InstantCommand(() -> selector.runLeftRight(LeftRight.LEFT)));
     xboxDrv.rightBumper().onTrue(new InstantCommand(() -> selector.runLeftRight(LeftRight.RIGHT)));
 
-    xboxDrv.leftBumper().onFalse(new InstantCommand(() -> selector.cancelCurrentDrivetrainCommand().schedule()));
-    xboxDrv.rightBumper().onFalse(new InstantCommand(() -> selector.cancelCurrentDrivetrainCommand().schedule()));
+    xboxDrv.leftBumper().onFalse(selector.cancelCurrentDrivetrainCommand(CancellationSource.NA));
+    xboxDrv.rightBumper().onFalse(selector.cancelCurrentDrivetrainCommand(CancellationSource.NA));
 
     // Coral Station Run Back
     xboxDrv.button(7).onTrue(new InstantCommand(() -> selector.toggleLeftStation()).alongWith(Commands.runOnce(() -> led.setControllerState(ControllerLEDState.BALLS))));
@@ -197,7 +202,8 @@ public class RobotContainer {
 
     // Default driving
     Trigger escapeTrajectory = new Trigger(()->(xboxDrv.getLeftY() > 0.8));
-    escapeTrajectory.onTrue(selector.cancelCurrentDrivetrainCommand().alongWith(selector.cancelAutoCommand()));
+
+    escapeTrajectory.onTrue(getCatzDrivetrain().cancelTrajectory());
 
     drive.setDefaultCommand(new TeleopDriveCmd(() -> xboxDrv.getLeftX(), () -> xboxDrv.getLeftY(), () -> xboxDrv.getRightX(), drive));
     //---------------------------------------------------------------------------------------------------------------------
@@ -352,6 +358,13 @@ public class RobotContainer {
       new InstantCommand(() ->xboxAux.getHID().setRumble(RumbleType.kBothRumble, strength)),
       new WaitCommand(duration),
       new InstantCommand(() ->xboxAux.getHID().setRumble(RumbleType.kBothRumble, 0.0))
+    );
+  }
+
+  public Command rumbleDrvAuxController(double strength, double duration){
+    return new ParallelCommandGroup(
+      rumbleAuxController(strength, duration),
+      rumbleDrvController(strength, duration)
     );
   }
 

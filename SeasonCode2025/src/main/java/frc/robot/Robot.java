@@ -43,6 +43,7 @@ import org.littletonrobotics.junction.rlog.RLOGServer;
 import org.littletonrobotics.junction.wpilog.WPILOGReader;
 import org.littletonrobotics.junction.wpilog.WPILOGWriter;
 
+
 public class Robot extends LoggedRobot {
   // -------------------------------------------------------------------------------------------------------------
   //  Essential Robot.java object declaration
@@ -378,12 +379,13 @@ public class Robot extends LoggedRobot {
       m_robotContainer.getCatzRampPivot().Ramp_Intake_Pos().withTimeout(1.0);
     }
 
+
+
     teleStart = Timer.getFPGATimestamp();
     m_robotContainer.getCatzRampPivot().setNeutralMode(NeutralMode.BRAKE);
     //CatzRobotTracker.getInstance().resetPose(m_robotContainer.getAutonomous().calculateReefPos(2, LeftRight.LEFT));
-
-  //  CatzRobotTracker.getInstance().resetPose(new Pose2d(Reef.center.minus(new Translation2d(Units.inchesToMeters(52.743), 0)), Rotation2d.k180deg));
-
+    //CatzRobotTracker.getInstance().resetPose(FlippingUtil.flipFieldPose(new Pose2d(Reef.center.minus(new Translation2d(Units.inchesToMeters(32.305+14.5), 0)), Rotation2d.kZero)));
+    //CatzRobotTracker.getInstance().resetPose(m_robotContainer.getSelector().calculateReefPose(3, LeftRight.LEFT, false));
   }
 
   @Override
