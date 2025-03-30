@@ -152,7 +152,7 @@ public class CatzClimb extends SubsystemBase {
   }
 
   public void climbFullManual(double joystickPower) {
-    manualPow = joystickPower * 0.5;
+    manualPow = joystickPower;
     targetPosition = ClimbPosition.FULL_MANUAL;
   }
 

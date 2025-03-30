@@ -156,11 +156,15 @@ public class RobotContainer {
     }));
 
     // NBA
-    xboxDrv.rightTrigger().onTrue(selector.runToNearestBranch().unless(()->xboxAux.back().getAsBoolean()).alongWith(Commands.runOnce(()->led.setControllerState(ControllerLEDState.NBA))));
+    xboxDrv.rightTrigger().onTrue(selector.runToNearestBranch().alongWith(Commands.runOnce(()->led.setControllerState(ControllerLEDState.NBA))));
     xboxDrv.rightTrigger().onFalse(selector.cancelCurrentDrivetrainCommand().alongWith(Commands.runOnce(()->led.setControllerState(ControllerLEDState.FULL_MANUAL))));
 
+    // NBA Barge
+    xboxDrv.leftTrigger().onTrue(selector.runToNetCommand().alongWith(Commands.runOnce(()->led.setControllerState(ControllerLEDState.NBA))));
+    xboxDrv.leftTrigger().onFalse(selector.cancelCurrentDrivetrainCommand().alongWith(Commands.runOnce(()->led.setControllerState(ControllerLEDState.FULL_MANUAL))));
+
     // BALLS
-    xboxDrv.y().onTrue(selector.runToNetCommand());
+    xboxDrv.y().onTrue(selector.runCoralStationCommand());
     xboxDrv.y().onFalse(selector.cancelCurrentDrivetrainCommand());
 
     // AQUA
@@ -177,6 +181,17 @@ public class RobotContainer {
     // Coral Station Run Back
     xboxDrv.button(7).onTrue(new InstantCommand(() -> selector.toggleLeftStation()).alongWith(Commands.runOnce(() -> led.setControllerState(ControllerLEDState.BALLS))));
     xboxDrv.button(8).onTrue(new InstantCommand(() -> selector.toggleRightStation()).alongWith(Commands.runOnce(() -> led.setControllerState(ControllerLEDState.BALLS))));
+
+    // Climb Action
+    Trigger climbMode = xboxDrv.povLeft();
+    xboxDrv.b().and(climbMode.toggleOnTrue(CatzStateCommands.extendClimb(this)));
+    xboxDrv.x().and(climbMode.toggleOnTrue(CatzStateCommands.fullClimb(this)));
+
+        // Manual Climb Control
+    xboxDrv.povUp().and(climbMode.toggleOnTrue(climb.ClimbManualMode(()-> 0.7)));
+    xboxDrv.povUp().onFalse(climb.CancelClimb());
+    xboxDrv.povDown().and(climbMode.toggleOnTrue(climb.ClimbManualMode(()-> -0.7)));
+    xboxDrv.povDown().onFalse(climb.CancelClimb());
 
     // Default driving
     Trigger escapeTrajectory = new Trigger(()->(xboxDrv.getLeftY() > 0.8));
@@ -208,24 +223,10 @@ public class RobotContainer {
     xboxAux.rightTrigger().onTrue(Commands.runOnce(()-> CatzSuperstructure.setChosenGamepiece(Gamepiece.ALGAE)));
 
     // Scoring Action
-    xboxAux.y().onTrue(Commands.runOnce(() -> superstructure.setCurrentRobotAction(RobotAction.OUTTAKE, "container")).alongWith(Commands.print("OUTTAKE L" + superstructure.getLevel())));
     xboxAux.x().onTrue(Commands.runOnce(() -> superstructure.setCurrentRobotAction(RobotAction.INTAKE, "container")).alongWith(Commands.print("INTAKE")));
-
-    xboxAux.b().onTrue(Commands.runOnce(() -> intakeRollers.outtake()).alongWith(Commands.print("ramp eject")));
+    xboxAux.y().onTrue(Commands.runOnce(() -> superstructure.setCurrentRobotAction(RobotAction.OUTTAKE, "container")).alongWith(Commands.print("OUTTAKE L" + superstructure.getLevel())));
     xboxAux.a().onTrue(Commands.runOnce(() -> superstructure.setCurrentRobotAction(RobotAction.STOW, "container")).alongWith(Commands.print("STOWWW")));
-
-    // Climb Action
-    Trigger climbOverride = new Trigger(xboxAux.leftStick().and(xboxAux.rightStick()));
-
-    xboxAux.y().and(climbOverride).onTrue(CatzStateCommands.extendClimb(this));
-    xboxAux.b().and(climbOverride).onTrue(CatzStateCommands.fullClimb(this));
-
-    isClimbFullManualEnabled.and(climbOverride).onTrue(Commands.runOnce(() -> superstructure.setClimbOverride(()->true)));
-    isClimbFullManualEnabled.and(climbOverride).onFalse(Commands.runOnce(() -> superstructure.setClimbOverride(()->false)));
-
-        // Manual Climb Control
-    xboxAux.back().onFalse(climb.CancelClimb());
-    xboxAux.back().onTrue(climb.ClimbManualMode(() -> xboxAux.getLeftY()).alongWith(Commands.print("Using manual climb")));
+    xboxAux.b().onTrue(Commands.runOnce(() -> intakeRollers.outtake()).alongWith(Commands.print("ramp eject")));
 
     // algae punch
     DoublePressTracker.createTrigger(xboxAux.x())
@@ -239,8 +240,6 @@ public class RobotContainer {
     xboxAux.povUp().onTrue(Commands.runOnce(() -> {superstructure.setLevel(2); SmartDashboard.putNumber("Reef Level", 2);}));
     xboxAux.povLeft().onTrue(Commands.runOnce(() -> {superstructure.setLevel(3); SmartDashboard.putNumber("Reef Level", 3);}));
     xboxAux.povDown().onTrue(Commands.runOnce(() -> {superstructure.setLevel(4); SmartDashboard.putNumber("Reef Level", 4);}));
-
-    xboxAux.a().onTrue(Commands.runOnce(() -> System.out.println("L:"+superstructure.getLevel()+", "+CatzSuperstructure.getChosenGamepiece())));
     //------------------------------------------------------------------------------------------------------------------------------
     //  XBOX test controls
     //------------------------------------------------------------------------------------------------------------------------------
