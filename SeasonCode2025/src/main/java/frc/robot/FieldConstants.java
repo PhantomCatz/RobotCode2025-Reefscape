@@ -28,6 +28,8 @@ import lombok.Getter;
  * have a blue alliance origin.
  */
 public class FieldConstants {
+  public static AprilTagFieldLayout APRILTAG_LAYOUT = AprilTagLayoutType.OFFICIAL.getLayout();
+
   public static final double FIELD_LENGTH_MTRS = Units.inchesToMeters(690.876);
   public static final double FIELD_WIDTH       = Units.inchesToMeters(317);
   public static final double STARTING_LINE_X   = Units.inchesToMeters(299.438); // Measured from the inside of starting line

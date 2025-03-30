@@ -21,6 +21,7 @@ import edu.wpi.first.networktables.DoubleArraySubscriber;
 import edu.wpi.first.networktables.DoubleSubscriber;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.Timer;
+import frc.robot.FieldConstants;
 import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.CatzRobotTracker;
 
 
@@ -181,7 +182,7 @@ public class VisionIOLimelight implements VisionIO {
 
     // Save tag IDs to inputs objects
 
-    if(tagIDSubscriber.exists() && tagIDSubscriber.get() >= 0){
+    if(tagIDSubscriber.exists() && tagIDSubscriber.get() >= 1 && tagIDSubscriber.get() <= FieldConstants.APRILTAG_LAYOUT.getTags().size()){
       tagIds.add((int) tagIDSubscriber.get());
     }
 

@@ -128,9 +128,7 @@ public class CatzVision extends SubsystemBase {
 
         int tagId = inputs[cameraIndex].tagIds[0];
         Pose3d observationPose = observation.pose();
-        System.out.println("id " + tagId);
-
-        Pose2d apriltagPose = FieldConstants.AprilTagLayoutType.OFFICIAL.getLayout().getTagPose(tagId).get().toPose2d();
+        Pose2d apriltagPose = FieldConstants.APRILTAG_LAYOUT.getTagPose(tagId).get().toPose2d();
 
         Translation2d limelightError = VisionConstants.LIMELIGHT_ERROR[cameraIndex].times(apriltagPose.getTranslation().minus(robotPose.getTranslation()).getNorm()).rotateBy(apriltagPose.getRotation());
         observationPose.plus(new Transform3d(limelightError.getX(), limelightError.getY(), 0.0, new Rotation3d()));
