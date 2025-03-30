@@ -186,6 +186,8 @@ public class RobotContainer {
     Trigger climbMode = xboxDrv.povLeft();
     xboxDrv.b().and(climbMode.toggleOnTrue(CatzStateCommands.extendClimb(this)));
     xboxDrv.x().and(climbMode.toggleOnTrue(CatzStateCommands.fullClimb(this)));
+    climbMode.toggleOnTrue(Commands.runOnce(()->superstructure.setClimbOverride(()->true)));
+    climbMode.toggleOnFalse(Commands.runOnce(()->superstructure.setClimbOverride(()->false)));
 
         // Manual Climb Control
     xboxDrv.povUp().and(climbMode.toggleOnTrue(climb.ClimbManualMode(()-> 0.7)));

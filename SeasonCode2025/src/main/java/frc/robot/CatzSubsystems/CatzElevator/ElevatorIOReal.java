@@ -104,7 +104,7 @@ public class ElevatorIOReal implements ElevatorIO {
     config.MotionMagic.MotionMagicCruiseVelocity = motionMagicParameters.mmCruiseVelocity();
     config.MotionMagic.MotionMagicAcceleration = motionMagicParameters.mmAcceleration();
     config.MotionMagic.MotionMagicJerk = motionMagicParameters.mmJerk();
-    config.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
+    config.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
 
     // Encoder Resetting
     leaderTalon.setPosition(0);
@@ -115,7 +115,7 @@ public class ElevatorIOReal implements ElevatorIO {
     followerTalon.getConfigurator().apply(config, 1.0);
 
     // Setting follower
-    followerTalon.setControl(new Follower(leaderTalon.getDeviceID(), true));
+    followerTalon.setControl(new Follower(leaderTalon.getDeviceID(), false));
 
     // Setting follower
     positionControlUp.EnableFOC = true;
@@ -147,6 +147,18 @@ public class ElevatorIOReal implements ElevatorIO {
 
       inputs.positionInch =       internalPositionRotations.getValueAsDouble() * FINAL_RATIO;
       inputs.velocityInchPerSec = velocityRps.getValueAsDouble() * FINAL_RATIO;
+      inputs.appliedVolts =       appliedVoltage.stream()
+                                                .mapToDouble(StatusSignal::getValueAsDouble)
+                                                .toArray();
+      inputs.supplyCurrentAmps =  supplyCurrent.stream()
+                                                .mapToDouble(StatusSignal::getValueAsDouble)
+                                                .toArray();
+      inputs.torqueCurrentAmps =  torqueCurrent.stream()
+                                              .mapToDouble(StatusSignal::getValueAsDouble)
+                                              .toArray();
+      inputs.tempCelcius =        tempCelsius.stream()
+                                            .mapToDouble(StatusSignal::getValueAsDouble)
+                                            .toArray();
 
       inputs.isBotLimitSwitched = m_elevatorLimitBot.get();
     }

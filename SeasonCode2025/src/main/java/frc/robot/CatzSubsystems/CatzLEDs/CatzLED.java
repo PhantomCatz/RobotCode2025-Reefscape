@@ -53,7 +53,7 @@ public class CatzLED extends VirtualSubsystem {
 
   @Getter @Setter @AutoLogOutput(key = "CatzSuperstructure/isClimbExtendingOut")
   private WinchingState climbDirection = WinchingState.IDLE;
-  
+
   public enum QueueLEDState {
     EMPTY,
     ONE_CORAL,

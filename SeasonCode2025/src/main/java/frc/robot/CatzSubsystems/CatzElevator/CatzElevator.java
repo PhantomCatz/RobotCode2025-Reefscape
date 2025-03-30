@@ -166,7 +166,7 @@ public class CatzElevator extends SubsystemBase {
       if(targetPosition == ElevatorPosition.PosStow) {
         // Safety Stow
 
-        if(getElevatorPositionInch() < 4) {
+        if(getElevatorPositionInch() < 2.0) {
           io.stop();
         } else {
           io.runSetpointDown(targetPosition.getTargetPositionInch());

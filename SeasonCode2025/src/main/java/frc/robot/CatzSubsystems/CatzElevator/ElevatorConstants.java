@@ -20,37 +20,27 @@ import frc.robot.Utilities.MotorUtil.MotionMagicParameters;
 
 /** Add your docs here. */
 public class ElevatorConstants {
-    public static final boolean isElevatorDisabled = true;
+    public static final boolean isElevatorDisabled = false;
 
     // Gearbox definitions
-    public static final double MAXPLANETARY_GEAR_RATIO   = 5.0;
-    public static final double T22_DIAMETER_INCHES       = 1.981;
+    public static final double ELEVATOR_GEAR_RATIO   = (( 42.0 / 12.0) * (22.0 / 16.0));
+    public static final double T16_DIAMETER_INCHES       = 1.503;
     //For every 9 rotations of the motor, the output shaft rotates once.
     //For every inch moved up by by the sprocket, the carriage rises by 2 inches
-    public static final double FINAL_RATIO               = 2 * (T22_DIAMETER_INCHES * Math.PI) / MAXPLANETARY_GEAR_RATIO;
-
-    // Elevator Heights:(Radians)
-    // public static final double STOW_HEIGHT = 5.0; // Raised to prevent boxtube crashing // /ELEVATOR_SPROCKET_RADIUS;
-    // public static final double L1_HEIGHT   = 11.0; // 8.6    / ELEVATOR_SPROCKET_RADIUS;
-    // public static final double L2_HEIGHT   = 33.0; //(25.77-5)/* 29.842*/ / ELEVATOR_SPROCKET_RADIUS; //25.77
-    // public static final double L3_HEIGHT   = 81.7; //(70.1-8) /*68.8 */  / ELEVATOR_SPROCKET_RADIUS; //70.1
-    // public static final double L4_HEIGHT   = 151.0; //(141)/* 133.3*/  / ELEVATOR_SPROCKET_RADIUS; //143.12
-    // public static final double L4_CORAL_ADJ = 160.0;
-    // public static final double BOT_BOT_ALGAE = 80.6;
-    // public static final double BOT_TOP_ALGAE = 140.7;
+    public static final double FINAL_RATIO               = 2 * (T16_DIAMETER_INCHES * Math.PI) / ELEVATOR_GEAR_RATIO;
 
     //inches TODO tune
-    public static final double STOW_HEIGHT = 3.0;
+    public static final double STOW_HEIGHT = 1.0;
     public static final double L1_HEIGHT   = 5.6;
-    public static final double L2_HEIGHT   = 13.0;
-    public static final double L3_HEIGHT   = 32.0;//81.7;
-    public static final double L4_HEIGHT   = 60.4;
-    public static final double L4_CORAL_ADJ = 64.0;
+    public static final double L2_HEIGHT   = 16.122;
+    public static final double L3_HEIGHT   = 34.763;//81.7;
+    public static final double L4_HEIGHT   = 65.443;
+    public static final double L4_CORAL_ADJ = 70.0;
     public static final double BOT_BOT_ALGAE = 20.6;
     public static final double BOT_TOP_ALGAE = 22.7;
     // Motor ID
-    public static final int LEFT_LEADER_ID  = 30;
-    public static final int RIGHT_FOLLOWER_ID = 31;
+    public static final int LEFT_LEADER_ID  = 31;
+    public static final int RIGHT_FOLLOWER_ID = 30;
 
     public static final int BOT_LIMIT_SWITCH = 2;
 
@@ -71,7 +61,8 @@ public class ElevatorConstants {
     // Initial PIDF and motion magic assignment
     public static final Gains slot0_gains =
         switch (CatzConstants.getRobotType()) {
-            case SN2 -> new Gains(8.0, 0.0, 0.0, 0.175, 0.230, 0.013, 0.4);
+            //case SN2 -> new Gains(8.0, 0.0, 0.0, 0.175, 0.230, 0.013, 0.4);
+            case SN2 -> new Gains(4.0, 0.0, 0.0, 0.0, 0.3, 0.03, 0.4);
             case SN1 -> new Gains(3.0, 0.0, 0.0, 0.175, 0.3, 0.13, 0.4); //
 
             case SN_TEST, SN1_2024 -> new Gains(7000.0, 0.0, 250.0, 8.4, 0.2, 0.2, 22.9);
