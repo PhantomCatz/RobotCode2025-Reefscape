@@ -14,7 +14,6 @@ package frc.robot.CatzSubsystems.CatzClimb;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
-import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.CatzConstants;
 import frc.robot.CatzSubsystems.CatzLEDs.CatzLED;
@@ -97,7 +96,7 @@ public class CatzClimb extends SubsystemBase {
     } else {
       if(isManual || targetPosition == ClimbPosition.FULL_MANUAL) {
         io.setPower(manualPow);
-        // System.out.println("full");
+        System.out.println("full");
       } else if(targetPosition == ClimbPosition.MANUAL) {
         io.setPosition(position);
         // System.out.println("semi");
@@ -161,7 +160,7 @@ public class CatzClimb extends SubsystemBase {
   }
 
   public Command CancelClimb() {
-    Command cancel = new InstantCommand().alongWith(Commands.runOnce(()->io.setPower(0.0)));
+    Command cancel = Commands.runOnce(()->manualPow = 0.0);
     cancel.addRequirements(this);
     return cancel;
   }

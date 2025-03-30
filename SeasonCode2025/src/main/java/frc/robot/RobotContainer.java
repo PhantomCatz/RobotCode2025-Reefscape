@@ -189,16 +189,16 @@ public class RobotContainer {
 
     // Climb Action
     Trigger climbMode = xboxDrv.povLeft();
-    xboxDrv.b().and(climbMode.toggleOnTrue(CatzStateCommands.extendClimb(this)));
-    xboxDrv.x().and(climbMode.toggleOnTrue(CatzStateCommands.fullClimb(this)));
-    climbMode.toggleOnTrue(Commands.runOnce(()->superstructure.setClimbOverride(()->true)));
-    climbMode.toggleOnFalse(Commands.runOnce(()->superstructure.setClimbOverride(()->false)));
+    xboxDrv.b().and(climbMode).onTrue(CatzStateCommands.extendClimb(this));
+    xboxDrv.x().and(climbMode).onTrue(CatzStateCommands.fullClimb(this));
+    climbMode.toggleOnTrue(Commands.startEnd(()->superstructure.setClimbOverride(()->true), ()->superstructure.setClimbOverride(()->false)));
 
         // Manual Climb Control
-    xboxDrv.povUp().and(climbMode.toggleOnTrue(climb.ClimbManualMode(()-> 0.7)));
+    xboxDrv.povUp().onTrue(climb.ClimbManualMode(()-> 1.0));
     xboxDrv.povUp().onFalse(climb.CancelClimb());
-    xboxDrv.povDown().and(climbMode.toggleOnTrue(climb.ClimbManualMode(()-> -0.7)));
+    xboxDrv.povDown().onTrue(climb.ClimbManualMode(()-> -1.0));
     xboxDrv.povDown().onFalse(climb.CancelClimb());
+
 
     // Default driving
     Trigger escapeTrajectory = new Trigger(()->(xboxDrv.getLeftY() > 0.8));
