@@ -67,8 +67,8 @@ public class RobotContainer {
   // Assistance Subsystem declaration
   private CatzLED led = CatzLED.getInstance();
   private CatzRobotTracker robotTracker = CatzRobotTracker.getInstance();
-  private CatzVision vision = new CatzVision(new VisionIOLimelight("limelight-udon"),
-                                             new VisionIOLimelight("limelight-soba"));
+  private CatzVision vision = new CatzVision(new VisionIOLimelight("limelight-gyoza"),
+                                             new VisionIOLimelight("limelight-tempura"));
   private CatzOuttake outtake;
   private CatzElevator elevator = new CatzElevator();
   private CatzClimb climb = new CatzClimb();
