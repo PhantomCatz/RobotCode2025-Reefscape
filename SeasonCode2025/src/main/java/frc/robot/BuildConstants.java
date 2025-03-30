@@ -13,6 +13,7 @@ public final class BuildConstants {
   public static final String GIT_BRANCH = "bugfix-nba-true";
   public static final String BUILD_DATE = "2025-03-29 21:36:54 EDT";
   public static final long BUILD_UNIX_TIME = 1743298614772L;
+
   public static final int DIRTY = 1;
 
   private BuildConstants(){}

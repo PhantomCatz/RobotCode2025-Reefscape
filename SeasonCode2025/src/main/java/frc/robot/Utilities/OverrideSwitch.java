@@ -27,21 +27,8 @@ public class OverrideSwitch {
     return joystick.isConnected();
   }
 
-  /** Gets the state of a driver-side switch (0-2 from left to right). */
-  public boolean getDriverSwitch(int index) {
-    if (index < 0 || index > 2) {
-      throw new RuntimeException(
-          "Invalid driver override index " + Integer.toString(index) + ". Must be 0-2.");
-    }
-    return joystick.getRawButton(index);
-  }
-
   /** Gets the state of an operator-side switch (0-4 from left to right). */
   public boolean getAuxSwitch(int index) {
-    if (index < 0 || index > 4) {
-      throw new RuntimeException(
-          "Invalid operator override index " + Integer.toString(index) + ". Must be 0-4.");
-    }
     return joystick.getRawButton(index);
   }
 
@@ -54,11 +41,6 @@ public class OverrideSwitch {
     } else {
       return MultiDirectionSwitchState.NEUTRAL;
     }
-  }
-
-  /** Returns a trigger for a driver-side switch (0-2 from left to right). */
-  public Trigger driverSwitch(int index) {
-    return new Trigger(() -> getDriverSwitch(index));
   }
 
   /** Returns a trigger for an operator-side switch (0-4 from left to right). */

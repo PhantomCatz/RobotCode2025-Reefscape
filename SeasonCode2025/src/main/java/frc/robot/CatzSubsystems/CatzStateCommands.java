@@ -389,10 +389,11 @@ public class CatzStateCommands {
             climb.Climb_Home(),
             outtake.stopOuttake(),
             rampPivot.Ramp_Intake_Pos(),
+            intakeRollers.stopIntaking(),
 
             new SequentialCommandGroup(
                 elevator.Elevator_L4(),
-                Commands.waitUntil(() -> elevator.getElevatorPositionInch() > 55.0),
+                Commands.waitUntil(() -> elevator.getElevatorPositionInch() > 50.0),
                 new ParallelCommandGroup(
                     algaePivot.AlgaePivot_NetAlgae(),
                     algae.vomitAlgae()
