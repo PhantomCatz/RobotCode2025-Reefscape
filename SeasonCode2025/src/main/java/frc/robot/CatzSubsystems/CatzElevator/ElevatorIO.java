@@ -26,10 +26,10 @@ public interface ElevatorIO {
     public double absoluteEncoderPositionRads = 0.0;
     public double relativeEncoderPositionRads = 0.0;
     public double velocityInchPerSec = 0.0;
-    public double appliedVolts;
-    public double supplyCurrentAmps;
-    public double torqueCurrentAmps;
-    public double tempCelcius;
+    public double[] appliedVolts = new double[] {};
+    public double[] supplyCurrentAmps = new double[] {};
+    public double[] torqueCurrentAmps = new double[] {};
+    public double[] tempCelcius = new double[] {};
 
   }
 
