@@ -51,6 +51,9 @@ public class CatzLED extends VirtualSubsystem {
   @Getter @Setter @AutoLogOutput (key = "CatzLED/QueueState")
   public QueueLEDState queueLEDState = QueueLEDState.EMPTY;
 
+  @Getter @Setter @AutoLogOutput(key = "CatzSuperstructure/isClimbExtendingOut")
+  private WinchingState climbDirection = WinchingState.IDLE;
+  
   public enum QueueLEDState {
     EMPTY,
     ONE_CORAL,
@@ -73,6 +76,17 @@ public class CatzLED extends VirtualSubsystem {
     ledChecked,
     nuhthing
   }
+
+  public enum WinchingState {
+    EXTENDING(Color.kGreen),
+    RETRACTING(Color.kRed),
+    IDLE(Color.kBlack);
+
+    private final Color color;
+    private WinchingState(Color color) {
+        this.color = color;
+    }
+}
 
   public double autoFinishedTime = 0.0;
   // MISC
@@ -249,6 +263,7 @@ public class CatzLED extends VirtualSubsystem {
         break;
         case CLIMB:
           rainbowCrossbar(rainbowCycleLength, rainbowDuration);
+          setSolidCrossbarColor(climbDirection.color);
         break;
         case sameBattery:
           setSolidElevatorColor(Color.kDarkOrange);

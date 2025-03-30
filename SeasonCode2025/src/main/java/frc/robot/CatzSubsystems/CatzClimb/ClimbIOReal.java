@@ -27,6 +27,7 @@ import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.Temperature;
 import edu.wpi.first.units.measure.Voltage;
+import edu.wpi.first.wpilibj.DutyCycle;
 
 /** Add your docs here. */
 public class ClimbIOReal implements ClimbIO {
@@ -43,6 +44,7 @@ public class ClimbIOReal implements ClimbIO {
   private final StatusSignal<Current> climbSupplyCurrent;
   private final StatusSignal<Current> climbTorqueCurrent;
   private final StatusSignal<Temperature> climbTempCelsius;
+  private final StatusSignal<Double> climbDutyCycle;
 
   public ClimbIOReal() {
     climbPosition = climbMotor.getPosition();
@@ -51,6 +53,7 @@ public class ClimbIOReal implements ClimbIO {
     climbSupplyCurrent = climbMotor.getSupplyCurrent();
     climbTorqueCurrent = climbMotor.getTorqueCurrent();
     climbTempCelsius = climbMotor.getDeviceTemp();
+    climbDutyCycle = climbMotor.getDutyCycle();
 
     BaseStatusSignal.setUpdateFrequencyForAll(
         100.0,
@@ -97,6 +100,7 @@ public class ClimbIOReal implements ClimbIO {
     inputs.supplyCurrentAmps = climbSupplyCurrent.getValueAsDouble();
     inputs.torqueCurrentAmps = climbTorqueCurrent.getValueAsDouble();
     inputs.tempCelsius = climbTempCelsius.getValueAsDouble();
+    inputs.commandedOutput = climbDutyCycle.getValueAsDouble();
   }
 
   @Override

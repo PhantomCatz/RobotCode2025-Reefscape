@@ -16,6 +16,7 @@ import java.util.function.BooleanSupplier;
 import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 
+import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
@@ -28,8 +29,8 @@ public class CatzSuperstructure extends VirtualSubsystem {
 
     private RobotContainer container;
 
-    @Getter @Setter @AutoLogOutput(key = "CatzSuperstructure/ChosenGamepiece")
-    private static Gamepiece chosenGamepiece = Gamepiece.CORAL;
+    static @Getter @Setter @AutoLogOutput(key = "CatzSuperstructure/ChosenGamepiece")
+    private Gamepiece chosenGamepiece = Gamepiece.CORAL;
 
     @Getter @Setter @AutoLogOutput(key = "CatzSuperstructure/Level")
     private int level = 1;
@@ -167,15 +168,15 @@ public class CatzSuperstructure extends VirtualSubsystem {
                     }
                 } else {
                     switch(level) {
-                        case 2:
+                        case 4:
                             currentRobotState = RobotState.PROCESSOR;
-                            System.out.println("Processor");
+                            //System.out.println("Processor");
                             robotActionCommand = CatzStateCommands.processor(container);
                             break;
-                        case 4:
+                        case 2:
                             currentRobotState = RobotState.NET_ALGAE;
-                            System.out.println("Net Algae");
-                            // robotActionCommand = CatzStateCommands.netAlgae(container);
+                            //System.out.println("Net Algae");
+                            robotActionCommand = CatzStateCommands.netAlgae(container);
                             break;
                         default:
                             robotActionCommand = Commands.none();
