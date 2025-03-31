@@ -8,24 +8,24 @@
       },
       "prevControl": null,
       "nextControl": {
-        "x": 2.209175551380162,
-        "y": 1.7522166288380403
+        "x": 1.4560833984051065,
+        "y": 1.4004936485294237
       },
       "isLocked": false,
       "linkedName": "Coral-Bottom"
     },
     {
       "anchor": {
-        "x": 3.705,
-        "y": 2.9817499999999995
+        "x": 3.1887295081967215,
+        "y": 3.8631659836065575
       },
       "prevControl": {
-        "x": 2.551334160108877,
-        "y": 2.0373800831801647
+        "x": 2.695640074960962,
+        "y": 3.0562686919726376
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": "Reef-C"
+      "linkedName": "Reef-B"
     }
   ],
   "rotationTargets": [],
@@ -42,7 +42,7 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 59.99999999999999
+    "rotation": 0.0
   },
   "reversed": false,
   "folder": "Bottom L4 FDC Paths",

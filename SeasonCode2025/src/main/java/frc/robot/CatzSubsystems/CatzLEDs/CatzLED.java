@@ -111,33 +111,14 @@ public class CatzLED extends VirtualSubsystem {
   // Constants
   private static final boolean paradeLeds = false;
   private static final int minLoopCycleCount = 10;
-  private static final int length = 49;
-  //22 11 24
+  private static final int length = 54;
+  //24 7 23
   private static final int LED_Sidebar_Start_RT = 0;
-  private static final int LED_Sidebar_End_RT   = 19;
-  private static final int LED_Crossbar_Start   = 20;
-  private static final int LED_Crossbar_End     = 26;
-  private static final int LED_Sidebar_Start_LT = 27;
-  private static final int LED_Sidebar_End_LT   = 49;
-
-  //LED Build up constants
-  private static final int LED_Sidebar_Build_LT_ONE_START   = 3;
-  private static final int LED_Sidebar_Build_LT_ONE_END     = 6;
-  private static final int LED_Sidebar_Build_LT_TWO_START   = 7;
-  private static final int LED_Sidebar_Build_LT_TWO_END     = 10;
-  private static final int LED_Sidebar_Build_LT_THREE_START = 11;
-  private static final int LED_Sidebar_Build_LT_THREE_END   = 14;
-  private static final int LED_Sidebar_Build_LT_FOUR_START  = 15;
-  private static final int LED_Sidebar_Build_LT_FOUR_END    = 18;
-  private static final int LED_Sidebar_Build_RT_ONE_START   = 49;
-  private static final int LED_Sidebar_Build_RT_ONE_END     = 46;
-  private static final int LED_Sidebar_Build_RT_TWO_START   = 45;
-  private static final int LED_Sidebar_Build_RT_TWO_END     = 42;
-  private static final int LED_Sidebar_Build_RT_THREE_START = 41;
-  private static final int LED_Sidebar_Build_RT_THREE_END   = 38;
-  private static final int LED_Sidebar_Build_RT_FOUR_START  = 37;
-  private static final int LED_Sidebar_Build_RT_FOUR_END    = 34;
-
+  private static final int LED_Sidebar_End_RT   = 23;
+  private static final int LED_Crossbar_Start   = 24;
+  private static final int LED_Crossbar_End     = 32;
+  private static final int LED_Sidebar_Start_LT = 33;
+  private static final int LED_Sidebar_End_LT   = 53;
 
   private static final double strobeDuration = 0.1;
   private static final double breathDuration = 1.0;
@@ -285,7 +266,6 @@ public class CatzLED extends VirtualSubsystem {
         setSolidCrossbarColor(Color.kGreen);
       }
     }
-    rainbowElevator(rainbowCycleLength, breathDuration);
 
     // Update LEDs
     ledStrip.setData(buffer);
@@ -354,15 +334,15 @@ public class CatzLED extends VirtualSubsystem {
     for (int i=0; i<LED_Crossbar_Start; i++) {
       if (i <= colored && ((i - colored % bubbleInterval) + bubbleInterval) % bubbleInterval < bubbleLength) {
         buffer.setLED(i, color);
-        buffer.setLED(46-i, color);
+        buffer.setLED(LED_Sidebar_End_LT-i, color);
       }
       else {
         buffer.setLED(i, Color.kBlack);
-        buffer.setLED(46-i, Color.kBlack);
+        buffer.setLED(LED_Sidebar_End_LT-i, Color.kBlack);
       }
     }
-    buffer.setLED(47, Color.kBlack);
-    buffer.setLED(48, Color.kBlack);
+    // buffer.setLED(47, Color.kBlack);
+    // buffer.setLED(48, Color.kBlack);
 
   }
 
@@ -371,11 +351,11 @@ public class CatzLED extends VirtualSubsystem {
     for (int i=0; i<LED_Crossbar_Start; i++) {
       if (i <= colored && i % 3 == colored % 3) {
         buffer.setLED(i, color);
-        buffer.setLED(46-i, color);
+        buffer.setLED(LED_Sidebar_End_LT-i, color);
       }
       else {
         buffer.setLED(i, Color.kBlack);
-        buffer.setLED(46-i, Color.kBlack);
+        buffer.setLED(LED_Sidebar_End_LT-i, Color.kBlack);
       }
     }
   }

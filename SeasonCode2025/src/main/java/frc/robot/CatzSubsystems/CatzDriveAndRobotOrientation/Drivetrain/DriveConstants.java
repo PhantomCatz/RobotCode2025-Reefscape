@@ -60,7 +60,7 @@ public class DriveConstants {
         .robotWidthY(Units.inchesToMeters(24.2))
         .bumperWidthX(Units.inchesToMeters(32))
         .bumperWidthY(Units.inchesToMeters(32))
-        .maxLinearVelocity(4.2)
+        .maxLinearVelocity(4.3)
         .maxLinearAcceleration(120)
         .maxAngularVelocity(Units.degreesToRadians(540))
         .maxAngularAcceleration(Units.degreesToRadians(720))
@@ -135,10 +135,10 @@ public class DriveConstants {
   static{
     switch(CatzConstants.getRobotType()){
         case SN2:
-            MODULE_CONFIGS[INDEX_FR] = new ModuleIDs(1, 2, 11, 0.4599609375, false);
-            MODULE_CONFIGS[INDEX_BR] = new ModuleIDs(3, 4, 12, 0.082763671875, false);
-            MODULE_CONFIGS[INDEX_BL] = new ModuleIDs(5, 6, 13, 0.8525390625, false);
-            MODULE_CONFIGS[INDEX_FL] = new ModuleIDs(7, 8, 14, 0.946533203125, false);
+            MODULE_CONFIGS[INDEX_FR] = new ModuleIDs(1, 2, 11, -0.539306640625, false);
+            MODULE_CONFIGS[INDEX_BR] = new ModuleIDs(3, 4, 12, 0.083251953125, false);
+            MODULE_CONFIGS[INDEX_BL] = new ModuleIDs(5, 6, 13, 0.85107421875, false);
+            MODULE_CONFIGS[INDEX_FL] = new ModuleIDs(7, 8, 14, -0.05224609375, false);
         break;
 
         case SN1:

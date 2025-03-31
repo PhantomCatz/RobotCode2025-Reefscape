@@ -126,7 +126,6 @@ public class CatzStateCommands {
         CatzIntakeRollers intakeRollers = robotContainer.getIntakeRollers();
 
         return new ParallelCommandGroup(
-            climb.fullClimb(),
             algae.stopAlgae(),
             outtake.stopOuttake(),
             algaePivot.AlgaePivot_Stow(),
@@ -159,7 +158,6 @@ public class CatzStateCommands {
 
         return new ParallelCommandGroup(
             algae.stopAlgae(),
-            climb.fullClimb(),
             algaePivot.AlgaePivot_Stow(),
             outtake.startIntaking(),
             elevator.Elevator_Stow(),
@@ -178,7 +176,6 @@ public class CatzStateCommands {
         CatzIntakeRollers intakeRollers = robotContainer.getIntakeRollers();
 
         return new ParallelCommandGroup(
-            climb.fullClimb(),
             algaePivot.AlgaePivot_Horizontal(),
             algae.eatAlgae(),
             outtake.stopOuttake(),
@@ -206,7 +203,6 @@ public class CatzStateCommands {
         return new ParallelCommandGroup(
             rampPivot.Ramp_Intake_Pos(),
             intakeRollers.stopIntaking(),
-            climb.fullClimb(),
             algae.stopAlgae(),
             algaePivot.AlgaePivot_Stow(),
 
@@ -232,7 +228,6 @@ public class CatzStateCommands {
 
         return new ParallelCommandGroup(
             rampPivot.Ramp_Intake_Pos(),
-            climb.fullClimb(),
             algae.stopAlgae(),
             algaePivot.AlgaePivot_Stow(),
             intakeRollers.stopIntaking(),
@@ -258,7 +253,6 @@ public class CatzStateCommands {
 
         return new ParallelCommandGroup(
             rampPivot.Ramp_Intake_Pos(),
-            climb.fullClimb(),
             algae.stopAlgae(),
             algaePivot.AlgaePivot_Stow(),
             intakeRollers.stopIntaking(),
@@ -283,7 +277,6 @@ public class CatzStateCommands {
 
         return new ParallelCommandGroup(
             rampPivot.Ramp_Intake_Pos(),
-            climb.fullClimb(),
             algae.stopAlgae(),
             algaePivot.AlgaePivot_Stow(),
             intakeRollers.stopIntaking(),
@@ -336,7 +329,6 @@ public class CatzStateCommands {
         CatzIntakeRollers intakeRollers = robotContainer.getIntakeRollers();
 
         return new SequentialCommandGroup(
-            climb.fullClimb(),
             algae.stopAlgae(),
             algaePivot.AlgaePivot_Stow(),
             rampPivot.Ramp_Intake_Pos(),
@@ -363,7 +355,6 @@ public class CatzStateCommands {
         CatzIntakeRollers intakeRollers = robotContainer.getIntakeRollers();
 
         return new ParallelCommandGroup(
-            climb.fullClimb(),
             outtake.stopOuttake(),
             rampPivot.Ramp_Intake_Pos(),
             intakeRollers.stopIntaking(),
@@ -387,7 +378,6 @@ public class CatzStateCommands {
         CatzIntakeRollers intakeRollers = robotContainer.getIntakeRollers();
 
         return new ParallelCommandGroup(
-            climb.Climb_Home(),
             outtake.stopOuttake(),
             rampPivot.Ramp_Intake_Pos(),
             intakeRollers.stopIntaking(),
@@ -426,7 +416,6 @@ public class CatzStateCommands {
         CatzIntakeRollers intakeRollers = robotContainer.getIntakeRollers();
 
         return new ParallelCommandGroup(
-            climb.fullClimb(),
             outtake.stopOuttake(),
             rampPivot.Ramp_Intake_Pos(),
             intakeRollers.stopIntaking(),
@@ -449,7 +438,6 @@ public class CatzStateCommands {
         CatzIntakeRollers intakeRollers = robotContainer.getIntakeRollers();
 
         return new ParallelCommandGroup(
-            climb.fullClimb(),
             outtake.stopOuttake(),
             rampPivot.Ramp_Intake_Pos(),
             intakeRollers.stopIntaking(),
@@ -495,9 +483,11 @@ public class CatzStateCommands {
         CatzElevator elevator = robotContainer.getCatzElevator();
         CatzRampPivot rampPivot = robotContainer.getCatzRampPivot();
         CatzIntakeRollers intakeRollers = robotContainer.getIntakeRollers();
+        CatzAlgaePivot algaePivot = robotContainer.getAlgaePivot();
 
         return new SequentialCommandGroup(
             new ParallelCommandGroup(
+                algaePivot.AlgaePivot_Stow(),
                 outtake.stopOuttake(),
                 algae.stopAlgae(),
                 rampPivot.Ramp_Climb_Pos(),

@@ -18,7 +18,7 @@ import frc.robot.Utilities.MotorUtil.MotionMagicParameters;
 /** Add your docs here. */
 public class RampPivotConstants {
 
-    public static final boolean isRampPivotDisabled = true;
+    public static final boolean isRampPivotDisabled = false;
 
     public static final int RAMP_PIVOT_MTR_ID = 41;
 
@@ -35,7 +35,7 @@ public class RampPivotConstants {
     // Initial PIDF and motion magic assignment
     public static final Gains gains =
         switch (CatzConstants.getRobotType()) {
-            case SN2 -> new Gains(3.0, 0.0, 0., 0.0, 0.0, 0.0, 0.0);
+            case SN2 -> new Gains(2.0, 0.0, 0., 0.0, 0.0, 0.0, 0.0);
             case SN1 -> new Gains(0.015, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0);
             case SN_TEST, SN1_2024 -> new Gains(7000.0, 0.0, 250.0, 8.4, 0.2, 0.2, 22.9);
         };

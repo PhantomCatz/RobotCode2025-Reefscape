@@ -33,6 +33,18 @@
           "data": {
             "name": "Bottom L4 FDC 5+ReefL4"
           }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Bottom L4 FDC 6+CS"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Bottom L4 FDC 7+ReefL4"
+          }
         }
       ]
     }

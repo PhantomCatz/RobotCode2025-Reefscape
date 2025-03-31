@@ -12,6 +12,10 @@
 package frc.robot;
 
 
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.RobotController;
@@ -20,6 +24,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import frc.robot.CatzConstants.RobotHardwareMode;
 import frc.robot.CatzConstants.RobotID;
+import frc.robot.FieldConstants.Reef;
 import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.CatzRobotTracker;
 import frc.robot.CatzSubsystems.CatzLEDs.CatzLED;
 import frc.robot.CatzSubsystems.CatzLEDs.CatzLED.ControllerLEDState;
@@ -42,6 +47,8 @@ import org.littletonrobotics.junction.networktables.NT4Publisher;
 import org.littletonrobotics.junction.rlog.RLOGServer;
 import org.littletonrobotics.junction.wpilog.WPILOGReader;
 import org.littletonrobotics.junction.wpilog.WPILOGWriter;
+
+import com.pathplanner.lib.util.FlippingUtil;
 
 
 public class Robot extends LoggedRobot {
@@ -384,8 +391,8 @@ public class Robot extends LoggedRobot {
     teleStart = Timer.getFPGATimestamp();
     m_robotContainer.getCatzRampPivot().setNeutralMode(NeutralMode.BRAKE);
     //CatzRobotTracker.getInstance().resetPose(m_robotContainer.getAutonomous().calculateReefPos(2, LeftRight.LEFT));
-    //CatzRobotTracker.getInstance().resetPose(FlippingUtil.flipFieldPose(new Pose2d(Reef.center.minus(new Translation2d(Units.inchesToMeters(32.305+14.5), 0)), Rotation2d.kZero)));
-    //CatzRobotTracker.getInstance().resetPose(m_robotContainer.getSelector().calculateReefPose(3, LeftRight.LEFT, false));
+    CatzRobotTracker.getInstance().resetPose(FlippingUtil.flipFieldPose(new Pose2d(Reef.center.minus(new Translation2d(Units.inchesToMeters(32.305+14.5), 0)), Rotation2d.kZero)));
+    //CatzRobotTracker.getInstance().resetPose(new Pose2d());
   }
 
   @Override

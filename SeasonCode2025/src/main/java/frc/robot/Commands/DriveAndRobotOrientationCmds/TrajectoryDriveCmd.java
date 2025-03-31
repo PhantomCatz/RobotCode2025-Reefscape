@@ -72,6 +72,7 @@ public class TrajectoryDriveCmd extends Command {
   private PathPlannerTrajectory trajectory;
   private PathPlannerPath path;
   private Supplier<PathPlannerPath> pathSupplier;
+  private Rotation2d endRotation;
 
   private double pathTimeOut = -999.0;
   private Timer timer = new Timer();
@@ -149,10 +150,10 @@ public class TrajectoryDriveCmd extends Command {
 
       printTime("dos");
 
+
       // Collect current drive state
       ChassisSpeeds currentSpeeds = DriveConstants.SWERVE_KINEMATICS.toChassisSpeeds(tracker.getCurrentModuleStates());
       List<PathPoint> pathPoints = usePath.getAllPathPoints();
-
 
       if(pathPoints.size() == 2){
         System.out.println("too shortt!!");
@@ -178,18 +179,19 @@ public class TrajectoryDriveCmd extends Command {
         //for some reason if you spam NBA current rotation gets bugged.
         this.trajectory = usePath.generateTrajectory(currentSpeeds, new Rotation2d(), DriveConstants.TRAJ_ROBOT_CONFIG);
         // this.trajectory = new PathPlannerTrajectory(
-        //   usePath,
-        //   currentSpeeds, //TODO make it not zero if its a thing thingy y esdpoifi
-        //   new Rotation2d(),
-        //   DriveConstants.TRAJ_ROBOT_CONFIG
-        // );
-      }
-      printTime("sdfioj");
-      if(trajectory == null) {
-        System.out.println("bugged!!!!!!!");
-        isBugged = true;
-        return;
-      }
+          //   usePath,
+          //   currentSpeeds, //TODO make it not zero if its a thing thingy y esdpoifi
+          //   new Rotation2d(),
+          //   DriveConstants.TRAJ_ROBOT_CONFIG
+          // );
+        }
+        printTime("sdfioj");
+        if(trajectory == null) {
+          System.out.println("bugged!!!!!!!");
+          isBugged = true;
+          return;
+        }
+        endRotation = trajectory.sample(trajectory.getTotalTimeSeconds()).pose.getRotation();
 
       printTime("cinco");
       hocontroller = DriveConstants.getNewHolController();
@@ -249,7 +251,6 @@ public class TrajectoryDriveCmd extends Command {
     // target velocity is used as a ff
     // -------------------------------------------------------------------------------------
     PathPlannerTrajectoryState goal = trajectory.sample(Math.min(currentTime, trajectory.getTotalTimeSeconds()));
-    PathPlannerTrajectoryState endGoal = trajectory.sample(trajectory.getTotalTimeSeconds()); // TODO we can optimize
 
     printTime("siete");
     Trajectory.State state = new Trajectory.State(
@@ -263,7 +264,7 @@ public class TrajectoryDriveCmd extends Command {
     printTime("ocho");
 
     // construct chassisspeeds
-    adjustedSpeeds = hocontroller.calculate(currentPose, state, endGoal.pose.getRotation());
+    adjustedSpeeds = hocontroller.calculate(currentPose, state, endRotation);
     // if (autoalign && translationError > FACE_REEF_DIST) {
     //   Translation2d reef = AllianceFlipUtil.apply(FieldConstants.Reef.center);
     //   adjustedSpeeds = hocontroller.calculate(currentPose, state, Rotation2d.fromRadians(Math.atan2(reef.getY() - currentPose.getY(),reef.getX() - currentPose.getX())));
@@ -271,7 +272,7 @@ public class TrajectoryDriveCmd extends Command {
     // }
     printTime("nueve");
 
-    adjustedSpeeds = applyCusp(adjustedSpeeds, translationError, endGoal.pose.getRotation().minus(currentPose.getRotation()).getDegrees(), CONVERGE_DISTANCE, CONVERGE_ANGLE);
+    adjustedSpeeds = applyCusp(adjustedSpeeds, translationError, endRotation.minus(currentPose.getRotation()).getDegrees(), CONVERGE_DISTANCE, CONVERGE_ANGLE);
 
     // Logging
     Logger.recordOutput("CatzRobotTracker/Desired Auto Pose", goal.pose);
