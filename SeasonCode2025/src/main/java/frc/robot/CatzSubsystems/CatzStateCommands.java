@@ -470,9 +470,9 @@ public class CatzStateCommands {
                 rampPivot.Ramp_Climb_Pos(),
                 intakeRollers.stopIntaking(),
                 elevator.Elevator_Stow()
-            ).alongWith(Commands.waitSeconds(0.0)), //TBD TESITNG
+            ).alongWith(Commands.waitSeconds(0.0)) //TBD TESITNG
 
-            climb.extendClimb()
+            // climb.extendClimb()
         ).unless(()-> Robot.isSimulation()).alongWith(Commands.print("EXTENDING CLIMB/////////////////////////////"));
     }
 

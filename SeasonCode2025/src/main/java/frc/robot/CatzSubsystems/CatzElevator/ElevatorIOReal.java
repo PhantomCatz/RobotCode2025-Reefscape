@@ -211,6 +211,14 @@ public class ElevatorIOReal implements ElevatorIO {
   }
 
   @Override
+  public void setMotionMagicParameters(double vel, double accel, double jerk) {
+    config.MotionMagic.MotionMagicCruiseVelocity = vel;
+    config.MotionMagic.MotionMagicAcceleration = accel;
+    config.MotionMagic.MotionMagicJerk = jerk;
+    leaderTalon.getConfigurator().apply(config);
+  }
+
+  @Override
   public void setBrakeMode(boolean enabled) {
     leaderTalon.setNeutralMode(enabled ? NeutralModeValue.Brake : NeutralModeValue.Coast);
     followerTalon.setNeutralMode(enabled ? NeutralModeValue.Brake : NeutralModeValue.Coast);
@@ -219,7 +227,7 @@ public class ElevatorIOReal implements ElevatorIO {
   @Override
   public void runMotor(double speed) {
     System.out.println(speed);
-    leaderTalon.setControl(new DutyCycleOut(speed));
+    leaderTalon.setControl(new VoltageOut(speed));
   }
 
   @Override

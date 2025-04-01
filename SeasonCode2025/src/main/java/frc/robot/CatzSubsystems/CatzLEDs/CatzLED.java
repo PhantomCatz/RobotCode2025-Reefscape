@@ -116,8 +116,8 @@ public class CatzLED extends VirtualSubsystem {
   private static final int LED_Sidebar_Start_RT = 0;
   private static final int LED_Sidebar_End_RT   = 23;
   private static final int LED_Crossbar_Start   = 24;
-  private static final int LED_Crossbar_End     = 32;
-  private static final int LED_Sidebar_Start_LT = 33;
+  private static final int LED_Crossbar_End     = 33;
+  private static final int LED_Sidebar_Start_LT = 34;
   private static final int LED_Sidebar_End_LT   = 53;
 
   private static final double strobeDuration = 0.1;

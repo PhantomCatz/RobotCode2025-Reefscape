@@ -177,6 +177,9 @@ public class CatzElevator extends SubsystemBase {
       }
     } else if (targetPosition == ElevatorPosition.PosManual) {
       io.runMotor(elevatorSpeed);
+
+      Logger.recordOutput("Elevator/Manual Speed", elevatorSpeed*10);
+      Logger.recordOutput("Elevator/Manual RPS", inputs.velocityInchPerSec/ElevatorConstants.FINAL_RATIO);
     } else {
       // Nothing happening
       io.stop();
