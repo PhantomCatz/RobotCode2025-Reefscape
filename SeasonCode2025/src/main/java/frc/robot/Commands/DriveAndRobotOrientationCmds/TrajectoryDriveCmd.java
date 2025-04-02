@@ -85,25 +85,27 @@ public class TrajectoryDriveCmd extends Command {
   private ChassisSpeeds adjustedSpeeds = new ChassisSpeeds();
 
   private boolean isBugged = false;
-
+  private final boolean isTelop;
   // ---------------------------------------------------------------------------------------------
   //
   // Trajectory Drive Command Constructor
   //
   // ---------------------------------------------------------------------------------------------
-  public TrajectoryDriveCmd(PathPlannerPath newPath, CatzDrivetrain drivetrain, boolean autoalign, RobotContainer container) {
+  public TrajectoryDriveCmd(PathPlannerPath newPath, CatzDrivetrain drivetrain, boolean autoalign, RobotContainer container, boolean isTeleop) {
     this.path = newPath;
     this.m_driveTrain = drivetrain;
     this.autoalign = autoalign;
     this.container = container;
+    this.isTelop = isTeleop;
     addRequirements(m_driveTrain);
   }
 
-  public TrajectoryDriveCmd(Supplier<PathPlannerPath> newPathSupplier, CatzDrivetrain drivetrain, boolean autoalign, RobotContainer container) {
+  public TrajectoryDriveCmd(Supplier<PathPlannerPath> newPathSupplier, CatzDrivetrain drivetrain, boolean autoalign, RobotContainer container, boolean isTeleop) {
     this.pathSupplier = newPathSupplier;
     this.m_driveTrain = drivetrain;
     this.autoalign = autoalign;
     this.container = container;
+    this.isTelop = isTeleop;
     addRequirements(m_driveTrain);
   }
 
@@ -194,7 +196,12 @@ public class TrajectoryDriveCmd extends Command {
         endRotation = endState.pose.getRotation();
 
       hocontroller = DriveConstants.getNewHolController();
-      pathTimeOut = trajectory.getTotalTimeSeconds() + TIMEOUT_EXTRA;
+
+      if(isTelop){
+        pathTimeOut = 999999;
+      }else{
+        pathTimeOut = trajectory.getTotalTimeSeconds() + TIMEOUT_EXTRA;
+      }
 
 
       // System.out.println("current " + tracker.getEstimatedPose());

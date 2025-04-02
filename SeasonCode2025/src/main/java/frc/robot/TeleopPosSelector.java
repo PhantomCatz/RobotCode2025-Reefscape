@@ -377,7 +377,7 @@ public class TeleopPosSelector { //TODO split up the file. it's too big and does
       currentDrivetrainCommand.cancel();
       PathPlannerPath path = getClosestNetPath();
       if(path != null){
-        currentDrivetrainCommand = new TrajectoryDriveCmd(path, drivetrain, true, m_container);
+        currentDrivetrainCommand = new TrajectoryDriveCmd(path, drivetrain, true, m_container, true);
       }else{
       currentDrivetrainCommand = new InstantCommand();
       }
@@ -480,7 +480,7 @@ public class TeleopPosSelector { //TODO split up the file. it's too big and does
     PathPlannerPath path = getStraightLinePath(currentPose, goal, DriveConstants.PATHFINDING_CONSTRAINTS); //TODO might need to scale constraints based off of distance from reef?
 
 
-    currentDrivetrainCommand = new TrajectoryDriveCmd(path, drivetrain, true, m_container).andThen(m_container.rumbleDrvAuxController(1.0, 0.2)).andThen(new InstantCommand(() -> isNBALeftRight = false));
+    currentDrivetrainCommand = new TrajectoryDriveCmd(path, drivetrain, true, m_container, true).andThen(m_container.rumbleDrvAuxController(1.0, 0.2)).andThen(new InstantCommand(() -> isNBALeftRight = false));
 
     try{
       currentDrivetrainCommand.schedule();
@@ -509,7 +509,7 @@ public class TeleopPosSelector { //TODO split up the file. it's too big and does
     }
 
     PathPlannerPath path = getStraightLinePath(currentPose, goal, DriveConstants.LEFT_RIGHT_NET_CONSTRAINTS);
-    currentDrivetrainCommand = new TrajectoryDriveCmd(path, drivetrain, false, m_container);
+    currentDrivetrainCommand = new TrajectoryDriveCmd(path, drivetrain, false, m_container, true);
     currentDrivetrainCommand.schedule();
   }
 
@@ -589,7 +589,7 @@ public class TeleopPosSelector { //TODO split up the file. it's too big and does
         // PathPlannerPath path = getPathfindingPath(calculateReefPose(getClosestReefPos().getFirst(), true, false));
         PathPlannerPath path = getStraightLinePath(tracker.getEstimatedPose(), calculateReefPose(getClosestReefPos().getFirst(), true, false), DriveConstants.PATHFINDING_CONSTRAINTS);
 
-        currentDrivetrainCommand = new TrajectoryDriveCmd(path, m_container.getCatzDrivetrain(), true, m_container)
+        currentDrivetrainCommand = new TrajectoryDriveCmd(path, m_container.getCatzDrivetrain(), true, m_container, true)
                                         .deadlineFor(new RepeatCommand(prematureCommand.onlyIf(() -> drivetrain.getDistanceError() < DriveConstants.PREDICT_DISTANCE_SCORE)))
                                         .andThen(m_container.rumbleDrvAuxController(1.0, 0.2));
         currentDrivetrainCommand.schedule();

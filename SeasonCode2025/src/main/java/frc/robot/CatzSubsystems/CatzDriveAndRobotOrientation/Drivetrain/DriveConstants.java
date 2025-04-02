@@ -182,7 +182,7 @@ public class DriveConstants {
 
   public static final PathConstraints LEFT_RIGHT_CONSTRAINTS = new PathConstraints(
     2,
-    2,
+    1.5,
     TRAJECTORY_CONFIG.maxAngularVelocity,
     TRAJECTORY_CONFIG.maxAngularAcceleration
   );
@@ -216,7 +216,7 @@ public class DriveConstants {
       new PIDController(10, 0.0, 0.3),
       new PIDController(10, 0.0, 0.3),
       new ProfiledPIDController(
-        6.5,
+        5.5,
         0.0,
         0.3,
         new TrapezoidProfile.Constraints(TRAJECTORY_CONFIG.maxAngularVelocity, TRAJECTORY_CONFIG.maxAngularAcceleration)

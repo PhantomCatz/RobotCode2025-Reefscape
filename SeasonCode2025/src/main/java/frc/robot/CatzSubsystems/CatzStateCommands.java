@@ -51,7 +51,7 @@ public class CatzStateCommands {
         CatzOuttake outtake = robotContainer.getCatzOuttake();
 
         return new SequentialCommandGroup(
-            new TrajectoryDriveCmd(pathToReadyPose, drivetrain, true, robotContainer).deadlineFor(
+            new TrajectoryDriveCmd(pathToReadyPose, drivetrain, true, robotContainer, false).deadlineFor(
                 new RepeatCommand(LXElevator(robotContainer, level).alongWith(new PrintCommand("elevavavava")).onlyIf(() -> drivetrain.getDistanceError() < DriveConstants.PREDICT_DISTANCE_SCORE))
             ),
             // new WaitUntilCommand(() -> !outtake.isDesiredCoralState(true)),
@@ -66,7 +66,7 @@ public class CatzStateCommands {
         CatzDrivetrain drivetrain = robotContainer.getCatzDrivetrain();
 
         return new SequentialCommandGroup(
-            new TrajectoryDriveCmd(pathToReadyPoseSupplier, drivetrain, false, robotContainer),
+            new TrajectoryDriveCmd(pathToReadyPoseSupplier, drivetrain, false, robotContainer, false),
             LXElevator(robotContainer, level),
             moveScore(robotContainer, level),
             stow(robotContainer)
@@ -78,7 +78,7 @@ public class CatzStateCommands {
         TeleopPosSelector selector = robotContainer.getSelector();
 
         return new SequentialCommandGroup(
-            new TrajectoryDriveCmd(()->selector.getMoveScorePath(), drivetrain, true, robotContainer),
+            new TrajectoryDriveCmd(()->selector.getMoveScorePath(), drivetrain, true, robotContainer, false),
             LXCoral(robotContainer, level)
         );
     }
@@ -88,7 +88,7 @@ public class CatzStateCommands {
         CatzOuttake outtake = robotContainer.getCatzOuttake();
 
         return new SequentialCommandGroup(
-            new TrajectoryDriveCmd(path, drivetrain, false, robotContainer).deadlineFor(
+            new TrajectoryDriveCmd(path, drivetrain, false, robotContainer, false).deadlineFor(
                 new RepeatCommand(intakeCoralStation(robotContainer).onlyIf(() -> drivetrain.getDistanceError() < DriveConstants.PREDICT_DISTANCE_INTAKE))
             )
             // Commands.waitUntil(() -> (waitForCoralSupplier.get() ? outtake.isDesiredCoralState(false) : true))
