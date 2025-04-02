@@ -63,6 +63,7 @@ public class CatzAutonomous extends SubsystemBase {
   private static final int MAX_QUESTIONS = 5;
   private static final String AUTO_STRING = "Auto";
   private final LoggedDashboardChooser<PathPlannerAuto> autoProgramChooser = new LoggedDashboardChooser<>(AUTO_STRING + "/Program");
+  private final SendableChooser<Boolean> waitForCoralChooser = new SendableChooser<>();
 
   private File autosDirectory            = new File(Filesystem.getDeployDirectory(), "pathplanner/autos");
   private File choreoPathsDirectory      = new File(Filesystem.getDeployDirectory(), "choreo");
@@ -124,6 +125,9 @@ public class CatzAutonomous extends SubsystemBase {
     HashMap<String, Command> reefPose3 = new HashMap<>();
     HashMap<String, Command> reefPose4 = new HashMap<>();
 
+    waitForCoralChooser.addOption("Yes", true);
+    waitForCoralChooser.addOption("No", false);
+
     for(int i = 0; i < FieldConstants.StartPoses.startArray.length; i++){
       final int j = i;
       Supplier<Pose2d> startPoseSupplier = ()->AllianceFlipUtil.apply(new Pose2d(FieldConstants.StartPoses.startArray[j], Rotation2d.k180deg));
@@ -138,7 +142,7 @@ public class CatzAutonomous extends SubsystemBase {
 
         NamedCommands.registerCommand(letter, new SeqCmd(
             CatzStateCommands.driveToScore(m_container, () ->selector.getPathfindingPath(()->selector.calculateReefPose(s, leftRight, false)), 4),
-            CatzStateCommands.driveToCoralStation(m_container, ()->selector.getPathfindingPath(()->selector.getBestCoralStation())).andThen(new PrintCommand("heheheHhahahahahah"))
+            CatzStateCommands.driveToCoralStation(m_container, ()->selector.getPathfindingPath(()->selector.getBestCoralStation()), () -> waitForCoralChooser.getSelected())
           )
         );
 
@@ -229,7 +233,7 @@ public class CatzAutonomous extends SubsystemBase {
             PathPlannerPath path = PathPlannerPath.fromPathFile(name);
 
             if(action.equalsIgnoreCase("CS")){
-              command = CatzStateCommands.driveToCoralStation(container, path);
+              command = CatzStateCommands.driveToCoralStation(container, path, () -> waitForCoralChooser.getSelected());
             } else if(action.contains("ReefL")){
               command = CatzStateCommands.driveToScore(container, path, Integer.parseInt(action.substring("ReefL".length())));
             }

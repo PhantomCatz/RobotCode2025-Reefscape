@@ -186,6 +186,8 @@ public class VisionIOLimelight implements VisionIO {
       tagIds.add((int) tagIDSubscriber.get());
     }
 
+
+
     int i = 0;
     inputs.tagIds = new int[tagIds.size()];
     for (int id : tagIds) {

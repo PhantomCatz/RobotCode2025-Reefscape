@@ -35,6 +35,7 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.ExtensionMethod;
 import org.littletonrobotics.junction.AutoLogOutput;
+import org.littletonrobotics.junction.Logger;
 
 
 @ExtensionMethod({GeomUtil.class})
@@ -231,6 +232,7 @@ public class CatzRobotTracker {
     // then replaying odometry data
     scaledTransform = new Transform2d(scaledTransform.getTranslation(), new Rotation2d()); //remove rotation input
 
+    Logger.recordOutput("CamTransform"+observation.name, transform);
     //TODO hopefully the latency does not matter here?
     visionPoseShift = scaledTransform.getTranslation();
 

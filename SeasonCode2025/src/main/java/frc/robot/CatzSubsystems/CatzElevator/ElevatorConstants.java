@@ -35,7 +35,7 @@ public class ElevatorConstants {
     public static final double L2_HEIGHT   = 16.122;
     public static final double L3_HEIGHT   = 34.763;
     public static final double L4_HEIGHT   = 65.443;
-    public static final double L4_CORAL_ADJ = 70.0;
+    public static final double L4_CORAL_ADJ = 67.0;
     public static final double BOT_BOT_ALGAE = 20.6;
     public static final double BOT_TOP_ALGAE = 22.7;
     // Motor ID

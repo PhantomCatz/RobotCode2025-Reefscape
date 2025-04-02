@@ -211,8 +211,8 @@ public class RobotContainer {
     //---------------------------------------------------------------------------------------------------------------------
 
     // Scoring Level Aqua determination
-    // xboxAux.rightTrigger().onTrue(Commands.runOnce(() -> selector.pathQueueAddBack(selector.getXBoxReefPos(), superstructure.getLevel()))
-    //                                       .alongWith(Commands.runOnce(() -> led.setControllerState(ControllerLEDState.AQUA))));
+    xboxAux.rightTrigger().onTrue(Commands.runOnce(() -> selector.pathQueueAddBack(selector.getXBoxReefPos(), superstructure.getLevel()))
+                                          .alongWith(Commands.runOnce(() -> led.setControllerState(ControllerLEDState.AQUA))));
     // xboxAux.leftBumper().onTrue(Commands.runOnce(() -> selector.pathQueuePopFront())
     //                                     .alongWith(Commands.runOnce(() -> led.setControllerState(ControllerLEDState.AQUA))));
     // xboxAux.rightBumper().onTrue(Commands.runOnce(() -> selector.pathQueuePopBack())
@@ -224,7 +224,6 @@ public class RobotContainer {
     xboxAux.leftStick().and(xboxAux.rightStick()).or(isElevatorFullManual).onTrue(elevator.elevatorFullManual(() -> -xboxAux.getLeftY())); // TODO make an override button for comp
     xboxAux.leftStick().and(xboxAux.rightStick()).or(isAlgaePivotFullManual).onTrue(algaePivot.AlgaePivotFullManualCommand(()->xboxAux.getRightY()));
     isRampPivotFullManual.onTrue(rampPivot.rampPivotManual(()->xboxAux.getLeftY()));
-
 
     // Gamepiece Selection
     xboxAux.leftTrigger().onTrue(Commands.runOnce(()-> CatzSuperstructure.setChosenGamepiece(Gamepiece.CORAL)));

@@ -59,8 +59,10 @@ public class VisionConstants {
       };
 
   public static Translation2d[] LIMELIGHT_ERROR = {
-    new Translation2d(-0.0290867, 0.070948).div(1.2907317),
-    new Translation2d(0.04282, 0.0833).div(1.2907317)
+    new Translation2d(0.07647673800,0.0883352451).div(2.356170511),
+    new Translation2d(0.01013154230126, -0.04330684940).div(2.356170511)
+    // new Translation2d(-0.0290867, 0.070948).div(1.2907317),
+    // new Translation2d(0.04282, 0.0833).div(1.2907317)
   };
 
   public static final boolean USE_MEGATAG1 = false; // megatag 1 3d solve allows robot to fly

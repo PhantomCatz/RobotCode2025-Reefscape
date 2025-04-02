@@ -31,6 +31,7 @@ import frc.robot.CatzSubsystems.CatzAlgaeEffector.CatzAlgaePivot.CatzAlgaePivot;
 import frc.robot.CatzSubsystems.CatzAlgaeEffector.CatzAlgaeRemover.CatzAlgaeRemover;
 import frc.robot.CatzSubsystems.CatzClimb.CatzClimb;
 import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.Drivetrain.CatzDrivetrain;
+import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.Drivetrain.DriveConstants;
 import frc.robot.CatzSubsystems.CatzElevator.CatzElevator;
 import frc.robot.CatzSubsystems.CatzOuttake.CatzOuttake;
 import frc.robot.CatzSubsystems.CatzRampPivot.CatzRampPivot;
@@ -46,17 +47,16 @@ public class CatzStateCommands {
     //
     //------------------------------------------------------------------------------------------------------------------------------------
     public static Command driveToScore(RobotContainer robotContainer, PathPlannerPath pathToReadyPose, int level){
-        final double PREDICT_DISTANCE = 1.60; //meters
-
         CatzDrivetrain drivetrain = robotContainer.getCatzDrivetrain();
         CatzOuttake outtake = robotContainer.getCatzOuttake();
 
         return new SequentialCommandGroup(
             new TrajectoryDriveCmd(pathToReadyPose, drivetrain, true, robotContainer).deadlineFor(
-                new RepeatCommand(LXElevator(robotContainer, level).alongWith(new PrintCommand("elevavavava")).onlyIf(() -> drivetrain.getDistanceError() < PREDICT_DISTANCE && !outtake.isDesiredCoralState(true)))
+                new RepeatCommand(LXElevator(robotContainer, level).alongWith(new PrintCommand("elevavavava")).onlyIf(() -> drivetrain.getDistanceError() < DriveConstants.PREDICT_DISTANCE_SCORE))
             ),
-            new WaitUntilCommand(() -> !outtake.isDesiredCoralState(true)),
+            // new WaitUntilCommand(() -> !outtake.isDesiredCoralState(true)),
             LXCoral(robotContainer, level),
+            new WaitUntilCommand(() -> outtake.isDesiredCoralState(true)),
             stow(robotContainer)
         );
     }
@@ -83,31 +83,20 @@ public class CatzStateCommands {
         );
     }
 
-    public static Command driveToCoralStation(RobotContainer robotContainer, PathPlannerPath path){
-
+    public static Command driveToCoralStation(RobotContainer robotContainer, PathPlannerPath path, Supplier<Boolean> waitForCoralSupplier){
         CatzDrivetrain drivetrain = robotContainer.getCatzDrivetrain();
         CatzOuttake outtake = robotContainer.getCatzOuttake();
 
         return new SequentialCommandGroup(
-            intakeCoralStation(robotContainer),
-            new TrajectoryDriveCmd(path, drivetrain, false, robotContainer)
-            // Commands.waitUntil(()->outtake.isDesiredCoralState(false)).deadlineFor(
-            // )
+            new TrajectoryDriveCmd(path, drivetrain, false, robotContainer).deadlineFor(
+                new RepeatCommand(intakeCoralStation(robotContainer).onlyIf(() -> drivetrain.getDistanceError() < DriveConstants.PREDICT_DISTANCE_INTAKE))
+            )
+            // Commands.waitUntil(() -> (waitForCoralSupplier.get() ? outtake.isDesiredCoralState(false) : true))
         );
     }
 
-    public static Command driveToCoralStation(RobotContainer robotContainer, Supplier<PathPlannerPath> pathSupplier){
-        final double PREDICT_DISTANCE = 1.0; //meters
-
-        CatzDrivetrain drivetrain = robotContainer.getCatzDrivetrain();
-        CatzOuttake outtake = robotContainer.getCatzOuttake();
-
-        return new SequentialCommandGroup(
-            new TrajectoryDriveCmd(pathSupplier, drivetrain, false, robotContainer).deadlineFor(
-                new RepeatCommand(intakeCoralStation(robotContainer).onlyIf(() -> drivetrain.getDistanceError() < PREDICT_DISTANCE))
-            ),
-            Commands.waitUntil(() -> outtake.isDesiredCoralState(false))
-        );
+    public static Command driveToCoralStation(RobotContainer robotContainer, Supplier<PathPlannerPath> pathSupplier, Supplier<Boolean> waitForCoralSupplier){
+        return driveToCoralStation(robotContainer, pathSupplier.get(), waitForCoralSupplier);
     }
 
     //------------------------------------------------------------------------------------------------------------------------------------

@@ -31,7 +31,6 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.PrintCommand;
 import edu.wpi.first.wpilibj2.command.RepeatCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.FieldConstants.Reef;
@@ -586,12 +585,12 @@ public class TeleopPosSelector { //TODO split up the file. it's too big and does
       currentDrivetrainCommand.cancel();
       try{
         //TODO add a check to see if the robot is against the wall but angled so that it runs distanced scoring
-        Command prematureCommand = superstructure.getChosenGamepiece() == Gamepiece.CORAL ? CatzStateCommands.LXElevator(m_container, superstructure.getLevel()) : CatzStateCommands.XAlgae(m_container, superstructure.getLevel());
+        Command prematureCommand = CatzStateCommands.LXElevator(m_container, superstructure.getLevel());//superstructure.getChosenGamepiece() == Gamepiece.CORAL ? CatzStateCommands.LXElevator(m_container, superstructure.getLevel()) : CatzStateCommands.XAlgae(m_container, superstructure.getLevel());
         // PathPlannerPath path = getPathfindingPath(calculateReefPose(getClosestReefPos().getFirst(), true, false));
         PathPlannerPath path = getStraightLinePath(tracker.getEstimatedPose(), calculateReefPose(getClosestReefPos().getFirst(), true, false), DriveConstants.PATHFINDING_CONSTRAINTS);
 
         currentDrivetrainCommand = new TrajectoryDriveCmd(path, m_container.getCatzDrivetrain(), true, m_container)
-                                        .deadlineFor(new RepeatCommand(prematureCommand).alongWith(new PrintCommand("elevaktorktpa!")).onlyIf(() -> drivetrain.getDistanceError() < 1.5))
+                                        .deadlineFor(new RepeatCommand(prematureCommand.onlyIf(() -> drivetrain.getDistanceError() < DriveConstants.PREDICT_DISTANCE_SCORE)))
                                         .andThen(m_container.rumbleDrvAuxController(1.0, 0.2));
         currentDrivetrainCommand.schedule();
       }catch(Exception e){
@@ -610,7 +609,7 @@ public class TeleopPosSelector { //TODO split up the file. it's too big and does
   }
 
   public Command getCoralStationCommand() {
-    return CatzStateCommands.driveToCoralStation(m_container, getPathfindingPath(getBestCoralStation()));
+    return CatzStateCommands.driveToCoralStation(m_container, getPathfindingPath(getBestCoralStation()), ()->true);
   }
 
   public Command getReefScoreCommand(Pair<Pair<Integer, LeftRight>, Integer> pair) {
