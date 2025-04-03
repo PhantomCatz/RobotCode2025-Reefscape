@@ -277,6 +277,7 @@ public class TrajectoryDriveCmd extends Command {
 
     // Logging
     Logger.recordOutput("CatzRobotTracker/Desired Auto Pose", goal.pose);
+    System.out.println("trans error: " + translationError);
 
     // send to drivetrain
     m_driveTrain.drive(adjustedSpeeds);
