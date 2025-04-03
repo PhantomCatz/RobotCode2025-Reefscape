@@ -20,6 +20,8 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.CatzConstants;
+import frc.robot.RobotContainer;
+import frc.robot.CatzSubsystems.CatzSuperstructure;
 import frc.robot.Utilities.LoggedTunableNumber;
 import lombok.RequiredArgsConstructor;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -29,6 +31,9 @@ import org.littletonrobotics.junction.Logger;
 
 
 public class CatzElevator extends SubsystemBase {
+
+  private CatzSuperstructure superstructure;
+
   private final ElevatorIO io;
   private final ElevatorIOInputsAutoLogged inputs = new ElevatorIOInputsAutoLogged();
 
@@ -40,6 +45,7 @@ public class CatzElevator extends SubsystemBase {
   private ElevatorPosition targetPosition = ElevatorPosition.PosStow;
   private ElevatorPosition prevTargetPositon = ElevatorPosition.PosNull;
   private ElevatorPosition previousLoggedPosition = ElevatorPosition.PosNull;
+  private Supplier<Integer> predictRaise = null;
 
   private boolean isElevatorInPos = false;
 
@@ -65,7 +71,9 @@ public class CatzElevator extends SubsystemBase {
     }
   }
 
-  public CatzElevator() {
+  public CatzElevator(RobotContainer container) {
+    this.superstructure = container.getSuperstructure();
+
     if(isElevatorDisabled) {
       io = new ElevatorIONull();
       System.out.println("Elevator Unconfigured");
@@ -153,7 +161,16 @@ public class CatzElevator extends SubsystemBase {
     }
 
     //---------------------------------------------------------------------------------------------------------------------------
+    //    Predict raise
+    //---------------------------------------------------------------------------------------------------------------------------
+    if(predictRaise != null){
+      Integer level = predictRaise.get();
+      if(level != null){
+        targetPosition = ElevatorPosition.valueOf("PosL" + level);
+      }
+    }
 
+    //---------------------------------------------------------------------------------------------------------------------------
     //    Control Mode setting
     //---------------------------------------------------------------------------------------------------------------------------
     if(DriverStation.isDisabled()) {
@@ -312,5 +329,13 @@ public class CatzElevator extends SubsystemBase {
   public Command elevatorFullManual(Supplier<Double> manuaSupplier) {
 
     return run(() -> elevatorFullManual(manuaSupplier.get()));
+  }
+
+  public Command startPredictingRaise(Supplier<Integer> shouldRaise){
+    return new InstantCommand(() -> predictRaise = shouldRaise);
+  }
+
+  public Command stopPredictingRaise(){
+    return new InstantCommand(() -> predictRaise = null);
   }
 }

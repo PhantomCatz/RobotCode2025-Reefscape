@@ -70,7 +70,7 @@ public class RobotContainer {
   private CatzVision vision = new CatzVision(new VisionIOLimelight("limelight-gyoza"),
                                              new VisionIOLimelight("limelight-tempura"));
   private CatzOuttake outtake;
-  private CatzElevator elevator = new CatzElevator();
+  private CatzElevator elevator = new CatzElevator(this);
   private CatzClimb climb = new CatzClimb();
   private CatzAlgaeRemover algaeRemover = new CatzAlgaeRemover();
   private CatzAlgaePivot algaePivot = new CatzAlgaePivot();

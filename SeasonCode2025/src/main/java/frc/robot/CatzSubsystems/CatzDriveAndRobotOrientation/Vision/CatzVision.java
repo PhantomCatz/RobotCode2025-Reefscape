@@ -171,6 +171,7 @@ public class CatzVision extends SubsystemBase {
         double stdDevFactor = Math.pow(observation.averageTagDistance(), 2.0) / observation.tagCount(); //TODO tune
       double linearStdDev = LINEAR_STD_DEV_BASELINE * stdDevFactor;
         double angularStdDev = ANGULAR_STD_DEV_BASELINE * stdDevFactor;
+
         if (observation.type() == PoseObservationType.MEGATAG_2) {
           linearStdDev *= LINEAR_STD_DEV_MEGATAG2_SCALE_FACTOR;
           angularStdDev *= ANGULAR_STD_DEV_MEGATAG2_SCALE_FACTOR;
@@ -179,6 +180,7 @@ public class CatzVision extends SubsystemBase {
           linearStdDev *= cameraStdDevFactors[cameraIndex];
           angularStdDev *= cameraStdDevFactors[cameraIndex];
         }
+
 
         // Send vision observation
         CatzRobotTracker.getInstance()

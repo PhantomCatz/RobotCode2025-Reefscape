@@ -24,6 +24,7 @@ import com.pathplanner.lib.path.PathConstraints;
 import com.pathplanner.lib.path.PathPlannerPath;
 import com.pathplanner.lib.path.Waypoint;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.Pair;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -31,7 +32,6 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.RepeatCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.FieldConstants.Reef;
 import frc.robot.Utilities.AllianceFlipUtil;
@@ -43,6 +43,7 @@ import frc.robot.CatzSubsystems.CatzSuperstructure;
 import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.CatzRobotTracker;
 import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.Drivetrain.CatzDrivetrain;
 import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.Drivetrain.DriveConstants;
+import frc.robot.CatzSubsystems.CatzElevator.CatzElevator;
 import frc.robot.CatzSubsystems.CatzLEDs.CatzLED;
 import frc.robot.CatzSubsystems.CatzLEDs.CatzLED.QueueLEDState;
 import frc.robot.CatzSubsystems.CatzOuttake.CatzOuttake;
@@ -62,6 +63,7 @@ public class TeleopPosSelector { //TODO split up the file. it's too big and does
   private CatzSuperstructure superstructure;
   private CatzDrivetrain drivetrain;
   private CatzOuttake outtake;
+  private CatzElevator elevator;
   private CatzRobotTracker tracker = CatzRobotTracker.getInstance();
 
   private Command currentDrivetrainCommand = new InstantCommand();
@@ -94,6 +96,7 @@ public class TeleopPosSelector { //TODO split up the file. it's too big and does
     this.xboxAux = aux;
     this.m_container = container;
     this.outtake = container.getCatzOuttake();
+    this.elevator = container.getCatzElevator();
     this.currentDrivetrainCommand.addRequirements(container.getCatzDrivetrain());
     this.currentDrivetrainCommand.addRequirements(container.getCatzElevator());
     this.currentDrivetrainCommand.addRequirements(container.getCatzOuttake());
@@ -577,21 +580,45 @@ public class TeleopPosSelector { //TODO split up the file. it's too big and does
     }
   }
 
+  // public Command runToNearestBranch() {
+
+  //   return new InstantCommand(() -> {
+  //     isNetAiming = false;
+  //     currentPathfindingPair = getClosestReefPos().getFirst();
+  //     currentDrivetrainCommand.cancel();
+  //     try{
+  //       //TODO add a check to see if the robot is against the wall but angled so that it runs distanced scoring
+  //       Command prematureCommand = CatzStateCommands.LXElevator(m_container, superstructure.getLevel());//superstructure.getChosenGamepiece() == Gamepiece.CORAL ? CatzStateCommands.LXElevator(m_container, superstructure.getLevel()) : CatzStateCommands.XAlgae(m_container, superstructure.getLevel());
+  //       // PathPlannerPath path = getPathfindingPath(calculateReefPose(getClosestReefPos().getFirst(), true, false));
+  //       PathPlannerPath path = getStraightLinePath(tracker.getEstimatedPose(), calculateReefPose(getClosestReefPos().getFirst(), true, false), DriveConstants.PATHFINDING_CONSTRAINTS);
+
+  //       currentDrivetrainCommand = new TrajectoryDriveCmd(path, m_container.getCatzDrivetrain(), true, m_container, true)
+  //                                       .deadlineFor(new RepeatCommand(prematureCommand.onlyIf(() -> drivetrain.getDistanceError() < DriveConstants.PREDICT_DISTANCE_SCORE)))
+  //                                       .andThen(m_container.rumbleDrvAuxController(1.0, 0.2));
+  //       currentDrivetrainCommand.schedule();
+  //     }catch(Exception e){
+  //       e.printStackTrace();
+  //     }
+  //   });
+  // }
+
   public Command runToNearestBranch() {
 
     return new InstantCommand(() -> {
       isNetAiming = false;
       currentPathfindingPair = getClosestReefPos().getFirst();
       currentDrivetrainCommand.cancel();
+
       try{
-        //TODO add a check to see if the robot is against the wall but angled so that it runs distanced scoring
-        Command prematureCommand = CatzStateCommands.LXElevator(m_container, superstructure.getLevel());//superstructure.getChosenGamepiece() == Gamepiece.CORAL ? CatzStateCommands.LXElevator(m_container, superstructure.getLevel()) : CatzStateCommands.XAlgae(m_container, superstructure.getLevel());
         // PathPlannerPath path = getPathfindingPath(calculateReefPose(getClosestReefPos().getFirst(), true, false));
         PathPlannerPath path = getStraightLinePath(tracker.getEstimatedPose(), calculateReefPose(getClosestReefPos().getFirst(), true, false), DriveConstants.PATHFINDING_CONSTRAINTS);
 
-        currentDrivetrainCommand = new TrajectoryDriveCmd(path, m_container.getCatzDrivetrain(), true, m_container, true)
-                                        .deadlineFor(new RepeatCommand(prematureCommand.onlyIf(() -> drivetrain.getDistanceError() < DriveConstants.PREDICT_DISTANCE_SCORE)))
-                                        .andThen(m_container.rumbleDrvAuxController(1.0, 0.2));
+        currentDrivetrainCommand =
+          (new TrajectoryDriveCmd(path, drivetrain, true, m_container, true)
+          .alongWith(elevator.startPredictingRaise(() -> drivetrain.getDistanceError() < DriveConstants.PREDICT_DISTANCE_SCORE ? superstructure.getLevel() : null)))
+          .andThen(m_container.rumbleDrvAuxController(1.0, 0.2))
+          .andThen(elevator.stopPredictingRaise());
+
         currentDrivetrainCommand.schedule();
       }catch(Exception e){
         e.printStackTrace();
@@ -647,12 +674,19 @@ public class TeleopPosSelector { //TODO split up the file. it's too big and does
     Translation2d goalPos = goal.getTranslation();
     Translation2d direction = goalPos.minus(currentPose).div(2.0);
 
+    PathConstraints scaledConstraint = new PathConstraints(
+      constraints.maxVelocityMPS(),
+      constraints.maxAccelerationMPSSq() * MathUtil.clamp(goalPos.getDistance(currentPose) * DriveConstants.ACCEL_PER_METER, DriveConstants.MIN_ACCELERATION, DriveConstants.MAX_ACCELERATION),
+      constraints.maxAngularVelocityRadPerSec(),
+      constraints.maxAngularAccelerationRadPerSecSq()
+    );
+
     PathPlannerPath path = new PathPlannerPath(
         Arrays.asList(new Waypoint[] {
             new Waypoint(null, currentPose, currentPose.plus(direction)),
             new Waypoint(goalPos.minus(direction), goalPos, null)
         }),
-        constraints,
+        scaledConstraint,
         null,
         new GoalEndState(0, goal.getRotation()));
 

@@ -25,6 +25,7 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
+import frc.robot.CatzConstants;
 import frc.robot.FieldConstants;
 import frc.robot.Robot;
 import frc.robot.RobotContainer;
@@ -52,7 +53,7 @@ import org.littletonrobotics.junction.Logger;
 public class TrajectoryDriveCmd extends Command {
   // Trajectory constants
   public static final double ALLOWABLE_POSE_ERROR = 0.05;
-  public static final double ALLOWABLE_AUTOAIM_ERROR = 0.025;
+  public static final double ALLOWABLE_AUTOAIM_ERROR = 0.02;
   public static final double ALLOWABLE_ROTATION_ERROR = 3.0;
   public static final double ALLOWABLE_VEL_ERROR = 0.80; // m/s
   public static final double ALLOWABLE_OMEGA_ERROR = 10.0;
@@ -60,6 +61,8 @@ public class TrajectoryDriveCmd extends Command {
   private static final double CONVERGE_DISTANCE = 0.04;
   private static final double CONVERGE_ANGLE = 1.0;
   private static final double FACE_REEF_DIST = 2.0;
+  private static final double ACCEL_FF = 0.5;
+  private static final double ACCEL_FF_THRESHOLD = 1;
   private final double ALLOWABLE_VISION_ADJUST = 5e-3; //TODO tune
 
   // Subsystems
@@ -185,13 +188,12 @@ public class TrajectoryDriveCmd extends Command {
         }
 
         if(pathPoints.size() == 2){
-
           Pose2d endPose = new Pose2d(pathPoints.get(1).position, usePath.getGoalEndState().rotation());
           isTwoPathPoints = new PathPlannerTrajectoryState();
           isTwoPathPoints.pose = endPose;
           endState = isTwoPathPoints;
         } else {
-          endState = trajectory.sample(trajectory.getTotalTimeSeconds());
+          endState = trajectory.getEndState();
         }
         endRotation = endState.pose.getRotation();
 
@@ -252,13 +254,20 @@ public class TrajectoryDriveCmd extends Command {
     // target velocity is used as a ff
     // -------------------------------------------------------------------------------------
     PathPlannerTrajectoryState goal = trajectory.sample(Math.min(currentTime, trajectory.getTotalTimeSeconds()));
+    PathPlannerTrajectoryState goalPlus = trajectory.sample(Math.min(currentTime + CatzConstants.LOOP_TIME, trajectory.getTotalTimeSeconds()));
     if(isTwoPathPoints != null){
       goal = isTwoPathPoints;
     }
 
+    double acceleration = (goalPlus.linearVelocity - goal.linearVelocity) / CatzConstants.LOOP_TIME;
+    if(acceleration < ACCEL_FF_THRESHOLD){
+      acceleration = 0.0;
+    }
+    System.out.println("acceleration " + acceleration);
+
     Trajectory.State state = new Trajectory.State(
         currentTime,
-        goal.linearVelocity,
+        goal.linearVelocity + ACCEL_FF * acceleration,
         0.0,
         new Pose2d(goal.pose.getTranslation(), goal.heading),
         0.0
@@ -301,6 +310,7 @@ public class TrajectoryDriveCmd extends Command {
 
   @Override
   public void end(boolean interrupted) {
+    Logger.recordOutput("CatzRobotTracker/Desired Auto Pose", new Pose2d());
     System.out.println("trajectory done");
 
     timer.stop(); // Stop timer

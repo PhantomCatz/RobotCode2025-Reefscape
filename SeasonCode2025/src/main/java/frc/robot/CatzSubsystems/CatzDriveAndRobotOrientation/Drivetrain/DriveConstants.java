@@ -11,6 +11,8 @@
 //------------------------------------------------------------------------------------
 package frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.Drivetrain;
 
+import static frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.Drivetrain.DriveConstants.DRIVE_CONFIG;
+
 import com.pathplanner.lib.config.ModuleConfig;
 import com.pathplanner.lib.config.RobotConfig;
 import com.pathplanner.lib.path.PathConstraints;
@@ -49,38 +51,42 @@ public class DriveConstants {
 
   public static final int GYRO_ID = 10;
 
-
-  public static final double PREDICT_DISTANCE_SCORE = 1.6;
+  public static final double PREDICT_DISTANCE_SCORE = 1.0;
   public static final double PREDICT_DISTANCE_INTAKE = 1.0;
 
   // ---------------------------------------------------------------------------------------------------------------
   // Drive Subsytem Config info
   // ---------------------------------------------------------------------------------------------------------------
 
+
   public static final DriveConfig DRIVE_CONFIG =
-    DriveConfig.builder()
-        .wheelRadius(Units.inchesToMeters(1.948))
-        .robotLengthX(Units.inchesToMeters(24.2))
-        .robotWidthY(Units.inchesToMeters(24.2))
-        .bumperWidthX(Units.inchesToMeters(32))
-        .bumperWidthY(Units.inchesToMeters(32))
-        .maxLinearVelocity(4.3)
-        .maxLinearAcceleration(120)
+  DriveConfig.builder()
+  .wheelRadius(Units.inchesToMeters(1.948))
+  .robotLengthX(Units.inchesToMeters(24.2))
+  .robotWidthY(Units.inchesToMeters(24.2))
+  .bumperWidthX(Units.inchesToMeters(32))
+  .bumperWidthY(Units.inchesToMeters(32))
+  .maxLinearVelocity(4.3)
+  .maxLinearAcceleration(120)
         .maxAngularVelocity(Units.degreesToRadians(540))
         .maxAngularAcceleration(Units.degreesToRadians(720))
         .build();
 
   public static final DriveConfig TRAJECTORY_CONFIG =
-    DriveConfig.builder()
-      .maxLinearVelocity(4.3)
-      .maxLinearAcceleration(4.3)
-      .maxAngularVelocity(Units.degreesToRadians(540))
-      .maxAngularAcceleration(Units.degreesToRadians(720))
-      .build();
+  DriveConfig.builder()
+  .maxLinearVelocity(4.3)
+  .maxLinearAcceleration(4.3)
+  .maxAngularVelocity(Units.degreesToRadians(540))
+  .maxAngularAcceleration(Units.degreesToRadians(720))
+  .build();
+
+  public static final double ACCEL_PER_METER = 2;
+  public static final double MIN_ACCELERATION = 0.75;
+  public static final double MAX_ACCELERATION = DRIVE_CONFIG.maxLinearAcceleration();
 
   public static final ModuleGainsAndRatios MODULE_GAINS_AND_RATIOS =
-      switch (CatzConstants.getRobotType()) {
-        case SN1, SN2 ->
+  switch (CatzConstants.getRobotType()) {
+    case SN1, SN2 ->
             new ModuleGainsAndRatios(
                 5.0,
                 0.45,
@@ -180,13 +186,6 @@ public class DriveConstants {
     TRAJECTORY_CONFIG.maxAngularAcceleration
   );
 
-  public static final PathConstraints LEFT_RIGHT_CONSTRAINTS = new PathConstraints(
-    2,
-    1.5,
-    TRAJECTORY_CONFIG.maxAngularVelocity,
-    TRAJECTORY_CONFIG.maxAngularAcceleration
-  );
-
   public static final PathConstraints LEFT_RIGHT_NET_CONSTRAINTS = new PathConstraints(
     1,
     4,
@@ -213,8 +212,8 @@ public class DriveConstants {
   // -----------------------------------------------------------------------------------------------------------------------------
   public static HolonomicDriveController getNewHolController() {
     return new HolonomicDriveController(
-      new PIDController(10, 0.0, 0.3),
-      new PIDController(10, 0.0, 0.3),
+      new PIDController(3.0, 0.0, 0.3),
+      new PIDController(3.0, 0.0, 0.3),
       new ProfiledPIDController(
         5.5,
         0.0,
