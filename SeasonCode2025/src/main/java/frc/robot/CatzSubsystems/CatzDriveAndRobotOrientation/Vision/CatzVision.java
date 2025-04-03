@@ -128,14 +128,14 @@ public class CatzVision extends SubsystemBase {
 
         int tagId = inputs[cameraIndex].tagIds[0];
         Pose3d observationPose = observation.pose();
-        try{
-          Pose2d apriltagPose = FieldConstants.APRILTAG_LAYOUT.getTagPose(tagId).get().toPose2d();
-          Translation2d limelightError = VisionConstants.LIMELIGHT_ERROR[cameraIndex].times(apriltagPose.getTranslation().minus(robotPose.getTranslation()).getNorm()).rotateBy(apriltagPose.getRotation());
-          observationPose = observationPose.plus(new Transform3d(limelightError.getX(), limelightError.getY(), 0.0, new Rotation3d()));
-        }catch (Exception e){
-          System.out.println("Apriltag not found!");
-          e.printStackTrace();
-        }
+        // try{
+        //   // Pose2d apriltagPose = FieldConstants.APRILTAG_LAYOUT.getTagPose(tagId).get().toPose2d();
+        //   // Translation2d limelightError = VisionConstants.LIMELIGHT_ERROR[cameraIndex].times(apriltagPose.getTranslation().minus(robotPose.getTranslation()).getNorm()).rotateBy(apriltagPose.getRotation());
+        //   // observationPose = observationPose.plus(new Transform3d(limelightError.getX(), limelightError.getY(), 0.0, new Rotation3d()));
+        // }catch (Exception e){
+        //   System.out.println("Apriltag not found!");
+        //   e.printStackTrace();
+        // }
 
 
         boolean rejectPose =

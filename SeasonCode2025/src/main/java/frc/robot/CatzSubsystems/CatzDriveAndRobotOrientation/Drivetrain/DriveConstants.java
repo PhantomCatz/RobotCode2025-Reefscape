@@ -50,7 +50,7 @@ public class DriveConstants {
   public static final int GYRO_ID = 10;
 
 
-  public static final double PREDICT_DISTANCE_SCORE = 1.0;
+  public static final double PREDICT_DISTANCE_SCORE = 1.6;
   public static final double PREDICT_DISTANCE_INTAKE = 1.0;
 
   // ---------------------------------------------------------------------------------------------------------------
@@ -213,8 +213,8 @@ public class DriveConstants {
   // -----------------------------------------------------------------------------------------------------------------------------
   public static HolonomicDriveController getNewHolController() {
     return new HolonomicDriveController(
-      new PIDController(10, 0.0, 0.3),
-      new PIDController(10, 0.0, 0.3),
+      new PIDController(4.5, 0.0, 0.3),
+      new PIDController(4.5, 0.0, 0.3),
       new ProfiledPIDController(
         5.5,
         0.0,
