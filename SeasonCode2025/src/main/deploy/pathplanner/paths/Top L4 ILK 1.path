@@ -4,15 +4,15 @@
     {
       "anchor": {
         "x": 7.1566598360655735,
-        "y": 2.978
+        "y": 5.073924180327869
       },
       "prevControl": null,
       "nextControl": {
         "x": 6.08591673784317,
-        "y": 3.0142058238845917
+        "y": 5.11013000421246
       },
       "isLocked": false,
-      "linkedName": "Start3"
+      "linkedName": "startTop"
     },
     {
       "anchor": {
@@ -48,7 +48,7 @@
   "folder": "Top L4 ILK Paths",
   "idealStartingState": {
     "velocity": 0,
-    "rotation": 179.52266860968942
+    "rotation": 180.0
   },
   "useDefaultConstraints": true
 }

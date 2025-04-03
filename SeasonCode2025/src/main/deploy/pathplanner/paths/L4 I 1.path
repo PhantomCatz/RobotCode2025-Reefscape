@@ -4,15 +4,15 @@
     {
       "anchor": {
         "x": 7.1566598360655735,
-        "y": 2.978
+        "y": 5.073924180327869
       },
       "prevControl": null,
       "nextControl": {
         "x": 5.637561210278691,
-        "y": 3.255724963292366
+        "y": 5.351649143620236
       },
       "isLocked": false,
-      "linkedName": "Start3"
+      "linkedName": "startTop"
     },
     {
       "anchor": {
@@ -20,8 +20,8 @@
         "y": 5.073924180327869
       },
       "prevControl": {
-        "x": 5.759234416698437,
-        "y": 5.8389274640797755
+        "x": 5.885963114754098,
+        "y": 5.325665983606557
       },
       "nextControl": null,
       "isLocked": false,
@@ -48,7 +48,7 @@
   "folder": "L4 I Paths",
   "idealStartingState": {
     "velocity": 0,
-    "rotation": 179.52266860968942
+    "rotation": 180.0
   },
   "useDefaultConstraints": true
 }

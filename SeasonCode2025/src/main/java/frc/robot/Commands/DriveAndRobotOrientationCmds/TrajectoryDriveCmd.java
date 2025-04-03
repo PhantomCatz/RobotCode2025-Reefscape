@@ -164,6 +164,7 @@ public class TrajectoryDriveCmd extends Command {
 
       boolean shouldChangeStartRot = tracker.getEstimatedPose().getTranslation().minus(pathPoints.get(pathPoints.size()-1).position).getNorm() > 0.50;
       Rotation2d startRot = tracker.getEstimatedPose().getRotation();
+
       if(shouldChangeStartRot){
         //if you are trying to auto align and the change in rotation is kind of big, then you want to set your starting rotation to the starting heading of path because for some mysterious reason
         //trajectory speed gets very slow when it needs to account for rotation. the only case where this wouldn't be auto align is if you are going to coral station
@@ -171,6 +172,7 @@ public class TrajectoryDriveCmd extends Command {
         //i really dont like this fix either but i cant find the source of the issue so ¯\_(ツ)_/¯
         startRot = autoalign ? pathPoints.get(1).position.minus(pathPoints.get(0).position).getAngle() : pathPoints.get(1).position.minus(pathPoints.get(0).position).getAngle().plus(Rotation2d.k180deg);
       }
+
       try {
         // Construct trajectory
         this.trajectory = usePath.generateTrajectory(currentSpeeds, startRot, DriveConstants.TRAJ_ROBOT_CONFIG);
@@ -185,6 +187,7 @@ public class TrajectoryDriveCmd extends Command {
           //   DriveConstants.TRAJ_ROBOT_CONFIG
           // );
         }
+
         if(trajectory == null) {
           System.out.println("bugged!!!!!!!");
           isBugged = true;
@@ -205,7 +208,7 @@ public class TrajectoryDriveCmd extends Command {
       hocontroller = DriveConstants.getNewHolController();
 
       if(isTelop){
-        pathTimeOut = 999999;
+        pathTimeOut = 999999.0;
       }else{
         pathTimeOut = trajectory.getTotalTimeSeconds() + TIMEOUT_EXTRA;
       }

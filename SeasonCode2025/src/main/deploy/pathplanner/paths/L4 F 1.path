@@ -48,7 +48,7 @@
   "folder": "L4 F Paths",
   "idealStartingState": {
     "velocity": 0,
-    "rotation": 179.52266860968942
+    "rotation": 180.0
   },
   "useDefaultConstraints": true
 }

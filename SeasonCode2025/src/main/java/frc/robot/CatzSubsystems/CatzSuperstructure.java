@@ -20,6 +20,8 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import frc.robot.RobotContainer;
+import frc.robot.CatzSubsystems.CatzLEDs.CatzLED;
+import frc.robot.CatzSubsystems.CatzLEDs.CatzLED.ControllerLEDState;
 import frc.robot.Utilities.VirtualSubsystem;
 import lombok.Getter;
 import lombok.Setter;
@@ -127,6 +129,7 @@ public class CatzSuperstructure extends VirtualSubsystem {
 
     public void setClimbOverride(BooleanSupplier isClimbEnabled) {
         CatzSuperstructure.isClimbEnabled = isClimbEnabled.getAsBoolean();
+        CatzLED.getInstance().setControllerState(ControllerLEDState.CLIMB);
         System.out.println("CLimb Enabled" + isClimbEnabled);
     }
 
@@ -271,7 +274,7 @@ public class CatzSuperstructure extends VirtualSubsystem {
         }
         previousAction = robotActionCommand;
 
-        Logger.recordOutput("CurrentRobotState/CurrentRobotState", currentRobotState);
+        Logger.recordOutput("CurrentRobotState/CurrentRobotState", currentRobotState.toString());
 
     }
 

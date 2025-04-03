@@ -96,7 +96,7 @@ public class CatzClimb extends SubsystemBase {
     } else {
       if(isManual || targetPosition == ClimbPosition.FULL_MANUAL) {
         io.setPower(manualPow);
-        System.out.println("full");
+        //System.out.println("full");
       } else if(targetPosition == ClimbPosition.MANUAL) {
         io.setPosition(position);
         // System.out.println("semi");

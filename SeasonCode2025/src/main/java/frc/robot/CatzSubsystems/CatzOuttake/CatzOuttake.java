@@ -139,7 +139,7 @@ public class CatzOuttake extends SubsystemBase {
         break;
     }
 
-    Logger.recordOutput("Outtake/State", currentState);
+    Logger.recordOutput("Outtake/State", currentState.toString());
 
     previousState = currentState;
 

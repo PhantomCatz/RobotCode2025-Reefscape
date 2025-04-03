@@ -109,20 +109,12 @@ public class CatzSwerveModule {
   } // -End of CatzSwerveModule Periodic
 
   public void debugLogsSwerve() {
-    Logger.recordOutput(
-        "Module " + m_moduleName + "/drive recorded fps",
-        Units.metersToFeet(Conversions.RPSToMPS(inputs.driveVelocityRPS)));
-    Logger.recordOutput(
-        "Module " + m_moduleName + "/drive target fps",
-        Units.metersToFeet(m_swerveModuleState.speedMetersPerSecond));
-    Logger.recordOutput(
-        "Module " + m_moduleName + "/currentmodule state", m_swerveModuleState.angle.getRadians());
-    Logger.recordOutput(
-        "Module " + m_moduleName + "/angle error deg",
-        Math.toDegrees(m_swerveModuleState.angle.getRadians() - getAbsEncRadians()));
+    Logger.recordOutput("Module " + m_moduleName + "/drive recorded fps", Units.metersToFeet(Conversions.RPSToMPS(inputs.driveVelocityRPS)));
+    Logger.recordOutput("Module " + m_moduleName + "/drive target fps", Units.metersToFeet(m_swerveModuleState.speedMetersPerSecond));
+    Logger.recordOutput("Module " + m_moduleName + "/currentmodule state", m_swerveModuleState.angle.getRadians());
+    Logger.recordOutput("Module " + m_moduleName + "/angle error deg", Math.toDegrees(m_swerveModuleState.angle.getRadians() - getAbsEncRadians()));
     Logger.recordOutput("Module " + m_moduleName + "/currentmoduleangle rad", getAbsEncRadians());
-    Logger.recordOutput(
-        "Module " + m_moduleName + "/current absolute enc", inputs.rawAbsEncValueRotation);
+    Logger.recordOutput("Module " + m_moduleName + "/current absolute enc", inputs.rawAbsEncValueRotation);
     // Logger.recordOutput("Module " + m_moduleName + "/targetmoduleangle rad",
     // m_swerveModuleState.angle.getRadians());
 
