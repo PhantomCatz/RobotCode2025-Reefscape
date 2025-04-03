@@ -28,6 +28,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.FieldConstants;
 import frc.robot.Robot;
 import frc.robot.RobotContainer;
+import frc.robot.CatzSubsystems.CatzSuperstructure.RobotAction;
 import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.CatzRobotTracker;
 import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.Drivetrain.CatzDrivetrain;
 import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.Drivetrain.DriveConstants;
@@ -86,26 +87,29 @@ public class TrajectoryDriveCmd extends Command {
 
   private boolean isBugged = false;
   private final boolean isTelop;
+  private final int level;
   // ---------------------------------------------------------------------------------------------
   //
   // Trajectory Drive Command Constructor
   //
   // ---------------------------------------------------------------------------------------------
-  public TrajectoryDriveCmd(PathPlannerPath newPath, CatzDrivetrain drivetrain, boolean autoalign, RobotContainer container, boolean isTeleop) {
+  public TrajectoryDriveCmd(PathPlannerPath newPath, CatzDrivetrain drivetrain, boolean autoalign, RobotContainer container, boolean isTeleop, int level) {
     this.path = newPath;
     this.m_driveTrain = drivetrain;
     this.autoalign = autoalign;
     this.container = container;
     this.isTelop = isTeleop;
+    this.level = level;
     addRequirements(m_driveTrain);
   }
 
-  public TrajectoryDriveCmd(Supplier<PathPlannerPath> newPathSupplier, CatzDrivetrain drivetrain, boolean autoalign, RobotContainer container, boolean isTeleop) {
+  public TrajectoryDriveCmd(Supplier<PathPlannerPath> newPathSupplier, CatzDrivetrain drivetrain, boolean autoalign, RobotContainer container, boolean isTeleop, int level) {
     this.pathSupplier = newPathSupplier;
     this.m_driveTrain = drivetrain;
     this.autoalign = autoalign;
     this.container = container;
     this.isTelop = isTeleop;
+    this.level = level;
     addRequirements(m_driveTrain);
   }
 
@@ -123,8 +127,11 @@ public class TrajectoryDriveCmd extends Command {
     // System.out.println(tag + (curTime-prevTime));
     prevTime = curTime;
   }
+  private boolean actionAlreadyTaken = false;
+
   @Override
   public void initialize() {
+    actionAlreadyTaken = false;
     prevTime = Timer.getFPGATimestamp();
     try{
       // Flip path if necessary
@@ -278,10 +285,13 @@ public class TrajectoryDriveCmd extends Command {
     // Logging
     Logger.recordOutput("CatzRobotTracker/Desired Auto Pose", goal.pose);
 
+    if(autoalign && translationError < DriveConstants.PREDICT_DISTANCE_SCORE && !actionAlreadyTaken && level != 0){
+      actionAlreadyTaken = true;
+      container.getSuperstructure().setCurrentRobotAction(RobotAction.AIMING, level);
+    }
+
     // send to drivetrain
     m_driveTrain.drive(adjustedSpeeds);
-
-    m_driveTrain.setDistanceError(translationError);
 
     CatzRobotTracker.getInstance().setCoralStationTrajectoryRemaining(trajectory.getTotalTimeSeconds()-currentTime);
 

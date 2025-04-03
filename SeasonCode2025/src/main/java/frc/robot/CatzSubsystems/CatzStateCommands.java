@@ -46,15 +46,27 @@ public class CatzStateCommands {
     //      Autonomous State COmmands
     //
     //------------------------------------------------------------------------------------------------------------------------------------
+    // public static Command driveToScore(RobotContainer robotContainer, PathPlannerPath pathToReadyPose, int level){
+    //     CatzDrivetrain drivetrain = robotContainer.getCatzDrivetrain();
+    //     CatzOuttake outtake = robotContainer.getCatzOuttake();
+
+    //     return new SequentialCommandGroup(
+    //         new TrajectoryDriveCmd(pathToReadyPose, drivetrain, true, robotContainer, false).deadlineFor(
+    //             new RepeatCommand(LXElevator(robotContainer, level).alongWith(new PrintCommand("elevavavava")).onlyIf(() -> drivetrain.getDistanceError() < DriveConstants.PREDICT_DISTANCE_SCORE))
+    //         ),
+    //         // new WaitUntilCommand(() -> !outtake.isDesiredCoralState(true)),
+    //         LXCoral(robotContainer, level),
+    //         new WaitUntilCommand(() -> outtake.isDesiredCoralState(true)),
+    //         stow(robotContainer)
+    //     );
+    // }
+
     public static Command driveToScore(RobotContainer robotContainer, PathPlannerPath pathToReadyPose, int level){
         CatzDrivetrain drivetrain = robotContainer.getCatzDrivetrain();
         CatzOuttake outtake = robotContainer.getCatzOuttake();
 
         return new SequentialCommandGroup(
-            new TrajectoryDriveCmd(pathToReadyPose, drivetrain, true, robotContainer, false).deadlineFor(
-                new RepeatCommand(LXElevator(robotContainer, level).alongWith(new PrintCommand("elevavavava")).onlyIf(() -> drivetrain.getDistanceError() < DriveConstants.PREDICT_DISTANCE_SCORE))
-            ),
-            // new WaitUntilCommand(() -> !outtake.isDesiredCoralState(true)),
+            new TrajectoryDriveCmd(pathToReadyPose, drivetrain, true, robotContainer, false, level),
             LXCoral(robotContainer, level),
             new WaitUntilCommand(() -> outtake.isDesiredCoralState(true)),
             stow(robotContainer)
@@ -66,7 +78,7 @@ public class CatzStateCommands {
         CatzDrivetrain drivetrain = robotContainer.getCatzDrivetrain();
 
         return new SequentialCommandGroup(
-            new TrajectoryDriveCmd(pathToReadyPoseSupplier, drivetrain, false, robotContainer, false),
+            new TrajectoryDriveCmd(pathToReadyPoseSupplier, drivetrain, false, robotContainer, false, level),
             LXElevator(robotContainer, level),
             moveScore(robotContainer, level),
             stow(robotContainer)
@@ -78,7 +90,7 @@ public class CatzStateCommands {
         TeleopPosSelector selector = robotContainer.getSelector();
 
         return new SequentialCommandGroup(
-            new TrajectoryDriveCmd(()->selector.getMoveScorePath(), drivetrain, true, robotContainer, false),
+            new TrajectoryDriveCmd(()->selector.getMoveScorePath(), drivetrain, true, robotContainer, false, level),
             LXCoral(robotContainer, level)
         );
     }
@@ -88,7 +100,7 @@ public class CatzStateCommands {
         CatzOuttake outtake = robotContainer.getCatzOuttake();
 
         return new SequentialCommandGroup(
-            new TrajectoryDriveCmd(path, drivetrain, false, robotContainer, false).deadlineFor(
+            new TrajectoryDriveCmd(path, drivetrain, false, robotContainer, false, 0).deadlineFor(
                 new RepeatCommand(intakeCoralStation(robotContainer).onlyIf(() -> drivetrain.getDistanceError() < DriveConstants.PREDICT_DISTANCE_INTAKE))
             )
             // Commands.waitUntil(() -> (waitForCoralSupplier.get() ? outtake.isDesiredCoralState(false) : true))

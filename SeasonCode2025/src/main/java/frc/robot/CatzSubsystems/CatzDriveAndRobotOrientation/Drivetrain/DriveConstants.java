@@ -50,7 +50,7 @@ public class DriveConstants {
   public static final int GYRO_ID = 10;
 
 
-  public static final double PREDICT_DISTANCE_SCORE = 1.6;
+  public static final double PREDICT_DISTANCE_SCORE = 1.0;
   public static final double PREDICT_DISTANCE_INTAKE = 1.0;
 
   // ---------------------------------------------------------------------------------------------------------------
