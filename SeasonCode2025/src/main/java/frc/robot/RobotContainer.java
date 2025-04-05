@@ -84,9 +84,9 @@ public class RobotContainer {
   private final CommandXboxController xboxDrv = new CommandXboxController(0);
   private final CommandXboxController xboxAux = new CommandXboxController(1);
   private final OverrideSwitch overrideHID = new OverrideSwitch(2);
+  private final Trigger isClimbFullManualEnabled = overrideHID.auxSwitch(1);
   private final Trigger isElevatorFullManual = overrideHID.auxSwitch(2);
   private final Trigger isAlgaePivotFullManual = overrideHID.auxSwitch(3);
-  private final Trigger isClimbFullManualEnabled = overrideHID.auxSwitch(1);
   private final Trigger isRampPivotFullManual = overrideHID.auxSwitch(4);
   private final Trigger climbMode = xboxAux.povLeft();
 
@@ -249,6 +249,8 @@ public class RobotContainer {
                                         .onlyIf(()->CatzSuperstructure.getChosenGamepiece() == Gamepiece.ALGAE)
                                         .alongWith(Commands.print("Algae Punch"))
     );
+
+    isClimbFullManualEnabled.onTrue(Commands.print("climb full man"));
 
     // Scoring Level
     xboxAux.povRight().onTrue(Commands.runOnce(()-> {superstructure.setLevel(1); SmartDashboard.putNumber("Reef Level", 1);}));

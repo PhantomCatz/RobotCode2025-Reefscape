@@ -90,8 +90,8 @@ public class CatzStateCommands {
         return new SequentialCommandGroup(
             new TrajectoryDriveCmd(path, drivetrain, false, robotContainer, false).deadlineFor(
                 new RepeatCommand(intakeCoralStation(robotContainer).onlyIf(() -> drivetrain.getDistanceError() < DriveConstants.PREDICT_DISTANCE_INTAKE))
-            )
-            // Commands.waitUntil(() -> (waitForCoralSupplier.get() ? outtake.isDesiredCoralState(false) : true))
+            ),
+            Commands.waitUntil(() -> (waitForCoralSupplier.get() ? outtake.isDesiredCoralState(false) : true)).withTimeout(2.0)
         );
     }
 
@@ -322,9 +322,9 @@ public class CatzStateCommands {
             algaePivot.AlgaePivot_Stow(),
             rampPivot.Ramp_Intake_Pos(),
             intakeRollers.stopIntaking(),
-            new PrintCommand("not yet"),
+            // new PrintCommand("not yet"),
             // Commands.waitUntil(() -> rampPivot.isSafeToRaiseElevator()),
-            new PrintCommand("safe to raise elevator!!"),
+            // new PrintCommand("safe to raise elevator!!"),
             elevator.Elevator_LX(level)
         ).unless(()-> Robot.isSimulation()).alongWith(Commands.print("L" + level+" Elevator Raise")).unless(()-> Robot.isSimulation());
     }

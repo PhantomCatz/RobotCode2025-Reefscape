@@ -80,6 +80,8 @@ public class CatzAutonomous extends SubsystemBase {
     this.m_container = container;
     this.drivetrain = container.getCatzDrivetrain();
 
+    SmartDashboard.putData("Wait For Coral?", waitForCoralChooser);
+
     // ------------------------------------------------------------------------------------------------------------
     // Autonmous questionaire gui configurations
     // ORDER MATTERS! Register named commands first, AutoBuilder second, Trajectories and add autos
@@ -103,7 +105,6 @@ public class CatzAutonomous extends SubsystemBase {
     }
     TeleopPosSelector selector = container.getSelector();
 
-
     NamedCommands.registerCommand("Stow", CatzStateCommands.stow(container));
     NamedCommands.registerCommand("IntakeCoralGround", CatzStateCommands.intakeCoralGround(container));
     NamedCommands.registerCommand("IntakeCoralStation", CatzStateCommands.intakeCoralStation(container));
@@ -125,8 +126,9 @@ public class CatzAutonomous extends SubsystemBase {
     HashMap<String, Command> reefPose3 = new HashMap<>();
     HashMap<String, Command> reefPose4 = new HashMap<>();
 
+    waitForCoralChooser.setDefaultOption("No", false);
+    // waitForCoralChooser.("Yes", true);
     waitForCoralChooser.addOption("Yes", true);
-    waitForCoralChooser.addOption("No", false);
 
     for(int i = 0; i < FieldConstants.StartPoses.startArray.length; i++){
       final int j = i;

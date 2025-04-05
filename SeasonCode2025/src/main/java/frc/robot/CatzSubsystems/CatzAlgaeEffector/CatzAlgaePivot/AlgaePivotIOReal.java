@@ -29,6 +29,7 @@ import edu.wpi.first.units.measure.Voltage;
 
 import static frc.robot.CatzSubsystems.CatzAlgaeEffector.CatzAlgaePivot.AlgaePivotConstants.*;
 
+
 /** Add your docs here. */
 public class AlgaePivotIOReal implements AlgaePivotIO {
 
@@ -80,6 +81,8 @@ public class AlgaePivotIOReal implements AlgaePivotIO {
 
       config.CurrentLimits.SupplyCurrentLimit = CURRENT_LIMIT;
       config.CurrentLimits.SupplyCurrentLimitEnable = true;
+      config.CurrentLimits.StatorCurrentLimit = CURRENT_LIMIT;
+      config.CurrentLimits.StatorCurrentLimitEnable = true;
       config.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
       config.MotorOutput.NeutralMode = NeutralModeValue.Brake;
 

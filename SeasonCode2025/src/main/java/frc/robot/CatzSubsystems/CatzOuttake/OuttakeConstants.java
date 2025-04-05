@@ -33,11 +33,11 @@ public class OuttakeConstants {
             case SN_TEST, SN1_2024 -> new Gains(7000.0, 0.0, 250.0, 8.4, 0.2, 0.2, 22.9);
         };
 
-    static double OUTTAKE_RT = 1.0;
-    static double OUTTAKE_LT = 1.0;
+    static double OUTTAKE_RT = 0.4;
+    static double OUTTAKE_LT = 0.4;
     static double OUTTAKE_L4 = 0.24;
     static double INTAKE_SPD = 0.4;
     static double ADJ_SPD = 0.1;
-    static double OUTTAKE_L1_RT = 0.1;
-    static double OUTTAKE_L1_LT = 0.5;
+    static double OUTTAKE_L1_RT = 0.05;
+    static double OUTTAKE_L1_LT = 0.3;
 }

@@ -39,12 +39,12 @@ public class CatzAlgaePivot extends SubsystemBase {
 
   @RequiredArgsConstructor
   public enum AlgaePivotPosition { //In degrees
-    STOW(() -> 90.0),
+    STOW(() -> 94.0),
     HORIZONTAL(() -> -15.0), // TBD
     NetAlgae(() -> 60.0), // 80.0TBD
     MANUAL(() -> manualPow),
-    BOTBOT(() -> 0.7),
-    BOTTOP(() -> 0.1),
+    BOTBOT(() -> -25.0),
+    BOTTOP(() ->-15.0),
     PUNCH(() -> 30.0),
     NULL(() -> 90.0),
     TUNNABLE(tunnablePos);

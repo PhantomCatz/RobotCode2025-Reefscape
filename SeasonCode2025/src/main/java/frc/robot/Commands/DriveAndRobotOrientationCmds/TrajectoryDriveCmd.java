@@ -56,11 +56,11 @@ public class TrajectoryDriveCmd extends Command {
   public static final double ALLOWABLE_ROTATION_ERROR = 3.0;
   public static final double ALLOWABLE_VEL_ERROR = 0.80; // m/s
   public static final double ALLOWABLE_OMEGA_ERROR = 10.0;
-  private static final double TIMEOUT_EXTRA = 200.0;
+  private static final double TIMEOUT_EXTRA = 2.0;
   private static final double CONVERGE_DISTANCE = 0.04;
   private static final double CONVERGE_ANGLE = 1.0;
   private static final double FACE_REEF_DIST = 2.0;
-  private final double ALLOWABLE_VISION_ADJUST = 5e-3; //TODO tune
+  private final double ALLOWABLE_VISION_ADJUST = 2e-3; //TODO tune
 
   // Subsystems
   private CatzDrivetrain m_driveTrain;
@@ -284,6 +284,17 @@ public class TrajectoryDriveCmd extends Command {
     // send to drivetrain
     m_driveTrain.drive(adjustedSpeeds);
 
+    double currentPosX = tracker.getEstimatedPose().getX();
+    double currentPosY = tracker.getEstimatedPose().getY();
+
+    double desiredPosX = endState.pose.getX();
+    double desiredPosY = endState.pose.getY();
+
+    double xError = Math.abs(desiredPosX - currentPosX);
+    double yError = Math.abs(desiredPosY - currentPosY);
+
+    translationError = Math.hypot(xError, yError);
+
     m_driveTrain.setDistanceError(translationError);
 
     CatzRobotTracker.getInstance().setCoralStationTrajectoryRemaining(trajectory.getTotalTimeSeconds()-currentTime);
@@ -332,6 +343,11 @@ public class TrajectoryDriveCmd extends Command {
     if (timer.hasElapsed(pathTimeOut)) {
       System.out.println("path timed out!");
       return true;
+    }
+
+    // dont end prematurely
+    if(!timer.hasElapsed(trajectory.getTotalTimeSeconds())){
+      return false;
     }
 
     System.out.println("vision: " + tracker.getVisionPoseShift().getNorm());
@@ -400,16 +416,16 @@ public class TrajectoryDriveCmd extends Command {
     // Check if the robot is near goal (and if robot velocity is zero if goal
     // velocity is zero)
 
-    double currentPosX = tracker.getEstimatedPose().getX();
-    double currentPosY = tracker.getEstimatedPose().getY();
+    // double currentPosX = tracker.getEstimatedPose().getX();
+    // double currentPosY = tracker.getEstimatedPose().getY();
 
-    double desiredPosX = endState.pose.getX();
-    double desiredPosY = endState.pose.getY();
+    // double desiredPosX = endState.pose.getX();
+    // double desiredPosY = endState.pose.getY();
 
-    double xError = Math.abs(desiredPosX - currentPosX);
-    double yError = Math.abs(desiredPosY - currentPosY);
+    // double xError = Math.abs(desiredPosX - currentPosX);
+    // double yError = Math.abs(desiredPosY - currentPosY);
 
-    translationError = Math.hypot(xError, yError);
+    // translationError = Math.hypot(xError, yError);
 
     // Desperate Throwing
     // if(Robot.getAutoElapsedTime() >= 14.50) {
