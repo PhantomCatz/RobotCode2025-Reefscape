@@ -184,7 +184,7 @@ public class RobotContainer {
     // Left Right
     xboxDrv.leftBumper().onTrue(new InstantCommand(() -> selector.runLeftRight(LeftRight.LEFT))
                                                                   .unless(()->CatzSuperstructure.isClimbEnabled())
-                                                                  .alongWith(climb.ClimbManualMode(()-> 0.8)
+                                                                  .alongWith(climb.ClimbManualMode(()-> 1.0)
                                                                   .onlyIf(()-> CatzSuperstructure.isClimbEnabled()).alongWith(Commands.print("climb mode")))
     );
     xboxDrv.rightBumper().onTrue(new InstantCommand(() -> selector.runLeftRight(LeftRight.RIGHT))

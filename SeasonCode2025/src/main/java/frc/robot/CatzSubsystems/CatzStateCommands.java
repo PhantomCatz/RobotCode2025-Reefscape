@@ -91,7 +91,7 @@ public class CatzStateCommands {
             new TrajectoryDriveCmd(path, drivetrain, false, robotContainer, false).deadlineFor(
                 new RepeatCommand(intakeCoralStation(robotContainer).onlyIf(() -> drivetrain.getDistanceError() < DriveConstants.PREDICT_DISTANCE_INTAKE))
             ),
-            Commands.waitUntil(() -> (waitForCoralSupplier.get() ? outtake.isDesiredCoralState(false) : true)).withTimeout(2.0)
+            Commands.waitUntil(() -> (waitForCoralSupplier.get() ? outtake.isDesiredCoralState(false) : true)).withTimeout(0.6)
         );
     }
 
@@ -274,7 +274,7 @@ public class CatzStateCommands {
                 elevator.Elevator_L4(),
                 Commands.waitUntil(() -> elevator.isElevatorInPos()).withTimeout(2.0),
                 outtake.outtakeL4(),
-                new WaitCommand(0.1),
+                new WaitCommand(0.15),
                 elevator.Elevator_L4_Adj(),
                 Commands.waitUntil(() -> elevator.isElevatorInPos()).withTimeout(2.0)
             ).withTimeout(3.0)

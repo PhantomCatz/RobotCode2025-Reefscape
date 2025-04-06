@@ -591,7 +591,7 @@ public class TeleopPosSelector { //TODO split up the file. it's too big and does
 
         currentDrivetrainCommand = new TrajectoryDriveCmd(path, m_container.getCatzDrivetrain(), true, m_container, true)
                                         .deadlineFor(new RepeatCommand(prematureCommand.onlyIf(() -> drivetrain.getDistanceError() < DriveConstants.PREDICT_DISTANCE_SCORE)))
-                                        .andThen(m_container.rumbleDrvAuxController(1.0, 0.2));
+                                        .andThen(m_container.controllerRumbleCommand());
         currentDrivetrainCommand.schedule();
       }catch(Exception e){
         e.printStackTrace();

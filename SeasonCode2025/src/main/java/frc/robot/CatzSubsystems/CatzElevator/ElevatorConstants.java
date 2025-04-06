@@ -79,7 +79,7 @@ public class ElevatorConstants {
 
     public static final MotionMagicParameters motionMagicParameters =
         switch (CatzConstants.getRobotType()) {
-            case SN2, SN1 -> new MotionMagicParameters(150, 250, 2000);
+            case SN2, SN1 -> new MotionMagicParameters(150, 250, 1500);
 
             case SN_TEST, SN1_2024 -> new MotionMagicParameters(0.0, 0.0, 0.0);
         };

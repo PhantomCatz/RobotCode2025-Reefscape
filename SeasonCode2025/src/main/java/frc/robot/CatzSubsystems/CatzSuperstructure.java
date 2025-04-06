@@ -129,7 +129,6 @@ public class CatzSuperstructure extends VirtualSubsystem {
 
     public void setClimbOverride(BooleanSupplier isClimbEnabled) {
         CatzSuperstructure.isClimbEnabled = isClimbEnabled.getAsBoolean();
-        CatzLED.getInstance().setControllerState(ControllerLEDState.CLIMB);
         System.out.println("CLimb Enabled" + isClimbEnabled);
     }
 
@@ -139,6 +138,7 @@ public class CatzSuperstructure extends VirtualSubsystem {
 
         if(isClimbEnabled) {
             System.out.println("HI");
+            CatzLED.getInstance().setControllerState(ControllerLEDState.CLIMB);
             return;
         }
 
