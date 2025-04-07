@@ -21,7 +21,7 @@ public class AlgaePivotConstants {
 
     // Gearbox definitions
     public static final double ALGAE_PIVOT_GEAR_REDUCTION = 6.0;
-    public static final double PIVOT_INITIAL_POS = (90.0 / 360.0) * ALGAE_PIVOT_GEAR_REDUCTION;
+    public static final double PIVOT_INITIAL_POS = (95.0 / 360.0) * ALGAE_PIVOT_GEAR_REDUCTION;
 
     public static final double CURRENT_LIMIT = 40.0;
     // Motor ID
@@ -46,7 +46,7 @@ public class AlgaePivotConstants {
 
     public static final MotionMagicParameters motionMagicParameters =
         switch (CatzConstants.getRobotType()) {
-            case SN2, SN1 -> new MotionMagicParameters(100, 200, 800);
+            case SN2, SN1 -> new MotionMagicParameters(100.0, 200.0, 800.0);
             case SN_TEST, SN1_2024 -> new MotionMagicParameters(0.0, 0.0, 0.0);
         };
 

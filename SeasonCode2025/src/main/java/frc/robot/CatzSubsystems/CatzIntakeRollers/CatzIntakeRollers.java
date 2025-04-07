@@ -99,7 +99,7 @@ public class CatzIntakeRollers extends SubsystemBase {
             break;
         }
 
-        Logger.recordOutput("IntakeRoller/State", currentState);
+        Logger.recordOutput("IntakeRoller/State", currentState.toString());
         previousState = currentState;
 
     }

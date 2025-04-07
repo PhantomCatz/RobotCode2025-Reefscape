@@ -31,6 +31,8 @@ import java.util.List;
 import java.util.Set;
 import java.util.function.Supplier;
 
+import org.littletonrobotics.junction.Logger;
+
 /** IO implementation for real Limelight hardware. */
 public class VisionIOLimelight implements VisionIO {
   private final Supplier<Rotation2d> rotationSupplier = () -> CatzRobotTracker.getInstance().getEstimatedPose().getRotation();
@@ -105,6 +107,15 @@ public class VisionIOLimelight implements VisionIO {
             (int) tagIDSubscriber.get(),
             cameraSpaceTranslation.getNorm())
             );
+          }
+          try{
+            for(var rawSample :megatag1Subscriber.readQueue()){
+              if(rawSample.value.length == 0) continue;
+              Logger.recordOutput("Megatag1Pose", parsePose(rawSample.value));
+
+            }
+          }catch (Exception e){
+            e.printStackTrace();
           }
 
           //----------------------------------------------------------------------------------------------
@@ -185,6 +196,8 @@ public class VisionIOLimelight implements VisionIO {
     if(tagIDSubscriber.exists() && tagIDSubscriber.get() >= 1 && tagIDSubscriber.get() <= FieldConstants.APRILTAG_LAYOUT.getTags().size()){
       tagIds.add((int) tagIDSubscriber.get());
     }
+
+
 
     int i = 0;
     inputs.tagIds = new int[tagIds.size()];

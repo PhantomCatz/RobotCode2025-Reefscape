@@ -29,6 +29,7 @@ import edu.wpi.first.units.measure.Voltage;
 
 import static frc.robot.CatzSubsystems.CatzAlgaeEffector.CatzAlgaePivot.AlgaePivotConstants.*;
 
+
 /** Add your docs here. */
 public class AlgaePivotIOReal implements AlgaePivotIO {
 
@@ -38,6 +39,8 @@ public class AlgaePivotIOReal implements AlgaePivotIO {
   private final VoltageOut voltageControl = new VoltageOut(0).withUpdateFreqHz(0.0);
 
   private final TalonFXConfiguration config = new TalonFXConfiguration();
+
+  // private final PIDController pid = new PIDController(slot0_gains.kP(), slot0_gains.kI(), slot0_gains.kD());
 
   private final StatusSignal<Angle> algaePivotPosition;
   private final StatusSignal<AngularVelocity> algaePivotVelocity;
@@ -80,6 +83,8 @@ public class AlgaePivotIOReal implements AlgaePivotIO {
 
       config.CurrentLimits.SupplyCurrentLimit = CURRENT_LIMIT;
       config.CurrentLimits.SupplyCurrentLimitEnable = true;
+      config.CurrentLimits.StatorCurrentLimit = CURRENT_LIMIT;
+      config.CurrentLimits.StatorCurrentLimitEnable = true;
       config.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
       config.MotorOutput.NeutralMode = NeutralModeValue.Brake;
 
@@ -119,6 +124,8 @@ public class AlgaePivotIOReal implements AlgaePivotIO {
 
   @Override
   public void runSetpointUp(double targetDegrees, double feedforwardVolts) {
+    // algaePivotMotor.setControl()
+
     double setpointRotations = ((targetDegrees / 360.0) * ALGAE_PIVOT_GEAR_REDUCTION);
     algaePivotMotor.setControl(positionControl.withPosition(setpointRotations)
                                               .withFeedForward(feedforwardVolts));

@@ -16,13 +16,9 @@ import static frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.Vision.Visio
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
-import edu.wpi.first.math.geometry.Rotation3d;
-import edu.wpi.first.math.geometry.Transform3d;
-import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Alert.AlertType;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.FieldConstants;
 import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.CatzRobotTracker;
 import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.CatzRobotTracker.TxTyObservation;
 import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.CatzRobotTracker.VisionObservation;
@@ -128,10 +124,15 @@ public class CatzVision extends SubsystemBase {
 
         int tagId = inputs[cameraIndex].tagIds[0];
         Pose3d observationPose = observation.pose();
-        Pose2d apriltagPose = FieldConstants.APRILTAG_LAYOUT.getTagPose(tagId).get().toPose2d();
+        // try{
+        //   // Pose2d apriltagPose = FieldConstants.APRILTAG_LAYOUT.getTagPose(tagId).get().toPose2d();
+        //   // Translation2d limelightError = VisionConstants.LIMELIGHT_ERROR[cameraIndex].times(apriltagPose.getTranslation().minus(robotPose.getTranslation()).getNorm()).rotateBy(apriltagPose.getRotation());
+        //   // observationPose = observationPose.plus(new Transform3d(limelightError.getX(), limelightError.getY(), 0.0, new Rotation3d()));
+        // }catch (Exception e){
+        //   System.out.println("Apriltag not found!");
+        //   e.printStackTrace();
+        // }
 
-        Translation2d limelightError = VisionConstants.LIMELIGHT_ERROR[cameraIndex].times(apriltagPose.getTranslation().minus(robotPose.getTranslation()).getNorm()).rotateBy(apriltagPose.getRotation());
-        observationPose.plus(new Transform3d(limelightError.getX(), limelightError.getY(), 0.0, new Rotation3d()));
 
         boolean rejectPose =
             ((observation.tagCount() == 0) // Must have at least one tag
@@ -175,6 +176,7 @@ public class CatzVision extends SubsystemBase {
           angularStdDev *= cameraStdDevFactors[cameraIndex];
         }
 
+
         // Send vision observation
         CatzRobotTracker.getInstance()
             .addVisionObservation(
@@ -189,6 +191,8 @@ public class CatzVision extends SubsystemBase {
         Logger.recordOutput("Vision/Camera" + cameraIndex + "/RobotPoses", robotPoses.toArray(new Pose3d[robotPoses.size()]));
         Logger.recordOutput("Vision/Camera" + cameraIndex + "/RobotPosesAccepted", robotPosesAccepted.toArray(new Pose3d[robotPosesAccepted.size()]));
         Logger.recordOutput("Vision/Camera" + cameraIndex + "/RobotPosesRejected", robotPosesRejected.toArray(new Pose3d[robotPosesRejected.size()]));
+        Logger.recordOutput("Vision/Camera" + cameraIndex + "/Standard Deviation", linearStdDev);
+
         allTagPoses.addAll(tagPoses);
 
         allRobotPoses.addAll(robotPoses);

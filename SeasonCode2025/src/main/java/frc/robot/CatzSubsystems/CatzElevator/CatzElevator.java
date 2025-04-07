@@ -177,6 +177,9 @@ public class CatzElevator extends SubsystemBase {
       }
     } else if (targetPosition == ElevatorPosition.PosManual) {
       io.runMotor(elevatorSpeed);
+
+      Logger.recordOutput("Elevator/Manual Speed", elevatorSpeed*10);
+      Logger.recordOutput("Elevator/Manual RPS", inputs.velocityInchPerSec/ElevatorConstants.FINAL_RATIO);
     } else {
       // Nothing happening
       io.stop();
@@ -279,7 +282,7 @@ public class CatzElevator extends SubsystemBase {
     boolean isElevatorInPos = (Math.abs((getElevatorPositionInch() - targetPosition.getTargetPositionInch())) < 1.0);
     if(isElevatorInPos) {
       settlingCounter++;
-      if(settlingCounter >= 1) {
+      if(settlingCounter >= 3) {
          isElevatorSettled = true;
         // settlingCounter = 0;
          //System.out.println("////////////ELEVATOR SETTLED FOR .2 SECONDS///////////////////");

@@ -56,11 +56,11 @@ public class TrajectoryDriveCmd extends Command {
   public static final double ALLOWABLE_ROTATION_ERROR = 3.0;
   public static final double ALLOWABLE_VEL_ERROR = 0.80; // m/s
   public static final double ALLOWABLE_OMEGA_ERROR = 10.0;
-  private static final double TIMEOUT_SCALAR = 2.0;
+  private static final double TIMEOUT_EXTRA = 2.0;
   private static final double CONVERGE_DISTANCE = 0.04;
   private static final double CONVERGE_ANGLE = 1.0;
   private static final double FACE_REEF_DIST = 2.0;
-  private final double ALLOWABLE_VISION_ADJUST = 5e-3; //TODO tune
+  private final double ALLOWABLE_VISION_ADJUST = 2e-3; //TODO tune
 
   // Subsystems
   private CatzDrivetrain m_driveTrain;
@@ -72,36 +72,40 @@ public class TrajectoryDriveCmd extends Command {
   private PathPlannerTrajectory trajectory;
   private PathPlannerPath path;
   private Supplier<PathPlannerPath> pathSupplier;
+  private Rotation2d endRotation;
 
   private double pathTimeOut = -999.0;
   private Timer timer = new Timer();
   private boolean autoalign = false;
-  private boolean isTwoPathPoints = false;
+  private PathPlannerTrajectoryState isTwoPathPoints = null;
+  private PathPlannerTrajectoryState endState;
   private double translationError = FieldConstants.FIELD_LENGTH_MTRS * 2;
 
   // Swerve Drive Variables
   private ChassisSpeeds adjustedSpeeds = new ChassisSpeeds();
 
   private boolean isBugged = false;
-
+  private final boolean isTelop;
   // ---------------------------------------------------------------------------------------------
   //
   // Trajectory Drive Command Constructor
   //
   // ---------------------------------------------------------------------------------------------
-  public TrajectoryDriveCmd(PathPlannerPath newPath, CatzDrivetrain drivetrain, boolean autoalign, RobotContainer container) {
+  public TrajectoryDriveCmd(PathPlannerPath newPath, CatzDrivetrain drivetrain, boolean autoalign, RobotContainer container, boolean isTeleop) {
     this.path = newPath;
     this.m_driveTrain = drivetrain;
     this.autoalign = autoalign;
     this.container = container;
+    this.isTelop = isTeleop;
     addRequirements(m_driveTrain);
   }
 
-  public TrajectoryDriveCmd(Supplier<PathPlannerPath> newPathSupplier, CatzDrivetrain drivetrain, boolean autoalign, RobotContainer container) {
+  public TrajectoryDriveCmd(Supplier<PathPlannerPath> newPathSupplier, CatzDrivetrain drivetrain, boolean autoalign, RobotContainer container, boolean isTeleop) {
     this.pathSupplier = newPathSupplier;
     this.m_driveTrain = drivetrain;
     this.autoalign = autoalign;
     this.container = container;
+    this.isTelop = isTeleop;
     addRequirements(m_driveTrain);
   }
 
@@ -134,8 +138,6 @@ public class TrajectoryDriveCmd extends Command {
       if(AllianceFlipUtil.shouldFlipToRed()) {
         usePath = path.flipPath();
       }
-      printTime("uno");
-      System.out.println("num of posts: " + usePath.getAllPathPoints());
 
       // Pose Reseting
       if (Robot.isFirstPath && DriverStation.isAutonomous()) {
@@ -147,53 +149,62 @@ public class TrajectoryDriveCmd extends Command {
         }
       }
 
-      printTime("dos");
 
       // Collect current drive state
       ChassisSpeeds currentSpeeds = DriveConstants.SWERVE_KINEMATICS.toChassisSpeeds(tracker.getCurrentModuleStates());
       List<PathPoint> pathPoints = usePath.getAllPathPoints();
 
 
-      if(pathPoints.size() == 2){
-        System.out.println("too shortt!!");
-        isTwoPathPoints = true;
-      }
-      printTime("tres");
-
       boolean shouldChangeStartRot = tracker.getEstimatedPose().getTranslation().minus(pathPoints.get(pathPoints.size()-1).position).getNorm() > 0.50;
       Rotation2d startRot = tracker.getEstimatedPose().getRotation();
+
       if(shouldChangeStartRot){
         //if you are trying to auto align and the change in rotation is kind of big, then you want to set your starting rotation to the starting heading of path because for some mysterious reason
         //trajectory speed gets very slow when it needs to account for rotation. the only case where this wouldn't be auto align is if you are going to coral station
-        //during autonomous, where you want to be facing backwards, so +180 for this case
+        //during autonomous, where you want to be facing is, so +180 for this case
         //i really dont like this fix either but i cant find the source of the issue so ¯\_(ツ)_/¯
         startRot = autoalign ? pathPoints.get(1).position.minus(pathPoints.get(0).position).getAngle() : pathPoints.get(1).position.minus(pathPoints.get(0).position).getAngle().plus(Rotation2d.k180deg);
       }
+
       try {
         // Construct trajectory
         this.trajectory = usePath.generateTrajectory(currentSpeeds, startRot, DriveConstants.TRAJ_ROBOT_CONFIG);
-        printTime("cuatro");
       } catch (Error e){
         e.printStackTrace();
         //for some reason if you spam NBA current rotation gets bugged.
         this.trajectory = usePath.generateTrajectory(currentSpeeds, new Rotation2d(), DriveConstants.TRAJ_ROBOT_CONFIG);
         // this.trajectory = new PathPlannerTrajectory(
-        //   usePath,
-        //   currentSpeeds, //TODO make it not zero if its a thing thingy y esdpoifi
-        //   new Rotation2d(),
-        //   DriveConstants.TRAJ_ROBOT_CONFIG
-        // );
-      }
-      printTime("sdfioj");
-      if(trajectory == null) {
-        System.out.println("bugged!!!!!!!");
-        isBugged = true;
-        return;
-      }
+          //   usePath,
+          //   currentSpeeds, //TODO make it not zero if its a thing thingy y esdpoifi
+          //   new Rotation2d(),
+          //   DriveConstants.TRAJ_ROBOT_CONFIG
+          // );
+        }
 
-      printTime("cinco");
+        if(trajectory == null) {
+          System.out.println("bugged!!!!!!!");
+          isBugged = true;
+          return;
+        }
+
+        if(pathPoints.size() == 2){
+
+          Pose2d endPose = new Pose2d(pathPoints.get(1).position, usePath.getGoalEndState().rotation());
+          isTwoPathPoints = new PathPlannerTrajectoryState();
+          isTwoPathPoints.pose = endPose;
+          endState = isTwoPathPoints;
+        } else {
+          endState = trajectory.sample(trajectory.getTotalTimeSeconds());
+        }
+        endRotation = endState.pose.getRotation();
+
       hocontroller = DriveConstants.getNewHolController();
-      pathTimeOut = trajectory.getTotalTimeSeconds() * TIMEOUT_SCALAR;
+
+      if(isTelop){
+        pathTimeOut = 999999.0;
+      }else{
+        pathTimeOut = trajectory.getTotalTimeSeconds() + TIMEOUT_EXTRA;
+      }
 
 
       // System.out.println("current " + tracker.getEstimatedPose());
@@ -206,7 +217,6 @@ public class TrajectoryDriveCmd extends Command {
 
       this.timer.reset();
       this.timer.start();
-      Logger.recordOutput("Goal Position", trajectory.getEndState().pose);
     } catch(Exception e) {
       isBugged = true;
       e.printStackTrace();
@@ -232,10 +242,6 @@ public class TrajectoryDriveCmd extends Command {
     // Collect instananous variables
     double currentTime = timer.get();
     Pose2d currentPose = tracker.getEstimatedPose();
-    if(isTwoPathPoints){
-      currentTime = trajectory.getTotalTimeSeconds();
-    }
-    printTime("seis");
     // ChassisSpeeds currentSpeeds = DriveConstants.SWERVE_KINEMATICS.toChassisSpeeds(m_driveTrain.getModuleStates());
     // double currentVel = Math.hypot(currentSpeeds.vxMetersPerSecond, currentSpeeds.vyMetersPerSecond);
 
@@ -249,9 +255,10 @@ public class TrajectoryDriveCmd extends Command {
     // target velocity is used as a ff
     // -------------------------------------------------------------------------------------
     PathPlannerTrajectoryState goal = trajectory.sample(Math.min(currentTime, trajectory.getTotalTimeSeconds()));
-    PathPlannerTrajectoryState endGoal = trajectory.sample(trajectory.getTotalTimeSeconds()); // TODO we can optimize
+    if(isTwoPathPoints != null){
+      goal = isTwoPathPoints;
+    }
 
-    printTime("siete");
     Trajectory.State state = new Trajectory.State(
         currentTime,
         goal.linearVelocity,
@@ -260,25 +267,33 @@ public class TrajectoryDriveCmd extends Command {
         0.0
     );
 
-    printTime("ocho");
 
     // construct chassisspeeds
-    adjustedSpeeds = hocontroller.calculate(currentPose, state, endGoal.pose.getRotation());
+    adjustedSpeeds = hocontroller.calculate(currentPose, state, endRotation);
     // if (autoalign && translationError > FACE_REEF_DIST) {
     //   Translation2d reef = AllianceFlipUtil.apply(FieldConstants.Reef.center);
     //   adjustedSpeeds = hocontroller.calculate(currentPose, state, Rotation2d.fromRadians(Math.atan2(reef.getY() - currentPose.getY(),reef.getX() - currentPose.getX())));
     // }else{
     // }
-    printTime("nueve");
 
-    adjustedSpeeds = applyCusp(adjustedSpeeds, translationError, endGoal.pose.getRotation().minus(currentPose.getRotation()).getDegrees(), CONVERGE_DISTANCE, CONVERGE_ANGLE);
+    adjustedSpeeds = applyCusp(adjustedSpeeds, translationError, endRotation.minus(currentPose.getRotation()).getDegrees(), CONVERGE_DISTANCE, CONVERGE_ANGLE);
 
     // Logging
     Logger.recordOutput("CatzRobotTracker/Desired Auto Pose", goal.pose);
 
     // send to drivetrain
     m_driveTrain.drive(adjustedSpeeds);
-    printTime("diez");
+
+    double currentPosX = tracker.getEstimatedPose().getX();
+    double currentPosY = tracker.getEstimatedPose().getY();
+
+    double desiredPosX = endState.pose.getX();
+    double desiredPosY = endState.pose.getY();
+
+    double xError = Math.abs(desiredPosX - currentPosX);
+    double yError = Math.abs(desiredPosY - currentPosY);
+
+    translationError = Math.hypot(xError, yError);
 
     m_driveTrain.setDistanceError(translationError);
 
@@ -305,6 +320,7 @@ public class TrajectoryDriveCmd extends Command {
     timer.stop(); // Stop timer
     m_driveTrain.stopDriving();
     m_driveTrain.drive(new ChassisSpeeds());
+    Logger.recordOutput("CatzRobotTracker/Desired Auto Pose", new Pose2d());
 
     // PathPlannerAuto.currentPathName = "";
     // Logger.recordOutput("CatzRobotTracker/Desired Auto Pose", new Pose2d());
@@ -329,6 +345,12 @@ public class TrajectoryDriveCmd extends Command {
       return true;
     }
 
+    // dont end prematurely
+    if(!timer.hasElapsed(trajectory.getTotalTimeSeconds())){
+      return false;
+    }
+
+    System.out.println("vision: " + tracker.getVisionPoseShift().getNorm());
     if (container.getCatzVision().isSeeingApriltag() && autoalign && tracker.getVisionPoseShift().getNorm() > ALLOWABLE_VISION_ADJUST) {
       // If trailing pose is within margin
       System.out.println("not visioning");
@@ -363,13 +385,11 @@ public class TrajectoryDriveCmd extends Command {
   }
 
   public boolean isAtGoalState(double poseError){
-    PathPlannerTrajectoryState endState = trajectory.getEndState();
-
     double currentRotation = tracker.getEstimatedPose().getRotation().getDegrees();
     double desiredRotation = endState.pose.getRotation().getDegrees();
 
     ChassisSpeeds currentChassisSpeeds = tracker.getRobotChassisSpeeds();
-    double desiredMPS = trajectory.getEndState().linearVelocity;
+    double desiredMPS = endState.linearVelocity;
     double currentMPS = Math.hypot(currentChassisSpeeds.vxMetersPerSecond, currentChassisSpeeds.vyMetersPerSecond);
     double currentRPS = Units.radiansToDegrees(currentChassisSpeeds.omegaRadiansPerSecond);
 
@@ -383,7 +403,6 @@ public class TrajectoryDriveCmd extends Command {
       rotationError = 0.0;
       System.out.println("THROW");
     }
-    printTime("once");
 
     // System.out.println("rotationerr: " + (rotationError));
     // System.out.println("omegaerr: " + (currentRPS));
@@ -396,18 +415,17 @@ public class TrajectoryDriveCmd extends Command {
   public boolean isPoseWithinThreshold(double poseError) {
     // Check if the robot is near goal (and if robot velocity is zero if goal
     // velocity is zero)
-    PathPlannerTrajectoryState endState = trajectory.getEndState();
 
-    double currentPosX = tracker.getEstimatedPose().getX();
-    double currentPosY = tracker.getEstimatedPose().getY();
+    // double currentPosX = tracker.getEstimatedPose().getX();
+    // double currentPosY = tracker.getEstimatedPose().getY();
 
-    double desiredPosX = endState.pose.getX();
-    double desiredPosY = endState.pose.getY();
+    // double desiredPosX = endState.pose.getX();
+    // double desiredPosY = endState.pose.getY();
 
-    double xError = Math.abs(desiredPosX - currentPosX);
-    double yError = Math.abs(desiredPosY - currentPosY);
+    // double xError = Math.abs(desiredPosX - currentPosX);
+    // double yError = Math.abs(desiredPosY - currentPosY);
 
-    translationError = Math.hypot(xError, yError);
+    // translationError = Math.hypot(xError, yError);
 
     // Desperate Throwing
     // if(Robot.getAutoElapsedTime() >= 14.50) {
@@ -416,7 +434,6 @@ public class TrajectoryDriveCmd extends Command {
     // }
 
     // System.out.println("poseerr:" + ((xError < poseError) &&(yError < poseError)));
-    printTime("doce");
     // System.out.println("transerr: " + (translationError));
     // System.out.println("pose errr: " + poseError);
     return translationError < poseError;

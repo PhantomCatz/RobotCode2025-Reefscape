@@ -3,29 +3,29 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 7.1566598360655735,
-        "y": 5.073924180327869
+        "x": 1.066905737704918,
+        "y": 0.7943135245901636
       },
       "prevControl": null,
       "nextControl": {
-        "x": 5.637561210278691,
-        "y": 5.351649143620236
+        "x": 1.3002432344706802,
+        "y": 1.2086903698409
       },
       "isLocked": false,
-      "linkedName": "startTop"
+      "linkedName": "Coral-Bottom"
     },
     {
       "anchor": {
-        "x": 5.286577868852459,
-        "y": 5.073924180327869
+        "x": 3.1887295081967215,
+        "y": 3.8631659836065575
       },
       "prevControl": {
-        "x": 5.885963114754098,
-        "y": 5.325665983606557
+        "x": 2.695640074960962,
+        "y": 3.0562686919726376
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": "Reef-I"
+      "linkedName": "Reef-B"
     }
   ],
   "rotationTargets": [],
@@ -42,13 +42,13 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": -119.99999999999999
+    "rotation": 0.0
   },
   "reversed": false,
-  "folder": "L4 I Paths",
+  "folder": "Bottom L4 FDC Paths",
   "idealStartingState": {
     "velocity": 0,
-    "rotation": 180.0
+    "rotation": 53.745999999999995
   },
   "useDefaultConstraints": true
 }

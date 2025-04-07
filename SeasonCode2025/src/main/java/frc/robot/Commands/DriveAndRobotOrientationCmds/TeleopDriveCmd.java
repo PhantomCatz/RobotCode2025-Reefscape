@@ -71,7 +71,7 @@ public class TeleopDriveCmd extends Command {
   //
   // --------------------------------------------------------------------------------------
   @Override
-  public void initialize() {}
+public void initialize() {}
 
   // --------------------------------------------------------------------------------------
   //
@@ -110,7 +110,7 @@ public class TeleopDriveCmd extends Command {
       m_headingAndVelocity_X *= 0.2;
       m_headingAndVelocity_Y *= 0.2;
       turningVelocity *= 0.2;
-      System.out.println("low speed");
+      //System.out.println("low speed");
     }
 
     // Construct desired chassis speeds

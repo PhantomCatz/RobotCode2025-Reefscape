@@ -39,14 +39,14 @@ public class CatzAlgaePivot extends SubsystemBase {
 
   @RequiredArgsConstructor
   public enum AlgaePivotPosition { //In degrees
-    STOW(() -> 90.0),
+    STOW(() -> 92.5),
     HORIZONTAL(() -> -15.0), // TBD
     NetAlgae(() -> 60.0), // 80.0TBD
     MANUAL(() -> manualPow),
-    BOTBOT(() -> 0.7),
-    BOTTOP(() -> 0.1),
+    BOTBOT(() -> -25.0),
+    BOTTOP(() ->-15.0),
     PUNCH(() -> 30.0),
-    NULL(() -> 90.0),
+    NULL(() -> 94.7),
     TUNNABLE(tunnablePos);
 
     private final DoubleSupplier motionType;
@@ -133,8 +133,8 @@ public class CatzAlgaePivot extends SubsystemBase {
         io.setPercentOutput(manualPow);
 
       } else if(targetPosition != AlgaePivotPosition.NULL) {
-        System.out.println("algae pivot position null");
-         io.runSetpointUp(targetPosition.getTargetAngle(), calculateArmFeedFoward());
+        // System.out.println("algae pivot position null");
+         io.runSetpointUp(targetPosition.getTargetAngle(), 0.0);
 
       } else {
 

@@ -32,12 +32,12 @@ public class ElevatorConstants {
     //inches TODO tune
     public static final double STOW_HEIGHT = 1.0;
     public static final double L1_HEIGHT   = 5.6;
-    public static final double L2_HEIGHT   = 16.122;
-    public static final double L3_HEIGHT   = 34.763;//81.7;
-    public static final double L4_HEIGHT   = 65.443;
-    public static final double L4_CORAL_ADJ = 70.0;
-    public static final double BOT_BOT_ALGAE = 20.6;
-    public static final double BOT_TOP_ALGAE = 22.7;
+    public static final double L2_HEIGHT   = 16.622;
+    public static final double L3_HEIGHT   = 34.763;
+    public static final double L4_HEIGHT   = 65.400;
+    public static final double L4_CORAL_ADJ = 69.0;
+    public static final double BOT_BOT_ALGAE = 15.6;
+    public static final double BOT_TOP_ALGAE = 35.7;
     // Motor ID
     public static final int LEFT_LEADER_ID  = 31;
     public static final int RIGHT_FOLLOWER_ID = 30;
@@ -58,19 +58,20 @@ public class ElevatorConstants {
     public static final Translation2d elevatorOrigin = new Translation2d(-0.238, 0.298);
     public static final double MANUAL_SCALE = 0.5;
 
-    // Initial PIDF and motion magic assignment
+    // Initial PIDF and motion magic assignmentP
     public static final Gains slot0_gains =
         switch (CatzConstants.getRobotType()) {
             //case SN2 -> new Gains(8.0, 0.0, 0.0, 0.175, 0.230, 0.013, 0.4);
-            case SN2 -> new Gains(4.0, 0.0, 0.0, 0.0, 0.3, 0.03, 0.4);
-            case SN1 -> new Gains(3.0, 0.0, 0.0, 0.175, 0.3, 0.13, 0.4); //
+            case SN2 -> new Gains(4.0, 0.0, 0.0, 0.065, 0.379, 0.015, 0.0);//            case SN2 -> new Gains(4.0, 0.0, 0.0, 0.175, 0.425, 0.022, 0.0);
+
+            case SN1 -> new Gains(3.0, 0.0, 0.0, 0.175, 0.3, 0.013, 0.4); //
 
             case SN_TEST, SN1_2024 -> new Gains(7000.0, 0.0, 250.0, 8.4, 0.2, 0.2, 22.9);
         };
 
     public static final Gains slot1_gains =
         switch (CatzConstants.getRobotType()) {
-            case SN2 -> new Gains(3.0, 0.0, 0.0, 0.175, 0.130, 0.013, 0.4);
+            case SN2 -> new Gains(3.0, 0.0, 0.0, 0.175, 0.130, 0.009, 0.4);
                                // v 75.0 vv 0.1 v
             case SN1 -> new Gains(3.0, 0.0, 0.0, 0.175, 0.13, 0.013, 0.4); //TODO
             case SN_TEST, SN1_2024 -> new Gains(7000.0, 0.0, 250.0, 8.4, 0.2, 0.2, 22.9);
@@ -78,7 +79,7 @@ public class ElevatorConstants {
 
     public static final MotionMagicParameters motionMagicParameters =
         switch (CatzConstants.getRobotType()) {
-            case SN2, SN1 -> new MotionMagicParameters(150, 250, 2000);
+            case SN2, SN1 -> new MotionMagicParameters(150, 250, 1500);
 
             case SN_TEST, SN1_2024 -> new MotionMagicParameters(0.0, 0.0, 0.0);
         };
