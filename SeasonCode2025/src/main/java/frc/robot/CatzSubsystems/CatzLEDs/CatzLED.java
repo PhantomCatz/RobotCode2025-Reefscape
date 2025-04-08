@@ -221,14 +221,15 @@ public class CatzLED extends VirtualSubsystem {
         case FULL_MANUAL:
           if(CatzSuperstructure.getCurrentCoralState() == CoralState.IN_OUTTAKE) {
             bigBubble((int) ((Timer.getFPGATimestamp() / bubbleTime) * LED_Sidebar_End_RT), 4, 10, Color.kAqua);
+          } else {
+            strobeElevator(Color.kAqua, Color.kBlack, breathDuration);
           }
         break;
         case NBA:
-          if(CatzSuperstructure.getCurrentCoralState() == CoralState.IN_OUTTAKE) {
-            // setSolidElevatorColor(Color.kYellow);
+          if(!CatzRobotTracker.getInstance().isReachedGoal()) {
             wave(Color.kRed, Color.kBlack, waveFastCycleLength, waveFastDuration);
           } else {
-            strobeElevator(Color.kYellow, Color.kBlack, breathDuration);
+            bigBubble((int) ((Timer.getFPGATimestamp() / bubbleTime) * LED_Sidebar_End_RT), 4, 10, Color.kWhite);
           }
         break;
         case AQUA:
@@ -330,7 +331,7 @@ public class CatzLED extends VirtualSubsystem {
   }
 
   private void bigBubble(int colored, int bubbleLength, int bubbleInterval, Color color) {
-    // System.out.println("big bubble" + colored);
+    System.out.println("big bubble" + colored);
     for (int i=0; i<LED_Crossbar_Start; i++) {
       if (i <= colored && ((i - colored % bubbleInterval) + bubbleInterval) % bubbleInterval < bubbleLength) {
         buffer.setLED(i, color);
@@ -372,6 +373,7 @@ public class CatzLED extends VirtualSubsystem {
   }
 
   private void strobeElevator(Color c1, Color c2, double duration) {
+    System.out.println("strobe");
     boolean c1On = ((Timer.getFPGATimestamp() % duration) / duration) > 0.5;
     setSolidElevatorColor(c1On ? c1 : c2);
   }
@@ -483,6 +485,7 @@ public class CatzLED extends VirtualSubsystem {
   }
 
   private void wave(Color c1, Color c2, double cycleLength, double duration) {
+    System.out.println("wave");
     double x = (1 - ((Timer.getFPGATimestamp() % duration) / duration)) * 2.0 * Math.PI;
     double xDiffPerLed = (2.0 * Math.PI) / cycleLength;
     for (int i = 0; i < length; i++) {

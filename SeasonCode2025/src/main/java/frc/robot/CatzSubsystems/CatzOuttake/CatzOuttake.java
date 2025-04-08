@@ -85,10 +85,17 @@ public class CatzOuttake extends SubsystemBase {
         return container.getSelector().hasCoralSIM;
       }
     } else {
+      boolean inOuttake = (inputs.bbreakBackTriggered || inputs.bbreakFrntTriggered);
+      if(inOuttake) {
+        CatzSuperstructure.setCurrentCoralState(CoralState.IN_OUTTAKE);
+      } else {
+        CatzSuperstructure.setCurrentCoralState(CoralState.NOT_IN_OUTTAKE);
+      }
+
       if(isOuttaking){
         return (!inputs.bbreakBackTriggered) && (!inputs.bbreakFrntTriggered); //both beam breaks must be off to be out of the coral effector
       }else{
-        return (inputs.bbreakBackTriggered || inputs.bbreakFrntTriggered); //only one of the beambreak must be triggered to be considered inside the coral effector
+        return inOuttake; //only one of the beambreak must be triggered to be considered inside the coral effector
       }
     }
   }
@@ -142,7 +149,6 @@ public class CatzOuttake extends SubsystemBase {
     Logger.recordOutput("Outtake/State", currentState.toString());
 
     previousState = currentState;
-
   }
 
   // ============================================

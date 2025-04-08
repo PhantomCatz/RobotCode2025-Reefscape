@@ -46,7 +46,7 @@ public class CatzSuperstructure extends VirtualSubsystem {
     private static boolean isClimbEnabled = false;
 
     @Getter @Setter @AutoLogOutput(key = "CatzSuperstructure/CurrentCoralState")
-    private static CoralState currentCoralState = CoralState.IN_OUTTAKE;
+    private static CoralState currentCoralState = CoralState.NOT_IN_OUTTAKE;
 
     @Getter @AutoLogOutput(key = "CatzSuperstructure/robotactionCommand")
     private Command robotActionCommand = Commands.none();
@@ -129,6 +129,12 @@ public class CatzSuperstructure extends VirtualSubsystem {
 
     public void setClimbOverride(BooleanSupplier isClimbEnabled) {
         CatzSuperstructure.isClimbEnabled = isClimbEnabled.getAsBoolean();
+        if (isClimbEnabled()) {
+            CatzLED.getInstance().setControllerState(ControllerLEDState.CLIMB);
+        }
+        else {
+            CatzLED.getInstance().setControllerState(ControllerLEDState.FULL_MANUAL);
+        }
         System.out.println("CLimb Enabled" + isClimbEnabled);
     }
 
