@@ -1,0 +1,70 @@
+{
+  "version": "2025.0",
+  "waypoints": [
+    {
+      "anchor": {
+        "x": 2.0019467213114757,
+        "y": 7.399538934426229
+      },
+      "prevControl": null,
+      "nextControl": {
+        "x": 2.4419297122326027,
+        "y": 7.215808287574423
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 6.785040983606557,
+        "y": 7.291649590163933
+      },
+      "prevControl": {
+        "x": 6.342097464384505,
+        "y": 7.5909378670482806
+      },
+      "nextControl": {
+        "x": 7.5275053588296785,
+        "y": 6.789980926179835
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 5.790061475409836,
+        "y": 4.186834016393442
+      },
+      "prevControl": {
+        "x": 6.784277091312275,
+        "y": 5.380798110095241
+      },
+      "nextControl": null,
+      "isLocked": false,
+      "linkedName": "Reef-H"
+    }
+  ],
+  "rotationTargets": [],
+  "constraintZones": [],
+  "pointTowardsZones": [],
+  "eventMarkers": [],
+  "globalConstraints": {
+    "maxVelocity": 17.0,
+    "maxAcceleration": 16.5,
+    "maxAngularVelocity": 600.0,
+    "maxAngularAcceleration": 60.0,
+    "nominalVoltage": 12.0,
+    "unlimited": false
+  },
+  "goalEndState": {
+    "velocity": 0,
+    "rotation": 180.0
+  },
+  "reversed": false,
+  "folder": "L4 H Paths",
+  "idealStartingState": {
+    "velocity": 0,
+    "rotation": 180.0
+  },
+  "useDefaultConstraints": true
+}
