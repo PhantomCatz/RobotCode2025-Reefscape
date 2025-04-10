@@ -32,7 +32,7 @@ public class AlgaePivotConstants {
     // Initial PIDF and motion magic assignment
     public static final Gains slot0_gains =
         switch (CatzConstants.getRobotType()) {
-            case SN2 -> new Gains(2.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0);
+            case SN2 -> new Gains(7.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0);
             case SN1 -> new Gains(10.0, 0.0, 0.1, 0.00, 0.0, 0.0, 3.0); //kg1.5
             case SN_TEST, SN1_2024 -> new Gains(7000.0, 0.0, 250.0, 8.4, 0.2, 0.2, 22.9);
         };
@@ -51,7 +51,7 @@ public class AlgaePivotConstants {
         };
 
 
-  public static LoggedTunableNumber tunnablePos = new LoggedTunableNumber("AlgaePivot/Applied Voltage", 1);
+  public static LoggedTunableNumber tunnablePos = new LoggedTunableNumber("AlgaePivot/tunnable Pos", 1);
   public static LoggedTunableNumber zeroPos  = new LoggedTunableNumber("AlgaePivot/ZeroPos", 90.0);
 
   public static LoggedTunableNumber slot0_kP = new LoggedTunableNumber("AlgaePivot/slot_0 kP", 4.0);

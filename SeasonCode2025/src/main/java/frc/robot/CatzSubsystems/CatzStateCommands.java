@@ -350,7 +350,7 @@ public class CatzStateCommands {
 
             new SequentialCommandGroup(
                 elevator.Elevator_Stow(),
-                algaePivot.AlgaePivot_Punch(),
+                algaePivot.AlgaePivot_BotBot(),
                 algae.vomitAlgae()
 
             )
@@ -376,7 +376,7 @@ public class CatzStateCommands {
                 Commands.waitUntil(() -> elevator.getElevatorPositionInch() > 50.0),
                 new ParallelCommandGroup(
                     algaePivot.AlgaePivot_NetAlgae(),
-                    algae.vomitAlgae()
+                    algae.eatAlgae()
                 )
             )
         ).unless(()-> Robot.isSimulation()).alongWith(Commands.print("Net Algae"));
@@ -408,10 +408,10 @@ public class CatzStateCommands {
             outtake.stopOuttake(),
             rampPivot.Ramp_Intake_Pos(),
             intakeRollers.stopIntaking(),
+            elevator.Elevator_BOT_BOT(), //TODO real height
 
             new SequentialCommandGroup(
-                algaePivot.AlgaePivot_BotBot(),
-                elevator.Elevator_BOT_BOT(), //TODO real height
+                algaePivot.AlgaePivot_BotBot().alongWith(Commands.waitSeconds(0.2)),
                 algae.eatAlgae()
             )
         ).unless(()-> Robot.isSimulation()).alongWith(Commands.print("Bot Algae"));
@@ -439,6 +439,48 @@ public class CatzStateCommands {
         ).unless(()-> Robot.isSimulation()).alongWith(Commands.print("Top Algae"));
     }
 
+    public static Command algaeStow(RobotContainer robotContainer) {
+
+        CatzClimb climb = robotContainer.getCatzClimb();
+        CatzOuttake outtake = robotContainer.getCatzOuttake();
+        CatzElevator elevator = robotContainer.getCatzElevator();
+        CatzAlgaeRemover remover = robotContainer.getCatzAlgaeRemover();
+        CatzAlgaePivot algaePivot = robotContainer.getAlgaePivot();
+        CatzRampPivot rampPivot = robotContainer.getCatzRampPivot();
+        CatzIntakeRollers intakeRollers = robotContainer.getIntakeRollers();
+
+        return new ParallelCommandGroup(
+            outtake.stopOuttake(),
+            algaePivot.AlgaePivot_Punch(),
+            rampPivot.Ramp_Intake_Pos(),  //TBD intake ramp pivot holds at intaking position for the duration of the match
+            intakeRollers.stopIntaking(),
+            elevator.Elevator_Stow(),
+            remover.holdAlgae()
+        ).unless(()-> Robot.isSimulation()).alongWith(Commands.print("Stow"));
+    }
+
+    public static Command algaeGrndIntk(RobotContainer robotContainer) {
+        CatzClimb climb = robotContainer.getCatzClimb();
+        CatzAlgaeRemover algae = robotContainer.getCatzAlgaeRemover();
+        CatzOuttake outtake = robotContainer.getCatzOuttake();
+        CatzElevator elevator = robotContainer.getCatzElevator();
+        CatzAlgaePivot algaePivot = robotContainer.getAlgaePivot();
+        CatzRampPivot rampPivot = robotContainer.getCatzRampPivot();
+        CatzIntakeRollers intakeRollers = robotContainer.getIntakeRollers();
+
+        return new ParallelCommandGroup(
+            outtake.stopOuttake(),
+            rampPivot.Ramp_Intake_Pos(),
+            intakeRollers.stopIntaking(),
+            elevator.Elevator_Stow(),
+
+            new SequentialCommandGroup(
+                algaePivot.AlgaePivot_GrndIntake().alongWith(Commands.waitSeconds(0.2)),
+                algae.eatAlgae()
+            )
+        ).unless(()-> Robot.isSimulation()).alongWith(Commands.print("Algae Ground Intake"));
+    }
+
     //------------------------------------------------------------------------------------------------------------------------------------
     //
     //      Climb Commands
@@ -459,9 +501,9 @@ public class CatzStateCommands {
                 rampPivot.Ramp_Climb_Pos(),
                 intakeRollers.stopIntaking(),
                 elevator.Elevator_Stow()
-            ).alongWith(Commands.waitSeconds(0.0)) //TBD TESITNG
+            ).alongWith(Commands.waitSeconds(0.5)), //TBD TESITNG
 
-            // climb.extendClimb()
+            climb.extendClimb()
         ).unless(()-> Robot.isSimulation()).alongWith(Commands.print("EXTENDING CLIMB/////////////////////////////"));
     }
 

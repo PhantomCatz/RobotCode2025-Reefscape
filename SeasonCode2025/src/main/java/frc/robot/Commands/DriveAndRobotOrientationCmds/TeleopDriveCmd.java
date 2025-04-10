@@ -107,9 +107,9 @@ public void initialize() {}
             : 0.0;
 
     if(CatzSuperstructure.isClimbEnabled()) {
-      m_headingAndVelocity_X *= 0.2;
-      m_headingAndVelocity_Y *= 0.2;
-      turningVelocity *= 0.2;
+      m_headingAndVelocity_X *= 0.4;
+      m_headingAndVelocity_Y *= 0.4;
+      turningVelocity *= 0.4;
       //System.out.println("low speed");
     }
 

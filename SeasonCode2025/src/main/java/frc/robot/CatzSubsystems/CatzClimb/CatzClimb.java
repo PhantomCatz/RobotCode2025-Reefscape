@@ -50,8 +50,8 @@ public class CatzClimb extends SubsystemBase {
   @RequiredArgsConstructor
   public enum ClimbPosition { //In Rotations //TBD
     RETRACT(() -> 46), //TBD
-    HOME(() -> 0.0), //TBD
-    EXTENDING(() -> -150.0), //TBD
+    HOME(() -> -10.0), //TBD
+    EXTENDING(() -> -230.0), //TBD
     MANUAL(() -> manualPow),
     FULL_MANUAL(() -> 0.0),
     TUNNABLE(tunnablePos);
@@ -92,10 +92,14 @@ public class CatzClimb extends SubsystemBase {
     io.updateInputs(inputs);
     Logger.processInputs("RealInputs/Climb", inputs);
     if (DriverStation.isDisabled()) {
+      io.setPower(0.0);
+      manualPow = 0.0;
+      targetPosition = ClimbPosition.MANUAL;
 
     } else {
       if(isManual || targetPosition == ClimbPosition.FULL_MANUAL) {
         io.setPower(manualPow);
+        System.out.println(manualPow);
         //System.out.println("full");
       } else if(targetPosition == ClimbPosition.MANUAL) {
         io.setPosition(position);

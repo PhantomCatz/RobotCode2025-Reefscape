@@ -62,7 +62,7 @@ public class ElevatorConstants {
     public static final Gains slot0_gains =
         switch (CatzConstants.getRobotType()) {
             //case SN2 -> new Gains(8.0, 0.0, 0.0, 0.175, 0.230, 0.013, 0.4);
-            case SN2 -> new Gains(4.0, 0.0, 0.0, 0.065, 0.379, 0.015, 0.0);//            case SN2 -> new Gains(4.0, 0.0, 0.0, 0.175, 0.425, 0.022, 0.0);
+            case SN2 -> new Gains(10.0, 0.0, 0.0, 0.065, 0.379, 0.009, 0.0);//            case SN2 -> new Gains(4.0, 0.0, 0.0, 0.175, 0.425, 0.022, 0.0);
 
             case SN1 -> new Gains(3.0, 0.0, 0.0, 0.175, 0.3, 0.013, 0.4); //
 
@@ -79,7 +79,7 @@ public class ElevatorConstants {
 
     public static final MotionMagicParameters motionMagicParameters =
         switch (CatzConstants.getRobotType()) {
-            case SN2, SN1 -> new MotionMagicParameters(150, 250, 1500);
+            case SN2, SN1 -> new MotionMagicParameters(500, 300, 4000);
 
             case SN_TEST, SN1_2024 -> new MotionMagicParameters(0.0, 0.0, 0.0);
         };

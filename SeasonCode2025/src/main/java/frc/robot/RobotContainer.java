@@ -165,12 +165,27 @@ public class RobotContainer {
     climbMode.toggleOnTrue(Commands.startEnd(()->superstructure.setClimbOverride(()->true), ()->superstructure.setClimbOverride(()->false)));
 
     //NBA
-    xboxDrv.rightTrigger().onTrue(selector.runToNearestBranch().alongWith(Commands.runOnce(()->led.setControllerState(ControllerLEDState.NBA))));
-    xboxDrv.rightTrigger().onFalse(selector.cancelCurrentDrivetrainCommand(CancellationSource.NBA).alongWith(Commands.runOnce(()->led.setControllerState(ControllerLEDState.FULL_MANUAL))));
+    xboxDrv.rightTrigger().onTrue(selector.runToNearestBranch().alongWith(Commands.runOnce(()->led.setControllerState(ControllerLEDState.NBA)))
+                                                               .unless(()->CatzSuperstructure.isClimbEnabled())
+                                                               .alongWith(climb.ClimbManualMode(()-> ((-xboxDrv.getRightTriggerAxis()-0.5)*2.0))
+                                                               .onlyIf(()-> CatzSuperstructure.isClimbEnabled()))
+    );
+    xboxDrv.rightTrigger().onFalse(selector.cancelCurrentDrivetrainCommand(CancellationSource.NBA)
+                                           .alongWith(Commands.runOnce(()->led.setControllerState(ControllerLEDState.FULL_MANUAL)))
+                                           .alongWith(climb.CancelClimb())
+    );
 
     // NBA Barge
-    xboxDrv.leftTrigger().onTrue(selector.runToNetCommand().alongWith(Commands.runOnce(()->led.setControllerState(ControllerLEDState.NBA))));
-    xboxDrv.leftTrigger().onFalse(selector.cancelCurrentDrivetrainCommand(CancellationSource.NET).alongWith(Commands.runOnce(()->led.setControllerState(ControllerLEDState.FULL_MANUAL))));
+    xboxDrv.leftTrigger().onTrue(selector.runToNetCommand()
+                                         .alongWith(Commands.runOnce(()->led.setControllerState(ControllerLEDState.NBA)))
+                                         .unless(()->CatzSuperstructure.isClimbEnabled())
+                                         .alongWith(climb.ClimbManualMode(()-> ((xboxDrv.getLeftTriggerAxis()-0.5)*2.0))
+                                         .onlyIf(()-> CatzSuperstructure.isClimbEnabled()))
+    );
+    xboxDrv.leftTrigger().onFalse(selector.cancelCurrentDrivetrainCommand(CancellationSource.NET)
+                                          .alongWith(Commands.runOnce(()->led.setControllerState(ControllerLEDState.FULL_MANUAL)))
+                                          .alongWith(climb.CancelClimb())
+    );
 
     // BALLS
 
@@ -182,16 +197,8 @@ public class RobotContainer {
     xboxDrv.a().onFalse(selector.cancelAutoCommand());
 
     // Left Right
-    xboxDrv.leftBumper().onTrue(new InstantCommand(() -> selector.runLeftRight(LeftRight.LEFT))
-                                                                  .unless(()->CatzSuperstructure.isClimbEnabled())
-                                                                  .alongWith(climb.ClimbManualMode(()-> 1.0)
-                                                                  .onlyIf(()-> CatzSuperstructure.isClimbEnabled()).alongWith(Commands.print("climb mode")))
-    );
-    xboxDrv.rightBumper().onTrue(new InstantCommand(() -> selector.runLeftRight(LeftRight.RIGHT))
-                                                                  .unless(()->CatzSuperstructure.isClimbEnabled())
-                                                                  .alongWith(climb.ClimbManualMode(()-> -1.0)
-                                                                  .onlyIf(()-> CatzSuperstructure.isClimbEnabled()))
-    );
+    xboxDrv.leftBumper().onTrue(new InstantCommand(() -> selector.runLeftRight(LeftRight.LEFT)));
+    xboxDrv.rightBumper().onTrue(new InstantCommand(() -> selector.runLeftRight(LeftRight.RIGHT)));
 
     xboxDrv.leftBumper().onFalse(selector.cancelCurrentDrivetrainCommand(CancellationSource.NA).alongWith(climb.CancelClimb()));
     xboxDrv.rightBumper().onFalse(selector.cancelCurrentDrivetrainCommand(CancellationSource.NA).alongWith(climb.CancelClimb()));
@@ -241,7 +248,8 @@ public class RobotContainer {
     xboxAux.x().onTrue(Commands.runOnce(() -> superstructure.setCurrentRobotAction(RobotAction.INTAKE, "container")).alongWith(Commands.print("INTAKE")));
     xboxAux.y().onTrue(Commands.runOnce(() -> superstructure.setCurrentRobotAction(RobotAction.OUTTAKE, "container")).alongWith(Commands.print("OUTTAKE L" + superstructure.getLevel())));
     xboxAux.a().onTrue(Commands.runOnce(() -> superstructure.setCurrentRobotAction(RobotAction.STOW, "container")).alongWith(Commands.print("STOWWW")));
-    xboxAux.b().onTrue(Commands.runOnce(() -> intakeRollers.outtake()).alongWith(Commands.print("ramp eject")));
+    xboxAux.b().onTrue(CatzStateCommands.algaeStow(this));
+
 
     // algae punch
     DoublePressTracker.createTrigger(xboxAux.x())
@@ -264,6 +272,8 @@ public class RobotContainer {
 
     // xboxTest.povUp().toggleOnTrue(rampPivot.Ramp_Intake_Pos().alongWith(Commands.print("pressed POV Up"))); //TBD
     // xboxTest.povLeft().toggleOnTrue(rampPivot.Ramp_Climb_Pos().alongWith(Commands.print("pressed POV Left")));
+    xboxTest.x().onTrue(Commands.runOnce(() -> CatzStateCommands.algaeGrndIntk(this)).alongWith(Commands.print("Hi")));
+    xboxTest.a().onTrue(Commands.runOnce(() -> superstructure.setCurrentRobotAction(RobotAction.STOW, "container")).alongWith(Commands.print("STOWWW")));
 
     xboxTest.povDown().toggleOnTrue(algaePivot.AlgaePivot_NetAlgae().alongWith(Commands.print("pressed POV Right"))); //TBD
     xboxTest.povUp().toggleOnTrue(algaePivot.AlgaePivot_Stow().alongWith(Commands.print("pressed POV Right"))); //TBD
@@ -295,8 +305,8 @@ public class RobotContainer {
 
     // xboxTest.rightStick().onTrue(elevator.elevatorFullManual(()->xboxTest.getRightY()));
 
-    // xboxTest.rightStick().onTrue(climb.ClimbManualMode(() -> xboxTest.getLeftY()).alongWith(Commands.print("Using manual ramp pivot")));
-    // xboxTest.rightStick().onFalse(climb.ClimbManualMode(()-> 0.0).alongWith(Commands.print("Nah - pivot motor")));
+    xboxTest.rightStick().onTrue(climb.ClimbManualMode(() -> xboxTest.getLeftY()*5).alongWith(Commands.print("Using manual ramp pivot")));
+    xboxTest.rightStick().onFalse(climb.ClimbManualMode(()-> 0.0).alongWith(Commands.print("Nah - pivot motor")));
 
     // Climb
     // xboxTest.back().and(xboxTest.b()).onTrue(CatzStateCommands.climb(this).alongWith(Commands.print("climb mode"))); // Setup Climb
