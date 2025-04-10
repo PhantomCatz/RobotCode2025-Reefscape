@@ -116,8 +116,8 @@ public class CatzLED extends VirtualSubsystem {
   private static final int LED_Sidebar_Start_RT = 0;
   private static final int LED_Sidebar_End_RT   = 23;
   private static final int LED_Crossbar_Start   = 24;
-  private static final int LED_Crossbar_End     = 33;
-  private static final int LED_Sidebar_Start_LT = 34;
+  private static final int LED_Crossbar_End     = 30;
+  private static final int LED_Sidebar_Start_LT = 31;
   private static final int LED_Sidebar_End_LT   = 53;
 
   private static final double strobeDuration = 0.1;
@@ -146,7 +146,7 @@ public class CatzLED extends VirtualSubsystem {
     loadingNotifier = new Notifier(
                             () -> {
                               synchronized (this) {
-                                breath(Color.kBlack, Color.kBlue, System.currentTimeMillis() / 1000.0);
+                                breath(Color.kBlack, Color.kWhiteSmoke, System.currentTimeMillis() / 1000.0);
                                 ledStrip.setData(buffer);
                               }
                             }
@@ -161,7 +161,7 @@ public class CatzLED extends VirtualSubsystem {
       alliance = DriverStation.getAlliance();
       allianceColor =
           alliance
-              .map(alliance -> alliance == Alliance.Blue ? Color.kBlue : Color.kRed)
+              .map(alliance -> alliance == Alliance.Blue ? Color.kAqua : Color.kOrangeRed)
               .orElse(Color.kPurple);
       secondaryDisabledColor = alliance.isPresent() ? Color.kYellow : Color.kBlack;
     }
@@ -244,7 +244,7 @@ public class CatzLED extends VirtualSubsystem {
           }
         break;
         case CLIMB:
-          rainbowCrossbar(rainbowCycleLength, rainbowDuration);
+          rainbowElevator(rainbowCycleLength, rainbowDuration);
           setSolidCrossbarColor(climbDirection.color);
         break;
         case sameBattery:
@@ -281,7 +281,7 @@ public class CatzLED extends VirtualSubsystem {
   // LED SOLID
   private void setSolidElevatorColor(Color color) {
     if (color != null) {
-      for (int i = LED_Sidebar_Start_RT; i < LED_Sidebar_End_LT; i++) {
+      for (int i = LED_Sidebar_Start_RT; i <= LED_Sidebar_End_LT; i++) {
         if(!(LED_Sidebar_End_RT<i && i<LED_Sidebar_Start_LT)) {
           buffer.setLED(i, color);
         }
@@ -331,7 +331,7 @@ public class CatzLED extends VirtualSubsystem {
   }
 
   private void bigBubble(int colored, int bubbleLength, int bubbleInterval, Color color) {
-    System.out.println("big bubble" + colored);
+    //System.out.println("big bubble" + colored);
     for (int i=0; i<LED_Crossbar_Start; i++) {
       if (i <= colored && ((i - colored % bubbleInterval) + bubbleInterval) % bubbleInterval < bubbleLength) {
         buffer.setLED(i, color);
@@ -373,7 +373,7 @@ public class CatzLED extends VirtualSubsystem {
   }
 
   private void strobeElevator(Color c1, Color c2, double duration) {
-    System.out.println("strobe");
+    //System.out.println("strobe");
     boolean c1On = ((Timer.getFPGATimestamp() % duration) / duration) > 0.5;
     setSolidElevatorColor(c1On ? c1 : c2);
   }
@@ -385,65 +385,7 @@ public class CatzLED extends VirtualSubsystem {
 
   //LED Build
   private void buildElevator(Color c1, Color c2, Color c3, Color c4) {
-    // BUILD ONE
-    // if (c1 != null) {
-    //   for (int i = LED_Sidebar_Build_LT_ONE_START; i <= LED_Sidebar_Build_LT_ONE_END; i++) {
-    //     if(!(LED_Sidebar_Build_LT_ONE_START < i && i < LED_Sidebar_Build_LT_ONE_END)) {
-    //       buffer.setLED(i, c1);
-    //     }
-    //   }
 
-    //   for (int i = LED_Sidebar_Build_RT_ONE_END; i <= LED_Sidebar_Build_RT_ONE_START; i++) {
-    //     if(!(LED_Sidebar_Build_LT_ONE_END < i && i < LED_Sidebar_Build_LT_ONE_START)) {
-    //       buffer.setLED(i, c1);
-    //     }
-    //   }
-    // }
-
-    // // BUILD TWO
-    // if (c2 != null) {
-    //   for (int i = LED_Sidebar_Build_LT_TWO_START; i <= LED_Sidebar_Build_LT_TWO_END; i++) {
-    //     if(!(LED_Sidebar_Build_LT_TWO_START < i && i < LED_Sidebar_Build_LT_TWO_END)) {
-    //       buffer.setLED(i, c2);
-    //     }
-    //   }
-
-    //   for (int i = LED_Sidebar_Build_RT_TWO_END; i <= LED_Sidebar_Build_RT_TWO_START; i++) {
-    //     if(!(LED_Sidebar_Build_RT_TWO_END < i && i < LED_Sidebar_Build_RT_TWO_START)) {
-    //       buffer.setLED(i, c2);
-    //     }
-    //   }
-    // }
-
-    // // BUILD THREE
-    // if (c3 != null) {
-    //   for (int i = LED_Sidebar_Build_LT_THREE_START; i <= LED_Sidebar_Build_LT_THREE_END; i++) {
-    //     if(!(LED_Sidebar_Build_LT_THREE_START < i && i < LED_Sidebar_Build_LT_THREE_END)) {
-    //       buffer.setLED(i, c3);
-    //     }
-    //   }
-
-    //   for (int i = LED_Sidebar_Build_RT_THREE_END; i <= LED_Sidebar_Build_RT_THREE_START; i++) {
-    //     if(!(LED_Sidebar_Build_RT_THREE_END < i && i < LED_Sidebar_Build_RT_THREE_START)) {
-    //       buffer.setLED(i, c3);
-    //     }
-    //   }
-    // }
-
-    // // BUILD FOUR
-    // if (c4 != null) {
-    //   for (int i = LED_Sidebar_Build_LT_FOUR_START; i <= LED_Sidebar_Build_LT_FOUR_END; i++) {
-    //     if(!(LED_Sidebar_Build_LT_FOUR_START < i && i < LED_Sidebar_Build_LT_FOUR_END)) {
-    //       buffer.setLED(i, c4);
-    //     }
-    //   }
-
-    //   for (int i = LED_Sidebar_Build_RT_FOUR_END; i <= LED_Sidebar_Build_RT_FOUR_START; i++) {
-    //     if(!(LED_Sidebar_Build_RT_FOUR_END < i && i < LED_Sidebar_Build_RT_FOUR_START)) {
-    //       buffer.setLED(i, c3);
-    //     }
-    //   }
-    // }
   }
 
   // LED BREATH
@@ -466,7 +408,7 @@ public class CatzLED extends VirtualSubsystem {
     double x = (1 - ((Timer.getFPGATimestamp() / duration) % 1.0)) * 180.0;
     double xDiffPerLed = 180.0 / cycleLength;
     for (int i = 0; i < length; i++) {
-      if(!(LED_Sidebar_End_RT<i && i<LED_Sidebar_Start_LT)) {
+      if(!(LED_Sidebar_End_RT<i && i< LED_Sidebar_Start_LT)) {
         x += xDiffPerLed;
         x %= 180.0;
         buffer.setHSV(i, (int) x, 255, 255);
@@ -485,7 +427,7 @@ public class CatzLED extends VirtualSubsystem {
   }
 
   private void wave(Color c1, Color c2, double cycleLength, double duration) {
-    System.out.println("wave");
+    //System.out.println("wave");
     double x = (1 - ((Timer.getFPGATimestamp() % duration) / duration)) * 2.0 * Math.PI;
     double xDiffPerLed = (2.0 * Math.PI) / cycleLength;
     for (int i = 0; i < length; i++) {

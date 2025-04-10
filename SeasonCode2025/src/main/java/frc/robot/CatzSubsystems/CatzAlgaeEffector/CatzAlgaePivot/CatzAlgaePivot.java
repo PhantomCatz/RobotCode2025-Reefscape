@@ -45,8 +45,9 @@ public class CatzAlgaePivot extends SubsystemBase {
     MANUAL(() -> manualPow),
     BOTBOT(() -> -25.0),
     BOTTOP(() ->-15.0),
-    PUNCH(() -> 30.0),
+    PUNCH(() -> -12.0),
     NULL(() -> 94.7),
+    GRND(() -> 0.7),
     TUNNABLE(tunnablePos);
 
     private final DoubleSupplier motionType;
@@ -219,6 +220,10 @@ public class CatzAlgaePivot extends SubsystemBase {
 
   public Command AlgaePivot_Punch() {
     return runOnce(() -> setAlgaePivotPos(AlgaePivotPosition.PUNCH));
+  }
+
+  public Command AlgaePivot_GrndIntake() {
+    return runOnce(() -> setAlgaePivotPos(AlgaePivotPosition.GRND));
   }
 
   public void setAlgaePivotPos(AlgaePivotPosition target) {

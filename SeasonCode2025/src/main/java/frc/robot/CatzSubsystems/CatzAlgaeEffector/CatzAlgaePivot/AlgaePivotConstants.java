@@ -51,7 +51,7 @@ public class AlgaePivotConstants {
         };
 
 
-  public static LoggedTunableNumber tunnablePos = new LoggedTunableNumber("AlgaePivot/Applied Voltage", 1);
+  public static LoggedTunableNumber tunnablePos = new LoggedTunableNumber("AlgaePivot/tunnable Pos", 1);
   public static LoggedTunableNumber zeroPos  = new LoggedTunableNumber("AlgaePivot/ZeroPos", 90.0);
 
   public static LoggedTunableNumber slot0_kP = new LoggedTunableNumber("AlgaePivot/slot_0 kP", 4.0);
