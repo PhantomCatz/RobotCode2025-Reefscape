@@ -408,34 +408,13 @@ public class TrajectoryDriveCmd extends Command {
     // System.out.println("omegaerr: " + (currentRPS));
     // System.out.println("speederr: " + (currentMPS));
 
+    CatzRobotTracker.getInstance().setReachedGoal(isPoseWithinThreshold(poseError));
+
     return isPoseWithinThreshold(poseError) && rotationError < ALLOWABLE_ROTATION_ERROR &&
     (desiredMPS != 0.0 || (currentMPS < ALLOWABLE_VEL_ERROR && currentRPS < ALLOWABLE_OMEGA_ERROR));
   }
 
   public boolean isPoseWithinThreshold(double poseError) {
-    // Check if the robot is near goal (and if robot velocity is zero if goal
-    // velocity is zero)
-
-    // double currentPosX = tracker.getEstimatedPose().getX();
-    // double currentPosY = tracker.getEstimatedPose().getY();
-
-    // double desiredPosX = endState.pose.getX();
-    // double desiredPosY = endState.pose.getY();
-
-    // double xError = Math.abs(desiredPosX - currentPosX);
-    // double yError = Math.abs(desiredPosY - currentPosY);
-
-    // translationError = Math.hypot(xError, yError);
-
-    // Desperate Throwing
-    // if(Robot.getAutoElapsedTime() >= 14.50) {
-    //   translationError = 0.0;
-    //   System.out.println("THROW");
-    // }
-
-    // System.out.println("poseerr:" + ((xError < poseError) &&(yError < poseError)));
-    // System.out.println("transerr: " + (translationError));
-    // System.out.println("pose errr: " + poseError);
     return translationError < poseError;
   }
 }

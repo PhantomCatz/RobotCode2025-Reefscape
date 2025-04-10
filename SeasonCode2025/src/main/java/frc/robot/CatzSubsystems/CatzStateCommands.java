@@ -430,10 +430,10 @@ public class CatzStateCommands {
             outtake.stopOuttake(),
             rampPivot.Ramp_Intake_Pos(),
             intakeRollers.stopIntaking(),
+            elevator.Elevator_BOT_TOP(),
 
             new SequentialCommandGroup(
-                algaePivot.AlgaePivot_BotTop(),
-                elevator.Elevator_BOT_TOP().withTimeout(2), //TODO real height
+                algaePivot.AlgaePivot_BotTop().alongWith(Commands.waitSeconds(0.2)),
                 algae.eatAlgae()
             )
         ).unless(()-> Robot.isSimulation()).alongWith(Commands.print("Top Algae"));

@@ -99,8 +99,8 @@ public class RobotContainer {
   private final Alert disconnectedAlertDrive      = new Alert("Driver controller disconnected (port 0).", AlertType.kWarning);
   private final Alert disconnectedAlertAux        = new Alert("Aux controller disconnected (port 1).", AlertType.kWarning);
   private final Alert disconnectedAlertOvverride  = new Alert("Override Switch disconnected (port 2)", AlertType.kWarning);
-  private final LoggedNetworkNumber endgameAlert1 = new LoggedNetworkNumber("Endgame Alert #1", 30.0);
-  private final LoggedNetworkNumber endgameAlert2 = new LoggedNetworkNumber("Endgame Alert #2", 15.0);
+  private final LoggedNetworkNumber endgameAlert1 = new LoggedNetworkNumber("Endgame Alert #1", 27.0);
+  private final LoggedNetworkNumber endgameAlert2 = new LoggedNetworkNumber("Endgame Alert #2", 10.0);
 
   // -------------------------------------------------------------------------------------------------------------------
   // Auto Declaration
@@ -166,11 +166,11 @@ public class RobotContainer {
 
     //NBA
     xboxDrv.rightTrigger().onTrue(selector.runToNearestBranch().alongWith(Commands.runOnce(()->led.setControllerState(ControllerLEDState.NBA))));
-    xboxDrv.rightTrigger().onFalse(selector.cancelCurrentDrivetrainCommand(CancellationSource.NBA));//.alongWith(Commands.runOnce(()->led.setControllerState(ControllerLEDState.FULL_MANUAL))));
+    xboxDrv.rightTrigger().onFalse(selector.cancelCurrentDrivetrainCommand(CancellationSource.NBA).alongWith(Commands.runOnce(()->led.setControllerState(ControllerLEDState.FULL_MANUAL))));
 
     // NBA Barge
     xboxDrv.leftTrigger().onTrue(selector.runToNetCommand().alongWith(Commands.runOnce(()->led.setControllerState(ControllerLEDState.NBA))));
-    xboxDrv.leftTrigger().onFalse(selector.cancelCurrentDrivetrainCommand(CancellationSource.NET));//.alongWith(Commands.runOnce(()->led.setControllerState(ControllerLEDState.FULL_MANUAL))));
+    xboxDrv.leftTrigger().onFalse(selector.cancelCurrentDrivetrainCommand(CancellationSource.NET).alongWith(Commands.runOnce(()->led.setControllerState(ControllerLEDState.FULL_MANUAL))));
 
     // BALLS
 

@@ -31,13 +31,13 @@ public class ElevatorConstants {
 
     //inches TODO tune
     public static final double STOW_HEIGHT = 1.0;
-    public static final double L1_HEIGHT   = 5.6;
+    public static final double L1_HEIGHT   = 11.0; //5.6
     public static final double L2_HEIGHT   = 16.622;
     public static final double L3_HEIGHT   = 34.763;
     public static final double L4_HEIGHT   = 65.400;
     public static final double L4_CORAL_ADJ = 69.0;
-    public static final double BOT_BOT_ALGAE = 15.6;
-    public static final double BOT_TOP_ALGAE = 35.7;
+    public static final double BOT_BOT_ALGAE = 25.6; //15.6
+    public static final double BOT_TOP_ALGAE = 42.7; //35.7
     // Motor ID
     public static final int LEFT_LEADER_ID  = 31;
     public static final int RIGHT_FOLLOWER_ID = 30;
@@ -66,7 +66,7 @@ public class ElevatorConstants {
 
             case SN1 -> new Gains(3.0, 0.0, 0.0, 0.175, 0.3, 0.013, 0.4); //
 
-            case SN_TEST, SN1_2024 -> new Gains(7000.0, 0.0, 250.0, 8.4, 0.2, 0.2, 22.9);
+            case SN_TEST, SN1_2024 -> new Gains(4.0, 0.0, 0.0, 0.065, 0.379, 0.015, 0.0);
         };
 
     public static final Gains slot1_gains =

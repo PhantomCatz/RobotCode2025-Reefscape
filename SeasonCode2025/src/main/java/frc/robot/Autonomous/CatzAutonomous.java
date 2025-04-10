@@ -218,38 +218,52 @@ public class CatzAutonomous extends SubsystemBase {
     for (File autoFile : autosDirectory.listFiles()) {
       String autoName = autoFile.getName().replaceFirst("[.][^.]+$", "");
       ArrayList<Object> commands = JSONUtil.getCommandsFromAuton(autoName);
-      for (Object o : commands) {
-        String commandName = JSONUtil.getCommandName(o);
-        try {
-          String[] components = commandName.split("\\+");
-          Command command = null;
+        for (Object o : commands) {
+          String commandName = JSONUtil.getCommandName(o);
+          if(commandName == null) {
+              System.out.println("commandName Null for " + autoName);
+              continue;
+          }
+          try {
+            String[] components = commandName.split("\\+");
+            Command command = null;
 
-          if(components.length == 1){
-            // Simple Trajectory Command
-            command = new TrajectoryDriveCmd(PathPlannerPath.fromPathFile(commandName), drivetrain, true, container, false);
-          } else if(components.length == 2){
-            // Command Trajectory with Mechanisms
-            String name = components[0];
-            String action = components[1];
+            if(components.length == 1) {
+              String action = components[0];
 
-            PathPlannerPath path = PathPlannerPath.fromPathFile(name);
+              if(action.contains("wait")) {
+                String waitTime = action.replace("wait", "");
+                waitTime.strip();
+                command = Commands.waitSeconds(Double.parseDouble(waitTime));
+              }
+              else {
+                // Simple Trajectory Command
+                command = new TrajectoryDriveCmd(PathPlannerPath.fromPathFile(commandName), drivetrain, true, container, false);
+              }
+            } else if(components.length == 2){
+              // Command Trajectory with Mechanisms
+              String name = components[0];
+              String action = components[1];
 
-            if(action.equalsIgnoreCase("CS")){
-              command = CatzStateCommands.driveToCoralStation(container, path, () -> waitForCoralChooser.getSelected());
-            } else if(action.contains("ReefL")){
-              command = CatzStateCommands.driveToScore(container, path, Integer.parseInt(action.substring("ReefL".length())));
+              PathPlannerPath path = PathPlannerPath.fromPathFile(name);
+
+              if(action.equalsIgnoreCase("CS")) {
+                command = CatzStateCommands.driveToCoralStation(container, path, () -> waitForCoralChooser.getSelected());
+              } else if(action.contains("ReefL")) {
+                command = CatzStateCommands.driveToScore(container, path, Integer.parseInt(action.substring("ReefL".length())));
+              }
             }
+
+            if(command == null){
+              System.out.println("****** typotypotypotypotypotypotypotypotypotypotypotypotypo       \n\n\n\n\nn\n\n\n\n \n\n\n typo in pathplanner reverting to drvive forward auto ********** ");
+              command = Commands.run(() -> drivetrain.drive(new ChassisSpeeds(0.5, 0.0, 0.0)), drivetrain).withTimeout(5.0); //TODO this only drives to the right(field relative). so make this different for blue alliance
+            }
+            NamedCommands.registerCommand(commandName, command);
+          } catch (FileVersionException | IOException | ParseException e) {
+            // e.printStackTrace();
           }
 
-          if(command == null){
-            System.out.println("****** typotypotypotypotypotypotypotypotypotypotypotypotypo       \n\n\n\n\nn\n\n\n\n \n\n\n typo in pathplanner reverting to drvive forward auto ********** ");
-            command = Commands.run(() -> drivetrain.drive(new ChassisSpeeds(0.5, 0.0, 0.0)), drivetrain).withTimeout(5.0); //TODO this only drives to the right(field relative). so make this different for blue alliance
-          }
-          NamedCommands.registerCommand(commandName, command);
-        } catch (FileVersionException | IOException | ParseException e) {
-          // e.printStackTrace();
         }
-      }
 
       autoProgramChooser.addDefaultOption(autoName, new PathPlannerAuto(autoName));
     }

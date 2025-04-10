@@ -222,17 +222,6 @@ public class CatzVision extends SubsystemBase {
         Logger.recordOutput("Vision/Camera" + cameraIndex + "/TxTyObservation tagID" + frameIndex, tagId);
         Logger.recordOutput("Vision/Camera" + cameraIndex + "/TxTyObservation distance" + frameIndex, distance);
       }
-
-      // Save tx ty observation data
-      for (var observation : txTyObservations.values()) {
-        if (!allTxTyObservations.containsKey(observation.tagId())
-            || observation.distance() < allTxTyObservations.get(observation.tagId()).distance()) {
-          allTxTyObservations.put(observation.tagId(), observation);
-        }
-      }
-      allTxTyObservations.values().stream().forEach(CatzRobotTracker.getInstance()::addTxTyObservation);
-
-
     }
 
   }

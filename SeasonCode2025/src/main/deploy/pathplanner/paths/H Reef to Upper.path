@@ -8,24 +8,40 @@
       },
       "prevControl": null,
       "nextControl": {
-        "x": 6.92889344262295,
-        "y": 4.714293032786885
+        "x": 6.821341984650153,
+        "y": 5.1575881822102465
       },
       "isLocked": false,
       "linkedName": "Reef-H"
     },
     {
       "anchor": {
-        "x": 1.6303278688524592,
-        "y": 7.23171106557377
+        "x": 6.856967213114754,
+        "y": 6.63232581967213
       },
       "prevControl": {
-        "x": 4.747131147540982,
-        "y": 6.6563012295081965
+        "x": 7.236840180365891,
+        "y": 5.911152400996622
+      },
+      "nextControl": {
+        "x": 6.106692017784437,
+        "y": 8.056692842888314
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 2.0019467213114757,
+        "y": 7.399538934426229
+      },
+      "prevControl": {
+        "x": 3.860193216867961,
+        "y": 7.01680340032501
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": "Coral-Top"
+      "linkedName": "Upper Station"
     }
   ],
   "rotationTargets": [],
@@ -33,16 +49,16 @@
   "pointTowardsZones": [],
   "eventMarkers": [],
   "globalConstraints": {
-    "maxVelocity": 4.3,
-    "maxAcceleration": 4.3,
-    "maxAngularVelocity": 540.0,
-    "maxAngularAcceleration": 720.0,
+    "maxVelocity": 17.0,
+    "maxAcceleration": 16.5,
+    "maxAngularVelocity": 600.0,
+    "maxAngularAcceleration": 60.0,
     "nominalVoltage": 12.0,
     "unlimited": false
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": -53.67317404787977
+    "rotation": -27.512002623851476
   },
   "reversed": false,
   "folder": "L4 H Paths",

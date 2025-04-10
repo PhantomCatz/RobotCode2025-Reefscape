@@ -1,0 +1,70 @@
+{
+  "version": "2025.0",
+  "waypoints": [
+    {
+      "anchor": {
+        "x": 5.814036885245901,
+        "y": 3.839190573770491
+      },
+      "prevControl": null,
+      "nextControl": {
+        "x": 6.4309553322996775,
+        "y": 3.0827159200676886
+      },
+      "isLocked": false,
+      "linkedName": "Reef-G"
+    },
+    {
+      "anchor": {
+        "x": 6.677151639344262,
+        "y": 1.1179815573770497
+      },
+      "prevControl": {
+        "x": 7.4615234753838955,
+        "y": 2.1630966723212612
+      },
+      "nextControl": {
+        "x": 5.941615468654764,
+        "y": 0.1379362086593816
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 1.6543032786885246,
+        "y": 0.722387295081968
+      },
+      "prevControl": {
+        "x": 3.881187877790803,
+        "y": 1.019837847267735
+      },
+      "nextControl": null,
+      "isLocked": false,
+      "linkedName": "Lower Station"
+    }
+  ],
+  "rotationTargets": [],
+  "constraintZones": [],
+  "pointTowardsZones": [],
+  "eventMarkers": [],
+  "globalConstraints": {
+    "maxVelocity": 17.0,
+    "maxAcceleration": 16.5,
+    "maxAngularVelocity": 600.0,
+    "maxAngularAcceleration": 60.0,
+    "nominalVoltage": 12.0,
+    "unlimited": false
+  },
+  "goalEndState": {
+    "velocity": 0,
+    "rotation": 53.8
+  },
+  "reversed": false,
+  "folder": "L4 G Paths",
+  "idealStartingState": {
+    "velocity": 0,
+    "rotation": 180.0
+  },
+  "useDefaultConstraints": true
+}

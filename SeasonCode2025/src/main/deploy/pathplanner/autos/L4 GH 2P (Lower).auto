@@ -1,0 +1,37 @@
+{
+  "version": "2025.0",
+  "command": {
+    "type": "sequential",
+    "data": {
+      "commands": [
+        {
+          "type": "named",
+          "data": {
+            "name": "Top GH 1+ReefL4"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Lower GH 2+CS"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Lower GH 3+ReefL4"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Lower GH 4+CS"
+          }
+        }
+      ]
+    }
+  },
+  "resetOdom": false,
+  "folder": "2 Piece Auto",
+  "choreoAuto": false
+}
