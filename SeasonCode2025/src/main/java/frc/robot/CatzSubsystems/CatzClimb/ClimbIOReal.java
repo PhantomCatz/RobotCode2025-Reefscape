@@ -111,7 +111,7 @@ public class ClimbIOReal implements ClimbIO {
 
   @Override
   public void setPower(double power) {
-    System.out.println("climb set power: " + power);
+    // System.out.println("climb set power: " + power);
     climbMotor.set(power);
   }
 
