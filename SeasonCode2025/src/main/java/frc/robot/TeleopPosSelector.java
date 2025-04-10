@@ -36,6 +36,7 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.FieldConstants.Reef;
 import frc.robot.Utilities.AllianceFlipUtil;
 import frc.robot.Utilities.CornerTrackingPathfinder;
+import frc.robot.CatzSubsystems.CatzSuperstructure.CoralState;
 import frc.robot.CatzSubsystems.CatzSuperstructure.Gamepiece;
 import frc.robot.CatzSubsystems.CatzSuperstructure.LeftRight;
 import frc.robot.CatzSubsystems.CatzStateCommands;
@@ -330,18 +331,17 @@ public class TeleopPosSelector { //TODO split up the file. it's too big and does
       radius = radius.plus(unitRadius.times(Reef.backDistance));
     }
 
-    Translation2d leftRight = unitLeftRight.times(leftRightPos.NUM * Reef.leftRightDistance);
+    Translation2d scoringPos = radius.plus(Reef.center);
 
-    //Left right changes depending on whether the selected side is the upper or lower half of the reef.
-    if (unitLeftRight.getY() < 0) {
-      leftRight = leftRight.times(-1);
+    if(superstructure.getChosenGamepiece() == Gamepiece.CORAL){
+      Translation2d leftRight = unitLeftRight.times(leftRightPos.NUM * Reef.leftRightDistance);
+      if (unitLeftRight.getY() < 0) {
+        leftRight = leftRight.times(-1);
+      }
+
+      scoringPos.plus(leftRight);
     }
 
-    if(superstructure.getChosenGamepiece() == Gamepiece.ALGAE){
-      leftRight = new Translation2d();
-    }
-
-    Translation2d scoringPos = radius.plus(leftRight).plus(Reef.center);
     return AllianceFlipUtil.apply(new Pose2d(scoringPos, selectedAngle.plus(Rotation2d.k180deg)));
   }
 
@@ -577,6 +577,7 @@ public class TeleopPosSelector { //TODO split up the file. it's too big and does
     }
   }
 
+  @SuppressWarnings("static-access")
   public Command runToNearestBranch() {
 
     return new InstantCommand(() -> {
@@ -585,9 +586,20 @@ public class TeleopPosSelector { //TODO split up the file. it's too big and does
       currentDrivetrainCommand.cancel();
       try{
         //TODO add a check to see if the robot is against the wall but angled so that it runs distanced scoring
-        Command prematureCommand = CatzStateCommands.LXElevator(m_container, superstructure.getLevel());//superstructure.getChosenGamepiece() == Gamepiece.CORAL ? CatzStateCommands.LXElevator(m_container, superstructure.getLevel()) : CatzStateCommands.XAlgae(m_container, superstructure.getLevel());
+        Command prematureCommand;//superstructure.getChosenGamepiece() == Gamepiece.CORAL ? CatzStateCommands.LXElevator(m_container, superstructure.getLevel()) : CatzStateCommands.XAlgae(m_container, superstructure.getLevel());
+        Pair<Integer, LeftRight> closestPos = getClosestReefPos().getFirst();
+
+        if(superstructure.getChosenGamepiece() ==  Gamepiece.CORAL){
+          prematureCommand = CatzStateCommands.LXElevator(m_container, superstructure.getLevel());
+        }else{ //selected game piece is algae
+          if(closestPos.getFirst() % 2 == 0){
+            prematureCommand = CatzStateCommands.botAlgae(m_container);
+          }else{
+            prematureCommand = CatzStateCommands.topAlgae(m_container);
+          }
+        }
         // PathPlannerPath path = getPathfindingPath(calculateReefPose(getClosestReefPos().getFirst(), true, false));
-        PathPlannerPath path = getStraightLinePath(tracker.getEstimatedPose(), calculateReefPose(getClosestReefPos().getFirst(), true, false), DriveConstants.PATHFINDING_CONSTRAINTS);
+        PathPlannerPath path = getStraightLinePath(tracker.getEstimatedPose(), calculateReefPose(closestPos, true, false), DriveConstants.PATHFINDING_CONSTRAINTS);
 
         currentDrivetrainCommand = new TrajectoryDriveCmd(path, m_container.getCatzDrivetrain(), true, m_container, true)
                                         .deadlineFor(new RepeatCommand(prematureCommand.onlyIf(() -> drivetrain.getDistanceError() < DriveConstants.PREDICT_DISTANCE_SCORE)))
