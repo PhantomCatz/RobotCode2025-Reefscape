@@ -32,7 +32,7 @@ public class AlgaePivotConstants {
     // Initial PIDF and motion magic assignment
     public static final Gains slot0_gains =
         switch (CatzConstants.getRobotType()) {
-            case SN2 -> new Gains(2.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0);
+            case SN2 -> new Gains(7.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0);
             case SN1 -> new Gains(10.0, 0.0, 0.1, 0.00, 0.0, 0.0, 3.0); //kg1.5
             case SN_TEST, SN1_2024 -> new Gains(7000.0, 0.0, 250.0, 8.4, 0.2, 0.2, 22.9);
         };
