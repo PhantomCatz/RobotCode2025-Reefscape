@@ -13,37 +13,19 @@
         {
           "type": "named",
           "data": {
-            "name": "wait1.0"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
             "name": "G Reef to Lower+CS"
           }
         },
         {
           "type": "named",
           "data": {
-            "name": "wait0.0"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "H Lower to Reef+ReefL4"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "H Reef to Lower+CS"
+            "name": "F Lower to Reef+ReefL4"
           }
         }
       ]
     }
   },
   "resetOdom": false,
-  "folder": "2 Piece Auto",
+  "folder": "New",
   "choreoAuto": false
 }

@@ -56,11 +56,11 @@ public class TrajectoryDriveCmd extends Command {
   public static final double ALLOWABLE_ROTATION_ERROR = 1.5;
   public static final double ALLOWABLE_VEL_ERROR = 0.80; // m/s
   public static final double ALLOWABLE_OMEGA_ERROR = 10.0;
-  private static final double TIMEOUT_EXTRA = 2.0;
+  private static final double TIMEOUT_EXTRA = 1.0;
   private static final double CONVERGE_DISTANCE = 0.04;
   private static final double CONVERGE_ANGLE = 1.0;
   private static final double FACE_REEF_DIST = 2.0;
-  private final double ALLOWABLE_VISION_ADJUST = 2e-3; //TODO tune
+  private final double ALLOWABLE_VISION_ADJUST = 5e-3; //TODO tune
 
   // Subsystems
   private CatzDrivetrain m_driveTrain;

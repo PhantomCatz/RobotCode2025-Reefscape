@@ -12,6 +12,7 @@
     "L4 H Paths",
     "L4 I Paths",
     "L4 J Paths",
+    "For New",
     "Straight Paths",
     "Test Paths",
     "Testy Folder",
@@ -24,6 +25,7 @@
     "2 Piece Auto",
     "3 Piece Auto",
     "4 Piece Auto",
+    "New",
     "Straight Auto"
   ],
   "defaultMaxVel": 4.3,

@@ -476,7 +476,7 @@ public class CatzStateCommands {
 
             new SequentialCommandGroup(
                 algaePivot.AlgaePivot_GrndIntake().alongWith(Commands.waitSeconds(0.2)),
-                algae.eatAlgae()
+                algae.vomitAlgae() //needs to spin other way
             )
         ).unless(()-> Robot.isSimulation()).alongWith(Commands.print("Algae Ground Intake"));
     }

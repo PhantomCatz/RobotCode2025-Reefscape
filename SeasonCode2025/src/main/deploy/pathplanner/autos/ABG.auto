@@ -7,49 +7,37 @@
         {
           "type": "named",
           "data": {
-            "name": "Top JLKA 1+ReefL4"
+            "name": "G Start+ReefL4"
           }
         },
         {
           "type": "named",
           "data": {
-            "name": "Top JLKA 2+CS"
+            "name": "G Reef to Upper+CS"
           }
         },
         {
           "type": "named",
           "data": {
-            "name": "Top JLKA 3+ReefL4"
+            "name": "Top IAB 5+ReefL4"
           }
         },
         {
           "type": "named",
           "data": {
-            "name": "Top JLKA 4+CS"
+            "name": "Top IAB 4+CS"
           }
         },
         {
           "type": "named",
           "data": {
-            "name": "Top JLKA 5+ReefL4"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "Top JLKA 6+CS"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "Top JLKA 7+ReefL4"
+            "name": "Top IAB 3+ReefL4"
           }
         }
       ]
     }
   },
   "resetOdom": false,
-  "folder": "4 Piece Auto",
+  "folder": "New",
   "choreoAuto": false
 }

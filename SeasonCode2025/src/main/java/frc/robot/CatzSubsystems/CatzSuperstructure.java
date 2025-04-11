@@ -231,21 +231,21 @@ public class CatzSuperstructure extends VirtualSubsystem {
                     currentRobotState = RobotState.INTAKE_CORAL_STATION;
                     robotActionCommand = CatzStateCommands.intakeCoralStation(container);
                 } else {
-                switch (level) {
-                    case 2:
-                        currentRobotState = RobotState.TOP_ALGAE;
-                        System.out.println("TOP algae");
-                        robotActionCommand = CatzStateCommands.botAlgae(container);
-                        break;
-                    case 4:
-                        currentRobotState = RobotState.BOT_ALGAE;
-                        System.out.println("BOT algae");
-                        robotActionCommand = CatzStateCommands.topAlgae(container);
-                        break;
-                    default:
-                        break;
+                    if(level == 2) {
+                        if(container.getSelector().recentNBAPos.getFirst() % 2 == 0) {
+                            currentRobotState = RobotState.BOT_ALGAE;
+                            System.out.println("BOT algae");
+                            robotActionCommand = CatzStateCommands.botAlgae(container);
+                        }else{
+                            currentRobotState = RobotState.TOP_ALGAE;
+                            System.out.println("TOP algae");
+                            robotActionCommand = CatzStateCommands.topAlgae(container);
+                        }
+                    } else if(level == 4) {
+                        robotActionCommand = CatzStateCommands.algaeGrndIntk(container);
+                    }
+
                 }
-            }
                 break;
 
             // Intake Algae Ground or Coral Ground
@@ -258,9 +258,9 @@ public class CatzSuperstructure extends VirtualSubsystem {
 
 
                 } else {
-                    currentRobotState = RobotState.GOBBLE_ALGAE;
-                    System.out.println("Gob algae");
-                    robotActionCommand = container.getAlgaePivot().AlgaePivot_Punch();
+                    currentRobotState = RobotState.INTAKE_ALGAE_GROUND;
+                    System.out.println("Ground algae");
+                    robotActionCommand = CatzStateCommands.algaeGrndIntk(container);
 
                 }
             break;

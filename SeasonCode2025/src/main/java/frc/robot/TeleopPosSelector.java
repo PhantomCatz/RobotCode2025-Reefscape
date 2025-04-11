@@ -67,7 +67,7 @@ public class TeleopPosSelector { //TODO split up the file. it's too big and does
   private Command currentDrivetrainCommand = new InstantCommand();
   private Command currentAutoplayCommand = new InstantCommand();
   private CornerTrackingPathfinder pathfinder = new CornerTrackingPathfinder();
-  private Pair<Integer, LeftRight> currentPathfindingPair = new Pair<Integer, LeftRight>(0, LeftRight.LEFT);
+  public Pair<Integer, LeftRight> recentNBAPos = new Pair<Integer, LeftRight>(0, LeftRight.LEFT);
   private Pair<Integer, LeftRight> currentlySelected = new Pair<Integer, LeftRight>(0, LeftRight.LEFT);
   private Deque<Pair<Pair<Integer, LeftRight>, Integer>> queuedPaths = new LinkedList<>();
   private HashMap<String, String> poseToLetter = new HashMap<>();
@@ -347,7 +347,7 @@ public class TeleopPosSelector { //TODO split up the file. it's too big and does
 
   public Pose2d calculateReefPose(Pair<Integer, LeftRight> pair, boolean isNBA, boolean isDistanced) {
     if (isNBA) {
-      currentPathfindingPair = pair;
+      recentNBAPos = pair;
     }
     if (pair == null) {
       return null;
@@ -458,13 +458,13 @@ public class TeleopPosSelector { //TODO split up the file. it's too big and does
   }
 
   private void runLeftRightNBA(LeftRight leftRight) {
-    if (currentPathfindingPair == null)
+    if (recentNBAPos == null)
       return; // means it is in AQUA
 
     currentDrivetrainCommand.cancel();
 
     Pose2d currentPose = tracker.getEstimatedPose();
-    Pose2d goal = calculateReefPose(new Pair<Integer, LeftRight>(currentPathfindingPair.getFirst(), leftRight), true, false); //TODO decide whether or not to have distanced
+    Pose2d goal = calculateReefPose(new Pair<Integer, LeftRight>(recentNBAPos.getFirst(), leftRight), true, false); //TODO decide whether or not to have distanced
 
     Translation2d goalPos = goal.getTranslation();
     Translation2d currentPos = currentPose.getTranslation();
@@ -577,15 +577,21 @@ public class TeleopPosSelector { //TODO split up the file. it's too big and does
     }
   }
 
+  @SuppressWarnings("static-access")
   public Command runToNearestBranch() {
 
     return new InstantCommand(() -> {
       isNetAiming = false;
-      currentPathfindingPair = getClosestReefPos().getFirst();
+      recentNBAPos = getClosestReefPos().getFirst();
       currentDrivetrainCommand.cancel();
       try{
         //TODO add a check to see if the robot is against the wall but angled so that it runs distanced scoring
-        Command prematureCommand = CatzStateCommands.LXElevator(m_container, superstructure.getLevel());//superstructure.getChosenGamepiece() == Gamepiece.CORAL ? CatzStateCommands.LXElevator(m_container, superstructure.getLevel()) : CatzStateCommands.XAlgae(m_container, superstructure.getLevel());
+        Command prematureCommand;
+        if(superstructure.getChosenGamepiece() == Gamepiece.CORAL){
+          prematureCommand = CatzStateCommands.LXElevator(m_container, superstructure.getLevel());
+        }else{ //algae
+          prematureCommand = new InstantCommand();
+        }
         // PathPlannerPath path = getPathfindingPath(calculateReefPose(getClosestReefPos().getFirst(), true, false));
         PathPlannerPath path = getStraightLinePath(tracker.getEstimatedPose(), calculateReefPose(getClosestReefPos().getFirst(), true, false), DriveConstants.PATHFINDING_CONSTRAINTS);
 
@@ -601,7 +607,7 @@ public class TeleopPosSelector { //TODO split up the file. it's too big and does
 
   public Command runCoralStationCommand() {
     return new InstantCommand(() -> {
-      currentPathfindingPair = null;
+      recentNBAPos = null;
       currentDrivetrainCommand.cancel();
       currentDrivetrainCommand = getCoralStationCommand();
       currentDrivetrainCommand.schedule();
@@ -613,7 +619,7 @@ public class TeleopPosSelector { //TODO split up the file. it's too big and does
   }
 
   public Command getReefScoreCommand(Pair<Pair<Integer, LeftRight>, Integer> pair) {
-    currentPathfindingPair = null;
+    recentNBAPos = null;
     isNetAiming = false;
 
     return CatzStateCommands.driveToScore(

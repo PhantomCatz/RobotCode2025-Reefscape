@@ -11,9 +11,9 @@
           }
         },
         {
-          "type": "wait",
+          "type": "named",
           "data": {
-            "waitTime": 7.5
+            "name": "wait1.0"
           }
         },
         {
@@ -23,9 +23,9 @@
           }
         },
         {
-          "type": "wait",
+          "type": "named",
           "data": {
-            "waitTime": 0.0
+            "name": "wait0.5"
           }
         },
         {
@@ -33,11 +33,17 @@
           "data": {
             "name": "G Upper to Reef+ReefL4"
           }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "G Reef to Upper+CS"
+          }
         }
       ]
     }
   },
-  "resetOdom": true,
+  "resetOdom": false,
   "folder": "2 Piece Auto",
   "choreoAuto": false
 }
