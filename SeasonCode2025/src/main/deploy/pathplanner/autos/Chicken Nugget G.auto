@@ -15,6 +15,12 @@
           "data": {
             "name": "AlgaeBot"
           }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "G to Algae"
+          }
         }
       ]
     }
