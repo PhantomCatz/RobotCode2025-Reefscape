@@ -120,6 +120,9 @@ public class CatzAutonomous extends SubsystemBase {
     NamedCommands.registerCommand("RestPose", Commands.runOnce(()->tracker.resetPose(new Pose2d())));
     NamedCommands.registerCommand("WheelCharacterization", new WheelRadiusCharacterization(drivetrain, Direction.CLOCKWISE));
 
+    NamedCommands.registerCommand("AlgaeTop", CatzStateCommands.topAlgae(container));
+    NamedCommands.registerCommand("AlgaeBot", CatzStateCommands.botAlgae(container));
+
     HashMap<String, Command> startPose = new HashMap<>();
     HashMap<String, Command> reefPose1 = new HashMap<>();
     HashMap<String, Command> reefPose2 = new HashMap<>();
