@@ -51,8 +51,8 @@ public class CatzClimb extends SubsystemBase {
   public enum ClimbPosition { //In Rotations //TBD
     RETRACT(() -> 46), //TBD
     HOME(() -> -10.0), //TBD
-    EXTENDING(() -> -230.0), //TBD
-    MANUAL(() -> manualPow),
+    EXTENDING(() -> -320.0), //TBD
+    MANUAL(() -> 0.0),
     FULL_MANUAL(() -> 0.0),
     TUNNABLE(tunnablePos);
 

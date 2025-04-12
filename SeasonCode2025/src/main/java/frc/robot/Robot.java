@@ -72,7 +72,7 @@ public class Robot extends LoggedRobot {
 
   // Timer related variables
   private double teleStart;
-  private double autoStart;
+  public static double autoStart = 0.0;
   private boolean autoMessagePrinted;
   @Getter
   private static double teleElapsedTime = 0.0;

@@ -19,6 +19,7 @@ import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Alert.AlertType;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Robot;
 import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.CatzRobotTracker;
 import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.CatzRobotTracker.TxTyObservation;
 import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.CatzRobotTracker.VisionObservation;
@@ -147,7 +148,8 @@ public class CatzVision extends SubsystemBase {
                 || (observationPose.getY() < 0.0)
                 || (observationPose.getY() > aprilTagLayout.getFieldWidth()))
                 // Filter out megatag 1 observations
-                || (!VisionConstants.USE_MEGATAG1 && observation.type() == PoseObservationType.MEGATAG_1);
+                || (!VisionConstants.USE_MEGATAG1 && observation.type() == PoseObservationType.MEGATAG_1)
+                || observation.timestamp() < Robot.autoStart;
         // Add pose to log
         robotPoses.add(observationPose);
         if (rejectPose) {
@@ -165,7 +167,7 @@ public class CatzVision extends SubsystemBase {
         // Calculate standard deviations
         //------------------------------------------------------------------------------------------------------------------------------------
         double stdDevFactor = Math.pow(observation.averageTagDistance(), 2.0) / observation.tagCount(); //TODO tune
-      double linearStdDev = LINEAR_STD_DEV_BASELINE * stdDevFactor;
+        double linearStdDev = LINEAR_STD_DEV_BASELINE * stdDevFactor;
         double angularStdDev = ANGULAR_STD_DEV_BASELINE * stdDevFactor;
         if (observation.type() == PoseObservationType.MEGATAG_2) {
           linearStdDev *= LINEAR_STD_DEV_MEGATAG2_SCALE_FACTOR;

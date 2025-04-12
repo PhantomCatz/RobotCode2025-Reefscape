@@ -21,6 +21,42 @@
           "data": {
             "name": "AlgaeBot"
           }
+        },
+        {
+          "type": "wait",
+          "data": {
+            "waitTime": 0.5
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "0 Backout"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Stow"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "0 Backout to CS+CS"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "G Lower to Reef+ReefL3"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "G Reef to Lower+CS"
+          }
         }
       ]
     }

@@ -3,29 +3,29 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 7.1,
-        "y": 2.978
+        "x": 3.8485,
+        "y": 2.891
       },
       "prevControl": null,
       "nextControl": {
-        "x": 6.224897540983606,
-        "y": 3.205766393442624
+        "x": 3.977896003392721,
+        "y": 3.104908097803685
       },
       "isLocked": false,
-      "linkedName": "Start3"
+      "linkedName": "Algae-4"
     },
     {
       "anchor": {
-        "x": 5.790061475409836,
-        "y": 4.186834016393442
+        "x": 3.524385245901639,
+        "y": 2.304764344262295
       },
       "prevControl": {
-        "x": 6.449385245901639,
-        "y": 4.114907786885245
+        "x": 3.655535003275937,
+        "y": 2.559519118470477
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": "Reef-H"
+      "linkedName": null
     }
   ],
   "rotationTargets": [],
@@ -42,13 +42,13 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 180.0
+    "rotation": 59.99999999999999
   },
   "reversed": false,
-  "folder": "L4 H Paths",
+  "folder": "Test Algae",
   "idealStartingState": {
     "velocity": 0,
-    "rotation": 180.0
+    "rotation": 59.99999999999999
   },
   "useDefaultConstraints": true
 }

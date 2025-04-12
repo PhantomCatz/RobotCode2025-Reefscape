@@ -3,13 +3,13 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 5.814,
-        "y": 3.839190573770491
+        "x": 5.790061475409836,
+        "y": 3.8511782786885242
       },
       "prevControl": null,
       "nextControl": {
-        "x": 6.054287755108588,
-        "y": 3.908196332551011
+        "x": 6.030349230518423,
+        "y": 3.920184037469044
       },
       "isLocked": false,
       "linkedName": "Reef-G"
@@ -25,7 +25,7 @@
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": "Algae-3"
+      "linkedName": "Algae-0"
     }
   ],
   "rotationTargets": [],

@@ -7,7 +7,7 @@
         {
           "type": "named",
           "data": {
-            "name": "G Start+ReefL4"
+            "name": "H Start+ReefL4"
           }
         },
         {
@@ -19,25 +19,19 @@
         {
           "type": "named",
           "data": {
-            "name": "G Reef to Lower+CS"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "wait0.0"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "H Lower to Reef+ReefL4"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
             "name": "H Reef to Lower+CS"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "G Lower to Reef+ReefL4"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "G Reef to Lower+CS"
           }
         }
       ]

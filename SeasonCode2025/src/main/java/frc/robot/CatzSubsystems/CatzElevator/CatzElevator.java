@@ -48,11 +48,13 @@ public class CatzElevator extends SubsystemBase {
       //TO CHANGE HEIGHT GO TO ElevatorConstants.java
       PosLimitSwitchStow(() -> 0.0),
       PosStow(() -> STOW_HEIGHT),
+      PosCoastStow(() -> COAST_STOW_HEIGHT),
       PosL1(() -> L1_HEIGHT),
       PosL2(() -> L2_HEIGHT),
       PosL3(() -> L3_HEIGHT),
       PosL4(() -> L4_HEIGHT),
       PosL4Adj(() -> L4_CORAL_ADJ),
+      AlgaeBotTransition(() -> ALGAE_BOT),
       PosBotBot(() -> BOT_BOT_ALGAE),
       PosBotTop(() -> BOT_TOP_ALGAE),
       PosManual(new LoggedTunableNumber("Elevator/ScoreSourceSetpoint",0.0)),
@@ -162,6 +164,9 @@ public class CatzElevator extends SubsystemBase {
       targetPosition = ElevatorPosition.PosNull;
     } else if(targetPosition != ElevatorPosition.PosNull &&
               targetPosition != ElevatorPosition.PosManual){
+      // if(targetPosition == ElevatorPosition.PosCoastStow) {
+      //   //hopefully a slow descent from algae intake positions to stow w an algae; regular PID effected desecent is too extreme for algae pivot arm
+      //   io.stop();
       // Setpoint PID
       if(targetPosition == ElevatorPosition.PosStow) {
         // Safety Stow
@@ -233,6 +238,10 @@ public class CatzElevator extends SubsystemBase {
     return runOnce(() -> setElevatorPos(ElevatorPosition.PosStow));
   }
 
+  public Command Elevator_Coast_Stow() {
+    return runOnce(() -> setElevatorPos(ElevatorPosition.PosCoastStow));
+  }
+
   public Command Elevator_L1() {
     return runOnce(() -> setElevatorPos(ElevatorPosition.PosL1));
   }
@@ -253,6 +262,9 @@ public class CatzElevator extends SubsystemBase {
     return runOnce(() -> setElevatorPos(ElevatorPosition.PosL4Adj));
   }
 
+  public Command Elevator_Bot_Transition() {
+    return runOnce(() -> setElevatorPos(ElevatorPosition.AlgaeBotTransition));
+  }
   public Command Elevator_BOT_BOT() {
     return runOnce(() -> setElevatorPos(ElevatorPosition.PosBotBot));
   }

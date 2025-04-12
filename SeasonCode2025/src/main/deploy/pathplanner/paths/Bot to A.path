@@ -3,13 +3,13 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 1.599,
-        "y": 0.66125
+        "x": 1.6543032786885246,
+        "y": 0.722387295081968
       },
       "prevControl": null,
       "nextControl": {
-        "x": 1.7268469505829533,
-        "y": 0.8879126076759716
+        "x": 1.782150229271478,
+        "y": 0.9490499027579395
       },
       "isLocked": false,
       "linkedName": "Lower Station"
@@ -45,7 +45,7 @@
     "rotation": 0.0
   },
   "reversed": false,
-  "folder": "Bot AB Paths",
+  "folder": null,
   "idealStartingState": {
     "velocity": 0,
     "rotation": 53.8

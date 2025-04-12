@@ -73,7 +73,7 @@ public class DriveConstants {
   public static final DriveConfig TRAJECTORY_CONFIG =
     DriveConfig.builder()
       .maxLinearVelocity(4.3)
-      .maxLinearAcceleration(4.3)
+      .maxLinearAcceleration(5.5)
       .maxAngularVelocity(Units.degreesToRadians(540))
       .maxAngularAcceleration(Units.degreesToRadians(720))
       .build();

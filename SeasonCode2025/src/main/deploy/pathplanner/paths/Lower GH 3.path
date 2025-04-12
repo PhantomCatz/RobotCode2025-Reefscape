@@ -3,13 +3,13 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 1.9779713114754096,
-        "y": 0.6864241803278684
+        "x": 1.7621926229508196,
+        "y": 0.6984118852459017
       },
       "prevControl": null,
       "nextControl": {
-        "x": 4.032477256216907,
-        "y": 0.9465864085109026
+        "x": 3.8166985676923177,
+        "y": 0.958574113428936
       },
       "isLocked": false,
       "linkedName": "TiltedLowerStation"
@@ -50,7 +50,7 @@
   "eventMarkers": [],
   "globalConstraints": {
     "maxVelocity": 4.3,
-    "maxAcceleration": 4.3,
+    "maxAcceleration": 5.5,
     "maxAngularVelocity": 540.0,
     "maxAngularAcceleration": 720.0,
     "nominalVoltage": 12.0,
@@ -64,7 +64,7 @@
   "folder": "Top GH Paths",
   "idealStartingState": {
     "velocity": 0,
-    "rotation": 14.931417178137481
+    "rotation": 40.23635830927382
   },
   "useDefaultConstraints": true
 }

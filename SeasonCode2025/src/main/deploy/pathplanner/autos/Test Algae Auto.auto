@@ -7,13 +7,7 @@
         {
           "type": "named",
           "data": {
-            "name": "G Start+ReefL4"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "G to Algae"
+            "name": "Station To 4"
           }
         },
         {
@@ -23,15 +17,9 @@
           }
         },
         {
-          "type": "wait",
-          "data": {
-            "waitTime": 0.5
-          }
-        },
-        {
           "type": "named",
           "data": {
-            "name": "0 Backout"
+            "name": "4 Backout"
           }
         },
         {
@@ -44,6 +32,6 @@
     }
   },
   "resetOdom": false,
-  "folder": "New",
+  "folder": null,
   "choreoAuto": false
 }

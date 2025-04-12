@@ -172,6 +172,7 @@ public class RobotContainer {
     );
     xboxDrv.rightTrigger().onFalse(selector.cancelCurrentDrivetrainCommand(CancellationSource.NBA)
                                            .alongWith(Commands.runOnce(()->led.setControllerState(ControllerLEDState.FULL_MANUAL)))
+                                           .unless(()-> CatzSuperstructure.isClimbEnabled())
                                            .alongWith(climb.CancelClimb())
     );
 
@@ -184,21 +185,22 @@ public class RobotContainer {
     );
     xboxDrv.leftTrigger().onFalse(selector.cancelCurrentDrivetrainCommand(CancellationSource.NET)
                                           .alongWith(Commands.runOnce(()->led.setControllerState(ControllerLEDState.FULL_MANUAL)))
+                                          .unless(()-> CatzSuperstructure.isClimbEnabled())
                                           .alongWith(climb.CancelClimb())
     );
 
     // BALLS
 
-    xboxDrv.y().onTrue(selector.runCoralStationCommand());
-    xboxDrv.y().onFalse(selector.cancelCurrentDrivetrainCommand(CancellationSource.NA));
+    // xboxDrv.y().onTrue(selector.runCoralStationCommand());
+    // xboxDrv.y().onFalse(selector.cancelCurrentDrivetrainCommand(CancellationSource.NA));
 
     // AQUA
-    xboxDrv.a().onTrue(new InstantCommand(() -> selector.runAutoCommand().schedule()));
-    xboxDrv.a().onFalse(selector.cancelAutoCommand());
+    // xboxDrv.a().onTrue(new InstantCommand(() -> selector.runAutoCommand().schedule()));
+    // xboxDrv.a().onFalse(selector.cancelAutoCommand());
 
     // Left Right
-    xboxDrv.leftBumper().onTrue(new InstantCommand(() -> selector.runLeftRight(LeftRight.LEFT)));
-    xboxDrv.rightBumper().onTrue(new InstantCommand(() -> selector.runLeftRight(LeftRight.RIGHT)));
+    xboxDrv.leftBumper().onTrue(new InstantCommand(() -> selector.runLeftRight(LeftRight.LEFT)).unless(()->CatzSuperstructure.isClimbEnabled()));
+    xboxDrv.rightBumper().onTrue(new InstantCommand(() -> selector.runLeftRight(LeftRight.RIGHT)).unless(()->CatzSuperstructure.isClimbEnabled()));
 
     xboxDrv.leftBumper().onFalse(selector.cancelCurrentDrivetrainCommand(CancellationSource.NA).alongWith(climb.CancelClimb()));
     xboxDrv.rightBumper().onFalse(selector.cancelCurrentDrivetrainCommand(CancellationSource.NA).alongWith(climb.CancelClimb()));
@@ -306,7 +308,6 @@ public class RobotContainer {
     // xboxTest.rightStick().onTrue(elevator.elevatorFullManual(()->xboxTest.getRightY()));
 
     xboxTest.rightStick().onTrue(climb.ClimbManualMode(() -> xboxTest.getLeftY()*5).alongWith(Commands.print("Using manual ramp pivot")));
-    xboxTest.rightStick().onFalse(climb.ClimbManualMode(()-> 0.0).alongWith(Commands.print("Nah - pivot motor")));
 
     // Climb
     // xboxTest.back().and(xboxTest.b()).onTrue(CatzStateCommands.climb(this).alongWith(Commands.print("climb mode"))); // Setup Climb

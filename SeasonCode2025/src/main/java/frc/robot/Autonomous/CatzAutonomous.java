@@ -116,7 +116,6 @@ public class CatzAutonomous extends SubsystemBase {
     NamedCommands.registerCommand("Processor", CatzStateCommands.processor(container));
     NamedCommands.registerCommand("BotAlgae", CatzStateCommands.intakeCoralGround(container));
     NamedCommands.registerCommand("TopAlgae", CatzStateCommands.topAlgae(container));
-    NamedCommands.registerCommand("Climb", CatzStateCommands.fullClimb(container));
     NamedCommands.registerCommand("RestPose", Commands.runOnce(()->tracker.resetPose(new Pose2d())));
     NamedCommands.registerCommand("WheelCharacterization", new WheelRadiusCharacterization(drivetrain, Direction.CLOCKWISE));
 
@@ -241,7 +240,7 @@ public class CatzAutonomous extends SubsystemBase {
               }
               else {
                 // Simple Trajectory Command
-                command = new TrajectoryDriveCmd(PathPlannerPath.fromPathFile(commandName), drivetrain, true, container, false);
+                command = new TrajectoryDriveCmd(PathPlannerPath.fromPathFile(commandName), drivetrain, false, container, false);
               }
             } else if(components.length == 2){
               // Command Trajectory with Mechanisms

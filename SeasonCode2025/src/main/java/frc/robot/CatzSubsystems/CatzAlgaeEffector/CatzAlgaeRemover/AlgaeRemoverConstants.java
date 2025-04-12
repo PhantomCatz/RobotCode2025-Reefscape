@@ -16,7 +16,7 @@ public class AlgaeRemoverConstants {
     public static final boolean isAlgaeRemoverDisabled = false;
 
     public static final int ALGAE_REMOVER_MOTOR_ID = 26;
-    public static final double ALGAE_EAT = -0.05;
+    public static final double ALGAE_EAT = -0.3;
     public static final double ALGAE_VOMIT = 1.0;
     public static final double ALGAE_HOLD = -0.05;
     public static final int STALL_CURRENT_LIMIT = 80;

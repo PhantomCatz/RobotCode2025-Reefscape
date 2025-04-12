@@ -43,6 +43,7 @@ public class CatzAlgaePivot extends SubsystemBase {
     HORIZONTAL(() -> -15.0), // TBD
     NetAlgae(() -> 60.0), // 80.0TBD
     MANUAL(() -> manualPow),
+    AlgaeBotTransition(() -> 20.112),
     BOTBOT(() -> -25.0),
     BOTTOP(() ->-15.0),
     PUNCH(() -> -12.0),
@@ -198,6 +199,7 @@ public class CatzAlgaePivot extends SubsystemBase {
     return runOnce(() -> setAlgaePivotPos(AlgaePivotPosition.STOW));
   }
 
+
   public Command AlgaePivot_Horizontal() {
     return runOnce(() -> setAlgaePivotPos(AlgaePivotPosition.HORIZONTAL));
   }
@@ -210,6 +212,9 @@ public class CatzAlgaePivot extends SubsystemBase {
     return runOnce(() -> setAlgaePivotPos(AlgaePivotPosition.TUNNABLE));
   }
 
+  public Command Algae_Transition_Bot() {
+    return runOnce(() -> setAlgaePivotPos(AlgaePivotPosition.AlgaeBotTransition));
+  }
   public Command AlgaePivot_BotBot() {
     return runOnce(() -> setAlgaePivotPos(AlgaePivotPosition.BOTBOT));
   }

@@ -3,45 +3,29 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 1.846106557377049,
-        "y": 7.423514344262295
+        "x": 5.814,
+        "y": 4.013
       },
       "prevControl": null,
       "nextControl": {
-        "x": 4.474173644708067,
-        "y": 7.162861842802188
+        "x": 6.652321270680204,
+        "y": 3.978468862054882
       },
       "isLocked": false,
-      "linkedName": "TiltedUpperStation"
+      "linkedName": "Algae-0"
     },
     {
       "anchor": {
-        "x": 6.545286885245901,
-        "y": 7.123821721311475
+        "x": 6.413422131147541,
+        "y": 4.013
       },
       "prevControl": {
-        "x": 5.966656363045596,
-        "y": 7.7576491608382785
-      },
-      "nextControl": {
-        "x": 7.057573102044761,
-        "y": 6.562667325473899
-      },
-      "isLocked": false,
-      "linkedName": null
-    },
-    {
-      "anchor": {
-        "x": 5.790061475409836,
-        "y": 3.8511782786885242
-      },
-      "prevControl": {
-        "x": 6.819048408955025,
-        "y": 5.147864788021417
+        "x": 5.3999321753908145,
+        "y": 4.0771162706467
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": "Reef-G"
+      "linkedName": "0 Backout"
     }
   ],
   "rotationTargets": [],
@@ -61,10 +45,10 @@
     "rotation": 180.0
   },
   "reversed": false,
-  "folder": "L4 G Paths",
+  "folder": "For New",
   "idealStartingState": {
     "velocity": 0,
-    "rotation": -34.11447294534142
+    "rotation": 180.0
   },
   "useDefaultConstraints": true
 }

@@ -231,18 +231,14 @@ public class CatzSuperstructure extends VirtualSubsystem {
                     currentRobotState = RobotState.INTAKE_CORAL_STATION;
                     robotActionCommand = CatzStateCommands.intakeCoralStation(container);
                 } else {
-                    if(level == 2) {
-                        if(container.getSelector().recentNBAPos.getFirst() % 2 == 0) {
-                            currentRobotState = RobotState.BOT_ALGAE;
-                            System.out.println("BOT algae");
-                            robotActionCommand = CatzStateCommands.botAlgae(container);
-                        }else{
-                            currentRobotState = RobotState.TOP_ALGAE;
-                            System.out.println("TOP algae");
-                            robotActionCommand = CatzStateCommands.topAlgae(container);
-                        }
-                    } else if(level == 4) {
-                        robotActionCommand = CatzStateCommands.algaeGrndIntk(container);
+                    if(container.getSelector().recentNBAPos.getFirst() % 2 == 0) {
+                        currentRobotState = RobotState.BOT_ALGAE;
+                        System.out.println("BOT algae");
+                        robotActionCommand = CatzStateCommands.botAlgae(container);
+                    }else{
+                        currentRobotState = RobotState.TOP_ALGAE;
+                        System.out.println("TOP algae");
+                        robotActionCommand = CatzStateCommands.topAlgae(container);
                     }
 
                 }
@@ -267,8 +263,14 @@ public class CatzSuperstructure extends VirtualSubsystem {
 
             default:
             case STOW:
-                currentRobotState = RobotState.STOW;
-                robotActionCommand = CatzStateCommands.stow(container);
+                // if(chosenGamepiece == Gamepiece.CORAL) {
+                    currentRobotState = RobotState.STOW;
+                    robotActionCommand = CatzStateCommands.stow(container);
+
+                // } else {
+                //     currentRobotState = RobotState.STOW;
+                //     robotActionCommand = CatzStateCommands.algaeStow(container);
+                // }
                 break;
 
         }

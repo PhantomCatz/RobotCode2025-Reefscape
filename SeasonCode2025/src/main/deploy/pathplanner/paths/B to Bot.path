@@ -16,12 +16,12 @@
     },
     {
       "anchor": {
-        "x": 1.599,
-        "y": 0.66125
+        "x": 1.6543032786885246,
+        "y": 0.722387295081968
       },
       "prevControl": {
-        "x": 1.5664707676531986,
-        "y": 0.9091246639794552
+        "x": 1.6217740463417232,
+        "y": 0.9702619590614232
       },
       "nextControl": null,
       "isLocked": false,
@@ -45,7 +45,7 @@
     "rotation": 53.8
   },
   "reversed": false,
-  "folder": "Bot AB Paths",
+  "folder": null,
   "idealStartingState": {
     "velocity": 0,
     "rotation": 0.0

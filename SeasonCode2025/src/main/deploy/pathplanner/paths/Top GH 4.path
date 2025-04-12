@@ -32,12 +32,12 @@
     },
     {
       "anchor": {
-        "x": 2.0019467213114757,
-        "y": 7.399538934426229
+        "x": 1.6867500000000002,
+        "y": 7.34975
       },
       "prevControl": {
-        "x": 4.0997791301148325,
-        "y": 7.1026601419220246
+        "x": 3.7845824088033577,
+        "y": 7.052871207495796
       },
       "nextControl": null,
       "isLocked": false,
@@ -50,7 +50,7 @@
   "eventMarkers": [],
   "globalConstraints": {
     "maxVelocity": 4.3,
-    "maxAcceleration": 4.3,
+    "maxAcceleration": 5.5,
     "maxAngularVelocity": 540.0,
     "maxAngularAcceleration": 720.0,
     "nominalVoltage": 12.0,
@@ -58,7 +58,7 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": -27.512002623851476
+    "rotation": -54.211026540816725
   },
   "reversed": false,
   "folder": "Top GH Paths",

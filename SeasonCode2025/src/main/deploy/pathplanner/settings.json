@@ -13,7 +13,7 @@
     "L4 H Paths",
     "L4 I Paths",
     "L4 J Paths",
-    "Bot AB Paths",
+    "Test Algae",
     "Straight Paths",
     "Test Paths",
     "Testy Folder",
@@ -30,7 +30,7 @@
     "Straight Auto"
   ],
   "defaultMaxVel": 4.3,
-  "defaultMaxAccel": 4.3,
+  "defaultMaxAccel": 5.5,
   "defaultMaxAngVel": 540.0,
   "defaultMaxAngAccel": 720.0,
   "defaultNominalVoltage": 12.0,

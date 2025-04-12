@@ -274,7 +274,7 @@ public class CatzStateCommands {
                 elevator.Elevator_L4(),
                 Commands.waitUntil(() -> elevator.isElevatorInPos()).withTimeout(2.0),
                 outtake.outtakeL4(),
-                new WaitCommand(0.1),
+                new WaitCommand(0.08),
                 elevator.Elevator_L4_Adj(),
                 Commands.waitUntil(() -> elevator.isElevatorInPos()).withTimeout(2.0)
             ).withTimeout(3.0)
@@ -404,14 +404,18 @@ public class CatzStateCommands {
         CatzRampPivot rampPivot = robotContainer.getCatzRampPivot();
         CatzIntakeRollers intakeRollers = robotContainer.getIntakeRollers();
 
-        return new ParallelCommandGroup(
-            outtake.stopOuttake(),
-            rampPivot.Ramp_Intake_Pos(),
-            intakeRollers.stopIntaking(),
-            elevator.Elevator_BOT_BOT(), //TODO real height
-
+        return new SequentialCommandGroup(
+            new ParallelCommandGroup(
+                outtake.stopOuttake(),
+                rampPivot.Ramp_Intake_Pos(),
+                intakeRollers.stopIntaking(),
+                algaePivot.Algae_Transition_Bot(),
+                elevator.Elevator_Bot_Transition()
+            ),
             new SequentialCommandGroup(
-                algaePivot.AlgaePivot_BotBot().alongWith(Commands.waitSeconds(0.2)),
+                Commands.waitSeconds((0.2)),
+                elevator.Elevator_BOT_BOT(), //TODO real height
+                algaePivot.AlgaePivot_BotBot(),
                 algae.eatAlgae()
             )
         ).unless(()-> Robot.isSimulation()).alongWith(Commands.print("Bot Algae"));
@@ -454,7 +458,7 @@ public class CatzStateCommands {
             algaePivot.AlgaePivot_Punch(),
             rampPivot.Ramp_Intake_Pos(),  //TBD intake ramp pivot holds at intaking position for the duration of the match
             intakeRollers.stopIntaking(),
-            elevator.Elevator_Stow(),
+            elevator.Elevator_Coast_Stow(),
             remover.holdAlgae()
         ).unless(()-> Robot.isSimulation()).alongWith(Commands.print("Stow"));
     }
@@ -501,32 +505,10 @@ public class CatzStateCommands {
                 rampPivot.Ramp_Climb_Pos(),
                 intakeRollers.stopIntaking(),
                 elevator.Elevator_Stow()
-            ).alongWith(Commands.waitSeconds(0.5)), //TBD TESITNG
+            ).alongWith(Commands.waitSeconds(0.1)), //TBD TESITNG
 
             climb.extendClimb()
         ).unless(()-> Robot.isSimulation()).alongWith(Commands.print("EXTENDING CLIMB/////////////////////////////"));
     }
 
-    public static Command fullClimb(RobotContainer robotContainer) {
-        CatzClimb climb = robotContainer.getCatzClimb();
-        CatzAlgaeRemover algae = robotContainer.getCatzAlgaeRemover();
-        CatzOuttake outtake = robotContainer.getCatzOuttake();
-        CatzElevator elevator = robotContainer.getCatzElevator();
-        CatzRampPivot rampPivot = robotContainer.getCatzRampPivot();
-        CatzIntakeRollers intakeRollers = robotContainer.getIntakeRollers();
-        CatzAlgaePivot algaePivot = robotContainer.getAlgaePivot();
-
-        return new SequentialCommandGroup(
-            new ParallelCommandGroup(
-                algaePivot.AlgaePivot_Stow(),
-                outtake.stopOuttake(),
-                algae.stopAlgae(),
-                rampPivot.Ramp_Climb_Pos(),
-                intakeRollers.stopIntaking(),
-                elevator.Elevator_Stow()
-            ).alongWith(Commands.waitSeconds(0.0)), //TBD TESTSETSING
-
-            climb.fullClimb()
-        ).unless(()-> Robot.isSimulation()).alongWith(Commands.print("CLIMBING/////////////////////////////"));
-    }
 }

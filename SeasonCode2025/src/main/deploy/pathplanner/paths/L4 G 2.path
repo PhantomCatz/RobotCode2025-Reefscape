@@ -3,25 +3,25 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 5.814036885245901,
-        "y": 3.839190573770491
+        "x": 5.790061475409836,
+        "y": 3.8511782786885242
       },
       "prevControl": null,
       "nextControl": {
-        "x": 6.485348360655738,
-        "y": 3.3237192622950817
+        "x": 6.461372950819673,
+        "y": 3.335706967213115
       },
       "isLocked": false,
       "linkedName": "Reef-G"
     },
     {
       "anchor": {
-        "x": 1.066905737704918,
-        "y": 0.7943135245901636
+        "x": 1.3552499999999998,
+        "y": 0.905
       },
       "prevControl": {
-        "x": 2.925,
-        "y": 0.938165983606558
+        "x": 3.2133442622950814,
+        "y": 1.0488524590163943
       },
       "nextControl": null,
       "isLocked": false,
@@ -34,7 +34,7 @@
   "eventMarkers": [],
   "globalConstraints": {
     "maxVelocity": 4.3,
-    "maxAcceleration": 4.3,
+    "maxAcceleration": 5.5,
     "maxAngularVelocity": 540.0,
     "maxAngularAcceleration": 720.0,
     "nominalVoltage": 12.0,
