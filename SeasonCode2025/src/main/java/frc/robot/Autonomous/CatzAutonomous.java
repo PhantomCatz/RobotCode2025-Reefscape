@@ -242,7 +242,7 @@ public class CatzAutonomous extends SubsystemBase {
                 // Simple Trajectory Command
                 command = new TrajectoryDriveCmd(PathPlannerPath.fromPathFile(commandName), drivetrain, false, container, false);
               }
-            } else if(components.length == 2){
+            } else if(components.length >= 2){
               // Command Trajectory with Mechanisms
               String name = components[0];
               String action = components[1];
@@ -252,8 +252,16 @@ public class CatzAutonomous extends SubsystemBase {
               if(action.equalsIgnoreCase("CS")) {
                 command = CatzStateCommands.driveToCoralStation(container, path, () -> waitForCoralChooser.getSelected());
               } else if(action.contains("ReefL")) {
-                command = CatzStateCommands.driveToScore(container, path, Integer.parseInt(action.substring("ReefL".length())));
+                if(components.length == 3){
+                  String d = components[2];
+                  double delay = Double.parseDouble(d.substring("d".length()));
+                  command = CatzStateCommands.driveToScore(container, path, Integer.parseInt(action.substring("ReefL".length())), delay);
+                }else{
+                  command = CatzStateCommands.driveToScore(container, path, Integer.parseInt(action.substring("ReefL".length())));
+                }
               }
+
+
             }
 
             if(command == null){

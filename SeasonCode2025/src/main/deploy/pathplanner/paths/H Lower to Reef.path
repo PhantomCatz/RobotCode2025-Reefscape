@@ -3,13 +3,13 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 1.7621926229508196,
-        "y": 0.6984118852459017
+        "x": 1.4984631147540983,
+        "y": 0.5545594262295083
       },
       "prevControl": null,
       "nextControl": {
-        "x": 2.961792568708164,
-        "y": 0.9581657670119671
+        "x": 2.698063060511443,
+        "y": 0.8143133079955736
       },
       "isLocked": false,
       "linkedName": "TiltedLowerStation"
@@ -32,11 +32,11 @@
     },
     {
       "anchor": {
-        "x": 5.790061475409836,
+        "x": 5.84,
         "y": 4.186834016393442
       },
       "prevControl": {
-        "x": 6.3135949470957415,
+        "x": 6.363533471685906,
         "y": 3.3581214744637746
       },
       "nextControl": null,
@@ -64,7 +64,7 @@
   "folder": "L4 H Paths",
   "idealStartingState": {
     "velocity": 0,
-    "rotation": 40.23635830927382
+    "rotation": 52.52382043863866
   },
   "useDefaultConstraints": true
 }

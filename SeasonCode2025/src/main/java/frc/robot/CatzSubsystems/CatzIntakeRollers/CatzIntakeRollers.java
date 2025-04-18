@@ -45,7 +45,8 @@ public class CatzIntakeRollers extends SubsystemBase {
     private intakeRollersStates currentState = intakeRollersStates.STOP;
     private intakeRollersStates previousState = intakeRollersStates.STOP;
 
-    public CatzIntakeRollers() {
+    public CatzIntakeRollers(RobotContainer container) {
+        this.container = container;
         if(isIntakeRollersDisabled) {
             io = new IntakeRollersIONull();
             System.out.println("Outtake Unconfigured");
@@ -85,7 +86,12 @@ public class CatzIntakeRollers extends SubsystemBase {
 
         switch (currentState) {
             case INTAKE:
-                case_rampRollersIn();
+                if(container.getCatzElevator().getElevatorPositionInch() < 4.0 && !DriverStation.isAutonomous()){
+                    case_rampRollersIn();
+                }
+                if(DriverStation.isAutonomous()){
+                    case_rampRollersIn();
+                }
             break;
             case ANTIJAM:
                 // adj_rampIntake(ANTIJAM_ROLLER_ROTATIONS);

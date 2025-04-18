@@ -61,6 +61,22 @@ public class CatzStateCommands {
         );
     }
 
+    public static Command driveToScore(RobotContainer robotContainer, PathPlannerPath pathToReadyPose, int level, double delay){
+        CatzDrivetrain drivetrain = robotContainer.getCatzDrivetrain();
+        CatzOuttake outtake = robotContainer.getCatzOuttake();
+
+        return new SequentialCommandGroup(
+            new TrajectoryDriveCmd(pathToReadyPose, drivetrain, true, robotContainer, false).deadlineFor(
+                new RepeatCommand(LXElevator(robotContainer, level).alongWith(new PrintCommand("elevavavava")).onlyIf(() -> drivetrain.getDistanceError() < DriveConstants.PREDICT_DISTANCE_SCORE))
+            ),
+            // new WaitUntilCommand(() -> !outtake.isDesiredCoralState(true)),
+            new WaitCommand(delay),
+            LXCoral(robotContainer, level),
+            new WaitUntilCommand(() -> outtake.isDesiredCoralState(true)),
+            stow(robotContainer)
+        );
+    }
+
     public static Command driveToScore(RobotContainer robotContainer, Supplier<PathPlannerPath> pathToReadyPoseSupplier, int level){
 
         CatzDrivetrain drivetrain = robotContainer.getCatzDrivetrain();
@@ -274,7 +290,7 @@ public class CatzStateCommands {
                 elevator.Elevator_L4(),
                 Commands.waitUntil(() -> elevator.isElevatorInPos()).withTimeout(2.0),
                 outtake.outtakeL4(),
-                new WaitCommand(0.08),
+                new WaitCommand(0.1),
                 elevator.Elevator_L4_Adj(),
                 Commands.waitUntil(() -> elevator.isElevatorInPos()).withTimeout(2.0)
             ).withTimeout(3.0)
@@ -503,8 +519,7 @@ public class CatzStateCommands {
                 outtake.stopOuttake(),
                 algae.stopAlgae(),
                 rampPivot.Ramp_Climb_Pos(),
-                intakeRollers.stopIntaking(),
-                elevator.Elevator_Stow()
+                intakeRollers.stopIntaking()
             ).alongWith(Commands.waitSeconds(0.1)), //TBD TESITNG
 
             climb.extendClimb()

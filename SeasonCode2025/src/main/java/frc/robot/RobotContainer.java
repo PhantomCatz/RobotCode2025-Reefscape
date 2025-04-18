@@ -68,14 +68,14 @@ public class RobotContainer {
   private CatzLED led = CatzLED.getInstance();
   private CatzRobotTracker robotTracker = CatzRobotTracker.getInstance();
   private CatzVision vision = new CatzVision(new VisionIOLimelight("limelight-gyoza"),
-                                             new VisionIOLimelight("limelight-tempura"));
+                                             new VisionIOLimelight("limelight-udon"));
   private CatzOuttake outtake;
   private CatzElevator elevator = new CatzElevator();
   private CatzClimb climb = new CatzClimb();
   private CatzAlgaeRemover algaeRemover = new CatzAlgaeRemover();
   private CatzAlgaePivot algaePivot = new CatzAlgaePivot();
   private CatzRampPivot rampPivot = new CatzRampPivot();
-  private CatzIntakeRollers intakeRollers = new CatzIntakeRollers();
+  private CatzIntakeRollers intakeRollers = new CatzIntakeRollers(this);
   private CatzSuperstructure superstructure = new CatzSuperstructure(this);
 
   // ------------------------------------------------------------------------------------------------------------------
@@ -238,9 +238,11 @@ public class RobotContainer {
     //                                     .alongWith(Commands.runOnce(() -> led.setControllerState(ControllerLEDState.AQUA))));
 
     // Full Manual
-    xboxAux.leftStick().and(xboxAux.rightStick()).or(isElevatorFullManual).onTrue(elevator.elevatorFullManual(() -> -xboxAux.getLeftY()).alongWith(Commands.print("Elevator Manual"))); // TODO make an override button for comp
-    xboxAux.leftStick().and(xboxAux.rightStick()).or(isAlgaePivotFullManual).onTrue(algaePivot.AlgaePivotFullManualCommand(()->xboxAux.getRightY()).alongWith(Commands.print("Algae Manual")));
-    isRampPivotFullManual.onTrue(rampPivot.rampPivotManual(()->xboxAux.getLeftY()).alongWith(Commands.print("Manual Ramp")));
+    xboxAux.leftStick().and(xboxAux.rightStick()).onTrue(elevator.elevatorFullManual(() -> -xboxAux.getLeftY()).alongWith(Commands.print("Elevator Manual"))); // TODO make an override button for
+    isElevatorFullManual.onTrue(elevator.elevatorFullManual(() -> -xboxAux.getLeftY()).alongWith(Commands.print("Elevator Manual"))); // TODO make an override button for
+    xboxAux.leftStick().and(xboxAux.rightStick()).onTrue(algaePivot.AlgaePivotFullManualCommand(()->xboxAux.getRightY()).alongWith(Commands.print("Algae Manual")));
+    isAlgaePivotFullManual.onTrue(algaePivot.AlgaePivotFullManualCommand(()->xboxAux.getRightY()).alongWith(Commands.print("Algae Manual")));
+    isRampPivotFullManual.onTrue(rampPivot.rampPivotManual(()->-xboxAux.getLeftY()).alongWith(Commands.print("Manual Ramp")));
 
     // Gamepiece Selection
     xboxAux.leftTrigger().onTrue(Commands.runOnce(()-> CatzSuperstructure.setChosenGamepiece(Gamepiece.CORAL)));

@@ -52,7 +52,7 @@ import org.littletonrobotics.junction.Logger;
 public class TrajectoryDriveCmd extends Command {
   // Trajectory constants
   public static final double ALLOWABLE_POSE_ERROR = 0.05;
-  public static final double ALLOWABLE_AUTOAIM_ERROR = 0.025;
+  public static final double ALLOWABLE_AUTOAIM_ERROR = 0.018;
   public static final double ALLOWABLE_ROTATION_ERROR = 1.5;
   public static final double ALLOWABLE_VEL_ERROR = 0.80; // m/s
   public static final double ALLOWABLE_OMEGA_ERROR = 10.0;
@@ -60,7 +60,7 @@ public class TrajectoryDriveCmd extends Command {
   private static final double CONVERGE_DISTANCE = 0.04;
   private static final double CONVERGE_ANGLE = 1.0;
   private static final double FACE_REEF_DIST = 2.0;
-  private final double ALLOWABLE_VISION_ADJUST = 5e-3; //TODO tune
+  private final double ALLOWABLE_VISION_ADJUST = 4e-3; //TODO tune
 
   // Subsystems
   private CatzDrivetrain m_driveTrain;
@@ -86,6 +86,7 @@ public class TrajectoryDriveCmd extends Command {
 
   private boolean isBugged = false;
   private final boolean isTelop;
+  private Rotation2d startRot;
   // ---------------------------------------------------------------------------------------------
   //
   // Trajectory Drive Command Constructor
@@ -148,7 +149,7 @@ public class TrajectoryDriveCmd extends Command {
           e.printStackTrace();
         }
       }
-
+      startRot = tracker.getEstimatedPose().getRotation();
 
       // Collect current drive state
       ChassisSpeeds currentSpeeds = DriveConstants.SWERVE_KINEMATICS.toChassisSpeeds(tracker.getCurrentModuleStates());
@@ -280,6 +281,10 @@ public class TrajectoryDriveCmd extends Command {
 
     // Logging
     Logger.recordOutput("CatzRobotTracker/Desired Auto Pose", goal.pose);
+
+    // if(Math.abs(startRot.minus(endRotation).getDegrees()) < 1){
+    //   adjustedSpeeds = new ChassisSpeeds(adjustedSpeeds.vxMetersPerSecond, adjustedSpeeds.vyMetersPerSecond, 0.0);
+    // }
 
     // send to drivetrain
     m_driveTrain.drive(adjustedSpeeds);

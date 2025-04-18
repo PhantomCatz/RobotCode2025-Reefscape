@@ -32,11 +32,11 @@
     },
     {
       "anchor": {
-        "x": 5.790061475409836,
+        "x": 5.84,
         "y": 4.186834016393442
       },
       "prevControl": {
-        "x": 6.784277091312275,
+        "x": 6.83421561590244,
         "y": 5.380798110095241
       },
       "nextControl": null,
@@ -64,7 +64,7 @@
   "folder": "L4 H Paths",
   "idealStartingState": {
     "velocity": 0,
-    "rotation": -34.11447294534142
+    "rotation": -66.19405648154236
   },
   "useDefaultConstraints": true
 }

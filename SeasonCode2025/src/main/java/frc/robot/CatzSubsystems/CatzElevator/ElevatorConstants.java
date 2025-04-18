@@ -35,7 +35,7 @@ public class ElevatorConstants {
     public static final double L1_HEIGHT   = 11.0; //5.6
     public static final double L2_HEIGHT   = 16.622;
     public static final double L3_HEIGHT   = 34.763;
-    public static final double L4_HEIGHT   = 65.400;
+    public static final double L4_HEIGHT   = 65.0;//64.65;//65.400;
     public static final double L4_CORAL_ADJ = 69.0;
     public static final double ALGAE_BOT   = 4.766847290;
     public static final double BOT_BOT_ALGAE = 25.6; //15.6

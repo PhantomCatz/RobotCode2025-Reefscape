@@ -3,13 +3,13 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 1.7621926229508196,
-        "y": 0.6984118852459017
+        "x": 1.4984631147540983,
+        "y": 0.5545594262295083
       },
       "prevControl": null,
       "nextControl": {
-        "x": 2.9534501223508665,
-        "y": 0.9397160290726417
+        "x": 2.689720614154145,
+        "y": 0.7958635700562484
       },
       "isLocked": false,
       "linkedName": "TiltedLowerStation"
@@ -32,11 +32,11 @@
     },
     {
       "anchor": {
-        "x": 5.790061475409836,
+        "x": 5.84,
         "y": 3.8511782786885242
       },
       "prevControl": {
-        "x": 6.264636121123459,
+        "x": 6.314574645713623,
         "y": 2.711257501661555
       },
       "nextControl": null,
@@ -64,7 +64,7 @@
   "folder": "L4 G Paths",
   "idealStartingState": {
     "velocity": 0,
-    "rotation": 40.23635830927382
+    "rotation": 52.52382043863866
   },
   "useDefaultConstraints": true
 }

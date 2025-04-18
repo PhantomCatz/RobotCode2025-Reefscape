@@ -166,7 +166,7 @@ public class CatzOuttake extends SubsystemBase {
     if(inputs.bbreakFrntTriggered) {
       io.runMotor(0.0, 0.0);
       intakeIterationCoutner++;
-      if(intakeIterationCoutner >= 3) {
+      if(intakeIterationCoutner >= 1) { //TODO was 3, trying new value 4/17 6:25pm
         if(inputs.bbreakBackTriggered) {
           intakeIterationCoutner = 0;
           currentState = outtakeStates.ADJ_FWD;

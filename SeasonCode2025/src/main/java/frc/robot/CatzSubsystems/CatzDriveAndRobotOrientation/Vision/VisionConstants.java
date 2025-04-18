@@ -60,7 +60,7 @@ public class VisionConstants {
         1.0 // Camera 1
       };
 
-  public static Translation2d[] LIMELIGHT_ERROR = {
+  public static final Translation2d[] LIMELIGHT_ERROR = {
     new Translation2d(0.07647673800,0.0883352451).div(2.356170511),
     new Translation2d(0.01013154230126, -0.04330684940).div(2.356170511)
     // new Translation2d(-0.0290867, 0.070948).div(1.2907317),
@@ -70,8 +70,8 @@ public class VisionConstants {
   public static final boolean USE_MEGATAG1 = false; // megatag 1 3d solve allows robot to fly
 
   public static final HashMap<String, Double> PING_MAP = new HashMap<>() {{
-    put("limelight-gyoza", 115.0);
-    put("limelight-tempura", 115.0);
+    put("limelight-gyoza", 76.25);
+    put("limelight-udon", 76.25);
 
   }};
 
