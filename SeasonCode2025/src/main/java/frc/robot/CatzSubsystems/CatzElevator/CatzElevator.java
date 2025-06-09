@@ -23,8 +23,12 @@ import frc.robot.CatzConstants;
 import frc.robot.Utilities.LoggedTunableNumber;
 import lombok.RequiredArgsConstructor;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.util.Color8Bit;
 
 import org.littletonrobotics.junction.Logger;
+import org.littletonrobotics.junction.mechanism.LoggedMechanism2d;
+import org.littletonrobotics.junction.mechanism.LoggedMechanismLigament2d;
+import org.littletonrobotics.junction.mechanism.LoggedMechanismRoot2d;
 
 
 
@@ -42,6 +46,13 @@ public class CatzElevator extends SubsystemBase {
   private ElevatorPosition previousLoggedPosition = ElevatorPosition.PosNull;
 
   private boolean isElevatorInPos = false;
+
+  // private final Mechanism2d m_mech2d = new Mechanism2d(20, 50);
+  // private final MechanismRoot2d m_mech2dRoot = m_mech2d.getRoot("elevator root", 10, 0);
+  // private final MechanismLigament2d m_elevatorMech2d = m_mech2dRoot.append(new MechanismLigament2d("Elevator", 10, 90));
+  LoggedMechanism2d mechanism = new LoggedMechanism2d(1, 1);
+  private final LoggedMechanismRoot2d mechanismRoot = mechanism.getRoot("elevator root", 0.63, 0);
+  private final LoggedMechanismLigament2d mechanismElevator = mechanismRoot.append(new LoggedMechanismLigament2d("Elevator", 0.5, 90, 10, new Color8Bit(255, 0, 0)));
 
   @RequiredArgsConstructor
   public static enum ElevatorPosition {
@@ -85,6 +96,7 @@ public class CatzElevator extends SubsystemBase {
         break;
       }
     }
+    // SmartDashboard.putData("Mech2d", m_mech2d);
   }
 
   @Override
@@ -162,6 +174,7 @@ public class CatzElevator extends SubsystemBase {
       targetPosition = ElevatorPosition.PosNull;
     } else if(targetPosition != ElevatorPosition.PosNull &&
               targetPosition != ElevatorPosition.PosManual){
+        System.out.println("elevatorgoing");
       // Setpoint PID
       if(targetPosition == ElevatorPosition.PosStow) {
         // Safety Stow
@@ -184,17 +197,19 @@ public class CatzElevator extends SubsystemBase {
       // Nothing happening
       io.stop();
     }
-
+    // Simulated logic
+    mechanismElevator.setLength(0.5 + targetPosition.getTargetPositionInch()*0.02);
     //----------------------------------------------------------------------------------------------------------------------------
     // Logging
     //----------------------------------------------------------------------------------------------------------------------------
 
 
-    Logger.recordOutput("Elevator/CurrentRadians", getElevatorPositionInch());
+    Logger.recordOutput("Elevator/CurrentPosition", getElevatorPositionInch());
     Logger.recordOutput("Elevator/prevtargetPosition", prevTargetPositon.getTargetPositionInch());
     Logger.recordOutput("Elevator/logged prev targetPosition", previousLoggedPosition.getTargetPositionInch());
     Logger.recordOutput("Elevator/isElevatorInPos", isElevatorInPosition());
     Logger.recordOutput("Elevator/targetPosition", targetPosition.getTargetPositionInch());
+    Logger.recordOutput("Mechanism2d/Elevator", mechanism);
 
     // Target Postioin Logging
     previousLoggedPosition = targetPosition;

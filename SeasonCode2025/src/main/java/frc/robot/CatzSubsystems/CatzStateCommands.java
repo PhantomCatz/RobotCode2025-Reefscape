@@ -24,7 +24,6 @@ import edu.wpi.first.wpilibj2.command.RepeatCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
-import frc.robot.Robot;
 import frc.robot.RobotContainer;
 import frc.robot.TeleopPosSelector;
 import frc.robot.CatzSubsystems.CatzAlgaeEffector.CatzAlgaePivot.CatzAlgaePivot;
@@ -121,7 +120,7 @@ public class CatzStateCommands {
             rampPivot.Ramp_Intake_Pos(),  //TBD intake ramp pivot holds at intaking position for the duration of the match
             intakeRollers.stopIntaking(),
             elevator.Elevator_Stow()
-        ).unless(()-> Robot.isSimulation()).alongWith(Commands.print("Stow"));
+        ).alongWith(Commands.print("Stow"));
 
     }
 
@@ -152,7 +151,7 @@ public class CatzStateCommands {
             elevator.Elevator_Stow(),
             rampPivot.Ramp_Intake_Pos(),
             intakeRollers.intake()
-        ).unless(()-> Robot.isSimulation()).alongWith(Commands.print("Intake Coral Station")).andThen(new InstantCommand(() -> selector.hasCoralSIM = true));
+        ).alongWith(Commands.print("Intake Coral Station")).andThen(new InstantCommand(() -> selector.hasCoralSIM = true));
     }
 
     public static Command intakeAlgae(RobotContainer robotContainer) {
@@ -172,7 +171,7 @@ public class CatzStateCommands {
             rampPivot.Ramp_Intake_Pos(),
             intakeRollers.stopIntaking()
 
-        ).unless(()-> Robot.isSimulation()).alongWith(Commands.print("intakeAlgae"));
+        ).alongWith(Commands.print("intakeAlgae"));
     }
 
     //------------------------------------------------------------------------------------------------------------------------------------
@@ -203,7 +202,7 @@ public class CatzStateCommands {
                 outtake.outtakeL1()
             ).withTimeout(1.0)
         )//.onlyIf(() -> CatzSuperstructure.getCurrentCoralState() == CoralState.IN_OUTTAKE)
-        .unless(()-> Robot.isSimulation()).alongWith(Commands.print("L1 Scoring State"));
+        .alongWith(Commands.print("L1 Scoring State"));
     }
 
     public static Command L2Coral(RobotContainer robotContainer) {
@@ -228,7 +227,7 @@ public class CatzStateCommands {
                 outtake.startOuttake()
             ).withTimeout(1.0)
         )//.onlyIf(() -> CatzSuperstructure.getCurrentCoralState() == CoralState.IN_OUTTAKE)
-         .unless(()-> Robot.isSimulation()).alongWith(Commands.print("L2 Scoring State")).unless(()-> Robot.isSimulation());
+         .alongWith(Commands.print("L2 Scoring State"));
     }
 
     public static Command L3Coral(RobotContainer robotContainer) {
@@ -252,7 +251,7 @@ public class CatzStateCommands {
                 outtake.startOuttake()
             ).withTimeout(1.0)
         )//.onlyIf(() -> CatzSuperstructure.getCurrentCoralState() == CoralState.IN_OUTTAKE)
-         .unless(()-> Robot.isSimulation()).alongWith(Commands.print("L3 scoring state"));
+         .alongWith(Commands.print("L3 scoring state"));
     }
 
     public static Command L4Coral(RobotContainer robotContainer) {
@@ -279,7 +278,7 @@ public class CatzStateCommands {
                 Commands.waitUntil(() -> elevator.isElevatorInPos()).withTimeout(2.0)
             ).withTimeout(3.0)
         )
-         .unless(()-> Robot.isSimulation()).alongWith(Commands.print("L4 Scoring State"));
+         .alongWith(Commands.print("L4 Scoring State"));
     }
 
     public static Command LXCoral(RobotContainer robotContainer, int level){
@@ -326,7 +325,7 @@ public class CatzStateCommands {
             // Commands.waitUntil(() -> rampPivot.isSafeToRaiseElevator()),
             // new PrintCommand("safe to raise elevator!!"),
             elevator.Elevator_LX(level)
-        ).unless(()-> Robot.isSimulation()).alongWith(Commands.print("L" + level+" Elevator Raise")).unless(()-> Robot.isSimulation());
+        ).alongWith(Commands.print("L" + level+" Elevator Raise"));
     }
 
     //------------------------------------------------------------------------------------------------------------------------------------
@@ -354,7 +353,7 @@ public class CatzStateCommands {
                 algae.vomitAlgae()
 
             )
-        ).unless(()-> Robot.isSimulation()).alongWith(Commands.print("processor"));
+        ).alongWith(Commands.print("processor"));
     }
 
     public static Command netAlgae(RobotContainer robotContainer) {
@@ -379,7 +378,7 @@ public class CatzStateCommands {
                     algae.eatAlgae()
                 )
             )
-        ).unless(()-> Robot.isSimulation()).alongWith(Commands.print("Net Algae"));
+        ).alongWith(Commands.print("Net Algae"));
     }
 
     public static Command XAlgae(RobotContainer robotContainer, int level){
@@ -414,7 +413,7 @@ public class CatzStateCommands {
                 algaePivot.AlgaePivot_BotBot().alongWith(Commands.waitSeconds(0.2)),
                 algae.eatAlgae()
             )
-        ).unless(()-> Robot.isSimulation()).alongWith(Commands.print("Bot Algae"));
+        ).alongWith(Commands.print("Bot Algae"));
     }
 
     public static Command topAlgae(RobotContainer robotContainer) {
@@ -436,7 +435,7 @@ public class CatzStateCommands {
                 algaePivot.AlgaePivot_BotTop().alongWith(Commands.waitSeconds(0.2)),
                 algae.eatAlgae()
             )
-        ).unless(()-> Robot.isSimulation()).alongWith(Commands.print("Top Algae"));
+        ).alongWith(Commands.print("Top Algae"));
     }
 
     public static Command algaeStow(RobotContainer robotContainer) {
@@ -456,7 +455,7 @@ public class CatzStateCommands {
             intakeRollers.stopIntaking(),
             elevator.Elevator_Stow(),
             remover.holdAlgae()
-        ).unless(()-> Robot.isSimulation()).alongWith(Commands.print("Stow"));
+        ).alongWith(Commands.print("Stow"));
     }
 
     public static Command algaeGrndIntk(RobotContainer robotContainer) {
@@ -478,7 +477,7 @@ public class CatzStateCommands {
                 algaePivot.AlgaePivot_GrndIntake().alongWith(Commands.waitSeconds(0.2)),
                 algae.eatAlgae()
             )
-        ).unless(()-> Robot.isSimulation()).alongWith(Commands.print("Algae Ground Intake"));
+        ).alongWith(Commands.print("Algae Ground Intake"));
     }
 
     //------------------------------------------------------------------------------------------------------------------------------------
@@ -504,7 +503,7 @@ public class CatzStateCommands {
             ).alongWith(Commands.waitSeconds(0.5)), //TBD TESITNG
 
             climb.extendClimb()
-        ).unless(()-> Robot.isSimulation()).alongWith(Commands.print("EXTENDING CLIMB/////////////////////////////"));
+        ).alongWith(Commands.print("EXTENDING CLIMB/////////////////////////////"));
     }
 
     public static Command fullClimb(RobotContainer robotContainer) {
@@ -527,6 +526,6 @@ public class CatzStateCommands {
             ).alongWith(Commands.waitSeconds(0.0)), //TBD TESTSETSING
 
             climb.fullClimb()
-        ).unless(()-> Robot.isSimulation()).alongWith(Commands.print("CLIMBING/////////////////////////////"));
+        ).alongWith(Commands.print("CLIMBING/////////////////////////////"));
     }
 }
