@@ -22,13 +22,22 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.CatzConstants;
 import frc.robot.Utilities.LoggedTunableNumber;
 import lombok.RequiredArgsConstructor;
+import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.system.plant.DCMotor;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.util.Color8Bit;
+import edu.wpi.first.wpilibj.RobotController;
+import edu.wpi.first.wpilibj.simulation.DCMotorSim;
+import edu.wpi.first.wpilibj.simulation.ElevatorSim;
 
 import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.mechanism.LoggedMechanism2d;
 import org.littletonrobotics.junction.mechanism.LoggedMechanismLigament2d;
 import org.littletonrobotics.junction.mechanism.LoggedMechanismRoot2d;
+
+import com.ctre.phoenix6.controls.DutyCycleOut;
+import com.ctre.phoenix6.hardware.TalonFX;
+
 
 
 
@@ -46,13 +55,6 @@ public class CatzElevator extends SubsystemBase {
   private ElevatorPosition previousLoggedPosition = ElevatorPosition.PosNull;
 
   private boolean isElevatorInPos = false;
-
-  // private final Mechanism2d m_mech2d = new Mechanism2d(20, 50);
-  // private final MechanismRoot2d m_mech2dRoot = m_mech2d.getRoot("elevator root", 10, 0);
-  // private final MechanismLigament2d m_elevatorMech2d = m_mech2dRoot.append(new MechanismLigament2d("Elevator", 10, 90));
-  LoggedMechanism2d mechanism = new LoggedMechanism2d(1, 1);
-  private final LoggedMechanismRoot2d mechanismRoot = mechanism.getRoot("elevator root", 0.63, 0);
-  private final LoggedMechanismLigament2d mechanismElevator = mechanismRoot.append(new LoggedMechanismLigament2d("Elevator", 0.5, 90, 10, new Color8Bit(255, 0, 0)));
 
   @RequiredArgsConstructor
   public static enum ElevatorPosition {
@@ -89,6 +91,10 @@ public class CatzElevator extends SubsystemBase {
         case REPLAY:
           io = new ElevatorIOReal() {};
           System.out.println("Elevator Configured for Replayed simulation");
+        break;
+        case SIM:
+          io = new ElevatorIOSim();
+          System.out.println("Elevator Configured for Simulation");
         break;
         default:
           io = new ElevatorIONull();
@@ -174,11 +180,9 @@ public class CatzElevator extends SubsystemBase {
       targetPosition = ElevatorPosition.PosNull;
     } else if(targetPosition != ElevatorPosition.PosNull &&
               targetPosition != ElevatorPosition.PosManual){
-        System.out.println("elevatorgoing");
       // Setpoint PID
       if(targetPosition == ElevatorPosition.PosStow) {
         // Safety Stow
-
         if(getElevatorPositionInch() < 2.0) {
           io.stop();
         } else {
@@ -187,6 +191,8 @@ public class CatzElevator extends SubsystemBase {
       } else {
         //Setpoint PID
         io.runSetpointUp(targetPosition.getTargetPositionInch());
+
+
       }
     } else if (targetPosition == ElevatorPosition.PosManual) {
       io.runMotor(elevatorSpeed);
@@ -197,8 +203,7 @@ public class CatzElevator extends SubsystemBase {
       // Nothing happening
       io.stop();
     }
-    // Simulated logic
-    mechanismElevator.setLength(0.5 + targetPosition.getTargetPositionInch()*0.02);
+
     //----------------------------------------------------------------------------------------------------------------------------
     // Logging
     //----------------------------------------------------------------------------------------------------------------------------
@@ -209,7 +214,7 @@ public class CatzElevator extends SubsystemBase {
     Logger.recordOutput("Elevator/logged prev targetPosition", previousLoggedPosition.getTargetPositionInch());
     Logger.recordOutput("Elevator/isElevatorInPos", isElevatorInPosition());
     Logger.recordOutput("Elevator/targetPosition", targetPosition.getTargetPositionInch());
-    Logger.recordOutput("Mechanism2d/Elevator", mechanism);
+    
 
     // Target Postioin Logging
     previousLoggedPosition = targetPosition;

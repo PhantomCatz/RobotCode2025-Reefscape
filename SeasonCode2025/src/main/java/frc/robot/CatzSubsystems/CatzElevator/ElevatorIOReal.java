@@ -35,7 +35,6 @@ public class ElevatorIOReal implements ElevatorIO {
   // Motor Instantiation
   TalonFX leaderTalon = new TalonFX(RIGHT_FOLLOWER_ID);
   TalonFX followerTalon = new TalonFX(LEFT_LEADER_ID);
-
   // Motor configuration
   private final TalonFXConfiguration config = new TalonFXConfiguration();
   private final MotionMagicVoltage positionControlUp = new MotionMagicVoltage(0.0).withUpdateFreqHz(0.0);
