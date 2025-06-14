@@ -159,7 +159,7 @@ public class CatzDrivetrain extends SubsystemBase {
     Logger.recordOutput("Drive/DistanceError", distanceError);
 
     pose = pose.interpolate(tracker.getEstimatedPose(), 0.05);
-    Logger.recordOutput("CatzRobotTracker/interlated pose", pose);
+    Logger.recordOutput("CatzRobotTracker/interpolated pose", pose);
 
     // -----------------------------------------------------------------------------------------------------
     // Attempt to update gyro inputs and log
