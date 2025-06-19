@@ -50,7 +50,7 @@ import frc.robot.Commands.DriveAndRobotOrientationCmds.TrajectoryDriveCmd;
 
 @SuppressWarnings({ "rawtypes", "unchecked" })
 public class TeleopPosSelector { //TODO split up the file. it's too big and does too much stuff
-  private final RobotContainer m_container;
+  public static final TeleopPosSelector Instance = new TeleopPosSelector();
 
   private final CommandXboxController xboxAux;
 
@@ -90,9 +90,8 @@ public class TeleopPosSelector { //TODO split up the file. it's too big and does
     NA
   }
 
-  public TeleopPosSelector(CommandXboxController aux, RobotContainer container) {
+  private TeleopPosSelector() {
     this.xboxAux = aux;
-    this.m_container = container;
     this.outtake = container.getCatzOuttake();
     this.currentDrivetrainCommand.addRequirements(container.getCatzDrivetrain());
     this.currentDrivetrainCommand.addRequirements(container.getCatzElevator());

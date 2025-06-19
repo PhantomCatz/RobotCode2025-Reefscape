@@ -19,11 +19,12 @@ import static frc.robot.CatzSubsystems.CatzAlgaeEffector.CatzAlgaeRemover.AlgaeR
 import org.littletonrobotics.junction.Logger;
 
 public class CatzAlgaeRemover extends SubsystemBase {
+  public static final CatzAlgaeRemover Instance = new CatzAlgaeRemover();
 
   private final AlgaeRemoverIO io;
   private final AlgaeEffectorIOInputsAutoLogged inputs = new AlgaeEffectorIOInputsAutoLogged();
 
-  public CatzAlgaeRemover() {
+  private CatzAlgaeRemover() {
     if(isAlgaeRemoverDisabled) { //Comes from Algae Remover Constants
       io = new AlgaeRemoverIONull();
       System.out.println("Algae Remover Unconfigured");

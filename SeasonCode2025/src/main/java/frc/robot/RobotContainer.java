@@ -55,28 +55,9 @@ import org.littletonrobotics.junction.networktables.LoggedNetworkNumber;
 
 
 public class RobotContainer {
+  public static final RobotContainer Instance = new RobotContainer();
 
   private final double SCORE_TRIGGER_THRESHHOLD = 0.8;
-
-  // -------------------------------------------------------------------------------------------------------------------
-  // Subsystem Declaration
-  // -------------------------------------------------------------------------------------------------------------------
-  // Primary subsystem declaration
-  private static CatzDrivetrain drive = new CatzDrivetrain();
-
-  // Assistance Subsystem declaration
-  private CatzLED led = CatzLED.getInstance();
-  private CatzRobotTracker robotTracker = CatzRobotTracker.getInstance();
-  private CatzVision vision = new CatzVision(new VisionIOLimelight("limelight-gyoza"),
-                                             new VisionIOLimelight("limelight-udon"));
-  private CatzOuttake outtake;
-  private CatzElevator elevator = new CatzElevator();
-  private CatzClimb climb = new CatzClimb();
-  private CatzAlgaeRemover algaeRemover = new CatzAlgaeRemover();
-  private CatzAlgaePivot algaePivot = new CatzAlgaePivot();
-  private CatzRampPivot rampPivot = new CatzRampPivot();
-  private CatzIntakeRollers intakeRollers = new CatzIntakeRollers(this);
-  private CatzSuperstructure superstructure = new CatzSuperstructure(this);
 
   // ------------------------------------------------------------------------------------------------------------------
   // Drive Controller Declaration
@@ -108,12 +89,7 @@ public class RobotContainer {
 
   private CatzAutonomous auto;
 
-  public RobotContainer() {
-    outtake = new CatzOuttake(this);
-    selector = new TeleopPosSelector(xboxAux, this);
-    auto = new CatzAutonomous(this);
-
-
+  private RobotContainer() {
     // Drive And Aux Command Mapping
     configureBindings();
 
@@ -412,55 +388,4 @@ public class RobotContainer {
   //      Subsystem getters
   //
   // ---------------------------------------------------------------------------
-  public CatzDrivetrain getCatzDrivetrain() {
-    return drive;
-  }
-
-  public CatzAlgaeRemover getCatzAlgaeRemover() {
-    return algaeRemover;
-  }
-
-  public CatzElevator getCatzElevator() {
-    return elevator;
-  }
-
-  public CatzClimb getCatzClimb() {
-    return climb;
-  }
-
-  public CatzOuttake getCatzOuttake() {
-    return outtake;
-  }
-
-  public Command getAutonomousCommand() {
-    return auto.getCommand();
-  }
-
-  public CatzAutonomous getAutonomous(){
-    return auto;
-  }
-
-  public TeleopPosSelector getSelector(){
-    return selector;
-  }
-
-  public CatzAlgaePivot getAlgaePivot(){
-    return algaePivot;
-  }
-
-  public CatzVision getCatzVision() {
-    return vision;
-  }
-
-  public CatzRampPivot getCatzRampPivot() {
-    return rampPivot;
-  }
-
-  public CatzIntakeRollers getIntakeRollers() {
-    return intakeRollers;
-  }
-
-  public CatzSuperstructure getSuperstructure(){
-    return superstructure;
-  }
 }

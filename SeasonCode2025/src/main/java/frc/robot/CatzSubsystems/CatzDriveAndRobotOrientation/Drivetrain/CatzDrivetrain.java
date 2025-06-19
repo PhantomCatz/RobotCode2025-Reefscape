@@ -44,6 +44,8 @@ import org.littletonrobotics.junction.Logger;
 
 // Drive train subsystem for swerve drive implementation
 public class CatzDrivetrain extends SubsystemBase {
+  public static final CatzDrivetrain Instance = new CatzDrivetrain();
+
   private double distanceError = 999999.9; //meters
 
   // Gyro input/output interface
@@ -79,7 +81,7 @@ public class CatzDrivetrain extends SubsystemBase {
 
   private final Field2d field;
 
-  public CatzDrivetrain() {
+  private CatzDrivetrain() {
 
     // Gyro Instantiation
     switch (CatzConstants.hardwareMode) {

@@ -29,6 +29,7 @@ import lombok.RequiredArgsConstructor;
 import org.littletonrobotics.junction.Logger;
 
 public class CatzClimb extends SubsystemBase {
+  public static final CatzClimb Instance = new CatzClimb();
 
   private final ClimbIO io;
   private final ClimbIOInputsAutoLogged inputs = new ClimbIOInputsAutoLogged();
@@ -46,6 +47,7 @@ public class CatzClimb extends SubsystemBase {
   static LoggedTunableNumber kV = new LoggedTunableNumber("Climb/kV", 0);
   static LoggedTunableNumber kA = new LoggedTunableNumber("Climb/kA", 0);
 
+  private final CatzLED LED;
 
   @RequiredArgsConstructor
   public enum ClimbPosition { //In Rotations //TBD
@@ -65,7 +67,7 @@ public class CatzClimb extends SubsystemBase {
 
   private ClimbPosition targetPosition = ClimbPosition.HOME;
 
-  public CatzClimb() {
+  private CatzClimb() {
     if(isClimbDisabled) { //Comes from Climb Constants
       io = new ClimbIONull();
       System.out.println("Climb Unconfigured");
@@ -85,6 +87,8 @@ public class CatzClimb extends SubsystemBase {
         break;
       }
     }
+
+    LED = CatzLED.Instance;
   }
 
   @Override
@@ -112,11 +116,11 @@ public class CatzClimb extends SubsystemBase {
       }
 
       if(inputs.commandedOutput > 0.1) {
-        CatzLED.getInstance().setClimbDirection(WinchingState.EXTENDING);
+        LED.setClimbDirection(WinchingState.EXTENDING);
       } else if(inputs.commandedOutput < -0.1) {
-        CatzLED.getInstance().setClimbDirection(WinchingState.RETRACTING);
+        LED.setClimbDirection(WinchingState.RETRACTING);
       } else {
-        CatzLED.getInstance().setClimbDirection(WinchingState.IDLE);
+        LED.setClimbDirection(WinchingState.IDLE);
       }
     }
 

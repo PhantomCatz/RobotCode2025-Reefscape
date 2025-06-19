@@ -11,6 +11,7 @@
 //------------------------------------------------------------------------------------
 package frc.robot.CatzSubsystems;
 
+import java.util.Set;
 import java.util.function.BooleanSupplier;
 
 import org.littletonrobotics.junction.AutoLogOutput;
@@ -19,6 +20,7 @@ import org.littletonrobotics.junction.Logger;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import frc.robot.RobotContainer;
 import frc.robot.CatzSubsystems.CatzLEDs.CatzLED;
 import frc.robot.CatzSubsystems.CatzLEDs.CatzLED.ControllerLEDState;
@@ -27,8 +29,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 public class CatzSuperstructure extends VirtualSubsystem {
-
-    private RobotContainer container;
+    public static final CatzSuperstructure Instance = new CatzSuperstructure();
 
     static @Getter @Setter @AutoLogOutput(key = "CatzSuperstructure/ChosenGamepiece")
     private Gamepiece chosenGamepiece = Gamepiece.CORAL;
@@ -106,10 +107,8 @@ public class CatzSuperstructure extends VirtualSubsystem {
         }
     }
 
-    public CatzSuperstructure(RobotContainer container) {
-        this.container = container;
+    private CatzSuperstructure() {
         this.level = 1;
-
     }
 
     public void setCurrentRobotAction(RobotAction action, String from){
@@ -244,23 +243,6 @@ public class CatzSuperstructure extends VirtualSubsystem {
                 }
                 break;
 
-            // Intake Algae Ground or Coral Ground
-
-            case INTAKE_GROUND:
-                if(chosenGamepiece == Gamepiece.CORAL) {
-                    currentRobotState = RobotState.INTAKE_CORAL_GROUND;
-                    System.out.println("Intake coral ground");
-                    robotActionCommand = CatzStateCommands.intakeCoralGround(container);
-
-
-                } else {
-                    currentRobotState = RobotState.INTAKE_ALGAE_GROUND;
-                    System.out.println("Ground algae");
-                    robotActionCommand = CatzStateCommands.algaeGrndIntk(container);
-
-                }
-            break;
-
             default:
             case STOW:
                 // if(chosenGamepiece == Gamepiece.CORAL) {
@@ -283,7 +265,12 @@ public class CatzSuperstructure extends VirtualSubsystem {
         previousAction = robotActionCommand;
 
         Logger.recordOutput("CurrentRobotState/CurrentRobotState", currentRobotState.toString());
+    }
 
+    public 
+
+    public Command L1Score(){
+        return new 
     }
 
 

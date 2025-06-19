@@ -63,9 +63,8 @@ public class TrajectoryDriveCmd extends Command {
   private final double ALLOWABLE_VISION_ADJUST = 4e-3; //TODO tune
 
   // Subsystems
-  private CatzDrivetrain m_driveTrain;
-  private CatzRobotTracker tracker = CatzRobotTracker.getInstance();
-  private final RobotContainer container;
+  private final CatzDrivetrain m_driveTrain;
+  private final CatzRobotTracker tracker;
 
   // Trajectory variables
   private HolonomicDriveController hocontroller;
@@ -92,20 +91,19 @@ public class TrajectoryDriveCmd extends Command {
   // Trajectory Drive Command Constructor
   //
   // ---------------------------------------------------------------------------------------------
-  public TrajectoryDriveCmd(PathPlannerPath newPath, CatzDrivetrain drivetrain, boolean autoalign, RobotContainer container, boolean isTeleop) {
+  public TrajectoryDriveCmd(PathPlannerPath newPath, boolean autoalign, boolean isTeleop) {
     this.path = newPath;
-    this.m_driveTrain = drivetrain;
     this.autoalign = autoalign;
-    this.container = container;
     this.isTelop = isTeleop;
+
+    m_driveTrain = CatzDrivetrain.Instance;
+    tracker = CatzRobotTracker.getInstance();
     addRequirements(m_driveTrain);
   }
 
-  public TrajectoryDriveCmd(Supplier<PathPlannerPath> newPathSupplier, CatzDrivetrain drivetrain, boolean autoalign, RobotContainer container, boolean isTeleop) {
+  public TrajectoryDriveCmd(Supplier<PathPlannerPath> newPathSupplier, boolean autoalign, boolean isTeleop) {
     this.pathSupplier = newPathSupplier;
-    this.m_driveTrain = drivetrain;
     this.autoalign = autoalign;
-    this.container = container;
     this.isTelop = isTeleop;
     addRequirements(m_driveTrain);
   }

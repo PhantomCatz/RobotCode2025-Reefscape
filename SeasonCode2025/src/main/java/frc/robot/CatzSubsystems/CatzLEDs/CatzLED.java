@@ -33,14 +33,7 @@ import java.util.Optional;
 import org.littletonrobotics.junction.AutoLogOutput;
 
 public class CatzLED extends VirtualSubsystem {
-  private static CatzLED instance = null;
-
-  public static CatzLED getInstance() {
-    if (instance == null) {
-      instance = new CatzLED();
-    }
-    return instance;
-  }
+  public static CatzLED Instance = new CatzLED();
 
   // ----------------------------------------------------------------------------------------------
   // Robot state LED tracking

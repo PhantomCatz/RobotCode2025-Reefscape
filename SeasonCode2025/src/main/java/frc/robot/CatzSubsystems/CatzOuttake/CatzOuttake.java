@@ -18,6 +18,7 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.CatzConstants;
 import frc.robot.RobotContainer;
+import frc.robot.TeleopPosSelector;
 import frc.robot.CatzSubsystems.CatzSuperstructure;
 import frc.robot.CatzSubsystems.CatzSuperstructure.CoralState;
 import lombok.Getter;
@@ -26,12 +27,15 @@ import lombok.Setter;
 import org.littletonrobotics.junction.Logger;
 
 public class CatzOuttake extends SubsystemBase {
+  public static final CatzOuttake Instance = new CatzOuttake();
 
   private final OuttakeIO io;
   private final OuttakeIOInputsAutoLogged inputs = new OuttakeIOInputsAutoLogged();
   private RobotContainer container;
   private int interationCounter = 0;
   private int intakeIterationCoutner = 0;
+
+  private final TeleopPosSelector SELECTOR;
 
   public enum outtakeStates {
     ADJ_INIT,
@@ -48,8 +52,7 @@ public class CatzOuttake extends SubsystemBase {
   public static outtakeStates currentState = outtakeStates.STOP;
   private outtakeStates previousState = outtakeStates.STOP;
 
-  public CatzOuttake(RobotContainer container) {
-    this.container = container;
+  private CatzOuttake() {
     if(isOuttakeDisabled) {
       io = new OuttakeIONull();
       System.out.println("Outtake Unconfigured");
@@ -69,6 +72,8 @@ public class CatzOuttake extends SubsystemBase {
         break;
       }
     }
+
+    SELECTOR = TeleopPosSelector.Instance;
   }
 
 
@@ -78,11 +83,11 @@ public class CatzOuttake extends SubsystemBase {
    * @return
    */
   public boolean isDesiredCoralState(boolean isOuttaking){
-    if (container.getSelector().useFakeCoral){
+    if (SELECTOR.useFakeCoral){
       if(isOuttaking){
-        return !container.getSelector().hasCoralSIM;
+        return !SELECTOR.hasCoralSIM;
       }else{
-        return container.getSelector().hasCoralSIM;
+        return SELECTOR.hasCoralSIM;
       }
     } else {
       boolean inOuttake = (inputs.bbreakBackTriggered || inputs.bbreakFrntTriggered);

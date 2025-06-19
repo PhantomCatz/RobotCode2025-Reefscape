@@ -34,13 +34,18 @@ import java.util.Map;
 import org.littletonrobotics.junction.Logger;
 
 public class CatzVision extends SubsystemBase {
+  public static final CatzVision Instance = new CatzVision(
+                                                new VisionIOLimelight("limelight-gyoza"),
+                                                new VisionIOLimelight("limelight-tempura")
+                                            );
+
   private final VisionIO[] io;
   private final VisionIOInputsAutoLogged[] inputs;
   private final Alert[] disconnectedAlerts;
 
   private PoseObservation[] poseObservations;
 
-  public CatzVision(VisionIO... io) {
+  private CatzVision(VisionIO... io) {
     this.io = io;
     // Initialize inputs
     this.inputs = new VisionIOInputsAutoLogged[io.length];

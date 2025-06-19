@@ -27,6 +27,7 @@ import lombok.RequiredArgsConstructor;
 import org.littletonrobotics.junction.Logger;
 
 public class CatzAlgaePivot extends SubsystemBase {
+  public static final CatzAlgaePivot Instance = new CatzAlgaePivot();
 
   private final AlgaePivotIO io;
   private final AlgaePivotIOInputsAutoLogged inputs = new AlgaePivotIOInputsAutoLogged();
@@ -58,7 +59,7 @@ public class CatzAlgaePivot extends SubsystemBase {
     }
   }
 
-  public CatzAlgaePivot() {
+  private CatzAlgaePivot() {
     if(isAlgaePivotDisabled) { //Comes from Algae Pivot Constants
       io = new AlgaePivotIONull();
       System.out.println("Algae Pivot Unconfigured");

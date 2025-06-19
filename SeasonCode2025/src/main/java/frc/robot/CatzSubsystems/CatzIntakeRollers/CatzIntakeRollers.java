@@ -19,6 +19,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.CatzConstants;
 import frc.robot.RobotContainer;
+import frc.robot.CatzSubsystems.CatzElevator.CatzElevator;
 import frc.robot.CatzSubsystems.CatzOuttake.CatzOuttake;
 import lombok.Getter;
 import lombok.Setter;
@@ -26,13 +27,13 @@ import lombok.Setter;
 import org.littletonrobotics.junction.Logger;
 
 public class CatzIntakeRollers extends SubsystemBase {
+    public static final CatzIntakeRollers Instance = new CatzIntakeRollers();
 
     private final IntakeRollersIO io;
     private final IntakeRollersIOInputsAutoLogged inputs = new IntakeRollersIOInputsAutoLogged();
     private int stuckCounter = 0;
     private int jamCounter = 0;
     private int beamBreakFaultCounter = 0;
-    private RobotContainer container;
 
     public enum intakeRollersStates {
         INTAKE,
@@ -45,8 +46,7 @@ public class CatzIntakeRollers extends SubsystemBase {
     private intakeRollersStates currentState = intakeRollersStates.STOP;
     private intakeRollersStates previousState = intakeRollersStates.STOP;
 
-    public CatzIntakeRollers(RobotContainer container) {
-        this.container = container;
+    private CatzIntakeRollers() {
         if(isIntakeRollersDisabled) {
             io = new IntakeRollersIONull();
             System.out.println("Outtake Unconfigured");
@@ -86,7 +86,7 @@ public class CatzIntakeRollers extends SubsystemBase {
 
         switch (currentState) {
             case INTAKE:
-                if(container.getCatzElevator().getElevatorPositionInch() < 4.0 && !DriverStation.isAutonomous()){
+                if(CatzElevator.Instance.getElevatorPositionInch() < 4.0 && !DriverStation.isAutonomous()){
                     case_rampRollersIn();
                 }
                 if(DriverStation.isAutonomous()){

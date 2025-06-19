@@ -29,6 +29,8 @@ import org.littletonrobotics.junction.Logger;
 
 
 public class CatzElevator extends SubsystemBase {
+  public static final CatzElevator Instance = new CatzElevator();
+
   private final ElevatorIO io;
   private final ElevatorIOInputsAutoLogged inputs = new ElevatorIOInputsAutoLogged();
 
@@ -67,7 +69,7 @@ public class CatzElevator extends SubsystemBase {
     }
   }
 
-  public CatzElevator() {
+  private CatzElevator() {
     if(isElevatorDisabled) {
       io = new ElevatorIONull();
       System.out.println("Elevator Unconfigured");

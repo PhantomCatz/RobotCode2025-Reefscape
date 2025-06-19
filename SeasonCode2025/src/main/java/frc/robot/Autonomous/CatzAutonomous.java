@@ -55,8 +55,6 @@ import org.json.simple.parser.ParseException;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
 public class CatzAutonomous extends SubsystemBase {
-  private RobotContainer m_container;
-
   // ------------------------------------------------------------------------------------------------------------
   // Questionairre
   // ------------------------------------------------------------------------------------------------------------
@@ -73,12 +71,11 @@ public class CatzAutonomous extends SubsystemBase {
   private HashMap<String, DashboardCmd> dashboardCmds = new HashMap<>();
   private PathPlannerAuto lastProgram;
 
-  private CatzRobotTracker tracker = CatzRobotTracker.getInstance();
-  private CatzDrivetrain drivetrain;
+  private final CatzRobotTracker tracker = CatzRobotTracker.getInstance();
+  private final CatzDrivetrain drivetrain;
 
-  public CatzAutonomous(RobotContainer container) {
-    this.m_container = container;
-    this.drivetrain = container.getCatzDrivetrain();
+  private CatzAutonomous() {
+    this.drivetrain = CatzDrivetrain.Instance;
 
     SmartDashboard.putData("Wait For Coral?", waitForCoralChooser);
 

@@ -29,6 +29,7 @@ import java.util.function.Supplier;
 import org.littletonrobotics.junction.Logger;
 
 public class CatzRampPivot extends SubsystemBase {
+  public static final CatzRampPivot Instance = new CatzRampPivot();
 
   private final RampPivotIO io;
   private final RampPivotIOInputsAutoLogged inputs = new RampPivotIOInputsAutoLogged();
@@ -58,7 +59,7 @@ public class CatzRampPivot extends SubsystemBase {
       return elevatorSetpointSupplier.getAsDouble();
     }
   }
-  public CatzRampPivot() {
+  private CatzRampPivot() {
         if(isRampPivotDisabled) { //Comes from Algae Remover Constants
       io = new RampPivotIONull();
       System.out.println("Ramp Pivot Unconfigured");
