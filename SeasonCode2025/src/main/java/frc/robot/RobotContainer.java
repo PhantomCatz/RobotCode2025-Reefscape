@@ -151,7 +151,7 @@ public class RobotContainer {
 
     // Climb
     Trigger climbMode = xboxDrv.povLeft();
-    xboxDrv.b().onTrue(CatzStateCommands.extendClimb());
+    xboxDrv.b().onTrue(superstructure.extendClimb());
     climbMode.toggleOnTrue(Commands.startEnd(()->superstructure.setClimbOverride(()->true), ()->superstructure.setClimbOverride(()->false)));
 
     //NBA
@@ -166,39 +166,12 @@ public class RobotContainer {
                                            .alongWith(climb.CancelClimb())
     );
 
-    // NBA Barge
-    xboxDrv.leftTrigger().onTrue(selector.runToNetCommand()
-                                         .alongWith(Commands.runOnce(()->led.setControllerState(ControllerLEDState.NBA)))
-                                         .unless(()->CatzSuperstructure.isClimbEnabled())
-                                         .alongWith(climb.ClimbManualMode(()-> ((xboxDrv.getLeftTriggerAxis()-0.5)*2.0))
-                                         .onlyIf(()-> CatzSuperstructure.isClimbEnabled()))
-    );
-    xboxDrv.leftTrigger().onFalse(selector.cancelCurrentDrivetrainCommand(CancellationSource.NET)
-                                          .alongWith(Commands.runOnce(()->led.setControllerState(ControllerLEDState.FULL_MANUAL)))
-                                          .unless(()-> CatzSuperstructure.isClimbEnabled())
-                                          .alongWith(climb.CancelClimb())
-    );
-
-    // BALLS
-
-    // xboxDrv.y().onTrue(selector.runCoralStationCommand());
-    // xboxDrv.y().onFalse(selector.cancelCurrentDrivetrainCommand(CancellationSource.NA));
-
-    // AQUA
-    // xboxDrv.a().onTrue(new InstantCommand(() -> selector.runAutoCommand().schedule()));
-    // xboxDrv.a().onFalse(selector.cancelAutoCommand());
-
     // Left Right
     xboxDrv.leftBumper().onTrue(new InstantCommand(() -> selector.runLeftRight(LeftRight.LEFT)).unless(()->CatzSuperstructure.isClimbEnabled()));
     xboxDrv.rightBumper().onTrue(new InstantCommand(() -> selector.runLeftRight(LeftRight.RIGHT)).unless(()->CatzSuperstructure.isClimbEnabled()));
 
     xboxDrv.leftBumper().onFalse(selector.cancelCurrentDrivetrainCommand(CancellationSource.NA).alongWith(climb.CancelClimb()));
     xboxDrv.rightBumper().onFalse(selector.cancelCurrentDrivetrainCommand(CancellationSource.NA).alongWith(climb.CancelClimb()));
-
-    // Coral Station Run Back
-    xboxDrv.button(7).onTrue(new InstantCommand(() -> selector.toggleLeftStation()).alongWith(Commands.runOnce(() -> led.setControllerState(ControllerLEDState.BALLS))));
-    xboxDrv.button(8).onTrue(new InstantCommand(() -> selector.toggleRightStation()).alongWith(Commands.runOnce(() -> led.setControllerState(ControllerLEDState.BALLS))));
-
 
     //     // Manual Climb Control
     // xboxDrv.povUp().onTrue(climb.ClimbManualMode(()-> 0.4));
@@ -215,17 +188,7 @@ public class RobotContainer {
     drivetrain.setDefaultCommand(new TeleopDriveCmd(() -> xboxDrv.getLeftX(), () -> xboxDrv.getLeftY(), () -> xboxDrv.getRightX(), drivetrain));
     //---------------------------------------------------------------------------------------------------------------------
     // XBOX AUX
-    //---------------------------------------------------------------------------------------------------------------------
-
-    // Scoring Level Aqua determination
-    xboxAux.rightTrigger().onTrue(Commands.runOnce(() -> selector.pathQueueAddBack(selector.getXBoxReefPos(), superstructure.getLevel()))
-                                          .alongWith(Commands.runOnce(() -> led.setControllerState(ControllerLEDState.AQUA))));
-    // xboxAux.leftBumper().onTrue(Commands.runOnce(() -> selector.pathQueuePopFront())
-    //                                     .alongWith(Commands.runOnce(() -> led.setControllerState(ControllerLEDState.AQUA))));
-    // xboxAux.rightBumper().onTrue(Commands.runOnce(() -> selector.pathQueuePopBack())
-    //                                      .alongWith(Commands.runOnce(() -> led.setControllerState(ControllerLEDState.AQUA))));
-    // xboxAux.rightStick().onTrue(Commands.runOnce(() -> selector.pathQueueClear()).unless(()->xboxAux.leftStick().getAsBoolean())
-    //                                     .alongWith(Commands.runOnce(() -> led.setControllerState(ControllerLEDState.AQUA))));
+    //------------------------------------------------------------------------------
 
     // Full Manual
     xboxAux.leftStick().and(xboxAux.rightStick()).onTrue(elevator.elevatorFullManual(() -> -xboxAux.getLeftY()).alongWith(Commands.print("Elevator Manual"))); // TODO make an override button for
@@ -242,7 +205,7 @@ public class RobotContainer {
     xboxAux.x().onTrue(Commands.runOnce(() -> superstructure.setCurrentRobotAction(RobotAction.INTAKE, "container")).alongWith(Commands.print("INTAKE")));
     xboxAux.y().onTrue(Commands.runOnce(() -> superstructure.setCurrentRobotAction(RobotAction.OUTTAKE, "container")).alongWith(Commands.print("OUTTAKE L" + superstructure.getLevel())));
     xboxAux.a().onTrue(Commands.runOnce(() -> superstructure.setCurrentRobotAction(RobotAction.STOW, "container")).alongWith(Commands.print("STOWWW")));
-    xboxAux.b().onTrue(CatzStateCommands.algaeStow());
+    xboxAux.b().onTrue(superstructure.algaeStow());
 
 
     // algae punch

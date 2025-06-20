@@ -296,6 +296,9 @@ public class CatzElevator extends SubsystemBase {
     return inputs.positionInch;
   }
 
+
+  //TODO do the check with velocity so that we dont need counter
+  //or use a Debouncer
   private boolean isElevatorInPosition() {
     boolean isElevatorSettled = false;
     boolean isElevatorInPos = (Math.abs((getElevatorPositionInch() - targetPosition.getTargetPositionInch())) < 1.0);
