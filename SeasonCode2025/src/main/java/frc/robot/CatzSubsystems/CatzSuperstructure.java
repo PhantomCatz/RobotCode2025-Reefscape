@@ -18,10 +18,12 @@ import java.util.function.Supplier;
 import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 
+import com.google.common.util.concurrent.ClosingFuture.DeferredCloser;
 import com.pathplanner.lib.path.PathPlannerPath;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.DeferredCommand;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.PrintCommand;
@@ -206,7 +208,8 @@ public class CatzSuperstructure extends VirtualSubsystem {
             algaePivot.AlgaePivot_Stow(),
             rampPivot.Ramp_Intake_Pos(),  //TODO? intake ramp pivot holds at intaking position for the duration of the match
             intakeRollers.stopIntaking(),
-            elevator.Elevator_Stow()
+            elevator.Elevator_Stow(),
+            new InstantCommand(() -> currentRobotState = RobotState.STOW)
         ).unless(()-> Robot.isSimulation()).alongWith(Commands.print("Stow"));
     }
 
@@ -320,7 +323,7 @@ public class CatzSuperstructure extends VirtualSubsystem {
 
     public Command LXCoral(int level){
         TeleopPosSelector selector = TeleopPosSelector.getInstance();
-
+        
         switch(level){
             case 1:
                 return L1Coral().andThen(new InstantCommand(()-> {selector.hasCoralSIM = false;}));
@@ -340,8 +343,61 @@ public class CatzSuperstructure extends VirtualSubsystem {
         }
     }
 
+    public Command LXCoral(){
+        TeleopPosSelector selector = TeleopPosSelector.getInstance();
+        
+        return new DeferredCommand(() -> {
+            switch(level){
+                case 1:
+                currentRobotState = RobotState.L1_CORAL;
+                
+                return L1Coral().andThen(new InstantCommand(()-> {selector.hasCoralSIM = false;}));
+                
+                case 2:
+                currentRobotState = RobotState.L2_CORAL;
+                
+                return L2Coral().andThen(new InstantCommand(()-> {selector.hasCoralSIM = false;}));
+                
+                case 3:
+                currentRobotState = RobotState.L3_CORAL;
+                
+                return L3Coral().andThen(new InstantCommand(()-> {selector.hasCoralSIM = false;}));
+                
+                case 4:
+                currentRobotState = RobotState.L4_CORAL;
+                
+                return L4Coral().andThen(new InstantCommand(()-> {selector.hasCoralSIM = false;}));
+                
+                default:
+                System.out.println("Invalid Coral Scoring Level!");
+                return new InstantCommand();
+            }
+        }, Set.of());
+    }
+
+    public Command intake(){
+        return new DeferredCommand(() -> {
+            if(chosenGamepiece == Gamepiece.CORAL) {
+                currentRobotState = RobotState.INTAKE_CORAL_STATION;
+                return intakeCoralStation();
+            } else {
+                switch (level) {
+                    case 2:
+                        currentRobotState = RobotState.TOP_ALGAE;
+                        System.out.println("TOP algae");
+                        return botAlgae();
+                    case 4:
+                        currentRobotState = RobotState.BOT_ALGAE;
+                        System.out.println("BOT algae");
+                        return topAlgae();
+                    default:
+                        return Commands.none();
+                }
+        }}, Set.of());
+    }
+    
     public Command LXElevator(int level){
-     
+        
         return new SequentialCommandGroup(
             algaeRemover.stopAlgae(),
             algaePivot.AlgaePivot_Stow(),
@@ -400,6 +456,7 @@ public class CatzSuperstructure extends VirtualSubsystem {
             return new PrintCommand("Invalid Algae Level!");
         }
     }
+
 
     public Command algaeStow() {
         return new ParallelCommandGroup(
