@@ -15,6 +15,7 @@ import java.util.Arrays;
 import java.util.Deque;
 import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.Set;
 import java.util.function.Supplier;
 
 import org.littletonrobotics.junction.Logger;
@@ -30,6 +31,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.DeferredCommand;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RepeatCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
@@ -56,12 +58,6 @@ public class TeleopPosSelector { //TODO split up the file. it's too big and does
     if(INSTANCE == null) INSTANCE = new TeleopPosSelector();
     return INSTANCE;
   }
-
-  
-  private final String REEFSIDE = "Reefside ";
-  private final String QUEUE = "PathQueue ";
-  private final int NUM_QUEUE_DISPLAY = 4;
-  private final double SELECTION_THRESHOLD = 0.7;
   
   private final CatzSuperstructure superstructure = CatzSuperstructure.getInstance();
   private final CatzDrivetrain drivetrain = CatzDrivetrain.getInstance();
@@ -69,9 +65,6 @@ public class TeleopPosSelector { //TODO split up the file. it's too big and does
   private final CatzRobotTracker tracker = CatzRobotTracker.getInstance();
   private final RobotContainer container = RobotContainer.getInstance();
 
-
-  private Command currentDrivetrainCommand = new InstantCommand();
-  private Command currentAutoplayCommand = new InstantCommand();
   private CornerTrackingPathfinder pathfinder = new CornerTrackingPathfinder();
   public Pair<Integer, LeftRight> recentNBAPos = new Pair<Integer, LeftRight>(0, LeftRight.LEFT);
   private HashMap<String, String> poseToLetter = new HashMap<>();
@@ -84,9 +77,6 @@ public class TeleopPosSelector { //TODO split up the file. it's too big and does
 
   public boolean hasCoralSIM = true;
 
-  private boolean isNetAiming = false;
-  private boolean isNBALeftRight = false;
-
   public enum CancellationSource{
     NBA,
     NET,
@@ -95,12 +85,6 @@ public class TeleopPosSelector { //TODO split up the file. it's too big and does
   }
 
   private TeleopPosSelector() {
-    xboxAux = container.getXboxAux();
-    
-    this.currentDrivetrainCommand.addRequirements(CatzDrivetrain.getInstance());
-    this.currentDrivetrainCommand.addRequirements(CatzElevator.getInstance());
-    this.currentDrivetrainCommand.addRequirements(CatzOuttake.getInstance());
-    //this.currentAutoplayCommand.addRequirements(container.getCatzDrivetrain());
 
     //Internally, we define a "branch" as one of the 6 sides of the reef. The more specific side of the branch is selected with the LEFT and RIGHT
     //The LEFT and RIGHT is always from the driverstation's POV
@@ -226,20 +210,6 @@ public class TeleopPosSelector { //TODO split up the file. it's too big and does
     return path;
   }
 
-  public Command runToNetCommand(){
-    return new InstantCommand(() -> {
-      isNetAiming = true;
-      currentDrivetrainCommand.cancel();
-      PathPlannerPath path = getClosestNetPath();
-      if(path != null){
-        currentDrivetrainCommand = new TrajectoryDriveCmd(path, true, true);
-      }else{
-      currentDrivetrainCommand = new InstantCommand();
-      }
-      currentDrivetrainCommand.schedule();
-    });
-  }
-
   public PathPlannerPath getPathfindingPath(Supplier<Pose2d> goalSupplier) {
     Pose2d goal = goalSupplier.get();
     if (goal == null) {
@@ -304,45 +274,19 @@ public class TeleopPosSelector { //TODO split up the file. it's too big and does
     }
   }
 
-  public void runLeftRight(LeftRight leftRight){
-    if(isNetAiming) {
-      runLeftRightNet(leftRight);
-    }else{
-      runLeftRightNBA(leftRight);
-    }
-  }
+  public Command runLeftRight(LeftRight leftRight){
+    return new DeferredCommand(() -> {
+      if(recentNBAPos == null) return new InstantCommand(); //the driver did not NBA yet, so there is no left right to go to
 
-  private void runLeftRightNBA(LeftRight leftRight) {
-    if (recentNBAPos == null)
-      return; // means it is in AQUA
+      Pose2d currentPose = tracker.getEstimatedPose();
+      Pose2d goal = calculateReefPose(new Pair<Integer, LeftRight>(recentNBAPos.getFirst(), leftRight), true, false); //TODO decide whether or not to have distanced
+  
+      Logger.recordOutput("LeftRightGoal", goal);
 
-    currentDrivetrainCommand.cancel();
+      PathPlannerPath path = getStraightLinePath(currentPose, goal, DriveConstants.PATHFINDING_CONSTRAINTS); //TODO might need to scale constraints based off of distance from reef?
 
-    Pose2d currentPose = tracker.getEstimatedPose();
-    Pose2d goal = calculateReefPose(new Pair<Integer, LeftRight>(recentNBAPos.getFirst(), leftRight), true, false); //TODO decide whether or not to have distanced
-
-    Translation2d goalPos = goal.getTranslation();
-    Translation2d currentPos = currentPose.getTranslation();
-    Translation2d direction = goalPos.minus(currentPos).div(2.0);
-
-    Logger.recordOutput("LeftRightGoal", goal);
-
-    // if (direction.getNorm() <= 1e-3) {
-    //   return;
-    // }
-    isNBALeftRight = true;
-
-    PathPlannerPath path = getStraightLinePath(currentPose, goal, DriveConstants.PATHFINDING_CONSTRAINTS); //TODO might need to scale constraints based off of distance from reef?
-
-
-    currentDrivetrainCommand = new TrajectoryDriveCmd(path, true, true).andThen(container.rumbleDrvAuxController(1.0, 0.2)).andThen(new InstantCommand(() -> isNBALeftRight = false));
-
-    try{
-      currentDrivetrainCommand.schedule();
-    }catch(Error e){
-      e.printStackTrace();
-      //i dunno man spamming nba causes so much problems
-    }
+      return new TrajectoryDriveCmd(path, true, true).andThen(container.rumbleDrvAuxController(1.0, 0.2));
+    }, Set.of(CatzDrivetrain.getInstance()));
   }
 
   public PathPlannerPath getMoveScorePath(){
@@ -351,87 +295,35 @@ public class TeleopPosSelector { //TODO split up the file. it's too big and does
     return getStraightLinePath(CatzRobotTracker.getInstance().getEstimatedPose(), goalPose, DriveConstants.PATHFINDING_CONSTRAINTS);
   }
 
-  private void runLeftRightNet(LeftRight leftRight){
-    currentDrivetrainCommand.cancel();
-
-    Pose2d currentPose = tracker.getEstimatedPose();
-    Pose2d goal;
-
-    if(leftRight == LeftRight.LEFT){
-      goal = new Pose2d(FieldConstants.Net.getX(), FieldConstants.Net.getYLeft(), AllianceFlipUtil.apply(Rotation2d.kZero));
-    }else{
-      goal = new Pose2d(FieldConstants.Net.getX(), FieldConstants.Net.getYRight(), AllianceFlipUtil.apply(Rotation2d.kZero));
-    }
-
-    PathPlannerPath path = getStraightLinePath(currentPose, goal, DriveConstants.LEFT_RIGHT_NET_CONSTRAINTS);
-    currentDrivetrainCommand = new TrajectoryDriveCmd(path, false, true);
-    currentDrivetrainCommand.schedule();
-  }
-
   //------------------------------------------------------------------------------------
   //
   //  Xbox Commands
   //
   //-----------------------------------------------------------------------------------
 
- 
-
   @SuppressWarnings("static-access")
   public Command runToNearestBranch() {
 
-    return new InstantCommand(() -> {
-      isNetAiming = false;
+    return new DeferredCommand(() -> {
       recentNBAPos = getClosestReefPos().getFirst();
-      currentDrivetrainCommand.cancel();
-      try{
-        //TODO add a check to see if the robot is against the wall but angled so that it runs distanced scoring
-        Command prematureCommand;
-        if(superstructure.getChosenGamepiece() == Gamepiece.CORAL){
-          prematureCommand = superstructure.LXElevator(superstructure.getLevel());
-        }else{ //algae
-          prematureCommand = new InstantCommand();
-        }
-        // PathPlannerPath path = getPathfindingPath(calculateReefPose(getClosestReefPos().getFirst(), true, false));
-        PathPlannerPath path = getStraightLinePath(tracker.getEstimatedPose(), calculateReefPose(getClosestReefPos().getFirst(), true, false), DriveConstants.PATHFINDING_CONSTRAINTS);
 
-        currentDrivetrainCommand = new TrajectoryDriveCmd(path, true, true)
+      Command prematureCommand;
+      if(superstructure.getChosenGamepiece() == Gamepiece.CORAL){
+        prematureCommand = superstructure.LXElevator(superstructure.getLevel());
+      }else{ //algae
+        prematureCommand = new InstantCommand();
+      }
+        
+      PathPlannerPath path = getStraightLinePath(tracker.getEstimatedPose(), calculateReefPose(getClosestReefPos().getFirst(), true, false), DriveConstants.PATHFINDING_CONSTRAINTS);
+
+      Command prepareScorePos = new TrajectoryDriveCmd(path, true, true)
                                         .deadlineFor(new RepeatCommand(prematureCommand.onlyIf(() -> drivetrain.getDistanceError() < DriveConstants.PREDICT_DISTANCE_SCORE)))
                                         .andThen(container.controllerRumbleCommand());
-        currentDrivetrainCommand.schedule();
-      }catch(Exception e){
-        e.printStackTrace();
-      }
-    });
+
+      return prepareScorePos;
+    }, Set.of(CatzDrivetrain.getInstance()));
   }
 
-  public Command getReefScoreCommand(Pair<Pair<Integer, LeftRight>, Integer> pair) {
-    recentNBAPos = null;
-    isNetAiming = false;
-
-    return superstructure.driveToScore(
-      getPathfindingPath(calculateReefPose(pair.getFirst(), false, false)),
-      pair.getSecond()
-    );
-  }
-
-  public Command cancelCurrentDrivetrainCommand(CancellationSource source) {
-    return new InstantCommand(() -> {
-      if(source == CancellationSource.NBA){
-        isNBALeftRight = false;
-      }
-      if(isNBALeftRight) {
-        return;
-      } //you want to be able to cancel leftright with NBA
-
-      currentDrivetrainCommand.cancel();
-    });
-  }
-
-  public Command cancelAutoCommand() {
-    return new InstantCommand(() -> {
-      currentAutoplayCommand.cancel();
-    });
-  }
 
   public PathPlannerPath getStraightLinePath(Pose2d start, Pose2d goal, PathConstraints constraints){
     Translation2d currentPose = start.getTranslation();

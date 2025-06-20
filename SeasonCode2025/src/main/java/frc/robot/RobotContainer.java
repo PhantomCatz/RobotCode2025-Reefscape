@@ -150,22 +150,19 @@ public class RobotContainer {
 
     //NBA
     xboxDrv.rightTrigger().onTrue(selector.runToNearestBranch().alongWith(Commands.runOnce(()->led.setControllerState(ControllerLEDState.NBA)))
+                                                               .onlyWhile(xboxDrv.rightTrigger())
                                                                .unless(()->CatzSuperstructure.isClimbEnabled())
                                                                .alongWith(climb.ClimbManualMode(()-> ((-xboxDrv.getRightTriggerAxis()-0.5)*2.0))
                                                                .onlyIf(()-> CatzSuperstructure.isClimbEnabled()))
     );
-    xboxDrv.rightTrigger().onFalse(selector.cancelCurrentDrivetrainCommand(CancellationSource.NBA)
-                                           .alongWith(Commands.runOnce(()->led.setControllerState(ControllerLEDState.FULL_MANUAL)))
+    xboxDrv.rightTrigger().onFalse(Commands.runOnce(()->led.setControllerState(ControllerLEDState.FULL_MANUAL))
                                            .unless(()-> CatzSuperstructure.isClimbEnabled())
                                            .alongWith(climb.CancelClimb())
     );
 
     // Left Right
-    xboxDrv.leftBumper().onTrue(new InstantCommand(() -> selector.runLeftRight(LeftRight.LEFT)).unless(()->CatzSuperstructure.isClimbEnabled()));
-    xboxDrv.rightBumper().onTrue(new InstantCommand(() -> selector.runLeftRight(LeftRight.RIGHT)).unless(()->CatzSuperstructure.isClimbEnabled()));
-
-    xboxDrv.leftBumper().onFalse(selector.cancelCurrentDrivetrainCommand(CancellationSource.NA).alongWith(climb.CancelClimb()));
-    xboxDrv.rightBumper().onFalse(selector.cancelCurrentDrivetrainCommand(CancellationSource.NA).alongWith(climb.CancelClimb()));
+    xboxDrv.leftBumper().onTrue(selector.runLeftRight(LeftRight.LEFT).unless(()->CatzSuperstructure.isClimbEnabled()));
+    xboxDrv.rightBumper().onTrue(selector.runLeftRight(LeftRight.RIGHT).unless(()->CatzSuperstructure.isClimbEnabled()));
 
     //     // Manual Climb Control
     // xboxDrv.povUp().onTrue(climb.ClimbManualMode(()-> 0.4));

@@ -397,10 +397,7 @@ public class Robot extends LoggedRobot {
 
   @Override
   public void teleopPeriodic() {
-
     teleElapsedTime = Timer.getFPGATimestamp() - teleStart;
-    TeleopPosSelector.getInstance().updateCurrentlySelected();
-
   }
 
   @Override
