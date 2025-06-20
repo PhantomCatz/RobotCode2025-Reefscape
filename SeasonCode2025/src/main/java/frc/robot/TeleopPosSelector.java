@@ -38,7 +38,6 @@ import frc.robot.Utilities.AllianceFlipUtil;
 import frc.robot.Utilities.CornerTrackingPathfinder;
 import frc.robot.CatzSubsystems.CatzSuperstructure.Gamepiece;
 import frc.robot.CatzSubsystems.CatzSuperstructure.LeftRight;
-import frc.robot.CatzSubsystems.CatzStateCommands;
 import frc.robot.CatzSubsystems.CatzSuperstructure;
 import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.CatzRobotTracker;
 import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.Drivetrain.CatzDrivetrain;
@@ -70,14 +69,11 @@ public class TeleopPosSelector { //TODO split up the file. it's too big and does
   private final CatzRobotTracker tracker = CatzRobotTracker.getInstance();
   private final RobotContainer container = RobotContainer.getInstance();
 
-  private final CommandXboxController xboxAux;
 
   private Command currentDrivetrainCommand = new InstantCommand();
   private Command currentAutoplayCommand = new InstantCommand();
   private CornerTrackingPathfinder pathfinder = new CornerTrackingPathfinder();
   public Pair<Integer, LeftRight> recentNBAPos = new Pair<Integer, LeftRight>(0, LeftRight.LEFT);
-  private Pair<Integer, LeftRight> currentlySelected = new Pair<Integer, LeftRight>(0, LeftRight.LEFT);
-  private Deque<Pair<Pair<Integer, LeftRight>, Integer>> queuedPaths = new LinkedList<>();
   private HashMap<String, String> poseToLetter = new HashMap<>();
 
   private final boolean manualOverrideUseFakeCoral = false; //if the real robot doesn't have mechanisms to hold real coral, simulate one
@@ -129,151 +125,6 @@ public class TeleopPosSelector { //TODO split up the file. it's too big and does
 
   public String getPoseToLetter(String pose){
     return poseToLetter.get(pose);
-  }
-
-  public void toggleLeftStation() {
-    leftCoralStation = !leftCoralStation;
-    SmartDashboard.putBoolean("Left Coral Station", leftCoralStation);
-  }
-
-  public void toggleRightStation() {
-    rightCoralStation = !rightCoralStation;
-    SmartDashboard.putBoolean("Right Coral Station", rightCoralStation);
-  }
-
-  /**
-   * When selecting the "best" coral station, the enabled coral station takes priority.
-   * If the coral stations are both enabled or disabled, then it selects the closest one.
-   * @return
-   */
-  public Pose2d getBestCoralStation() {
-    Pose2d right = FieldConstants.CoralStation.getRightStation();
-    Pose2d left = FieldConstants.CoralStation.getLeftStation();
-    // TODO flip right and left when on red alliance
-
-    if (!leftCoralStation && rightCoralStation) {
-      return right;
-    } else if (!rightCoralStation && leftCoralStation) {
-      return left;
-    } else {
-      Pose2d nearestStation = right;
-      Translation2d robotPos = tracker.getEstimatedPose().getTranslation();
-
-      if (robotPos.getDistance(right.getTranslation()) > robotPos.getDistance(left.getTranslation())) {
-        nearestStation = left;
-      }
-      return nearestStation;
-    }
-  }
-
-  public void pathQueueAddFront(Pair<Integer, LeftRight> pose, int reefLevel) {
-    // there was no joystick input
-    if (pose == null || queuedPaths.size() >= NUM_QUEUE_DISPLAY)
-      return;
-
-    queuedPaths.addFirst(new Pair(pose, reefLevel));
-  }
-
-  public void pathQueueAddBack(Pair<Integer, LeftRight> pose, int reefLevel) {
-    // there was no joystick input
-    if (pose == null || queuedPaths.size() >= NUM_QUEUE_DISPLAY)
-      return;
-
-    queuedPaths.addLast(new Pair(pose, reefLevel));
-  }
-
-  public Pair<Pair<Integer, LeftRight>, Integer> pathQueuePeekFront() {
-    if (queuedPaths.peekFirst() != null) {
-      return queuedPaths.peekFirst();
-    } else {
-      return new Pair(null, 0);
-    }
-  }
-
-  public Pair<Pair<Integer, LeftRight>, Integer> pathQueuePopFront() {
-    if (queuedPaths.peekFirst() != null) {
-      return queuedPaths.pollFirst();
-    } else {
-      return new Pair(null, 0);
-    }
-  }
-
-  public void pathQueuePopBack() {
-    queuedPaths.pollLast();
-  }
-
-  public void pathQueueClear() {
-    queuedPaths.clear();
-  }
-
-  public void updateCurrentlySelected() {
-    currentlySelected = getXBoxReefPos();
-
-    //Update the display to see which branch is currently being selected by the aux driver.
-    for (int side = 0; side < 6; side++) {
-      SmartDashboard.putBoolean(REEFSIDE + side + " L",
-          side == currentlySelected.getFirst() && currentlySelected.getSecond().equals(LeftRight.LEFT));
-      SmartDashboard.putBoolean(REEFSIDE + side + " R",
-          side == currentlySelected.getFirst() && currentlySelected.getSecond().equals(LeftRight.RIGHT));
-    }
-
-    //clear the display queue in case a queue was deleted
-    for (int i = 0; i < NUM_QUEUE_DISPLAY; i++) {
-      SmartDashboard.putString(QUEUE + i, "");
-    }
-
-    //Update the queue display
-    int i = 0;
-    for (Pair<Pair<Integer, LeftRight>, Integer> pair : queuedPaths) {
-      Pair<Integer, LeftRight> pose = pair.getFirst();
-      SmartDashboard.putString(QUEUE + i,
-          poseToLetter.get(pose.getFirst() + " " + pose.getSecond()) + " " + pair.getSecond());
-      i++;
-    }
-
-    int ledQueue = 0;
-    for (Pair<Pair<Integer, LeftRight>, Integer> pair : queuedPaths) {
-      ledQueue++;
-    }
-
-    if(ledQueue == 1) {
-      CatzLED.getInstance().setQueueLEDState(QueueLEDState.ONE_CORAL);
-    } else if(ledQueue == 2) {
-      CatzLED.getInstance().setQueueLEDState(QueueLEDState.TWO_CORAL);
-    } else if(ledQueue == 3) {
-      CatzLED.getInstance().setQueueLEDState(QueueLEDState.THREE_CORAL);
-    } else if(ledQueue == 4) {
-      CatzLED.getInstance().setQueueLEDState(QueueLEDState.FOUR_CORAL);
-    } else {
-      CatzLED.getInstance().setQueueLEDState(QueueLEDState.EMPTY);
-    }
-
-  }
-
-  public Pair<Integer, LeftRight> getXBoxReefPos() {
-    int side = 0;
-    LeftRight leftRight = LeftRight.LEFT;
-
-    //The x and y are field relative with blue alliance origin.
-    final double x = -xboxAux.getRightY();
-    final double y = -xboxAux.getRightX();
-
-    if (Math.hypot(x, y) > SELECTION_THRESHOLD) {
-      // ensures angle is between 0-2pi (Dr. Eric Yuchen Lu (MD)'s idea)
-      double angle = (Math.atan2(y, x) + 2 * Math.PI) % (2 * Math.PI);
-      side = (int) Math.round(angle * 3.0 / Math.PI) % 6; //mod 6 to keep the side between 0 and 5
-
-      // Split the angle into twelveth and determine the left or right. Left and right changes when x is negative
-      int leftOrRight = (int) Math.ceil(angle * 6.0 / Math.PI) % 12;
-      if (x > 0) {
-        leftRight = leftOrRight % 2 == 0 ? LeftRight.RIGHT : LeftRight.LEFT;
-      } else {
-        leftRight = leftOrRight % 2 == 0 ? LeftRight.LEFT : LeftRight.RIGHT;
-      }
-      return new Pair<Integer, LeftRight>(side, leftRight);
-    } else {
-      return currentlySelected;
-    }
   }
 
   /**
@@ -523,63 +374,7 @@ public class TeleopPosSelector { //TODO split up the file. it's too big and does
   //
   //-----------------------------------------------------------------------------------
 
-  public Command runAutoCommand() {
-    return new InstantCommand(() -> {
-      currentAutoplayCommand.cancel();
-      currentAutoplayCommand = new Command() {
-
-        @Override
-        public void initialize() {
-          currentDrivetrainCommand.cancel();
-          currentDrivetrainCommand = getNextCommand();
-          currentDrivetrainCommand.schedule();
-        }
-
-        @Override
-        public void execute() {
-          if (!currentDrivetrainCommand.isScheduled() == true) { //haha L
-            currentDrivetrainCommand = getNextCommand();
-            currentDrivetrainCommand.schedule();
-          }
-        }
-
-        @Override
-        public boolean isFinished() {
-          return false;
-        }
-
-        @Override
-        public void end(boolean interrupted) {
-          currentDrivetrainCommand.cancel();
-        }
-
-      };
-      currentAutoplayCommand.schedule();
-    });
-  }
-
-  private Command getNextCommand() {
-    Pair<Pair<Integer, LeftRight>, Integer> pair = pathQueuePeekFront();
-
-    if (useFakeCoral) {
-      if (hasCoralSIM) {
-        if (queuedPaths.isEmpty()){
-          return new InstantCommand();
-        }
-        return getReefScoreCommand(pair).andThen(new InstantCommand(() -> pathQueuePopFront()));
-      } else {
-        return getCoralStationCommand();
-      }
-    } else {
-      if (outtake.isDesiredCoralState(true)) {
-        return getCoralStationCommand();
-      } else {
-        System.out.println("i have coral/?");
-          if (queuedPaths.isEmpty()) {System.out.println("no ");return new InstantCommand();}
-        return getReefScoreCommand(pair).andThen(new InstantCommand(() -> pathQueuePopFront()));
-      }
-    }
-  }
+ 
 
   @SuppressWarnings("static-access")
   public Command runToNearestBranch() {
@@ -592,7 +387,7 @@ public class TeleopPosSelector { //TODO split up the file. it's too big and does
         //TODO add a check to see if the robot is against the wall but angled so that it runs distanced scoring
         Command prematureCommand;
         if(superstructure.getChosenGamepiece() == Gamepiece.CORAL){
-          prematureCommand = CatzStateCommands.LXElevator(superstructure.getLevel());
+          prematureCommand = superstructure.LXElevator(superstructure.getLevel());
         }else{ //algae
           prematureCommand = new InstantCommand();
         }
@@ -609,24 +404,11 @@ public class TeleopPosSelector { //TODO split up the file. it's too big and does
     });
   }
 
-  public Command runCoralStationCommand() {
-    return new InstantCommand(() -> {
-      recentNBAPos = null;
-      currentDrivetrainCommand.cancel();
-      currentDrivetrainCommand = getCoralStationCommand();
-      currentDrivetrainCommand.schedule();
-    });
-  }
-
-  public Command getCoralStationCommand() {
-    return CatzStateCommands.driveToCoralStation(getPathfindingPath(getBestCoralStation()), ()->true);
-  }
-
   public Command getReefScoreCommand(Pair<Pair<Integer, LeftRight>, Integer> pair) {
     recentNBAPos = null;
     isNetAiming = false;
 
-    return CatzStateCommands.driveToScore(
+    return superstructure.driveToScore(
       getPathfindingPath(calculateReefPose(pair.getFirst(), false, false)),
       pair.getSecond()
     );
