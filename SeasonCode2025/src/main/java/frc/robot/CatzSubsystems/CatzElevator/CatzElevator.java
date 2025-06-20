@@ -29,7 +29,12 @@ import org.littletonrobotics.junction.Logger;
 
 
 public class CatzElevator extends SubsystemBase {
-  public static final CatzElevator Instance = new CatzElevator();
+  private static CatzElevator INSTANCE;
+
+  public static CatzElevator getInstance(){
+    if(INSTANCE == null) INSTANCE = new CatzElevator();
+    return INSTANCE;
+  }
 
   private final ElevatorIO io;
   private final ElevatorIOInputsAutoLogged inputs = new ElevatorIOInputsAutoLogged();

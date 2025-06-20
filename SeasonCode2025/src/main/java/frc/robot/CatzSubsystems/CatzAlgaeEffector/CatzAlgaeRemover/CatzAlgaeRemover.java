@@ -19,7 +19,12 @@ import static frc.robot.CatzSubsystems.CatzAlgaeEffector.CatzAlgaeRemover.AlgaeR
 import org.littletonrobotics.junction.Logger;
 
 public class CatzAlgaeRemover extends SubsystemBase {
-  public static final CatzAlgaeRemover Instance = new CatzAlgaeRemover();
+  private static CatzAlgaeRemover INSTANCE;
+
+  public static CatzAlgaeRemover getInstance(){
+    if(INSTANCE == null) INSTANCE = new CatzAlgaeRemover();
+    return INSTANCE;
+  }
 
   private final AlgaeRemoverIO io;
   private final AlgaeEffectorIOInputsAutoLogged inputs = new AlgaeEffectorIOInputsAutoLogged();

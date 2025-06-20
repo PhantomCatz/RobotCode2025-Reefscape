@@ -44,7 +44,12 @@ import org.littletonrobotics.junction.Logger;
 
 // Drive train subsystem for swerve drive implementation
 public class CatzDrivetrain extends SubsystemBase {
-  public static final CatzDrivetrain Instance = new CatzDrivetrain();
+  private static CatzDrivetrain INSTANCE;
+
+  public static CatzDrivetrain getInstance(){
+    if(INSTANCE == null) INSTANCE = new CatzDrivetrain();
+    return INSTANCE;
+  }
 
   private double distanceError = 999999.9; //meters
 

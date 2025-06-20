@@ -44,11 +44,11 @@ public class CatzRobotTracker {
   private static final Matrix<N3, N1> ODOMETRY_STD_DEVS =
       new Matrix<>(VecBuilder.fill(0.003, 0.003, 0.002));
 
-  private static CatzRobotTracker instance;
+  private static CatzRobotTracker INSTANCE;
 
-  public static CatzRobotTracker getInstance() {
-    if (instance == null) instance = new CatzRobotTracker();
-    return instance;
+  public static CatzRobotTracker getInstance(){
+    if(INSTANCE == null) INSTANCE = new CatzRobotTracker();
+    return INSTANCE;
   }
 
   private static final Map<Integer, Pose2d> tagPoses2d = new HashMap<>();

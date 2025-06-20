@@ -55,7 +55,12 @@ import org.littletonrobotics.junction.networktables.LoggedNetworkNumber;
 
 
 public class RobotContainer {
-  public static final RobotContainer Instance = new RobotContainer();
+  private static RobotContainer INSTANCE;
+
+  public static RobotContainer getInstance(){
+    if(INSTANCE == null) INSTANCE = new RobotContainer();
+    return INSTANCE;
+  }
 
   private final double SCORE_TRIGGER_THRESHHOLD = 0.8;
 
@@ -84,10 +89,19 @@ public class RobotContainer {
   private final LoggedNetworkNumber endgameAlert2 = new LoggedNetworkNumber("Endgame Alert #2", 10.0);
 
   // -------------------------------------------------------------------------------------------------------------------
-  // Auto Declaration
+  // Subsystem Declaration
   // ---------------------------------------------------------------------------------------------------------------------
 
-  private CatzAutonomous auto;
+  private final CatzAutonomous auto = CatzAutonomous.getInstance();
+  private final CatzRobotTracker tracker = CatzRobotTracker.getInstance();
+  private final CatzSuperstructure superstructure = CatzSuperstructure.getInstance();
+  private final CatzClimb climb = CatzClimb.getInstance();
+  private final CatzLED led = CatzLED.getInstance();
+  private final CatzDrivetrain drivetrain = CatzDrivetrain.getInstance();
+  private final CatzElevator elevator = CatzElevator.getInstance();
+  private final CatzRampPivot rampPivot = CatzRampPivot.getInstance();
+  private final CatzAlgaePivot algaePivot = CatzAlgaePivot.getInstance();
+  private final CatzAlgaeRemover algaeRemover = CatzAlgaeRemover.getInstance();
 
   private RobotContainer() {
     // Drive And Aux Command Mapping
@@ -129,15 +143,15 @@ public class RobotContainer {
     // Reset odometry
     DoublePressTracker.createTrigger(xboxDrv.button(8).and(xboxDrv.button(7))).onTrue(new InstantCommand(() -> {
       if(AllianceFlipUtil.shouldFlipToRed()){
-        robotTracker.resetPose(new Pose2d(robotTracker.getEstimatedPose().getTranslation(), Rotation2d.k180deg));
+        tracker.resetPose(new Pose2d(tracker.getEstimatedPose().getTranslation(), Rotation2d.k180deg));
       }else{
-        robotTracker.resetPose(new Pose2d(robotTracker.getEstimatedPose().getTranslation(), new Rotation2d()));
+        tracker.resetPose(new Pose2d(tracker.getEstimatedPose().getTranslation(), new Rotation2d()));
       }
     }));
 
     // Climb
     Trigger climbMode = xboxDrv.povLeft();
-    xboxDrv.b().onTrue(CatzStateCommands.extendClimb(this));
+    xboxDrv.b().onTrue(CatzStateCommands.extendClimb());
     climbMode.toggleOnTrue(Commands.startEnd(()->superstructure.setClimbOverride(()->true), ()->superstructure.setClimbOverride(()->false)));
 
     //NBA
@@ -196,9 +210,9 @@ public class RobotContainer {
     // Default driving
     Trigger escapeTrajectory = new Trigger(()->(xboxDrv.getLeftY() > 0.8));
 
-    escapeTrajectory.onTrue(getCatzDrivetrain().cancelTrajectory());
+    escapeTrajectory.onTrue(drivetrain.cancelTrajectory());
 
-    drive.setDefaultCommand(new TeleopDriveCmd(() -> xboxDrv.getLeftX(), () -> xboxDrv.getLeftY(), () -> xboxDrv.getRightX(), drive));
+    drivetrain.setDefaultCommand(new TeleopDriveCmd(() -> xboxDrv.getLeftX(), () -> xboxDrv.getLeftY(), () -> xboxDrv.getRightX(), drivetrain));
     //---------------------------------------------------------------------------------------------------------------------
     // XBOX AUX
     //---------------------------------------------------------------------------------------------------------------------
@@ -228,7 +242,7 @@ public class RobotContainer {
     xboxAux.x().onTrue(Commands.runOnce(() -> superstructure.setCurrentRobotAction(RobotAction.INTAKE, "container")).alongWith(Commands.print("INTAKE")));
     xboxAux.y().onTrue(Commands.runOnce(() -> superstructure.setCurrentRobotAction(RobotAction.OUTTAKE, "container")).alongWith(Commands.print("OUTTAKE L" + superstructure.getLevel())));
     xboxAux.a().onTrue(Commands.runOnce(() -> superstructure.setCurrentRobotAction(RobotAction.STOW, "container")).alongWith(Commands.print("STOWWW")));
-    xboxAux.b().onTrue(CatzStateCommands.algaeStow(this));
+    xboxAux.b().onTrue(CatzStateCommands.algaeStow());
 
 
     // algae punch
@@ -252,7 +266,7 @@ public class RobotContainer {
 
     // xboxTest.povUp().toggleOnTrue(rampPivot.Ramp_Intake_Pos().alongWith(Commands.print("pressed POV Up"))); //TBD
     // xboxTest.povLeft().toggleOnTrue(rampPivot.Ramp_Climb_Pos().alongWith(Commands.print("pressed POV Left")));
-    xboxTest.x().onTrue(Commands.runOnce(() -> CatzStateCommands.algaeGrndIntk(this)).alongWith(Commands.print("Hi")));
+    xboxTest.x().onTrue(Commands.runOnce(() -> CatzStateCommands.algaeGroundIntake()).alongWith(Commands.print("Hi")));
     xboxTest.a().onTrue(Commands.runOnce(() -> superstructure.setCurrentRobotAction(RobotAction.STOW, "container")).alongWith(Commands.print("STOWWW")));
 
     xboxTest.povDown().toggleOnTrue(algaePivot.AlgaePivot_NetAlgae().alongWith(Commands.print("pressed POV Right"))); //TBD
@@ -382,6 +396,13 @@ public class RobotContainer {
 
   }
 
+  public Command getAutonomousCommand(){
+    return auto.getCommand();
+  }
+
+  public CommandXboxController getXboxAux(){
+    return xboxAux;
+  }
 
   // ---------------------------------------------------------------------------
   //

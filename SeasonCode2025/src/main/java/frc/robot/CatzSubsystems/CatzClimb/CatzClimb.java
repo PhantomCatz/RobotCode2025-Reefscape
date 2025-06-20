@@ -29,7 +29,12 @@ import lombok.RequiredArgsConstructor;
 import org.littletonrobotics.junction.Logger;
 
 public class CatzClimb extends SubsystemBase {
-  public static final CatzClimb Instance = new CatzClimb();
+  private static CatzClimb INSTANCE;
+
+  public static CatzClimb getInstance(){
+    if(INSTANCE == null) INSTANCE = new CatzClimb();
+    return INSTANCE;
+  }
 
   private final ClimbIO io;
   private final ClimbIOInputsAutoLogged inputs = new ClimbIOInputsAutoLogged();
@@ -47,7 +52,7 @@ public class CatzClimb extends SubsystemBase {
   static LoggedTunableNumber kV = new LoggedTunableNumber("Climb/kV", 0);
   static LoggedTunableNumber kA = new LoggedTunableNumber("Climb/kA", 0);
 
-  private final CatzLED LED;
+  private final CatzLED LED = CatzLED.getInstance();
 
   @RequiredArgsConstructor
   public enum ClimbPosition { //In Rotations //TBD
@@ -87,8 +92,6 @@ public class CatzClimb extends SubsystemBase {
         break;
       }
     }
-
-    LED = CatzLED.Instance;
   }
 
   @Override

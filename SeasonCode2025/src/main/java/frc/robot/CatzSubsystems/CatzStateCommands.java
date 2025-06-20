@@ -25,7 +25,6 @@ import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import frc.robot.Robot;
-import frc.robot.;
 import frc.robot.TeleopPosSelector;
 import frc.robot.CatzSubsystems.CatzAlgaeEffector.CatzAlgaePivot.CatzAlgaePivot;
 import frc.robot.CatzSubsystems.CatzAlgaeEffector.CatzAlgaeRemover.CatzAlgaeRemover;
@@ -47,11 +46,11 @@ public class CatzStateCommands {
     //
     //------------------------------------------------------------------------------------------------------------------------------------
     public static Command driveToScore(PathPlannerPath pathToReadyPose, int level){
-        CatzDrivetrain drivetrain = CatzDrivetrain.Instance;
-        CatzOuttake outtake = CatzOuttake.Instance;
+        CatzDrivetrain drivetrain = CatzDrivetrain.getInstance();
+        CatzOuttake outtake = CatzOuttake.getInstance();
 
         return new SequentialCommandGroup(
-            new TrajectoryDriveCmd(pathToReadyPose, drivetrain, true, false).deadlineFor(
+            new TrajectoryDriveCmd(pathToReadyPose, true, false).deadlineFor(
                 new RepeatCommand(LXElevator(level).alongWith(new PrintCommand("elevavavava")).onlyIf(() -> drivetrain.getDistanceError() < DriveConstants.PREDICT_DISTANCE_SCORE))
             ),
             // new WaitUntilCommand(() -> !outtake.isDesiredCoralState(true)),
@@ -62,11 +61,11 @@ public class CatzStateCommands {
     }
 
     public static Command driveToScore(PathPlannerPath pathToReadyPose, int level, double delay){
-        CatzDrivetrain drivetrain = CatzDrivetrain.Instance;
-        CatzOuttake outtake = CatzOuttake.Instance;
+        CatzDrivetrain drivetrain = CatzDrivetrain.getInstance();
+        CatzOuttake outtake = CatzOuttake.getInstance();
 
         return new SequentialCommandGroup(
-            new TrajectoryDriveCmd(pathToReadyPose, drivetrain, true, false).deadlineFor(
+            new TrajectoryDriveCmd(pathToReadyPose, true, false).deadlineFor(
                 new RepeatCommand(LXElevator(level).alongWith(new PrintCommand("elevavavava")).onlyIf(() -> drivetrain.getDistanceError() < DriveConstants.PREDICT_DISTANCE_SCORE))
             ),
             // new WaitUntilCommand(() -> !outtake.isDesiredCoralState(true)),
@@ -79,10 +78,10 @@ public class CatzStateCommands {
 
     public static Command driveToScore(Supplier<PathPlannerPath> pathToReadyPoseSupplier, int level){
 
-        CatzDrivetrain drivetrain = CatzDrivetrain.Instance;
+        CatzDrivetrain drivetrain = CatzDrivetrain.getInstance();
 
         return new SequentialCommandGroup(
-            new TrajectoryDriveCmd(pathToReadyPoseSupplier, drivetrain, false, false),
+            new TrajectoryDriveCmd(pathToReadyPoseSupplier, false, false),
             LXElevator(level),
             moveScore(level),
             stow()
@@ -90,21 +89,21 @@ public class CatzStateCommands {
     }
 
     public static Command moveScore(int level){
-        CatzDrivetrain drivetrain = CatzDrivetrain.Instance;
-        TeleopPosSelector selector = TeleopPosSelector.Instance;
+        CatzDrivetrain drivetrain = CatzDrivetrain.getInstance();
+        TeleopPosSelector selector = TeleopPosSelector.getInstance();
 
         return new SequentialCommandGroup(
-            new TrajectoryDriveCmd(()->selector.getMoveScorePath(), drivetrain, true, false),
+            new TrajectoryDriveCmd(()->selector.getMoveScorePath(), true, false),
             LXCoral(level)
         );
     }
 
     public static Command driveToCoralStation(PathPlannerPath path, Supplier<Boolean> waitForCoralSupplier){
-        CatzDrivetrain drivetrain = CatzDrivetrain.Instance;
-        CatzOuttake outtake = CatzOuttake.Instance;
+        CatzDrivetrain drivetrain = CatzDrivetrain.getInstance();
+        CatzOuttake outtake = CatzOuttake.getInstance();
 
         return new SequentialCommandGroup(
-            new TrajectoryDriveCmd(path, drivetrain, false, false).deadlineFor(
+            new TrajectoryDriveCmd(path, false, false).deadlineFor(
                 new RepeatCommand(intakeCoralStation().onlyIf(() -> drivetrain.getDistanceError() < DriveConstants.PREDICT_DISTANCE_INTAKE))
             ),
             Commands.waitUntil(() -> (waitForCoralSupplier.get() ? outtake.isDesiredCoralState(false) : true)).withTimeout(0.6)
@@ -122,13 +121,13 @@ public class CatzStateCommands {
     //------------------------------------------------------------------------------------------------------------------------------------
     public static Command stow() {
 
-        CatzClimb climb = CatzClimb.Instance;
-        CatzAlgaeRemover algae = CatzAlgaeRemover.Instance;
-        CatzOuttake outtake = CatzOuttake.Instance;
-        CatzElevator elevator = CatzElevator.Instance;
-        CatzAlgaePivot algaePivot = CatzAlgaePivot.Instance;
-        CatzRampPivot rampPivot = CatzRampPivot.Instance;
-        CatzIntakeRollers intakeRollers = CatzIntakeRollers.Instance;
+        CatzClimb climb = CatzClimb.getInstance();
+        CatzAlgaeRemover algae = CatzAlgaeRemover.getInstance();
+        CatzOuttake outtake = CatzOuttake.getInstance();
+        CatzElevator elevator = CatzElevator.getInstance();
+        CatzAlgaePivot algaePivot = CatzAlgaePivot.getInstance();
+        CatzRampPivot rampPivot = CatzRampPivot.getInstance();
+        CatzIntakeRollers intakeRollers = CatzIntakeRollers.getInstance();
 
         return new ParallelCommandGroup(
             algae.stopAlgae(),
@@ -142,14 +141,14 @@ public class CatzStateCommands {
     }
 
     public static Command intakeCoralStation() {
-        CatzAlgaeRemover algae = CatzAlgaeRemover.Instance;
-        CatzOuttake outtake = CatzOuttake.Instance;
-        CatzElevator elevator = CatzElevator.Instance;
-        CatzAlgaePivot algaePivot = CatzAlgaePivot.Instance;
-        CatzRampPivot rampPivot = CatzRampPivot.Instance;
-        CatzIntakeRollers intakeRollers = CatzIntakeRollers.Instance;
-        CatzClimb climb = CatzClimb.Instance;
-        TeleopPosSelector selector = TeleopPosSelector.Instance;
+        CatzAlgaeRemover algae = CatzAlgaeRemover.getInstance();
+        CatzOuttake outtake = CatzOuttake.getInstance();
+        CatzElevator elevator = CatzElevator.getInstance();
+        CatzAlgaePivot algaePivot = CatzAlgaePivot.getInstance();
+        CatzRampPivot rampPivot = CatzRampPivot.getInstance();
+        CatzIntakeRollers intakeRollers = CatzIntakeRollers.getInstance();
+        CatzClimb climb = CatzClimb.getInstance();
+        TeleopPosSelector selector = TeleopPosSelector.getInstance();
 
         return new ParallelCommandGroup(
             algae.stopAlgae(),
@@ -162,13 +161,13 @@ public class CatzStateCommands {
     }
 
     public static Command intakeAlgae() {
-        CatzClimb climb = CatzClimb.Instance;
-        CatzAlgaeRemover algae = CatzAlgaeRemover.Instance;
-        CatzOuttake outtake = CatzOuttake.Instance;
-        CatzElevator elevator = CatzElevator.Instance;
-        CatzAlgaePivot algaePivot = CatzAlgaePivot.Instance;
-        CatzRampPivot rampPivot = CatzRampPivot.Instance;
-        CatzIntakeRollers intakeRollers = CatzIntakeRollers.Instance;
+        CatzClimb climb = CatzClimb.getInstance();
+        CatzAlgaeRemover algae = CatzAlgaeRemover.getInstance();
+        CatzOuttake outtake = CatzOuttake.getInstance();
+        CatzElevator elevator = CatzElevator.getInstance();
+        CatzAlgaePivot algaePivot = CatzAlgaePivot.getInstance();
+        CatzRampPivot rampPivot = CatzRampPivot.getInstance();
+        CatzIntakeRollers intakeRollers = CatzIntakeRollers.getInstance();
 
         return new ParallelCommandGroup(
             algaePivot.AlgaePivot_Horizontal(),
@@ -187,13 +186,13 @@ public class CatzStateCommands {
     //
     //------------------------------------------------------------------------------------------------------------------------------------
     public static Command L1Coral() {
-        CatzClimb climb = CatzClimb.Instance;
-        CatzAlgaeRemover algae = CatzAlgaeRemover.Instance;
-        CatzOuttake outtake = CatzOuttake.Instance;
-        CatzElevator elevator = CatzElevator.Instance;
-        CatzAlgaePivot algaePivot = CatzAlgaePivot.Instance;
-        CatzRampPivot rampPivot = CatzRampPivot.Instance;
-        CatzIntakeRollers intakeRollers = CatzIntakeRollers.Instance;
+        CatzClimb climb = CatzClimb.getInstance();
+        CatzAlgaeRemover algae = CatzAlgaeRemover.getInstance();
+        CatzOuttake outtake = CatzOuttake.getInstance();
+        CatzElevator elevator = CatzElevator.getInstance();
+        CatzAlgaePivot algaePivot = CatzAlgaePivot.getInstance();
+        CatzRampPivot rampPivot = CatzRampPivot.getInstance();
+        CatzIntakeRollers intakeRollers = CatzIntakeRollers.getInstance();
 
         return new ParallelCommandGroup(
             rampPivot.Ramp_Intake_Pos(),
@@ -211,13 +210,13 @@ public class CatzStateCommands {
     }
 
     public static Command L2Coral() {
-        CatzClimb climb = CatzClimb.Instance;
-        CatzAlgaeRemover algae = CatzAlgaeRemover.Instance;
-        CatzOuttake outtake = CatzOuttake.Instance;
-        CatzElevator elevator = CatzElevator.Instance;
-        CatzAlgaePivot algaePivot = CatzAlgaePivot.Instance;
-        CatzRampPivot rampPivot = CatzRampPivot.Instance;
-        CatzIntakeRollers intakeRollers = CatzIntakeRollers.Instance;
+        CatzClimb climb = CatzClimb.getInstance();
+        CatzAlgaeRemover algae = CatzAlgaeRemover.getInstance();
+        CatzOuttake outtake = CatzOuttake.getInstance();
+        CatzElevator elevator = CatzElevator.getInstance();
+        CatzAlgaePivot algaePivot = CatzAlgaePivot.getInstance();
+        CatzRampPivot rampPivot = CatzRampPivot.getInstance();
+        CatzIntakeRollers intakeRollers = CatzIntakeRollers.getInstance();
 
         return new ParallelCommandGroup(
             rampPivot.Ramp_Intake_Pos(),
@@ -235,13 +234,13 @@ public class CatzStateCommands {
     }
 
     public static Command L3Coral() {
-        CatzClimb climb = CatzClimb.Instance;
-        CatzAlgaeRemover algae = CatzAlgaeRemover.Instance;
-        CatzOuttake outtake = CatzOuttake.Instance;
-        CatzElevator elevator = CatzElevator.Instance;
-        CatzAlgaePivot algaePivot = CatzAlgaePivot.Instance;
-        CatzRampPivot rampPivot = CatzRampPivot.Instance;
-        CatzIntakeRollers intakeRollers = CatzIntakeRollers.Instance;
+        CatzClimb climb = CatzClimb.getInstance();
+        CatzAlgaeRemover algae = CatzAlgaeRemover.getInstance();
+        CatzOuttake outtake = CatzOuttake.getInstance();
+        CatzElevator elevator = CatzElevator.getInstance();
+        CatzAlgaePivot algaePivot = CatzAlgaePivot.getInstance();
+        CatzRampPivot rampPivot = CatzRampPivot.getInstance();
+        CatzIntakeRollers intakeRollers = CatzIntakeRollers.getInstance();
 
         return new ParallelCommandGroup(
             rampPivot.Ramp_Intake_Pos(),
@@ -259,13 +258,13 @@ public class CatzStateCommands {
     }
 
     public static Command L4Coral() {
-        CatzClimb climb = CatzClimb.Instance;
-        CatzAlgaeRemover algae = CatzAlgaeRemover.Instance;
-        CatzOuttake outtake = CatzOuttake.Instance;
-        CatzElevator elevator = CatzElevator.Instance;
-        CatzAlgaePivot algaePivot = CatzAlgaePivot.Instance;
-        CatzRampPivot rampPivot = CatzRampPivot.Instance;
-        CatzIntakeRollers intakeRollers = CatzIntakeRollers.Instance;
+        CatzClimb climb = CatzClimb.getInstance();
+        CatzAlgaeRemover algae = CatzAlgaeRemover.getInstance();
+        CatzOuttake outtake = CatzOuttake.getInstance();
+        CatzElevator elevator = CatzElevator.getInstance();
+        CatzAlgaePivot algaePivot = CatzAlgaePivot.getInstance();
+        CatzRampPivot rampPivot = CatzRampPivot.getInstance();
+        CatzIntakeRollers intakeRollers = CatzIntakeRollers.getInstance();
 
         return new ParallelCommandGroup(
             rampPivot.Ramp_Intake_Pos(),
@@ -285,8 +284,8 @@ public class CatzStateCommands {
          .unless(()-> Robot.isSimulation()).alongWith(Commands.print("L4 Scoring State"));
     }
 
-    public static Command LXCoral(, int level){
-        TeleopPosSelector selector = TeleopPosSelector.Instance;
+    public static Command LXCoral(int level){
+        TeleopPosSelector selector = TeleopPosSelector.getInstance();
 
         switch(level){
             case 1:
@@ -312,13 +311,13 @@ public class CatzStateCommands {
     //      Preraise elevator
     //
     //------------------------------------------------------------------------------------------------------------------------------------
-    public static Command LXElevator(, int level){
-        CatzClimb climb = CatzClimb.Instance;
-        CatzAlgaeRemover algae = CatzAlgaeRemover.Instance;
-        CatzElevator elevator = CatzElevator.Instance;
-        CatzAlgaePivot algaePivot = CatzAlgaePivot.Instance;
-        CatzRampPivot rampPivot = CatzRampPivot.Instance;
-        CatzIntakeRollers intakeRollers = CatzIntakeRollers.Instance;
+    public static Command LXElevator(int level){
+        CatzClimb climb = CatzClimb.getInstance();
+        CatzAlgaeRemover algae = CatzAlgaeRemover.getInstance();
+        CatzElevator elevator = CatzElevator.getInstance();
+        CatzAlgaePivot algaePivot = CatzAlgaePivot.getInstance();
+        CatzRampPivot rampPivot = CatzRampPivot.getInstance();
+        CatzIntakeRollers intakeRollers = CatzIntakeRollers.getInstance();
 
         return new SequentialCommandGroup(
             algae.stopAlgae(),
@@ -338,13 +337,13 @@ public class CatzStateCommands {
     //
     //------------------------------------------------------------------------------------------------------------------------------------
     public static Command processor() {
-        CatzClimb climb = CatzClimb.Instance;
-        CatzAlgaeRemover algae = CatzAlgaeRemover.Instance;
-        CatzOuttake outtake = CatzOuttake.Instance;
-        CatzElevator elevator = CatzElevator.Instance;
-        CatzAlgaePivot algaePivot = CatzAlgaePivot.Instance;
-        CatzRampPivot rampPivot = CatzRampPivot.Instance;
-        CatzIntakeRollers intakeRollers = CatzIntakeRollers.Instance;
+        CatzClimb climb = CatzClimb.getInstance();
+        CatzAlgaeRemover algae = CatzAlgaeRemover.getInstance();
+        CatzOuttake outtake = CatzOuttake.getInstance();
+        CatzElevator elevator = CatzElevator.getInstance();
+        CatzAlgaePivot algaePivot = CatzAlgaePivot.getInstance();
+        CatzRampPivot rampPivot = CatzRampPivot.getInstance();
+        CatzIntakeRollers intakeRollers = CatzIntakeRollers.getInstance();
 
         return new ParallelCommandGroup(
             outtake.stopOuttake(),
@@ -361,13 +360,13 @@ public class CatzStateCommands {
     }
 
     public static Command netAlgae() {
-        CatzClimb climb = CatzClimb.Instance;
-        CatzAlgaeRemover algae = CatzAlgaeRemover.Instance;
-        CatzOuttake outtake = CatzOuttake.Instance;
-        CatzElevator elevator = CatzElevator.Instance;
-        CatzAlgaePivot algaePivot = CatzAlgaePivot.Instance;
-        CatzRampPivot rampPivot = CatzRampPivot.Instance;
-        CatzIntakeRollers intakeRollers = CatzIntakeRollers.Instance;
+        CatzClimb climb = CatzClimb.getInstance();
+        CatzAlgaeRemover algae = CatzAlgaeRemover.getInstance();
+        CatzOuttake outtake = CatzOuttake.getInstance();
+        CatzElevator elevator = CatzElevator.getInstance();
+        CatzAlgaePivot algaePivot = CatzAlgaePivot.getInstance();
+        CatzRampPivot rampPivot = CatzRampPivot.getInstance();
+        CatzIntakeRollers intakeRollers = CatzIntakeRollers.getInstance();
 
         return new ParallelCommandGroup(
             outtake.stopOuttake(),
@@ -385,7 +384,7 @@ public class CatzStateCommands {
         ).unless(()-> Robot.isSimulation()).alongWith(Commands.print("Net Algae"));
     }
 
-    public static Command XAlgae(, int level){
+    public static Command XAlgae(int level){
         switch(level){
             case 2:
             return topAlgae();
@@ -399,13 +398,13 @@ public class CatzStateCommands {
     }
 
     public static Command botAlgae() {
-        CatzClimb climb = CatzClimb.Instance;
-        CatzAlgaeRemover algae = CatzAlgaeRemover.Instance;
-        CatzOuttake outtake = CatzOuttake.Instance;
-        CatzElevator elevator = CatzElevator.Instance;
-        CatzAlgaePivot algaePivot = CatzAlgaePivot.Instance;
-        CatzRampPivot rampPivot = CatzRampPivot.Instance;
-        CatzIntakeRollers intakeRollers = CatzIntakeRollers.Instance;
+        CatzClimb climb = CatzClimb.getInstance();
+        CatzAlgaeRemover algae = CatzAlgaeRemover.getInstance();
+        CatzOuttake outtake = CatzOuttake.getInstance();
+        CatzElevator elevator = CatzElevator.getInstance();
+        CatzAlgaePivot algaePivot = CatzAlgaePivot.getInstance();
+        CatzRampPivot rampPivot = CatzRampPivot.getInstance();
+        CatzIntakeRollers intakeRollers = CatzIntakeRollers.getInstance();
 
         return new SequentialCommandGroup(
             new ParallelCommandGroup(
@@ -425,13 +424,13 @@ public class CatzStateCommands {
     }
 
     public static Command topAlgae() {
-        CatzClimb climb = CatzClimb.Instance;
-        CatzAlgaeRemover algae = CatzAlgaeRemover.Instance;
-        CatzOuttake outtake = CatzOuttake.Instance;
-        CatzElevator elevator = CatzElevator.Instance;
-        CatzAlgaePivot algaePivot = CatzAlgaePivot.Instance;
-        CatzRampPivot rampPivot = CatzRampPivot.Instance;
-        CatzIntakeRollers intakeRollers = CatzIntakeRollers.Instance;
+        CatzClimb climb = CatzClimb.getInstance();
+        CatzAlgaeRemover algae = CatzAlgaeRemover.getInstance();
+        CatzOuttake outtake = CatzOuttake.getInstance();
+        CatzElevator elevator = CatzElevator.getInstance();
+        CatzAlgaePivot algaePivot = CatzAlgaePivot.getInstance();
+        CatzRampPivot rampPivot = CatzRampPivot.getInstance();
+        CatzIntakeRollers intakeRollers = CatzIntakeRollers.getInstance();
 
         return new ParallelCommandGroup(
             outtake.stopOuttake(),
@@ -448,13 +447,13 @@ public class CatzStateCommands {
 
     public static Command algaeStow() {
 
-        CatzClimb climb = CatzClimb.Instance;
-        CatzOuttake outtake = CatzOuttake.Instance;
-        CatzElevator elevator = CatzElevator.Instance;
-        CatzAlgaeRemover remover = CatzAlgaeRemover.Instance;
-        CatzAlgaePivot algaePivot = CatzAlgaePivot.Instance;
-        CatzRampPivot rampPivot = CatzRampPivot.Instance;
-        CatzIntakeRollers intakeRollers = CatzIntakeRollers.Instance;
+        CatzClimb climb = CatzClimb.getInstance();
+        CatzOuttake outtake = CatzOuttake.getInstance();
+        CatzElevator elevator = CatzElevator.getInstance();
+        CatzAlgaeRemover remover = CatzAlgaeRemover.getInstance();
+        CatzAlgaePivot algaePivot = CatzAlgaePivot.getInstance();
+        CatzRampPivot rampPivot = CatzRampPivot.getInstance();
+        CatzIntakeRollers intakeRollers = CatzIntakeRollers.getInstance();
 
         return new ParallelCommandGroup(
             outtake.stopOuttake(),
@@ -466,14 +465,14 @@ public class CatzStateCommands {
         ).unless(()-> Robot.isSimulation()).alongWith(Commands.print("Stow"));
     }
 
-    public static Command algaeGrndIntk() {
-        CatzClimb climb = CatzClimb.Instance;
-        CatzAlgaeRemover algae = CatzAlgaeRemover.Instance;
-        CatzOuttake outtake = CatzOuttake.Instance;
-        CatzElevator elevator = CatzElevator.Instance;
-        CatzAlgaePivot algaePivot = CatzAlgaePivot.Instance;
-        CatzRampPivot rampPivot = CatzRampPivot.Instance;
-        CatzIntakeRollers intakeRollers = CatzIntakeRollers.Instance;
+    public static Command algaeGroundIntake() {
+        CatzClimb climb = CatzClimb.getInstance();
+        CatzAlgaeRemover algae = CatzAlgaeRemover.getInstance();
+        CatzOuttake outtake = CatzOuttake.getInstance();
+        CatzElevator elevator = CatzElevator.getInstance();
+        CatzAlgaePivot algaePivot = CatzAlgaePivot.getInstance();
+        CatzRampPivot rampPivot = CatzRampPivot.getInstance();
+        CatzIntakeRollers intakeRollers = CatzIntakeRollers.getInstance();
 
         return new ParallelCommandGroup(
             outtake.stopOuttake(),
@@ -494,12 +493,12 @@ public class CatzStateCommands {
     //
     //------------------------------------------------------------------------------------------------------------------------------------
     public static Command extendClimb() {
-        CatzClimb climb = CatzClimb.Instance;
-        CatzAlgaeRemover algae = CatzAlgaeRemover.Instance;
-        CatzOuttake outtake = CatzOuttake.Instance;
-        CatzElevator elevator = CatzElevator.Instance;
-        CatzRampPivot rampPivot = CatzRampPivot.Instance;
-        CatzIntakeRollers intakeRollers = CatzIntakeRollers.Instance;
+        CatzClimb climb = CatzClimb.getInstance();
+        CatzAlgaeRemover algae = CatzAlgaeRemover.getInstance();
+        CatzOuttake outtake = CatzOuttake.getInstance();
+        CatzElevator elevator = CatzElevator.getInstance();
+        CatzRampPivot rampPivot = CatzRampPivot.getInstance();
+        CatzIntakeRollers intakeRollers = CatzIntakeRollers.getInstance();
 
         return new SequentialCommandGroup(
             new ParallelCommandGroup(

@@ -21,7 +21,8 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
-import frc.robot.RobotContainer;
+import frc.robot.Robot;
+import frc.robot.TeleopPosSelector;
 import frc.robot.CatzSubsystems.CatzLEDs.CatzLED;
 import frc.robot.CatzSubsystems.CatzLEDs.CatzLED.ControllerLEDState;
 import frc.robot.Utilities.VirtualSubsystem;
@@ -29,7 +30,12 @@ import lombok.Getter;
 import lombok.Setter;
 
 public class CatzSuperstructure extends VirtualSubsystem {
-    public static final CatzSuperstructure Instance = new CatzSuperstructure();
+    private static CatzSuperstructure INSTANCE;
+
+    public static CatzSuperstructure getInstance(){
+        if(INSTANCE == null) INSTANCE = new CatzSuperstructure();
+        return INSTANCE;
+    }
 
     static @Getter @Setter @AutoLogOutput(key = "CatzSuperstructure/ChosenGamepiece")
     private Gamepiece chosenGamepiece = Gamepiece.CORAL;
@@ -53,6 +59,8 @@ public class CatzSuperstructure extends VirtualSubsystem {
     private Command robotActionCommand = Commands.none();
 
     private Command previousAction = new InstantCommand();
+
+    private final CatzLED LED = CatzLED.getInstance();
 
     public enum Gamepiece{
         CORAL,
@@ -129,10 +137,10 @@ public class CatzSuperstructure extends VirtualSubsystem {
     public void setClimbOverride(BooleanSupplier isClimbEnabled) {
         CatzSuperstructure.isClimbEnabled = isClimbEnabled.getAsBoolean();
         if (isClimbEnabled()) {
-            CatzLED.getInstance().setControllerState(ControllerLEDState.CLIMB);
+            LED.setControllerState(ControllerLEDState.CLIMB);
         }
         else {
-            CatzLED.getInstance().setControllerState(ControllerLEDState.FULL_MANUAL);
+            LED.setControllerState(ControllerLEDState.FULL_MANUAL);
         }
         System.out.println("CLimb Enabled" + isClimbEnabled);
     }
@@ -143,7 +151,7 @@ public class CatzSuperstructure extends VirtualSubsystem {
 
         if(isClimbEnabled) {
             System.out.println("HI");
-            CatzLED.getInstance().setControllerState(ControllerLEDState.CLIMB);
+            LED.setControllerState(ControllerLEDState.CLIMB);
             return;
         }
 
@@ -155,22 +163,22 @@ public class CatzSuperstructure extends VirtualSubsystem {
                     switch (level) {
                         case 1:
                         currentRobotState = RobotState.L1_CORAL;
-                        robotActionCommand = CatzStateCommands.L1Coral(container);
+                        robotActionCommand = CatzStateCommands.L1Coral();
                         break;
 
                         case 2:
                         currentRobotState = RobotState.L2_CORAL;
-                        robotActionCommand = CatzStateCommands.L2Coral(container);
+                        robotActionCommand = CatzStateCommands.L2Coral();
                         break;
 
                         case 3:
                         currentRobotState = RobotState.L3_CORAL;
-                        robotActionCommand = CatzStateCommands.L3Coral(container);
+                        robotActionCommand = CatzStateCommands.L3Coral();
                         break;
 
                         case 4:
                         currentRobotState = RobotState.L4_CORAL;
-                        robotActionCommand = CatzStateCommands.L4Coral(container);
+                        robotActionCommand = CatzStateCommands.L4Coral();
                         break;
                     }
                 } else {
@@ -178,12 +186,12 @@ public class CatzSuperstructure extends VirtualSubsystem {
                         case 4:
                             currentRobotState = RobotState.PROCESSOR;
                             //System.out.println("Processor");
-                            robotActionCommand = CatzStateCommands.processor(container);
+                            robotActionCommand = CatzStateCommands.processor();
                             break;
                         case 2:
                             currentRobotState = RobotState.NET_ALGAE;
                             //System.out.println("Net Algae");
-                            robotActionCommand = CatzStateCommands.netAlgae(container);
+                            robotActionCommand = CatzStateCommands.netAlgae();
                             break;
                         default:
                             robotActionCommand = Commands.none();
@@ -197,7 +205,7 @@ public class CatzSuperstructure extends VirtualSubsystem {
             case AIMING:
 
                 if(chosenGamepiece == Gamepiece.CORAL) {
-                    robotActionCommand = CatzStateCommands.LXElevator(container, level);
+                    robotActionCommand = CatzStateCommands.LXElevator(level);
                     switch (level) {
                         case 1:
                         currentRobotState = RobotState.L1_AIMING;
@@ -217,7 +225,7 @@ public class CatzSuperstructure extends VirtualSubsystem {
                     }
                 } else {
                     currentRobotState = RobotState.PROCESSOR;
-                    robotActionCommand = CatzStateCommands.processor(container);
+                    robotActionCommand = CatzStateCommands.processor();
                     // System.out.println("Processor");
 
                 }
@@ -228,16 +236,16 @@ public class CatzSuperstructure extends VirtualSubsystem {
             case INTAKE:
                 if(chosenGamepiece == Gamepiece.CORAL) {
                     currentRobotState = RobotState.INTAKE_CORAL_STATION;
-                    robotActionCommand = CatzStateCommands.intakeCoralStation(container);
+                    robotActionCommand = CatzStateCommands.intakeCoralStation();
                 } else {
-                    if(container.getSelector().recentNBAPos.getFirst() % 2 == 0) {
+                    if(TeleopPosSelector.getInstance().recentNBAPos.getFirst() % 2 == 0) {
                         currentRobotState = RobotState.BOT_ALGAE;
                         System.out.println("BOT algae");
-                        robotActionCommand = CatzStateCommands.botAlgae(container);
+                        robotActionCommand = CatzStateCommands.botAlgae();
                     }else{
                         currentRobotState = RobotState.TOP_ALGAE;
                         System.out.println("TOP algae");
-                        robotActionCommand = CatzStateCommands.topAlgae(container);
+                        robotActionCommand = CatzStateCommands.topAlgae();
                     }
 
                 }
@@ -247,11 +255,11 @@ public class CatzSuperstructure extends VirtualSubsystem {
             case STOW:
                 // if(chosenGamepiece == Gamepiece.CORAL) {
                     currentRobotState = RobotState.STOW;
-                    robotActionCommand = CatzStateCommands.stow(container);
+                    robotActionCommand = CatzStateCommands.stow();
 
                 // } else {
                 //     currentRobotState = RobotState.STOW;
-                //     robotActionCommand = CatzStateCommands.algaeStow(container);
+                //     robotActionCommand = CatzStateCommands.algaeStow();
                 // }
                 break;
 
@@ -267,11 +275,11 @@ public class CatzSuperstructure extends VirtualSubsystem {
         Logger.recordOutput("CurrentRobotState/CurrentRobotState", currentRobotState.toString());
     }
 
-    public 
+    // public 
 
-    public Command L1Score(){
-        return new 
-    }
+    // public Command L1Score(){
+    //     return new 
+    // }
 
 
     @Override

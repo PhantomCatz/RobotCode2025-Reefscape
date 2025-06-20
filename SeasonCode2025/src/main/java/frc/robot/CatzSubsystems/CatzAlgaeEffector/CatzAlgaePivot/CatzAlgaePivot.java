@@ -27,7 +27,12 @@ import lombok.RequiredArgsConstructor;
 import org.littletonrobotics.junction.Logger;
 
 public class CatzAlgaePivot extends SubsystemBase {
-  public static final CatzAlgaePivot Instance = new CatzAlgaePivot();
+  private static CatzAlgaePivot INSTANCE;
+
+  public static CatzAlgaePivot getInstance(){
+    if(INSTANCE == null) INSTANCE = new CatzAlgaePivot();
+    return INSTANCE;
+  }
 
   private final AlgaePivotIO io;
   private final AlgaePivotIOInputsAutoLogged inputs = new AlgaePivotIOInputsAutoLogged();

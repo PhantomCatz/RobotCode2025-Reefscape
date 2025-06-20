@@ -27,7 +27,12 @@ import lombok.Setter;
 import org.littletonrobotics.junction.Logger;
 
 public class CatzOuttake extends SubsystemBase {
-  public static final CatzOuttake Instance = new CatzOuttake();
+  private static CatzOuttake INSTANCE;
+
+  public static CatzOuttake getInstance(){
+    if(INSTANCE == null) INSTANCE = new CatzOuttake();
+    return INSTANCE;
+  }
 
   private final OuttakeIO io;
   private final OuttakeIOInputsAutoLogged inputs = new OuttakeIOInputsAutoLogged();
@@ -35,7 +40,7 @@ public class CatzOuttake extends SubsystemBase {
   private int interationCounter = 0;
   private int intakeIterationCoutner = 0;
 
-  private final TeleopPosSelector SELECTOR;
+  private final TeleopPosSelector SELECTOR = TeleopPosSelector.getInstance();
 
   public enum outtakeStates {
     ADJ_INIT,
@@ -72,8 +77,6 @@ public class CatzOuttake extends SubsystemBase {
         break;
       }
     }
-
-    SELECTOR = TeleopPosSelector.Instance;
   }
 
 

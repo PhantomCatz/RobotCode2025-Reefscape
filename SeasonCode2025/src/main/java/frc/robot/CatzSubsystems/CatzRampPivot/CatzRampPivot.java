@@ -29,7 +29,12 @@ import java.util.function.Supplier;
 import org.littletonrobotics.junction.Logger;
 
 public class CatzRampPivot extends SubsystemBase {
-  public static final CatzRampPivot Instance = new CatzRampPivot();
+  private static CatzRampPivot INSTANCE;
+
+  public static CatzRampPivot getInstance(){
+    if(INSTANCE == null ) INSTANCE = new CatzRampPivot();
+    return INSTANCE;
+  }
 
   private final RampPivotIO io;
   private final RampPivotIOInputsAutoLogged inputs = new RampPivotIOInputsAutoLogged();

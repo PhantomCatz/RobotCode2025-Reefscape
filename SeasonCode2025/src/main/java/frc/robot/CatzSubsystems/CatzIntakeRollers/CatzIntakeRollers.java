@@ -27,7 +27,12 @@ import lombok.Setter;
 import org.littletonrobotics.junction.Logger;
 
 public class CatzIntakeRollers extends SubsystemBase {
-    public static final CatzIntakeRollers Instance = new CatzIntakeRollers();
+    private static CatzIntakeRollers INSTANCE;
+
+    public static CatzIntakeRollers getInstance(){
+        if(INSTANCE == null) INSTANCE = new CatzIntakeRollers();
+        return INSTANCE;
+    }
 
     private final IntakeRollersIO io;
     private final IntakeRollersIOInputsAutoLogged inputs = new IntakeRollersIOInputsAutoLogged();

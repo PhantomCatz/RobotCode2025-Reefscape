@@ -55,6 +55,13 @@ import org.json.simple.parser.ParseException;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
 public class CatzAutonomous extends SubsystemBase {
+  private static CatzAutonomous instance;
+
+  public static CatzAutonomous getInstance(){
+    if(instance == null) instance = new CatzAutonomous();
+    return instance;
+  }
+
   // ------------------------------------------------------------------------------------------------------------
   // Questionairre
   // ------------------------------------------------------------------------------------------------------------
@@ -72,10 +79,10 @@ public class CatzAutonomous extends SubsystemBase {
   private PathPlannerAuto lastProgram;
 
   private final CatzRobotTracker tracker = CatzRobotTracker.getInstance();
-  private final CatzDrivetrain drivetrain;
+  private final CatzDrivetrain drivetrain = CatzDrivetrain.getInstance();
+  private final RobotContainer container= RobotContainer.getInstance();
 
   private CatzAutonomous() {
-    this.drivetrain = CatzDrivetrain.Instance;
 
     SmartDashboard.putData("Wait For Coral?", waitForCoralChooser);
 
@@ -95,29 +102,28 @@ public class CatzAutonomous extends SubsystemBase {
         NamedCommands.registerCommand(
             pathName,
             new TrajectoryDriveCmd(
-                PathPlannerPath.fromChoreoTrajectory(pathName), drivetrain, true, container, false));
+                PathPlannerPath.fromChoreoTrajectory(pathName), true, false));
       } catch (FileVersionException | IOException | ParseException e) {
         e.printStackTrace();
       }
     }
-    TeleopPosSelector selector = container.getSelector();
+    TeleopPosSelector selector = TeleopPosSelector.getInstance();
 
-    NamedCommands.registerCommand("Stow", CatzStateCommands.stow(container));
-    NamedCommands.registerCommand("IntakeCoralGround", CatzStateCommands.intakeCoralGround(container));
-    NamedCommands.registerCommand("IntakeCoralStation", CatzStateCommands.intakeCoralStation(container));
-    NamedCommands.registerCommand("IntakeAlgae", CatzStateCommands.intakeAlgae(container));
-    NamedCommands.registerCommand("L1Coral", CatzStateCommands.L1Coral(container));
-    NamedCommands.registerCommand("L2Coral", CatzStateCommands.L2Coral(container));
-    NamedCommands.registerCommand("L3Coral", CatzStateCommands.L3Coral(container));
-    NamedCommands.registerCommand("L4Coral", CatzStateCommands.L4Coral(container));
-    NamedCommands.registerCommand("Processor", CatzStateCommands.processor(container));
-    NamedCommands.registerCommand("BotAlgae", CatzStateCommands.intakeCoralGround(container));
-    NamedCommands.registerCommand("TopAlgae", CatzStateCommands.topAlgae(container));
+    NamedCommands.registerCommand("Stow", CatzStateCommands.stow());
+    NamedCommands.registerCommand("IntakeCoralStation", CatzStateCommands.intakeCoralStation());
+    NamedCommands.registerCommand("IntakeAlgae", CatzStateCommands.intakeAlgae());
+    NamedCommands.registerCommand("L1Coral", CatzStateCommands.L1Coral());
+    NamedCommands.registerCommand("L2Coral", CatzStateCommands.L2Coral());
+    NamedCommands.registerCommand("L3Coral", CatzStateCommands.L3Coral());
+    NamedCommands.registerCommand("L4Coral", CatzStateCommands.L4Coral());
+    NamedCommands.registerCommand("Processor", CatzStateCommands.processor());
+    NamedCommands.registerCommand("BotAlgae", CatzStateCommands.botAlgae());
+    NamedCommands.registerCommand("TopAlgae", CatzStateCommands.topAlgae());
     NamedCommands.registerCommand("RestPose", Commands.runOnce(()->tracker.resetPose(new Pose2d())));
     NamedCommands.registerCommand("WheelCharacterization", new WheelRadiusCharacterization(drivetrain, Direction.CLOCKWISE));
 
-    NamedCommands.registerCommand("AlgaeTop", CatzStateCommands.topAlgae(container));
-    NamedCommands.registerCommand("AlgaeBot", CatzStateCommands.botAlgae(container));
+    NamedCommands.registerCommand("AlgaeTop", CatzStateCommands.topAlgae());
+    NamedCommands.registerCommand("AlgaeBot", CatzStateCommands.botAlgae());
 
     HashMap<String, Command> startPose = new HashMap<>();
     HashMap<String, Command> reefPose1 = new HashMap<>();
@@ -142,8 +148,8 @@ public class CatzAutonomous extends SubsystemBase {
         final int s = side;
 
         NamedCommands.registerCommand(letter, new SeqCmd(
-            CatzStateCommands.driveToScore(m_container, () ->selector.getPathfindingPath(()->selector.calculateReefPose(s, leftRight, false)), 4),
-            CatzStateCommands.driveToCoralStation(m_container, ()->selector.getPathfindingPath(()->selector.getBestCoralStation()), () -> waitForCoralChooser.getSelected())
+            CatzStateCommands.driveToScore(() ->selector.getPathfindingPath(()->selector.calculateReefPose(s, leftRight, false)), 4),
+            CatzStateCommands.driveToCoralStation(()->selector.getPathfindingPath(()->selector.getBestCoralStation()), () -> waitForCoralChooser.getSelected())
           )
         );
 
@@ -203,11 +209,11 @@ public class CatzAutonomous extends SubsystemBase {
       tracker::getEstimatedPose,
       tracker::resetPose,
       tracker::getRobotChassisSpeeds,
-      container.getCatzDrivetrain()::d,
+      drivetrain::d,
       null,
       DriveConstants.TRAJ_ROBOT_CONFIG,
       shouldFlip,
-      container.getCatzDrivetrain()
+      drivetrain
     );
 
     // ------------------------------------------------------------------------------------------------------------
@@ -237,7 +243,7 @@ public class CatzAutonomous extends SubsystemBase {
               }
               else {
                 // Simple Trajectory Command
-                command = new TrajectoryDriveCmd(PathPlannerPath.fromPathFile(commandName), drivetrain, false, container, false);
+                command = new TrajectoryDriveCmd(PathPlannerPath.fromPathFile(commandName), false, false);
               }
             } else if(components.length >= 2){
               // Command Trajectory with Mechanisms
@@ -247,14 +253,14 @@ public class CatzAutonomous extends SubsystemBase {
               PathPlannerPath path = PathPlannerPath.fromPathFile(name);
 
               if(action.equalsIgnoreCase("CS")) {
-                command = CatzStateCommands.driveToCoralStation(container, path, () -> waitForCoralChooser.getSelected());
+                command = CatzStateCommands.driveToCoralStation(path, () -> waitForCoralChooser.getSelected());
               } else if(action.contains("ReefL")) {
                 if(components.length == 3){
                   String d = components[2];
                   double delay = Double.parseDouble(d.substring("d".length()));
-                  command = CatzStateCommands.driveToScore(container, path, Integer.parseInt(action.substring("ReefL".length())), delay);
+                  command = CatzStateCommands.driveToScore(path, Integer.parseInt(action.substring("ReefL".length())), delay);
                 }else{
-                  command = CatzStateCommands.driveToScore(container, path, Integer.parseInt(action.substring("ReefL".length())));
+                  command = CatzStateCommands.driveToScore(path, Integer.parseInt(action.substring("ReefL".length())));
                 }
               }
 
