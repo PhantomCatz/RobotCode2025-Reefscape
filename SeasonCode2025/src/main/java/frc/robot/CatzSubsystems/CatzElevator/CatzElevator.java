@@ -22,21 +22,10 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.CatzConstants;
 import frc.robot.Utilities.LoggedTunableNumber;
 import lombok.RequiredArgsConstructor;
-import edu.wpi.first.math.controller.PIDController;
-import edu.wpi.first.math.system.plant.DCMotor;
-import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.RobotController;
-import edu.wpi.first.wpilibj.simulation.DCMotorSim;
-import edu.wpi.first.wpilibj.simulation.ElevatorSim;
 
 import org.littletonrobotics.junction.Logger;
-import org.littletonrobotics.junction.mechanism.LoggedMechanism2d;
-import org.littletonrobotics.junction.mechanism.LoggedMechanismLigament2d;
-import org.littletonrobotics.junction.mechanism.LoggedMechanismRoot2d;
 
-import com.ctre.phoenix6.controls.DutyCycleOut;
-import com.ctre.phoenix6.hardware.TalonFX;
 
 
 
@@ -214,7 +203,7 @@ public class CatzElevator extends SubsystemBase {
     Logger.recordOutput("Elevator/logged prev targetPosition", previousLoggedPosition.getTargetPositionInch());
     Logger.recordOutput("Elevator/isElevatorInPos", isElevatorInPosition());
     Logger.recordOutput("Elevator/targetPosition", targetPosition.getTargetPositionInch());
-    
+
 
     // Target Postioin Logging
     previousLoggedPosition = targetPosition;
