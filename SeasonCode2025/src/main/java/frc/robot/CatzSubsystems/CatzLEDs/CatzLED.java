@@ -127,6 +127,7 @@ public class CatzLED extends VirtualSubsystem {
   private static final double waveExponent = 0.4;
   private static final double waveFastCycleLength = 25.0;
   private static final double waveFastDuration = 0.25;
+  private static final double waveSlowDuration = 4.0;
   private static final double waveAllianceCycleLength = 15.0;
   private static final double waveAllianceDuration = 2.0;
   private static final double bubbleTime = 2.5;

@@ -107,7 +107,7 @@ public class CatzStateCommands {
             new TrajectoryDriveCmd(path, drivetrain, false, robotContainer, false).deadlineFor(
                 new RepeatCommand(intakeCoralStation(robotContainer).onlyIf(() -> drivetrain.getDistanceError() < DriveConstants.PREDICT_DISTANCE_INTAKE))
             ),
-            Commands.waitUntil(() -> (waitForCoralSupplier.get() ? outtake.isDesiredCoralState(false) : true)).withTimeout(0.6)
+            Commands.waitUntil(() -> (waitForCoralSupplier.get() ? outtake.isDesiredCoralState(false) : true)).withTimeout(3.0)
         );
     }
 
