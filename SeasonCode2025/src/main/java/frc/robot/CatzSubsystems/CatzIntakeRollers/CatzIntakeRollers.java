@@ -18,13 +18,10 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.CatzConstants;
-import frc.robot.RobotContainer;
 import frc.robot.CatzSubsystems.CatzElevator.CatzElevator;
 import frc.robot.CatzSubsystems.CatzOuttake.CatzOuttake;
 import lombok.Getter;
 import lombok.Setter;
-
-import org.littletonrobotics.junction.Logger;
 
 public class CatzIntakeRollers extends SubsystemBase {
     private static CatzIntakeRollers INSTANCE;
@@ -91,7 +88,7 @@ public class CatzIntakeRollers extends SubsystemBase {
 
         switch (currentState) {
             case INTAKE:
-                if(CatzElevator.Instance.getElevatorPositionInch() < 4.0 && !DriverStation.isAutonomous()){
+                if(CatzElevator.getInstance().getElevatorPositionInch() < 4.0 && !DriverStation.isAutonomous()){
                     case_rampRollersIn();
                 }
                 if(DriverStation.isAutonomous()){

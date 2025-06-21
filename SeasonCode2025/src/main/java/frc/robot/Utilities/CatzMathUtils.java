@@ -60,7 +60,7 @@ public class CatzMathUtils {
     return newAngle;
   }
 
-  public static double Clamp(double min, double input, double max) {
+  public static double clamp(double min, double input, double max) {
     double clampedValue;
     if (input > max) {
       clampedValue = max;
@@ -71,6 +71,10 @@ public class CatzMathUtils {
     }
     return clampedValue;
   }
+
+  public static boolean inRange(double v, double min, double max) {
+		return v > min && v < max;
+	}
 
   public static double toUnitCircAngle(double angleRadians) {
     double rotations = angleRadians / (2 * Math.PI);

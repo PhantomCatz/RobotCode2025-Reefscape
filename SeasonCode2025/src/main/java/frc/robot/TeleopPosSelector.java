@@ -12,9 +12,7 @@
 package frc.robot;
 
 import java.util.Arrays;
-import java.util.Deque;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.Set;
 import java.util.function.Supplier;
 
@@ -34,7 +32,6 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.DeferredCommand;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RepeatCommand;
-import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.FieldConstants.Reef;
 import frc.robot.Utilities.AllianceFlipUtil;
 import frc.robot.Utilities.CornerTrackingPathfinder;
@@ -44,9 +41,6 @@ import frc.robot.CatzSubsystems.CatzSuperstructure;
 import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.CatzRobotTracker;
 import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.Drivetrain.CatzDrivetrain;
 import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.Drivetrain.DriveConstants;
-import frc.robot.CatzSubsystems.CatzElevator.CatzElevator;
-import frc.robot.CatzSubsystems.CatzLEDs.CatzLED;
-import frc.robot.CatzSubsystems.CatzLEDs.CatzLED.QueueLEDState;
 import frc.robot.CatzSubsystems.CatzOuttake.CatzOuttake;
 import frc.robot.Commands.DriveAndRobotOrientationCmds.TrajectoryDriveCmd;
 
@@ -58,7 +52,7 @@ public class TeleopPosSelector { //TODO split up the file. it's too big and does
     if(INSTANCE == null) INSTANCE = new TeleopPosSelector();
     return INSTANCE;
   }
-  
+
   private final CatzSuperstructure superstructure = CatzSuperstructure.getInstance();
   private final CatzDrivetrain drivetrain = CatzDrivetrain.getInstance();
   private final CatzOuttake outtake = CatzOuttake.getInstance();
@@ -280,7 +274,7 @@ public class TeleopPosSelector { //TODO split up the file. it's too big and does
 
       Pose2d currentPose = tracker.getEstimatedPose();
       Pose2d goal = calculateReefPose(new Pair<Integer, LeftRight>(recentNBAPos.getFirst(), leftRight), true, false); //TODO decide whether or not to have distanced
-  
+
       Logger.recordOutput("LeftRightGoal", goal);
 
       PathPlannerPath path = getStraightLinePath(currentPose, goal, DriveConstants.PATHFINDING_CONSTRAINTS); //TODO might need to scale constraints based off of distance from reef?
@@ -313,7 +307,7 @@ public class TeleopPosSelector { //TODO split up the file. it's too big and does
       }else{ //algae
         prematureCommand = new InstantCommand();
       }
-        
+
       PathPlannerPath path = getStraightLinePath(tracker.getEstimatedPose(), calculateReefPose(getClosestReefPos().getFirst(), true, false), DriveConstants.PATHFINDING_CONSTRAINTS);
 
       Command prepareScorePos = new TrajectoryDriveCmd(path, true, true)

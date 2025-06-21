@@ -27,7 +27,6 @@ import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.FieldConstants;
 import frc.robot.Robot;
-import frc.robot.RobotContainer;
 import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.CatzRobotTracker;
 import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.Drivetrain.CatzDrivetrain;
 import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.Drivetrain.DriveConstants;
@@ -107,20 +106,13 @@ public class TrajectoryDriveCmd extends Command {
     addRequirements(drivetrain);
   }
 
-  public void setPath(PathPlannerPath path){
-    this.path = path;
-  }
   private double prevTime;
   // ---------------------------------------------------------------------------------------------
   //
   // Initialize
   //
   // ---------------------------------------------------------------------------------------------
-  void printTime(String tag){
-    double curTime = Timer.getFPGATimestamp();
-    // System.out.println(tag + (curTime-prevTime));
-    prevTime = curTime;
-  }
+
   @Override
   public void initialize() {
     prevTime = Timer.getFPGATimestamp();
