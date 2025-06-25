@@ -1,14 +1,3 @@
-//------------------------------------------------------------------------------------
-// 2025 FRC 2637
-// https://github.com/PhantomCatz
-//
-// Use of this source code is governed by an MIT-style
-// license that can be found in the LICENSE file at
-// the root directory of this project. 
-//
-//        "6 hours of debugging can save you 5 minutes of reading documentation."
-//
-//------------------------------------------------------------------------------------
 package frc.robot.Commands.CharacterizationCmds;
 
 import edu.wpi.first.math.MathUtil;
@@ -38,7 +27,7 @@ public class WheelRadiusCharacterization extends Command {
       new LoggedTunableNumber("WheelRadiusCharacterization/SpeedRadsPerSec", 1);
   private static final double driveRadius = DriveConstants.DRIVE_CONFIG.driveBaseRadius();
   private static final DoubleSupplier gyroYawRadsSupplier =
-      () -> CatzRobotTracker.getInstance().getEstimatedPose().getRotation().getRadians();
+      () -> CatzRobotTracker.Instance.getEstimatedPose().getRotation().getRadians();
 
   @RequiredArgsConstructor
   public enum Direction {

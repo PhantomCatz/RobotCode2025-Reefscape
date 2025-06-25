@@ -1,14 +1,3 @@
-//------------------------------------------------------------------------------------
-// 2025 FRC 2637
-// https://github.com/PhantomCatz
-//
-// Use of this source code is governed by an MIT-style
-// license that can be found in the LICENSE file at
-// the root directory of this project. 
-//
-//        "6 hours of debugging can save you 5 minutes of reading documentation."
-//
-//------------------------------------------------------------------------------------
 package frc.robot;
 
 import java.util.Arrays;
@@ -46,18 +35,7 @@ import frc.robot.Commands.DriveAndRobotOrientationCmds.TrajectoryDriveCmd;
 
 @SuppressWarnings({ "rawtypes", "unchecked" })
 public class TeleopPosSelector { //TODO split up the file. it's too big and does too much stuff
-  private static TeleopPosSelector INSTANCE;
-
-  public static TeleopPosSelector getInstance(){
-    if(INSTANCE == null) INSTANCE = new TeleopPosSelector();
-    return INSTANCE;
-  }
-
-  private final CatzSuperstructure superstructure = CatzSuperstructure.getInstance();
-  private final CatzDrivetrain drivetrain = CatzDrivetrain.getInstance();
-  private final CatzOuttake outtake = CatzOuttake.getInstance();
-  private final CatzRobotTracker tracker = CatzRobotTracker.getInstance();
-  private final RobotContainer container = RobotContainer.getInstance();
+  public static final TeleopPosSelector Instance = new TeleopPosSelector();
 
   private CornerTrackingPathfinder pathfinder = new CornerTrackingPathfinder();
   public Pair<Integer, LeftRight> recentNBAPos = new Pair<Integer, LeftRight>(0, LeftRight.LEFT);
@@ -112,7 +90,7 @@ public class TeleopPosSelector { //TODO split up the file. it's too big and does
   public Pair<Pair<Integer, LeftRight>, Integer> getClosestReefPos() {
     int closestSide = 0;
     LeftRight closestLeftRight = LeftRight.LEFT;
-    Translation2d robotPos = tracker.getEstimatedPose().getTranslation();
+    Translation2d robotPos = CatzRobotTracker.Instance.getEstimatedPose().getTranslation();
 
     for (int side = 0; side < 6; side++) {
       for (LeftRight leftRight : LeftRight.values()) {
@@ -124,7 +102,7 @@ public class TeleopPosSelector { //TODO split up the file. it's too big and does
         }
       }
     }
-    return new Pair(new Pair(closestSide, closestLeftRight), superstructure.getLevel());
+    return new Pair(new Pair(closestSide, closestLeftRight), CatzSuperstructure.Instance.getLevel());
   }
 
   public Pair<Integer, LeftRight> getClosestReefPos(Translation2d pose) {
@@ -170,7 +148,7 @@ public class TeleopPosSelector { //TODO split up the file. it's too big and does
       leftRight = leftRight.times(-1);
     }
 
-    if(superstructure.getChosenGamepiece() == Gamepiece.ALGAE){
+    if(CatzSuperstructure.Instance.getChosenGamepiece() == Gamepiece.ALGAE){
       leftRight = new Translation2d();
     }
 
@@ -192,7 +170,7 @@ public class TeleopPosSelector { //TODO split up the file. it's too big and does
 
 
   public PathPlannerPath getClosestNetPath(){
-    PathPlannerPath path = pathfinder.getPathToNet(CatzRobotTracker.getInstance().getEstimatedPose().getTranslation(), new GoalEndState(0.0, AllianceFlipUtil.apply(Rotation2d.kZero)));
+    PathPlannerPath path = pathfinder.getPathToNet(CatzRobotTracker.Instance.getEstimatedPose().getTranslation(), new GoalEndState(0.0, AllianceFlipUtil.apply(Rotation2d.kZero)));
     if(path == null){
       return null;
     }
@@ -211,7 +189,7 @@ public class TeleopPosSelector { //TODO split up the file. it's too big and does
       return null;
     }
 
-    Translation2d robotPos = tracker.getEstimatedPose().getTranslation();
+    Translation2d robotPos = CatzRobotTracker.Instance.getEstimatedPose().getTranslation();
     PathPlannerPath path   = pathfinder.getPath(robotPos, goal.getTranslation(),
         new GoalEndState(0.0, goal.getRotation()));
 
@@ -232,7 +210,7 @@ public class TeleopPosSelector { //TODO split up the file. it's too big and does
       return null;
     }
 
-    Translation2d robotPos = tracker.getEstimatedPose().getTranslation();
+    Translation2d robotPos = CatzRobotTracker.Instance.getEstimatedPose().getTranslation();
     PathPlannerPath path   = pathfinder.getPath(robotPos, goal.getTranslation(),
         new GoalEndState(0.0, goal.getRotation()));
 
@@ -272,21 +250,22 @@ public class TeleopPosSelector { //TODO split up the file. it's too big and does
     return new DeferredCommand(() -> {
       if(recentNBAPos == null) return new InstantCommand(); //the driver did not NBA yet, so there is no left right to go to
 
-      Pose2d currentPose = tracker.getEstimatedPose();
+      Pose2d currentPose = CatzRobotTracker.Instance.getEstimatedPose();
       Pose2d goal = calculateReefPose(new Pair<Integer, LeftRight>(recentNBAPos.getFirst(), leftRight), true, false); //TODO decide whether or not to have distanced
 
       Logger.recordOutput("LeftRightGoal", goal);
 
       PathPlannerPath path = getStraightLinePath(currentPose, goal, DriveConstants.PATHFINDING_CONSTRAINTS); //TODO might need to scale constraints based off of distance from reef?
 
-      return new TrajectoryDriveCmd(path, true, true).andThen(container.rumbleDrvAuxController(1.0, 0.2));
-    }, Set.of(CatzDrivetrain.getInstance()));
+      return new TrajectoryDriveCmd(path, true, true).andThen(RobotContainer.Instance.rumbleDrvAuxController(1.0, 0.2));
+    }, Set.of(CatzDrivetrain.Instance));
+
   }
 
   public PathPlannerPath getMoveScorePath(){
     Pose2d goalPose = calculateReefPose(getClosestReefPos().getFirst(), true, false);
 
-    return getStraightLinePath(CatzRobotTracker.getInstance().getEstimatedPose(), goalPose, DriveConstants.PATHFINDING_CONSTRAINTS);
+    return getStraightLinePath(CatzRobotTracker.Instance.getEstimatedPose(), goalPose, DriveConstants.PATHFINDING_CONSTRAINTS);
   }
 
   //------------------------------------------------------------------------------------
@@ -302,20 +281,20 @@ public class TeleopPosSelector { //TODO split up the file. it's too big and does
       recentNBAPos = getClosestReefPos().getFirst();
 
       Command prematureCommand;
-      if(superstructure.getChosenGamepiece() == Gamepiece.CORAL){
-        prematureCommand = superstructure.LXElevator(superstructure.getLevel());
+      if(CatzSuperstructure.Instance.getChosenGamepiece() == Gamepiece.CORAL){
+        prematureCommand = CatzSuperstructure.Instance.LXElevator(CatzSuperstructure.Instance.getLevel());
       }else{ //algae
         prematureCommand = new InstantCommand();
       }
 
-      PathPlannerPath path = getStraightLinePath(tracker.getEstimatedPose(), calculateReefPose(getClosestReefPos().getFirst(), true, false), DriveConstants.PATHFINDING_CONSTRAINTS);
+      PathPlannerPath path = getStraightLinePath(CatzRobotTracker.Instance.getEstimatedPose(), calculateReefPose(getClosestReefPos().getFirst(), true, false), DriveConstants.PATHFINDING_CONSTRAINTS);
 
       Command prepareScorePos = new TrajectoryDriveCmd(path, true, true)
-                                        .deadlineFor(new RepeatCommand(prematureCommand.onlyIf(() -> drivetrain.getDistanceError() < DriveConstants.PREDICT_DISTANCE_SCORE)))
-                                        .andThen(container.controllerRumbleCommand());
+                                        .deadlineFor(new RepeatCommand(prematureCommand.onlyIf(() -> CatzDrivetrain.Instance.getDistanceError() < DriveConstants.PREDICT_DISTANCE_SCORE)))
+                                        .andThen(RobotContainer.Instance.controllerRumbleCommand());
 
       return prepareScorePos;
-    }, Set.of(CatzDrivetrain.getInstance()));
+    }, Set.of(CatzDrivetrain.Instance));
   }
 
 

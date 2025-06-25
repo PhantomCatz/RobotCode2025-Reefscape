@@ -1,14 +1,3 @@
-//------------------------------------------------------------------------------------
-// 2025 FRC 2637
-// https://github.com/PhantomCatz
-//
-// Use of this source code is governed by an MIT-style
-// license that can be found in the LICENSE file at
-// the root directory of this project. 
-//
-//        "6 hours of debugging can save you 5 minutes of reading documentation."
-//
-//------------------------------------------------------------------------------------
 package frc.robot.Commands.DriveAndRobotOrientationCmds;
 
 import edu.wpi.first.math.controller.ProfiledPIDController;
@@ -33,18 +22,18 @@ public class PIDDriveCmd extends Command{
     private Rotation2d direction;
 
     public PIDDriveCmd(Pose2d goal, double goalVel, ProfiledPIDController translationController, ProfiledPIDController rotationController){
-        addRequirements(CatzDrivetrain.getInstance());
+        addRequirements(CatzDrivetrain.Instance);
 
         this.goalPos = goal;
         this.goalVel = goalVel;
-        
+
         this.translationController = translationController;
         this.rotationController = rotationController;
     }
 
     @Override
     public void initialize(){
-        Pose2d currentPose = CatzRobotTracker.getInstance().getEstimatedPose();
+        Pose2d currentPose = CatzRobotTracker.Instance.getEstimatedPose();
         Translation2d poseError = goalPos.minus(currentPose).getTranslation();
 
         targetDistance = poseError.getNorm();
@@ -53,7 +42,7 @@ public class PIDDriveCmd extends Command{
 
     @Override
     public void execute(){
-        Pose2d currentPose = CatzRobotTracker.getInstance().getEstimatedPose();
+        Pose2d currentPose = CatzRobotTracker.Instance.getEstimatedPose();
 
         double currentDistance = goalPos.minus(currentPose).getTranslation().getNorm();
 
@@ -63,6 +52,6 @@ public class PIDDriveCmd extends Command{
         double targetOmega = rotationController.calculate(currentPose.getRotation().getDegrees(), goalPos.getRotation().getDegrees());
 
         ChassisSpeeds goalChassisSpeeds = new ChassisSpeeds(targetVel * direction.getCos(), targetVel * direction.getSin(), targetOmega);
-        
+
     }
 }

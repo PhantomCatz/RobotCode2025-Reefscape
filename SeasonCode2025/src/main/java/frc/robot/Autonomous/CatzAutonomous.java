@@ -1,14 +1,3 @@
-//------------------------------------------------------------------------------------
-// 2025 FRC 2637
-// https://github.com/PhantomCatz
-//
-// Use of this source code is governed by an MIT-style
-// license that can be found in the LICENSE file at
-// the root directory of this project. 
-//
-//        "6 hours of debugging can save you 5 minutes of reading documentation."
-//
-//------------------------------------------------------------------------------------
 package frc.robot.Autonomous;
 
 import com.pathplanner.lib.auto.AutoBuilder;
@@ -18,6 +7,7 @@ import com.pathplanner.lib.path.PathPlannerPath;
 import com.pathplanner.lib.util.FileVersionException;
 
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Filesystem;
@@ -25,14 +15,19 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.PrintCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.CatzSubsystems.CatzSuperstructure;
 import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.*;
 import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.Drivetrain.CatzDrivetrain;
 import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.Drivetrain.DriveConstants;
+import frc.robot.CatzSubsystems.CatzOuttake.CatzOuttake;
+import frc.robot.CatzSubsystems.CatzSuperstructure.LeftRight;
 import frc.robot.Commands.CharacterizationCmds.WheelRadiusCharacterization;
 import frc.robot.Commands.CharacterizationCmds.WheelRadiusCharacterization.Direction;
 import frc.robot.Commands.DriveAndRobotOrientationCmds.TrajectoryDriveCmd;
+import frc.robot.FieldConstants;
 import frc.robot.RobotContainer;
 import frc.robot.TeleopPosSelector;
 import frc.robot.Utilities.AllianceFlipUtil;
@@ -43,18 +38,14 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.function.BooleanSupplier;
+import java.util.function.Supplier;
 
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
 public class CatzAutonomous extends SubsystemBase {
-  private static CatzAutonomous instance;
-
-  public static CatzAutonomous getInstance(){
-    if(instance == null) instance = new CatzAutonomous();
-    return instance;
-  }
+  public static final CatzAutonomous Instance = new CatzAutonomous();
 
   // ------------------------------------------------------------------------------------------------------------
   // Questionairre
@@ -71,11 +62,6 @@ public class CatzAutonomous extends SubsystemBase {
   private JSONParser parser = new JSONParser();
   private HashMap<String, DashboardCmd> dashboardCmds = new HashMap<>();
   private PathPlannerAuto lastProgram;
-
-  private final CatzRobotTracker tracker = CatzRobotTracker.getInstance();
-  private final CatzDrivetrain drivetrain = CatzDrivetrain.getInstance();
-  private final RobotContainer container = RobotContainer.getInstance();
-  private final CatzSuperstructure superstructure = CatzSuperstructure.getInstance();
 
   private CatzAutonomous() {
 
@@ -102,22 +88,22 @@ public class CatzAutonomous extends SubsystemBase {
         e.printStackTrace();
       }
     }
-    TeleopPosSelector selector = TeleopPosSelector.getInstance();
+    TeleopPosSelector selector = TeleopPosSelector.Instance;
 
-    NamedCommands.registerCommand("Stow", superstructure.stow());
-    NamedCommands.registerCommand("IntakeCoralStation", superstructure.intakeCoralStation());
-    NamedCommands.registerCommand("IntakeAlgae", superstructure.intakeAlgae());
-    NamedCommands.registerCommand("L1Coral", superstructure.L1Coral());
-    NamedCommands.registerCommand("L2Coral", superstructure.L2Coral());
-    NamedCommands.registerCommand("L3Coral", superstructure.L3Coral());
-    NamedCommands.registerCommand("L4Coral", superstructure.L4Coral());
-    NamedCommands.registerCommand("BotAlgae", superstructure.botAlgae());
-    NamedCommands.registerCommand("TopAlgae", superstructure.topAlgae());
-    NamedCommands.registerCommand("RestPose", Commands.runOnce(()->tracker.resetPose(new Pose2d())));
-    NamedCommands.registerCommand("WheelCharacterization", new WheelRadiusCharacterization(drivetrain, Direction.CLOCKWISE));
+    NamedCommands.registerCommand("Stow", CatzSuperstructure.Instance.stow());
+    NamedCommands.registerCommand("IntakeCoralStation", CatzSuperstructure.Instance.intakeCoralStation());
+    NamedCommands.registerCommand("IntakeAlgae", CatzSuperstructure.Instance.intakeAlgae());
+    NamedCommands.registerCommand("L1Coral", CatzSuperstructure.Instance.L1Coral());
+    NamedCommands.registerCommand("L2Coral", CatzSuperstructure.Instance.L2Coral());
+    NamedCommands.registerCommand("L3Coral", CatzSuperstructure.Instance.L3Coral());
+    NamedCommands.registerCommand("L4Coral", CatzSuperstructure.Instance.L4Coral());
+    NamedCommands.registerCommand("BotAlgae", CatzSuperstructure.Instance.botAlgae());
+    NamedCommands.registerCommand("TopAlgae", CatzSuperstructure.Instance.topAlgae());
+    NamedCommands.registerCommand("RestPose", Commands.runOnce(()->CatzRobotTracker.Instance.resetPose(new Pose2d())));
+    NamedCommands.registerCommand("WheelCharacterization", new WheelRadiusCharacterization(CatzDrivetrain.Instance, Direction.CLOCKWISE));
 
-    NamedCommands.registerCommand("AlgaeTop", superstructure.topAlgae());
-    NamedCommands.registerCommand("AlgaeBot", superstructure.botAlgae());
+    NamedCommands.registerCommand("AlgaeTop", CatzSuperstructure.Instance.topAlgae());
+    NamedCommands.registerCommand("AlgaeBot", CatzSuperstructure.Instance.botAlgae());
 
     HashMap<String, Command> startPose = new HashMap<>();
     HashMap<String, Command> reefPose1 = new HashMap<>();
@@ -129,60 +115,85 @@ public class CatzAutonomous extends SubsystemBase {
     // waitForCoralChooser.("Yes", true);
     waitForCoralChooser.addOption("Yes", true);
 
-    // for(int i = 0; i < FieldConstants.StartPoses.startArray.length; i++){
-    //   final int j = i;
-    //   Supplier<Pose2d> startPoseSupplier = ()->AllianceFlipUtil.apply(new Pose2d(FieldConstants.StartPoses.startArray[j], Rotation2d.k180deg));
-    //   startPose.put(""+(i+1), new InstantCommand(()->CatzRobotTracker.getInstance().resetPose(startPoseSupplier)));
-    // }
-    // dashboardCmds.put("StartChooser", new DashboardCmd("Start Where?", startPose));
+    for(int i = 0; i < FieldConstants.StartPoses.startArray.length; i++){
+      final int j = i;
+      Supplier<Pose2d> startPoseSupplier = ()->AllianceFlipUtil.apply(new Pose2d(FieldConstants.StartPoses.startArray[j], Rotation2d.k180deg));
+      startPose.put(""+(i+1), new InstantCommand(()->CatzRobotTracker.Instance.resetPose(startPoseSupplier)));
+    }
+    dashboardCmds.put("StartChooser", new DashboardCmd("Start Where?", startPose));
 
-    // for(int side = 0; side < 6; side++){
-    //   for(LeftRight leftRight : LeftRight.values()){
-    //     String letter = selector.getPoseToLetter(""+side + " " + leftRight);
-    //     final int s = side;
+    for(int side = 0; side < 6; side++){
+      for(LeftRight leftRight : LeftRight.values()){
+        String letter = selector.getPoseToLetter(""+side + " " + leftRight);
+        final int s = side;
 
-    //     NamedCommands.registerCommand(letter, new SeqCmd(
-    //         superstructure.driveToScore(() ->selector.getPathfindingPath(()->selector.calculateReefPose(s, leftRight, false)), 4),
-    //         superstructure.driveToCoralStation(()->selector.getPathfindingPath(()->selector.getBestCoralStation()), () -> waitForCoralChooser.getSelected())
-    //       )
-    //     );
+        // NamedCommands.registerCommand(letter, new SeqCmd(
+        //     CatzSuperstructure.Instance.driveToScore(() ->selector.getPathfindingPath(()->selector.calculateReefPose(s, leftRight, false)), 4),
+        //     CatzSuperstructure.Instance.driveToCoralStation(()->selector.getPathfindingPath(()->selector.getBestCoralStation()), () -> waitForCoralChooser.getSelected())
+        //   )
+        // );
 
-    //     reefPose1.put(letter, NamedCommands.getCommand(letter));
-    //     reefPose2.put(letter, NamedCommands.getCommand(letter));
-    //     reefPose3.put(letter, NamedCommands.getCommand(letter));
-    //     reefPose4.put(letter, NamedCommands.getCommand(letter));
-    //   }
-    // }
+        reefPose1.put(letter, NamedCommands.getCommand(letter));
+        reefPose2.put(letter, NamedCommands.getCommand(letter));
+        reefPose3.put(letter, NamedCommands.getCommand(letter));
+        reefPose4.put(letter, NamedCommands.getCommand(letter));
+      }
+    }
 
-    // reefPose1.put("None", new InstantCommand());
-    // reefPose2.put("None", new InstantCommand());
-    // reefPose3.put("None", new InstantCommand());
-    // reefPose4.put("None", new InstantCommand());
+    reefPose1.put("None", new InstantCommand());
+    reefPose2.put("None", new InstantCommand());
+    reefPose3.put("None", new InstantCommand());
+    reefPose4.put("None", new InstantCommand());
 
-    // dashboardCmds.put("ReefChooser1", new DashboardCmd("First Pose?", reefPose1));
-    // dashboardCmds.put("ReefChooser2", new DashboardCmd("Second pose?", reefPose2));
-    // dashboardCmds.put("ReefChooser3", new DashboardCmd("Third Pose?", reefPose3));
-    // dashboardCmds.put("ReefChooser4", new DashboardCmd("Fourth Pose?", reefPose4));
+    dashboardCmds.put("ReefChooser1", new DashboardCmd("First Pose?", reefPose1));
+    dashboardCmds.put("ReefChooser2", new DashboardCmd("Second pose?", reefPose2));
+    dashboardCmds.put("ReefChooser3", new DashboardCmd("Third Pose?", reefPose3));
+    dashboardCmds.put("ReefChooser4", new DashboardCmd("Fourth Pose?", reefPose4));
     //----------------------------------------------------------------------------------------------------
     //
     //----------------------------------------------------------------------------------------------------
+    HashMap<String, Command> chooseYourOwnScoringBOT = new HashMap<>();
+    chooseYourOwnScoringBOT.put("Score A", NamedCommands.getCommand("Score L"));
+    chooseYourOwnScoringBOT.put("Score B", NamedCommands.getCommand("CollectGP1"));
+    chooseYourOwnScoringBOT.put("Score C", NamedCommands.getCommand("CollectGP1"));
+    chooseYourOwnScoringBOT.put("Score D", NamedCommands.getCommand("CollectGP1"));
+    chooseYourOwnScoringBOT.put("Score E", NamedCommands.getCommand("CollectGP1"));
+    chooseYourOwnScoringBOT.put("Score F", NamedCommands.getCommand("CollectGP1"));
+    chooseYourOwnScoringBOT.put("Do Nothing", new PrintCommand("Skipped"));
+    dashboardCmds.put("BotScoringChooser", new DashboardCmd("Score Where?", chooseYourOwnScoringBOT));
+
+    HashMap<String, Command> chooseYourOwnScoringTOP = new HashMap<>();
+    chooseYourOwnScoringTOP.put("Score A", NamedCommands.getCommand("Score A"));
+    chooseYourOwnScoringTOP.put("Score H", NamedCommands.getCommand("Score H"));
+    chooseYourOwnScoringTOP.put("Score I", NamedCommands.getCommand("Score I"));
+    chooseYourOwnScoringTOP.put("Score J", NamedCommands.getCommand("Score J"));
+    chooseYourOwnScoringTOP.put("Score K", NamedCommands.getCommand("Score K"));
+    chooseYourOwnScoringTOP.put("Score L", NamedCommands.getCommand("Score L"));
+    chooseYourOwnScoringTOP.put("Do Nothing", new PrintCommand("Skipped"));
+    dashboardCmds.put("TopScoringChooser", new DashboardCmd("Score Where?", chooseYourOwnScoringTOP));
+
+    HashMap<String, Command> L1orL4 = new HashMap<>();
+    L1orL4.put("Score L1", NamedCommands.getCommand("L1Ccoral"));
+    L1orL4.put("Score L2", NamedCommands.getCommand("L1Ccoral"));
+    L1orL4.put("Score L3", NamedCommands.getCommand("L1Ccoral"));
+    L1orL4.put("Score L4", NamedCommands.getCommand("L4Coral"));
+    dashboardCmds.put("CoralScoringChooser", new DashboardCmd("Score Where?", L1orL4));
 
     for (String question : dashboardCmds.keySet()) {
       NamedCommands.registerCommand(question, dashboardCmds.get(question));
     }
 
-    BooleanSupplier shouldFlip = () -> AllianceFlipUtil.shouldFlipToRed();
-
     // This is not used anywhere but the library wants it
+    BooleanSupplier shouldFlip = () -> AllianceFlipUtil.shouldFlipToRed();
     AutoBuilder.configure(
-      tracker::getEstimatedPose,
-      tracker::resetPose,
-      tracker::getRobotChassisSpeeds,
-      drivetrain::d,
+      CatzRobotTracker.Instance::getEstimatedPose,
+      CatzRobotTracker.Instance::resetPose,
+      CatzRobotTracker.Instance::getRobotChassisSpeeds,
+      CatzDrivetrain.Instance::d,
       null,
       DriveConstants.TRAJ_ROBOT_CONFIG,
       shouldFlip,
-      drivetrain
+      CatzDrivetrain.Instance
     );
 
     // ------------------------------------------------------------------------------------------------------------
@@ -222,14 +233,14 @@ public class CatzAutonomous extends SubsystemBase {
               PathPlannerPath path = PathPlannerPath.fromPathFile(name);
 
               if(action.equalsIgnoreCase("CS")) {
-                command = superstructure.driveToCoralStation(path, () -> waitForCoralChooser.getSelected());
+                command = CatzSuperstructure.Instance.driveToCoralStation(path, () -> waitForCoralChooser.getSelected());
               } else if(action.contains("ReefL")) {
                 if(components.length == 3){
                   String d = components[2];
                   double delay = Double.parseDouble(d.substring("d".length()));
-                  command = superstructure.driveToScore(path, Integer.parseInt(action.substring("ReefL".length())), delay);
+                  command = CatzSuperstructure.Instance.driveToScore(path, Integer.parseInt(action.substring("ReefL".length())), delay);
                 }else{
-                  command = superstructure.driveToScore(path, Integer.parseInt(action.substring("ReefL".length())));
+                  command = CatzSuperstructure.Instance.driveToScore(path, Integer.parseInt(action.substring("ReefL".length())));
                 }
               }
 
@@ -238,7 +249,7 @@ public class CatzAutonomous extends SubsystemBase {
 
             if(command == null){
               System.out.println("****** typotypotypotypotypotypotypotypotypotypotypotypotypo       \n\n\n\n\nn\n\n\n\n \n\n\n typo in pathplanner reverting to drvive forward auto ********** ");
-              command = Commands.run(() -> drivetrain.drive(new ChassisSpeeds(0.5, 0.0, 0.0)), drivetrain).withTimeout(5.0); //TODO this only drives to the right(field relative). so make this different for blue alliance
+              command = Commands.run(() -> CatzDrivetrain.Instance.drive(new ChassisSpeeds(0.5, 0.0, 0.0)), CatzDrivetrain.Instance).withTimeout(5.0); //TODO this only drives to the right(field relative). so make this different for blue alliance
             }
             NamedCommands.registerCommand(commandName, command);
           } catch (FileVersionException | IOException | ParseException e) {
@@ -297,7 +308,7 @@ public class CatzAutonomous extends SubsystemBase {
   //
   //----------------------------------------------------------------------------------------------------------
   public Command wheelRadiusCharacterization() {
-    return new WheelRadiusCharacterization(drivetrain, Direction.COUNTER_CLOCKWISE);
+    return new WheelRadiusCharacterization(CatzDrivetrain.Instance, Direction.COUNTER_CLOCKWISE);
   }
 
   /** Getter for final autonomous Program */

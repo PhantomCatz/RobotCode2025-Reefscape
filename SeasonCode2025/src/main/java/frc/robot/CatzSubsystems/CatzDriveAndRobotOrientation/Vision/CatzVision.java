@@ -1,14 +1,3 @@
-//------------------------------------------------------------------------------------
-// 2025 FRC 2637
-// https://github.com/PhantomCatz
-//
-// Use of this source code is governed by an MIT-style
-// license that can be found in the LICENSE file at
-// the root directory of this project. 
-//
-//        "6 hours of debugging can save you 5 minutes of reading documentation."
-//
-//------------------------------------------------------------------------------------
 package frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.Vision;
 
 import static frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.Vision.VisionConstants.*;
@@ -97,7 +86,7 @@ public class CatzVision extends SubsystemBase {
     List<Pose3d> allRobotPosesRejected = new LinkedList<>();
     Map<Integer, TxTyObservation> allTxTyObservations = new HashMap<>();
     Map<Integer, TxTyObservation> txTyObservations = new HashMap<>();
-    Pose2d robotPose = CatzRobotTracker.getInstance().getEstimatedPose();
+    Pose2d robotPose = CatzRobotTracker.Instance.getEstimatedPose();
 
     //------------------------------------------------------------------------------------------------------------------------------------
     // Get Global Pose observation data
@@ -185,7 +174,7 @@ public class CatzVision extends SubsystemBase {
 
 
         // Send vision observation
-        CatzRobotTracker.getInstance()
+        CatzRobotTracker.Instance
             .addVisionObservation(
                 new VisionObservation(
                     inputs[cameraIndex].name,

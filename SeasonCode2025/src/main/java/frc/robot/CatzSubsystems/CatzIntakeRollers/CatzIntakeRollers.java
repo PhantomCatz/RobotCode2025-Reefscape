@@ -1,14 +1,3 @@
-//------------------------------------------------------------------------------------
-// 2025 FRC 2637
-// https://github.com/PhantomCatz
-//
-// Use of this source code is governed by an MIT-style
-// license that can be found in the LICENSE file at
-// the root directory of this project. 
-//
-//        "6 hours of debugging can save you 5 minutes of reading documentation."
-//
-//------------------------------------------------------------------------------------
 package frc.robot.CatzSubsystems.CatzIntakeRollers;
 import static frc.robot.CatzSubsystems.CatzIntakeRollers.IntakeRollersConstants.*;
 
@@ -24,12 +13,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 public class CatzIntakeRollers extends SubsystemBase {
-    private static CatzIntakeRollers INSTANCE;
-
-    public static CatzIntakeRollers getInstance(){
-        if(INSTANCE == null) INSTANCE = new CatzIntakeRollers();
-        return INSTANCE;
-    }
+    public static final CatzIntakeRollers Instance = new CatzIntakeRollers();
 
     private final IntakeRollersIO io;
     private final IntakeRollersIOInputsAutoLogged inputs = new IntakeRollersIOInputsAutoLogged();
@@ -88,7 +72,7 @@ public class CatzIntakeRollers extends SubsystemBase {
 
         switch (currentState) {
             case INTAKE:
-                if(CatzElevator.getInstance().getElevatorPositionInch() < 4.0 && !DriverStation.isAutonomous()){
+                if(CatzElevator.Instance.getElevatorPositionInch() < 4.0 && !DriverStation.isAutonomous()){
                     case_rampRollersIn();
                 }
                 if(DriverStation.isAutonomous()){

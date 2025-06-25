@@ -1,14 +1,3 @@
-//------------------------------------------------------------------------------------
-// 2025 FRC 2637
-// https://github.com/PhantomCatz
-//
-// Use of this source code is governed by an MIT-style
-// license that can be found in the LICENSE file at
-// the root directory of this project. 
-//
-//        "6 hours of debugging can save you 5 minutes of reading documentation."
-//
-//------------------------------------------------------------------------------------
 package frc.robot.CatzSubsystems;
 
 import java.util.Set;
@@ -51,12 +40,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 public class CatzSuperstructure extends VirtualSubsystem {
-    private static CatzSuperstructure INSTANCE;
-
-    public static CatzSuperstructure getInstance(){
-        if(INSTANCE == null) INSTANCE = new CatzSuperstructure();
-        return INSTANCE;
-    }
+    public static final CatzSuperstructure Instance = new CatzSuperstructure();
 
     static @Getter @Setter @AutoLogOutput(key = "CatzSuperstructure/ChosenGamepiece")
     private Gamepiece chosenGamepiece = Gamepiece.CORAL;
@@ -80,19 +64,6 @@ public class CatzSuperstructure extends VirtualSubsystem {
     private Command robotActionCommand = Commands.none();
 
     private Command previousAction = new InstantCommand();
-
-    private final CatzLED LED = CatzLED.getInstance();
-    private final CatzAutonomous auto = CatzAutonomous.getInstance();
-    private final CatzRobotTracker tracker = CatzRobotTracker.getInstance();
-    private final CatzSuperstructure superstructure = CatzSuperstructure.getInstance();
-    private final CatzClimb climb = CatzClimb.getInstance();
-    private final CatzDrivetrain drivetrain = CatzDrivetrain.getInstance();
-    private final CatzElevator elevator = CatzElevator.getInstance();
-    private final CatzRampPivot rampPivot = CatzRampPivot.getInstance();
-    private final CatzAlgaePivot algaePivot = CatzAlgaePivot.getInstance();
-    private final CatzAlgaeRemover algaeRemover = CatzAlgaeRemover.getInstance();
-    private final CatzOuttake outtake = CatzOuttake.getInstance();
-    private final CatzIntakeRollers intakeRollers = CatzIntakeRollers.getInstance();
 
     public enum Gamepiece{
         CORAL,
@@ -164,10 +135,10 @@ public class CatzSuperstructure extends VirtualSubsystem {
     public void setClimbOverride(BooleanSupplier isClimbEnabled) {
         CatzSuperstructure.isClimbEnabled = isClimbEnabled.getAsBoolean();
         if (isClimbEnabled()) {
-            LED.setControllerState(ControllerLEDState.CLIMB);
+            CatzLED.Instance.setControllerState(ControllerLEDState.CLIMB);
         }
         else {
-            LED.setControllerState(ControllerLEDState.FULL_MANUAL);
+            CatzLED.Instance.setControllerState(ControllerLEDState.FULL_MANUAL);
         }
         System.out.println("CLimb Enabled" + isClimbEnabled);
     }
@@ -176,11 +147,11 @@ public class CatzSuperstructure extends VirtualSubsystem {
 
         return new SequentialCommandGroup(
             new TrajectoryDriveCmd(pathToReadyPose, true, false).deadlineFor(
-                new RepeatCommand(LXElevator(level).alongWith(new PrintCommand("elevavavava")).onlyIf(() -> drivetrain.getDistanceError() < DriveConstants.PREDICT_DISTANCE_SCORE))
+                new RepeatCommand(LXElevator(level).alongWith(new PrintCommand("elevavavava")).onlyIf(() -> CatzDrivetrain.Instance.getDistanceError() < DriveConstants.PREDICT_DISTANCE_SCORE))
             ),
-            // new WaitUntilCommand(() -> !outtake.isDesiredCoralState(true)),
+            // new WaitUntilCommand(() -> !CatzOuttake.Instance.isDesiredCoralState(true)),
             LXCoral(level),
-            new WaitUntilCommand(() -> outtake.isDesiredCoralState(true)),
+            new WaitUntilCommand(() -> CatzOuttake.Instance.isDesiredCoralState(true)),
             stow()
         );
     }
@@ -189,12 +160,12 @@ public class CatzSuperstructure extends VirtualSubsystem {
 
         return new SequentialCommandGroup(
             new TrajectoryDriveCmd(pathToReadyPose, true, false).deadlineFor(
-                new RepeatCommand(LXElevator(level).alongWith(new PrintCommand("elevavavava")).onlyIf(() -> drivetrain.getDistanceError() < DriveConstants.PREDICT_DISTANCE_SCORE))
+                new RepeatCommand(LXElevator(level).alongWith(new PrintCommand("elevavavava")).onlyIf(() -> CatzDrivetrain.Instance.getDistanceError() < DriveConstants.PREDICT_DISTANCE_SCORE))
             ),
-            // new WaitUntilCommand(() -> !outtake.isDesiredCoralState(true)),
+            // new WaitUntilCommand(() -> !CatzOuttake.Instance.isDesiredCoralState(true)),
             new WaitCommand(delay),
             LXCoral(level),
-            new WaitUntilCommand(() -> outtake.isDesiredCoralState(true)),
+            new WaitUntilCommand(() -> CatzOuttake.Instance.isDesiredCoralState(true)),
             stow()
         );
     }
@@ -203,58 +174,45 @@ public class CatzSuperstructure extends VirtualSubsystem {
 
         return new SequentialCommandGroup(
             new TrajectoryDriveCmd(path, false, false).deadlineFor(
-                new RepeatCommand(intakeCoralStation().onlyIf(() -> drivetrain.getDistanceError() < DriveConstants.PREDICT_DISTANCE_INTAKE))
+                new RepeatCommand(intakeCoralStation().onlyIf(() -> CatzDrivetrain.Instance.getDistanceError() < DriveConstants.PREDICT_DISTANCE_INTAKE))
             ),
-            Commands.waitUntil(() -> (waitForCoralSupplier.get() ? outtake.isDesiredCoralState(false) : true)).withTimeout(0.6)
+            Commands.waitUntil(() -> (waitForCoralSupplier.get() ? CatzOuttake.Instance.isDesiredCoralState(false) : true)).withTimeout(0.6)
         );
     }
 
     public Command stow(){
         return new ParallelCommandGroup(
-            algaeRemover.stopAlgae(),
-            outtake.stopOuttake(),
-            algaePivot.AlgaePivot_Stow(),
-            rampPivot.Ramp_Intake_Pos(),  //TODO? intake ramp pivot holds at intaking position for the duration of the match
-            intakeRollers.stopIntaking(),
-            elevator.Elevator_Stow(),
+            CatzAlgaeRemover.Instance.stopAlgae(),
+            CatzOuttake.Instance.stopOuttake(),
+            CatzAlgaePivot.Instance.AlgaePivot_Stow(),
+            CatzRampPivot.Instance.Ramp_Intake_Pos(),  //TODO? intake ramp pivot holds at intaking position for the duration of the match
+            CatzIntakeRollers.Instance.stopIntaking(),
+            CatzElevator.Instance.Elevator_Stow(),
             new InstantCommand(() -> currentRobotState = RobotState.STOW)
         ).unless(()-> Robot.isSimulation()).alongWith(Commands.print("Stow"));
     }
 
-    public static Command intakeCoralStation() {
-        CatzAlgaeRemover algae = CatzAlgaeRemover.getInstance();
-        CatzOuttake outtake = CatzOuttake.getInstance();
-        CatzElevator elevator = CatzElevator.getInstance();
-        CatzAlgaePivot algaePivot = CatzAlgaePivot.getInstance();
-        CatzRampPivot rampPivot = CatzRampPivot.getInstance();
-        CatzIntakeRollers intakeRollers = CatzIntakeRollers.getInstance();
-        TeleopPosSelector selector = TeleopPosSelector.getInstance();
+    public Command intakeCoralStation() {
 
         return new ParallelCommandGroup(
-            algae.stopAlgae(),
-            algaePivot.AlgaePivot_Stow(),
-            outtake.startIntaking(),
-            elevator.Elevator_Stow(),
-            rampPivot.Ramp_Intake_Pos(),
-            intakeRollers.intake()
-        ).unless(()-> Robot.isSimulation()).alongWith(Commands.print("Intake Coral Station")).andThen(new InstantCommand(() -> selector.hasCoralSIM = true));
+            CatzAlgaeRemover.Instance.stopAlgae(),
+            CatzAlgaePivot.Instance.AlgaePivot_Stow(),
+            CatzOuttake.Instance.startIntaking(),
+            CatzElevator.Instance.Elevator_Stow(),
+            CatzRampPivot.Instance.Ramp_Intake_Pos(),
+            CatzIntakeRollers.Instance.intake()
+        ).unless(()-> Robot.isSimulation()).alongWith(Commands.print("Intake Coral Station")).andThen(new InstantCommand(() -> TeleopPosSelector.Instance.hasCoralSIM = true));
     }
 
-    public static Command intakeAlgae() {
-        CatzAlgaeRemover algae = CatzAlgaeRemover.getInstance();
-        CatzOuttake outtake = CatzOuttake.getInstance();
-        CatzElevator elevator = CatzElevator.getInstance();
-        CatzAlgaePivot algaePivot = CatzAlgaePivot.getInstance();
-        CatzRampPivot rampPivot = CatzRampPivot.getInstance();
-        CatzIntakeRollers intakeRollers = CatzIntakeRollers.getInstance();
+    public Command intakeAlgae() {
 
         return new ParallelCommandGroup(
-            algaePivot.AlgaePivot_Horizontal(),
-            algae.eatAlgae(),
-            outtake.stopOuttake(),
-            elevator.Elevator_Stow(),
-            rampPivot.Ramp_Intake_Pos(),
-            intakeRollers.stopIntaking()
+            CatzAlgaePivot.Instance.AlgaePivot_Horizontal(),
+            CatzAlgaeRemover.Instance.eatAlgae(),
+            CatzOuttake.Instance.stopOuttake(),
+            CatzElevator.Instance.Elevator_Stow(),
+            CatzRampPivot.Instance.Ramp_Intake_Pos(),
+            CatzIntakeRollers.Instance.stopIntaking()
 
         ).unless(()-> Robot.isSimulation()).alongWith(Commands.print("intakeAlgae"));
     }
@@ -262,15 +220,15 @@ public class CatzSuperstructure extends VirtualSubsystem {
     public Command L1Coral() {
 
         return new ParallelCommandGroup(
-            rampPivot.Ramp_Intake_Pos(),
-            intakeRollers.stopIntaking(),
-            algaeRemover.stopAlgae(),
-            algaePivot.AlgaePivot_Stow(),
+            CatzRampPivot.Instance.Ramp_Intake_Pos(),
+            CatzIntakeRollers.Instance.stopIntaking(),
+            CatzAlgaeRemover.Instance.stopAlgae(),
+            CatzAlgaePivot.Instance.AlgaePivot_Stow(),
 
             new SequentialCommandGroup(
-                elevator.Elevator_L1(),
-                Commands.waitUntil(() -> elevator.isElevatorInPos()).withTimeout(1.0),
-                outtake.outtakeL1()
+                CatzElevator.Instance.Elevator_L1(),
+                Commands.waitUntil(() -> CatzElevator.Instance.isElevatorInPos()).withTimeout(1.0),
+                CatzOuttake.Instance.outtakeL1()
             )
         )//.onlyIf(() -> CatzSuperstructure.getCurrentCoralState() == CoralState.IN_OUTTAKE)
         .unless(()-> Robot.isSimulation()).alongWith(Commands.print("L1 Scoring State"));
@@ -279,15 +237,15 @@ public class CatzSuperstructure extends VirtualSubsystem {
     public Command L2Coral() {
 
         return new ParallelCommandGroup(
-            rampPivot.Ramp_Intake_Pos(),
-            algaeRemover.stopAlgae(),
-            algaePivot.AlgaePivot_Stow(),
-            intakeRollers.stopIntaking(),
+            CatzRampPivot.Instance.Ramp_Intake_Pos(),
+            CatzAlgaeRemover.Instance.stopAlgae(),
+            CatzAlgaePivot.Instance.AlgaePivot_Stow(),
+            CatzIntakeRollers.Instance.stopIntaking(),
 
             new SequentialCommandGroup(
-                elevator.Elevator_L2(),
-                new waituntil(() -> elevator.isElevatorInPos()).withTimeout(1.0), //huh
-                outtake.startOuttake()
+                CatzElevator.Instance.Elevator_L2(),
+                new waituntil(() -> CatzElevator.Instance.isElevatorInPos()).withTimeout(1.0), //huh
+                CatzOuttake.Instance.startOuttake()
             )
         )//.onlyIf(() -> CatzSuperstructure.getCurrentCoralState() == CoralState.IN_OUTTAKE)
          .unless(()-> Robot.isSimulation()).alongWith(Commands.print("L2 Scoring State")).unless(()-> Robot.isSimulation());
@@ -296,15 +254,15 @@ public class CatzSuperstructure extends VirtualSubsystem {
     public Command L3Coral() {
 
         return new ParallelCommandGroup(
-            rampPivot.Ramp_Intake_Pos(),
-            algaeRemover.stopAlgae(),
-            algaePivot.AlgaePivot_Stow(),
-            intakeRollers.stopIntaking(),
+            CatzRampPivot.Instance.Ramp_Intake_Pos(),
+            CatzAlgaeRemover.Instance.stopAlgae(),
+            CatzAlgaePivot.Instance.AlgaePivot_Stow(),
+            CatzIntakeRollers.Instance.stopIntaking(),
 
             new SequentialCommandGroup(
-                elevator.Elevator_L3(),
-                Commands.waitUntil(() -> elevator.isElevatorInPos()).withTimeout(1.0),
-                outtake.startOuttake()
+                CatzElevator.Instance.Elevator_L3(),
+                Commands.waitUntil(() -> CatzElevator.Instance.isElevatorInPos()).withTimeout(1.0),
+                CatzOuttake.Instance.startOuttake()
             )
         )//.onlyIf(() -> CatzSuperstructure.getCurrentCoralState() == CoralState.IN_OUTTAKE)
          .unless(()-> Robot.isSimulation()).alongWith(Commands.print("L3 scoring state"));
@@ -312,25 +270,25 @@ public class CatzSuperstructure extends VirtualSubsystem {
 
     public Command L4Coral() {
         return new ParallelCommandGroup(
-            rampPivot.Ramp_Intake_Pos(),
-            algaeRemover.stopAlgae(),
-            algaePivot.AlgaePivot_Stow(),
-            intakeRollers.stopIntaking(),
+            CatzRampPivot.Instance.Ramp_Intake_Pos(),
+            CatzAlgaeRemover.Instance.stopAlgae(),
+            CatzAlgaePivot.Instance.AlgaePivot_Stow(),
+            CatzIntakeRollers.Instance.stopIntaking(),
 
             new SequentialCommandGroup(
-                elevator.Elevator_L4(),
-                Commands.waitUntil(() -> elevator.isElevatorInPos()).withTimeout(2.0),
-                outtake.outtakeL4(),
+                CatzElevator.Instance.Elevator_L4(),
+                Commands.waitUntil(() -> CatzElevator.Instance.isElevatorInPos()).withTimeout(2.0),
+                CatzOuttake.Instance.outtakeL4(),
                 new WaitCommand(0.1),
-                elevator.Elevator_L4_Adj(),
-                Commands.waitUntil(() -> elevator.isElevatorInPos()).withTimeout(2.0)
+                CatzElevator.Instance.Elevator_L4_Adj(),
+                Commands.waitUntil(() -> CatzElevator.Instance.isElevatorInPos()).withTimeout(2.0)
             )
         )
          .unless(()-> Robot.isSimulation()).alongWith(Commands.print("L4 Scoring State"));
     }
 
     public Command LXCoral(int level){
-        TeleopPosSelector selector = TeleopPosSelector.getInstance();
+        TeleopPosSelector selector = TeleopPosSelector.Instance;
 
         switch(level){
             case 1:
@@ -352,7 +310,7 @@ public class CatzSuperstructure extends VirtualSubsystem {
     }
 
     public Command LXCoral(){
-        TeleopPosSelector selector = TeleopPosSelector.getInstance();
+        TeleopPosSelector selector = TeleopPosSelector.Instance;
 
         return new DeferredCommand(() -> {
             switch(level){
@@ -407,32 +365,32 @@ public class CatzSuperstructure extends VirtualSubsystem {
     public Command LXElevator(int level){
 
         return new SequentialCommandGroup(
-            algaeRemover.stopAlgae(),
-            algaePivot.AlgaePivot_Stow(),
-            rampPivot.Ramp_Intake_Pos(),
-            intakeRollers.stopIntaking(),
+            CatzAlgaeRemover.Instance.stopAlgae(),
+            CatzAlgaePivot.Instance.AlgaePivot_Stow(),
+            CatzRampPivot.Instance.Ramp_Intake_Pos(),
+            CatzIntakeRollers.Instance.stopIntaking(),
             // new PrintCommand("not yet"),
-            // Commands.waitUntil(() -> rampPivot.isSafeToRaiseElevator()),
-            // new PrintCommand("safe to raise elevator!!"),
-            elevator.Elevator_LX(level)
-        ).unless(()-> Robot.isSimulation()).alongWith(Commands.print("L" + level+" Elevator Raise")).unless(()-> Robot.isSimulation());
+            // Commands.waitUntil(() -> CatzRampPivot.Instance.isSafeToRaiseElevator()),
+            // new PrintCommand("safe to raise CatzElevator.Instance!!"),
+            CatzElevator.Instance.Elevator_LX(level)
+        ).unless(()-> Robot.isSimulation()).alongWith(Commands.print("L" + level+" CatzElevator.Instance Raise")).unless(()-> Robot.isSimulation());
     }
 
     public Command botAlgae() {
 
         return new SequentialCommandGroup(
             new ParallelCommandGroup(
-                outtake.stopOuttake(),
-                rampPivot.Ramp_Intake_Pos(),
-                intakeRollers.stopIntaking(),
-                algaePivot.Algae_Transition_Bot(),
-                elevator.Elevator_Bot_Transition()
+                CatzOuttake.Instance.stopOuttake(),
+                CatzRampPivot.Instance.Ramp_Intake_Pos(),
+                CatzIntakeRollers.Instance.stopIntaking(),
+                CatzAlgaePivot.Instance.Algae_Transition_Bot(),
+                CatzElevator.Instance.Elevator_Bot_Transition()
             ),
             new SequentialCommandGroup(
                 Commands.waitSeconds((0.2)),
-                elevator.Elevator_BOT_BOT(), //TODO real height
-                algaePivot.AlgaePivot_BotBot(),
-                algaeRemover.eatAlgae()
+                CatzElevator.Instance.Elevator_BOT_BOT(), //TODO real height
+                CatzAlgaePivot.Instance.AlgaePivot_BotBot(),
+                CatzAlgaeRemover.Instance.eatAlgae()
             )
         ).unless(()-> Robot.isSimulation()).alongWith(Commands.print("Bot Algae"));
     }
@@ -440,14 +398,14 @@ public class CatzSuperstructure extends VirtualSubsystem {
     public Command topAlgae() {
 
         return new ParallelCommandGroup(
-            outtake.stopOuttake(),
-            rampPivot.Ramp_Intake_Pos(),
-            intakeRollers.stopIntaking(),
-            elevator.Elevator_BOT_TOP(),
+            CatzOuttake.Instance.stopOuttake(),
+            CatzRampPivot.Instance.Ramp_Intake_Pos(),
+            CatzIntakeRollers.Instance.stopIntaking(),
+            CatzElevator.Instance.Elevator_BOT_TOP(),
 
             new SequentialCommandGroup(
-                algaePivot.AlgaePivot_BotTop().alongWith(Commands.waitSeconds(0.2)),
-                algaeRemover.eatAlgae()
+                CatzAlgaePivot.Instance.AlgaePivot_BotTop().alongWith(Commands.waitSeconds(0.2)),
+                CatzAlgaeRemover.Instance.eatAlgae()
             )
         ).unless(()-> Robot.isSimulation()).alongWith(Commands.print("Top Algae"));
     }
@@ -468,12 +426,12 @@ public class CatzSuperstructure extends VirtualSubsystem {
 
     public Command algaeStow() {
         return new ParallelCommandGroup(
-            outtake.stopOuttake(),
-            algaePivot.AlgaePivot_Punch(),
-            rampPivot.Ramp_Intake_Pos(),  //TBD intake ramp pivot holds at intaking position for the duration of the match
-            intakeRollers.stopIntaking(),
-            elevator.Elevator_Coast_Stow(),
-            algaeRemover.holdAlgae()
+            CatzOuttake.Instance.stopOuttake(),
+            CatzAlgaePivot.Instance.AlgaePivot_Punch(),
+            CatzRampPivot.Instance.Ramp_Intake_Pos(),  //TBD intake ramp pivot holds at intaking position for the duration of the match
+            CatzIntakeRollers.Instance.stopIntaking(),
+            CatzElevator.Instance.Elevator_Coast_Stow(),
+            CatzAlgaeRemover.Instance.holdAlgae()
         ).unless(()-> Robot.isSimulation()).alongWith(Commands.print("Stow"));
     }
 
@@ -481,13 +439,13 @@ public class CatzSuperstructure extends VirtualSubsystem {
 
         return new SequentialCommandGroup(
             new ParallelCommandGroup(
-                outtake.stopOuttake(),
-                algaeRemover.stopAlgae(),
-                rampPivot.Ramp_Climb_Pos(),
-                intakeRollers.stopIntaking()
+                CatzOuttake.Instance.stopOuttake(),
+                CatzAlgaeRemover.Instance.stopAlgae(),
+                CatzRampPivot.Instance.Ramp_Climb_Pos(),
+                CatzIntakeRollers.Instance.stopIntaking()
             ).alongWith(Commands.waitSeconds(0.1)), //TBD TESITNG
 
-            climb.extendClimb()
+            CatzClimb.Instance.extendClimb()
         ).unless(()-> Robot.isSimulation()).alongWith(Commands.print("EXTENDING CLIMB/////////////////////////////"));
     }
 

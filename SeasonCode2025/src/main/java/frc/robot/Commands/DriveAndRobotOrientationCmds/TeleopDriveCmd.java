@@ -1,14 +1,3 @@
-//------------------------------------------------------------------------------------
-// 2025 FRC 2637
-// https://github.com/PhantomCatz
-//
-// Use of this source code is governed by an MIT-style
-// license that can be found in the LICENSE file at
-// the root directory of this project. 
-//
-//        "6 hours of debugging can save you 5 minutes of reading documentation."
-//
-//------------------------------------------------------------------------------------
 package frc.robot.Commands.DriveAndRobotOrientationCmds;
 
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
@@ -118,7 +107,7 @@ public void initialize() {}
     chassisSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(m_headingAndVelocity_X,
                                                           m_headingAndVelocity_Y,
                                                           turningVelocity,
-                                                          CatzRobotTracker.getInstance().getEstimatedPose().getRotation());
+                                                          CatzRobotTracker.Instance.getEstimatedPose().getRotation());
 
     // Send new chassisspeeds object to the drivetrain
     m_drivetrain.drive(chassisSpeeds);

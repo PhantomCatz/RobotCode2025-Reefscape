@@ -1,14 +1,3 @@
-//------------------------------------------------------------------------------------
-// 2025 FRC 2637
-// https://github.com/PhantomCatz
-//
-// Use of this source code is governed by an MIT-style
-// license that can be found in the LICENSE file at
-// the root directory of this project. 
-//
-//        "6 hours of debugging can save you 5 minutes of reading documentation."
-//
-//------------------------------------------------------------------------------------
 package frc.robot.Commands.DriveAndRobotOrientationCmds;
 
 import com.pathplanner.lib.path.PathPlannerPath;
@@ -83,8 +72,8 @@ public class TrajectoryDriveCmd extends Command {
   private final boolean isTelop;
   private Rotation2d startRot;
 
-  private final CatzDrivetrain drivetrain = CatzDrivetrain.getInstance();
-  private final CatzRobotTracker tracker = CatzRobotTracker.getInstance();
+  private final CatzDrivetrain drivetrain = CatzDrivetrain.Instance;
+  private final CatzRobotTracker tracker = CatzRobotTracker.Instance;
   // ---------------------------------------------------------------------------------------------
   //
   // Trajectory Drive Command Constructor
@@ -402,7 +391,7 @@ public class TrajectoryDriveCmd extends Command {
     // System.out.println("omegaerr: " + (currentRPS));
     // System.out.println("speederr: " + (currentMPS));
 
-    CatzRobotTracker.getInstance().setReachedGoal(isPoseWithinThreshold(poseError));
+    CatzRobotTracker.Instance.setReachedGoal(isPoseWithinThreshold(poseError));
 
     return isPoseWithinThreshold(poseError) && rotationError < ALLOWABLE_ROTATION_ERROR &&
     (desiredMPS != 0.0 || (currentMPS < ALLOWABLE_VEL_ERROR && currentRPS < ALLOWABLE_OMEGA_ERROR));

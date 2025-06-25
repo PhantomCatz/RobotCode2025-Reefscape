@@ -1,14 +1,3 @@
-//------------------------------------------------------------------------------------
-// 2025 FRC 2637
-// https://github.com/PhantomCatz
-//
-// Use of this source code is governed by an MIT-style
-// license that can be found in the LICENSE file at
-// the root directory of this project. 
-//
-//        "6 hours of debugging can save you 5 minutes of reading documentation."
-//
-//------------------------------------------------------------------------------------
 package frc.robot.CatzSubsystems.CatzOuttake;
 import static frc.robot.CatzSubsystems.CatzOuttake.OuttakeConstants.*;
 
@@ -27,20 +16,13 @@ import lombok.Setter;
 import org.littletonrobotics.junction.Logger;
 
 public class CatzOuttake extends SubsystemBase {
-  private static CatzOuttake INSTANCE;
-
-  public static CatzOuttake getInstance(){
-    if(INSTANCE == null) INSTANCE = new CatzOuttake();
-    return INSTANCE;
-  }
+  public static final CatzOuttake Instance = new CatzOuttake();
 
   private final OuttakeIO io;
   private final OuttakeIOInputsAutoLogged inputs = new OuttakeIOInputsAutoLogged();
   private RobotContainer container;
   private int interationCounter = 0;
   private int intakeIterationCoutner = 0;
-
-  private final TeleopPosSelector SELECTOR = TeleopPosSelector.getInstance();
 
   public enum outtakeStates {
     ADJ_INIT,
@@ -86,11 +68,11 @@ public class CatzOuttake extends SubsystemBase {
    * @return
    */
   public boolean isDesiredCoralState(boolean isOuttaking){
-    if (SELECTOR.useFakeCoral){
+    if (TeleopPosSelector.Instance.useFakeCoral){
       if(isOuttaking){
-        return !SELECTOR.hasCoralSIM;
+        return !TeleopPosSelector.Instance.hasCoralSIM;
       }else{
-        return SELECTOR.hasCoralSIM;
+        return TeleopPosSelector.Instance.hasCoralSIM;
       }
     } else {
       boolean inOuttake = (inputs.bbreakBackTriggered || inputs.bbreakFrntTriggered);

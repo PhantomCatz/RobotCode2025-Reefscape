@@ -1,14 +1,3 @@
-//------------------------------------------------------------------------------------
-// 2025 FRC 2637
-// https://github.com/PhantomCatz
-//
-// Use of this source code is governed by an MIT-style
-// license that can be found in the LICENSE file at
-// the root directory of this project. 
-//
-//        "6 hours of debugging can save you 5 minutes of reading documentation."
-//
-//------------------------------------------------------------------------------------
 package frc.robot;
 
 import edu.wpi.first.math.geometry.Pose2d;
@@ -36,6 +25,7 @@ import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.Drivetrain.CatzDriv
 import frc.robot.CatzSubsystems.CatzElevator.*;
 import frc.robot.CatzSubsystems.CatzLEDs.CatzLED;
 import frc.robot.CatzSubsystems.CatzLEDs.CatzLED.ControllerLEDState;
+import frc.robot.CatzSubsystems.CatzOuttake.CatzOuttake;
 import frc.robot.CatzSubsystems.CatzRampPivot.CatzRampPivot;
 import frc.robot.Commands.DriveAndRobotOrientationCmds.TeleopDriveCmd;
 import frc.robot.Utilities.Alert;
@@ -48,12 +38,7 @@ import org.littletonrobotics.junction.networktables.LoggedNetworkNumber;
 
 
 public class RobotContainer {
-  private static RobotContainer INSTANCE;
-
-  public static RobotContainer getInstance(){
-    if(INSTANCE == null) INSTANCE = new RobotContainer();
-    return INSTANCE;
-  }
+  public static final RobotContainer Instance = new RobotContainer();
 
   private final double SCORE_TRIGGER_THRESHHOLD = 0.8;
 
@@ -85,16 +70,16 @@ public class RobotContainer {
   // Subsystem Declaration
   // ---------------------------------------------------------------------------------------------------------------------
 
-  private final CatzAutonomous auto = CatzAutonomous.getInstance();
-  private final CatzRobotTracker tracker = CatzRobotTracker.getInstance();
-  private final CatzSuperstructure superstructure = CatzSuperstructure.getInstance();
-  private final CatzClimb climb = CatzClimb.getInstance();
-  private final CatzLED led = CatzLED.getInstance();
-  private final CatzDrivetrain drivetrain = CatzDrivetrain.getInstance();
-  private final CatzElevator elevator = CatzElevator.getInstance();
-  private final CatzRampPivot rampPivot = CatzRampPivot.getInstance();
-  private final CatzAlgaePivot algaePivot = CatzAlgaePivot.getInstance();
-  private final CatzAlgaeRemover algaeRemover = CatzAlgaeRemover.getInstance();
+  private final CatzAutonomous auto = CatzAutonomous.Instance;
+  private final CatzRobotTracker tracker = CatzRobotTracker.Instance;
+  private final CatzSuperstructure superstructure = CatzSuperstructure.Instance;
+  private final CatzClimb climb = CatzClimb.Instance;
+  private final CatzLED led = CatzLED.Instance;
+  private final CatzDrivetrain drivetrain = CatzDrivetrain.Instance;
+  private final CatzElevator elevator = CatzElevator.Instance;
+  private final CatzRampPivot rampPivot = CatzRampPivot.Instance;
+  private final CatzAlgaePivot algaePivot = CatzAlgaePivot.Instance;
+  private final CatzAlgaeRemover algaeRemover = CatzAlgaeRemover.Instance;
 
   private RobotContainer() {
     // Drive And Aux Command Mapping

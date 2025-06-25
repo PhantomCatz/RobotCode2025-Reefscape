@@ -1,30 +1,15 @@
-//------------------------------------------------------------------------------------
-// 2025 FRC 2637
-// https://github.com/PhantomCatz
-//
-// Use of this source code is governed by an MIT-style
-// license that can be found in the LICENSE file at
-// the root directory of this project. 
-//
-//        "6 hours of debugging can save you 5 minutes of reading documentation."
-//
-//------------------------------------------------------------------------------------
 package frc.robot.CatzSubsystems.CatzAlgaeEffector.CatzAlgaeRemover;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.CatzConstants;
+import frc.robot.CatzSubsystems.CatzOuttake.CatzOuttake;
 
 import static frc.robot.CatzSubsystems.CatzAlgaeEffector.CatzAlgaeRemover.AlgaeRemoverConstants.*;
 
 import org.littletonrobotics.junction.Logger;
 
 public class CatzAlgaeRemover extends SubsystemBase {
-  private static CatzAlgaeRemover INSTANCE;
-
-  public static CatzAlgaeRemover getInstance(){
-    if(INSTANCE == null) INSTANCE = new CatzAlgaeRemover();
-    return INSTANCE;
-  }
+  public static final CatzAlgaeRemover Instance = new CatzAlgaeRemover();
 
   private final AlgaeRemoverIO io;
   private final AlgaeEffectorIOInputsAutoLogged inputs = new AlgaeEffectorIOInputsAutoLogged();

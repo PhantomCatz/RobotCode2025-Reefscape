@@ -1,14 +1,3 @@
-//------------------------------------------------------------------------------------
-// 2025 FRC 2637
-// https://github.com/PhantomCatz
-//
-// Use of this source code is governed by an MIT-style
-// license that can be found in the LICENSE file at
-// the root directory of this project. 
-//
-//        "6 hours of debugging can save you 5 minutes of reading documentation."
-//
-//------------------------------------------------------------------------------------
 package frc.robot.CatzSubsystems.CatzRampPivot;
 
 import edu.wpi.first.wpilibj.DriverStation;
@@ -29,12 +18,7 @@ import java.util.function.Supplier;
 import org.littletonrobotics.junction.Logger;
 
 public class CatzRampPivot extends SubsystemBase {
-  private static CatzRampPivot INSTANCE;
-
-  public static CatzRampPivot getInstance(){
-    if(INSTANCE == null ) INSTANCE = new CatzRampPivot();
-    return INSTANCE;
-  }
+  public static final CatzRampPivot Instance = new CatzRampPivot();
 
   private final RampPivotIO io;
   private final RampPivotIOInputsAutoLogged inputs = new RampPivotIOInputsAutoLogged();

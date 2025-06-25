@@ -1,14 +1,3 @@
-//------------------------------------------------------------------------------------
-// 2025 FRC 2637
-// https://github.com/PhantomCatz
-//
-// Use of this source code is governed by an MIT-style
-// license that can be found in the LICENSE file at
-// the root directory of this project. 
-//
-//        "6 hours of debugging can save you 5 minutes of reading documentation."
-//
-//------------------------------------------------------------------------------------
 package frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.Drivetrain;
 
 import static frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.Drivetrain.DriveConstants.*;
@@ -32,6 +21,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.CatzConstants;
 import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.CatzRobotTracker;
 import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.CatzRobotTracker.OdometryObservation;
+import frc.robot.CatzSubsystems.CatzOuttake.CatzOuttake;
 import frc.robot.Robot;
 import frc.robot.Utilities.Alert;
 import frc.robot.Utilities.EqualsUtil;
@@ -44,21 +34,13 @@ import org.littletonrobotics.junction.Logger;
 
 // Drive train subsystem for swerve drive implementation
 public class CatzDrivetrain extends SubsystemBase {
-  private static CatzDrivetrain INSTANCE;
-
-  public static CatzDrivetrain getInstance(){
-    if(INSTANCE == null) INSTANCE = new CatzDrivetrain();
-    return INSTANCE;
-  }
+  public static final CatzDrivetrain Instance = new CatzDrivetrain();
 
   private double distanceError = 999999.9; //meters
 
   // Gyro input/output interface
   private final GyroIO gyroIO;
   private final GyroIOInputsAutoLogged gyroInputs = new GyroIOInputsAutoLogged();
-
-  // Position, odmetetry, and velocity estimator
-  private final CatzRobotTracker tracker = CatzRobotTracker.getInstance();
 
   // Alerts
   private final Alert gyroDisconnected;
@@ -165,7 +147,7 @@ public class CatzDrivetrain extends SubsystemBase {
 
     Logger.recordOutput("Drive/DistanceError", distanceError);
 
-    pose = pose.interpolate(tracker.getEstimatedPose(), 0.05);
+    pose = pose.interpolate(CatzRobotTracker.Instance.getEstimatedPose(), 0.05);
     Logger.recordOutput("CatzRobotTracker/interlated pose", pose);
 
     // -----------------------------------------------------------------------------------------------------
@@ -200,7 +182,7 @@ public class CatzDrivetrain extends SubsystemBase {
                                                     gyroAngle2d,
                                                     Timer.getFPGATimestamp()
                                           );
-    CatzRobotTracker.getInstance().addOdometryObservation(observation);
+    CatzRobotTracker.Instance.addOdometryObservation(observation);
 
     // Update current velocities use gyro when possible
     Twist2d robotRelativeVelocity = getTwist2dSpeeds();
@@ -208,7 +190,7 @@ public class CatzDrivetrain extends SubsystemBase {
         gyroInputs.gyroConnected
             ? Math.toRadians(gyroInputs.gyroYawVel)
             : robotRelativeVelocity.dtheta;
-    CatzRobotTracker.getInstance().addVelocityData(robotRelativeVelocity);
+    CatzRobotTracker.Instance.addVelocityData(robotRelativeVelocity);
 
     // --------------------------------------------------------------
     // Logging

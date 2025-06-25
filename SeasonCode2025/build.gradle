@@ -233,10 +233,9 @@ spotless {
             exclude '**/build/**', '**/build-*/**', 'src/main/java/frc/robot/BuildConstants.java', '**.vscode/launch.json**'
         }
         toggleOffOn()
-        removeUnusedImports()
         trimTrailingWhitespace()
         endWithNewline()
-        licenseHeader('\"6 hours of debugging can save you 5 minutes of reading documentation.\"\n//\n//------------------------------------------------------------------------------------')
+        licenseHeader('')
         //licenseHeader("//\n//        \"6 hours of debugging can save you 5 minutes of reading documentation.\"\n//\n//------------------------------------------------------------------------------------")
     }
     groovyGradle {

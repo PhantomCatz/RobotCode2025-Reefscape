@@ -1,14 +1,3 @@
-//------------------------------------------------------------------------------------
-// 2025 FRC 2637
-// https://github.com/PhantomCatz
-//
-// Use of this source code is governed by an MIT-style
-// license that can be found in the LICENSE file at
-// the root directory of this project. 
-//
-//        "6 hours of debugging can save you 5 minutes of reading documentation."
-//
-//------------------------------------------------------------------------------------
 package frc.robot;
 
 
@@ -108,8 +97,8 @@ public class Robot extends LoggedRobot {
   // reset Position Logging
   public static boolean isResetPositionUsedInAuto = false;
 
-  private final RobotContainer container = RobotContainer.getInstance();
-  private final CatzLED LED = CatzLED.getInstance();
+  private final RobotContainer container = RobotContainer.Instance;
+  private final CatzLED LED = CatzLED.Instance;
 
   // --------------------------------------------------------------------------------------------------------
   //
@@ -308,7 +297,7 @@ public class Robot extends LoggedRobot {
   // --------------------------------------------------------------------------------------------------------
   @Override
   public void disabledInit() {
-    CatzRampPivot.getInstance().setNeutralMode(NeutralMode.COAST);
+    CatzRampPivot.Instance.setNeutralMode(NeutralMode.COAST);
     isResetPositionUsedInAuto = false;
   }
 
@@ -352,11 +341,11 @@ public class Robot extends LoggedRobot {
     isFirstPath = true;
     // deployment benchmark
     LAST_DEPLOYMENT_WARNING.set(true);
-    CatzRampPivot.getInstance().setNeutralMode(NeutralMode.BRAKE);
-    CatzAlgaePivot.getInstance().setAlgaePivotPos(AlgaePivotPosition.STOW);
+    CatzRampPivot.Instance.setNeutralMode(NeutralMode.BRAKE);
+    CatzAlgaePivot.Instance.setAlgaePivotPos(AlgaePivotPosition.STOW);
     autoStart = Timer.getFPGATimestamp();
     m_autonomousCommand = container.getAutonomousCommand();
-    CatzRampPivot.getInstance().Ramp_Intake_Pos().withTimeout(1.0);
+    CatzRampPivot.Instance.Ramp_Intake_Pos().withTimeout(1.0);
     if (m_autonomousCommand != null) {
       m_autonomousCommand.schedule();
     }
@@ -382,17 +371,17 @@ public class Robot extends LoggedRobot {
     if (m_autonomousCommand != null) {
       m_autonomousCommand.cancel();
     } else {
-      CatzRampPivot.getInstance().Ramp_Intake_Pos().withTimeout(1.0);
+      CatzRampPivot.Instance.Ramp_Intake_Pos().withTimeout(1.0);
     }
 
 
 
     teleStart = Timer.getFPGATimestamp();
-    CatzRampPivot.getInstance().setNeutralMode(NeutralMode.BRAKE);
-    CatzAlgaePivot.getInstance().setAlgaePivotPos(AlgaePivotPosition.STOW);
-    //CatzRobotTracker.getInstance().resetPose(m_robotContainer.getAutonomous().calculateReefPos(2, LeftRight.LEFT));
-    //For limelight error calculations CatzRobotTracker.getInstance().resetPose(FlippingUtil.flipFieldPose(new Pose2d(Reef.center.minus(new Translation2d(Units.inchesToMeters(32.305+14.5), 0)), Rotation2d.kZero)));
-    //CatzRobotTracker.getInstance().resetPose(new Pose2d());
+    CatzRampPivot.Instance.setNeutralMode(NeutralMode.BRAKE);
+    CatzAlgaePivot.Instance.setAlgaePivotPos(AlgaePivotPosition.STOW);
+    //CatzRobotTracker.Instance.resetPose(m_robotContainer.getAutonomous().calculateReefPos(2, LeftRight.LEFT));
+    //For limelight error calculations CatzRobotTracker.Instance.resetPose(FlippingUtil.flipFieldPose(new Pose2d(Reef.center.minus(new Translation2d(Units.inchesToMeters(32.305+14.5), 0)), Rotation2d.kZero)));
+    //CatzRobotTracker.Instance.resetPose(new Pose2d());
   }
 
   @Override
@@ -411,7 +400,7 @@ public class Robot extends LoggedRobot {
   @Override
   public void testInit() {
     CommandScheduler.getInstance().cancelAll();
-    CatzRobotTracker.getInstance().resetPose(CatzVision.Instance.getPoseObservation()[0].pose().toPose2d());
+    CatzRobotTracker.Instance.resetPose(CatzVision.Instance.getPoseObservation()[0].pose().toPose2d());
   }
 
   @Override
