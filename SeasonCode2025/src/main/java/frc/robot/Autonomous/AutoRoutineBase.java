@@ -26,4 +26,8 @@ public class AutoRoutineBase {
     protected AutoTrajectory getTrajectory(String name, int index){
         return routine.trajectory(name, index);
     }
+
+    public AutoRoutine getRoutine(){
+        return routine;
+    }
 }

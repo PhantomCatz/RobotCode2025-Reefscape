@@ -8,11 +8,13 @@ import com.pathplanner.lib.util.PathPlannerLogging;
 import choreo.trajectory.SwerveSample;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Twist2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.wpilibj.*;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -23,6 +25,7 @@ import frc.robot.CatzConstants;
 import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.CatzRobotTracker;
 import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.CatzRobotTracker.OdometryObservation;
 import frc.robot.CatzSubsystems.CatzOuttake.CatzOuttake;
+import frc.robot.Commands.DriveAndRobotOrientationCmds.HolonomicDriveController;
 import frc.robot.Robot;
 import frc.robot.Utilities.Alert;
 import frc.robot.Utilities.EqualsUtil;
@@ -55,6 +58,8 @@ public class CatzDrivetrain extends SubsystemBase {
   public final CatzSwerveModule RT_BACK_MODULE;
   public final CatzSwerveModule LT_BACK_MODULE;
   public final CatzSwerveModule LT_FRNT_MODULE;
+
+  private HolonomicDriveController hoController = DriveConstants.getNewHolController();
 
   private SwerveSetpoint currentSetpoint =
       new SwerveSetpoint(
@@ -354,8 +359,29 @@ public class CatzDrivetrain extends SubsystemBase {
     }
   }
 
-  public void followChoreoTrajectory(SwerveSample sample){
-    //TODO implement. It will be basically the same thing as the trajectory follow command.
+  /**
+   * Make sure to run this before every new trajectory
+   */
+  public void followChoreoTrajectoryInit(){
+    hoController = DriveConstants.getNewHolController();
+  }
+
+  /**
+   * This function only runs the "execute" portion of a command. Initialization and ending should be done elsewhere.
+   * 
+   * @param sample
+   */
+  public void followChoreoTrajectoryExecute(SwerveSample sample){
+    Trajectory.State state = new Trajectory.State(
+      sample.t,
+      Math.hypot(sample.vx,sample.vy),
+      0.0,
+      new Pose2d(new Translation2d(sample.x, sample.y), Rotation2d.fromRadians(sample.heading)),
+      0.0
+    );
+
+    Pose2d curPose = CatzRobotTracker.Instance.getEstimatedPose();
+    // ChassisSpeeds adjustedSpeeds = hoController.calculate(curPose, state, sample.)
   }
 
   // -----------------------------------------------------------------------------------------------------------

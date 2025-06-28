@@ -27,7 +27,7 @@ public final class CatzConstants {
   public static final AutoFactory autoFactory = new AutoFactory(
                                                   CatzRobotTracker.Instance::getEstimatedPose,
                                                   CatzRobotTracker.Instance::resetPose,
-                                                  CatzDrivetrain.Instance::followChoreoTrajectory,
+                                                  CatzDrivetrain.Instance::followChoreoTrajectoryExecute,
                                                   true,
                                                   CatzDrivetrain.Instance
                                                 );
