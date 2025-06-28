@@ -19,6 +19,8 @@ import org.littletonrobotics.junction.mechanism.LoggedMechanismLigament2d;
 import org.littletonrobotics.junction.mechanism.LoggedMechanismRoot2d;
 
 import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.simulation.ElevatorSim;
@@ -59,20 +61,25 @@ public class ElevatorIOSim implements ElevatorIO{
   private final LoggedMechanismRoot2d mechanismRoot = mechanism.getRoot("elevator root", 0.63, 0);
   private final LoggedMechanismLigament2d mechanismElevator = mechanismRoot.append(new LoggedMechanismLigament2d("Elevator", m_elevatorSim.getPositionMeters(), 90));
 
+  private Pose3d stage1 = new Pose3d(0.63, 0, 0, new Rotation3d(90, 0, 0));
+  private final Pose3d[] elevatorPoses = {stage1};
+
   @Override
   public void updateInputs(ElevatorIOInputs inputs) {
     currentRotations = elevatorPositionInches / FINAL_RATIO;
     Logger.recordOutput("Elevator/SimTargetRotations", targetRotations);
     Logger.recordOutput("Elevator/SimRotations", currentRotations);
+
     double setVoltage = simPidController.calculate(currentRotations, targetRotations) * 12.0;
     m_elevatorSim.setInputVoltage(setVoltage);
     m_elevatorSim.update(0.02);
-    // m_motorSimModel.update(0.02);
+
     elevatorVelocity = m_elevatorSim.getVelocityMetersPerSecond();
     elevatorPositionInches = Units.metersToInches(m_elevatorSim.getPositionMeters());
     System.out.println("current elevator input " + m_elevatorSim.getInput());
     Logger.recordOutput("Elevator/SimCurrentSpeedMetersPerSecond", elevatorVelocity);
     Logger.recordOutput("Elevator/SimCurrentPositionInches", elevatorPositionInches);
+    Logger.recordOutput("FinalComponentPoses", new Pose3d[] {new Pose3d(0.63, elevatorPositionInches / 2, 0, new Rotation3d(0.0, 90.0, 0.0))});
     mechanismElevator.setLength(0.5 + Units.inchesToMeters(elevatorPositionInches));
     Logger.recordOutput("Mechanism2d/Elevator", mechanism);
   }
