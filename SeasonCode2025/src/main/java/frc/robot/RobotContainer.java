@@ -287,7 +287,7 @@ public class RobotContainer {
       new InstantCommand(() ->xboxDrv.getHID().setRumble(RumbleType.kBothRumble, strength)),
       new WaitCommand(duration),
       new InstantCommand(() ->xboxDrv.getHID().setRumble(RumbleType.kBothRumble, 0.0))
-    );
+    ).finallyDo(()->xboxDrv.getHID().setRumble(RumbleType.kBothRumble, 0.0));
   }
 
   public Command rumbleAuxController(double strength, double duration){

@@ -60,7 +60,6 @@ public class CatzRobotTracker {
   private Pose2d odometryPose = new Pose2d();
 
   @Getter
-  @AutoLogOutput(key = "CatzRobotTracker/EstimatedPose")
   private Pose2d estimatedPose = new Pose2d();
 
   @Getter
@@ -157,6 +156,8 @@ public class CatzRobotTracker {
             (chassisSpeeds.omegaRadiansPerSecond - m_lastChassisSpeeds.omegaRadiansPerSecond)
                 / observation.timestamp);
     m_lastChassisSpeeds = chassisSpeeds;
+
+    Logger.recordOutput("CatzRobotTracker/EstimatedPose", estimatedPose);
   } // end of addOdometryObservation
 
   /** Add Vision Observation */

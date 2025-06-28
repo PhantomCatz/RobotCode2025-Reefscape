@@ -101,7 +101,7 @@ public class ModuleIORealFoc implements ModuleIO {
 
     // Set Update Frequency
     BaseStatusSignal.setUpdateFrequencyForAll(
-        100.0, driveVelocity, driveAppliedVolts, driveSupplyCurrent, driveTorqueCurrent);
+        100.0, driveVelocity, driveAppliedVolts, driveSupplyCurrent, driveTorqueCurrent); //our robot runs on 50 hertz. this update frequency is twice as fast
 
     // Optimize bus utilization
     driveTalon.optimizeBusUtilization(0, 1.0);
@@ -134,7 +134,7 @@ public class ModuleIORealFoc implements ModuleIO {
 
     // Set Update Frequency
     BaseStatusSignal.setUpdateFrequencyForAll(
-        100.0, steerVelocity, steerAppliedVolts, steerSupplyCurrent, steerTorqueCurrent);
+        100.0, steerVelocity, steerAppliedVolts, steerSupplyCurrent, steerTorqueCurrent); //frequency twice as fast again
 
     steerTalon.optimizeBusUtilization(0, 1.0);
 
@@ -155,7 +155,7 @@ public class ModuleIORealFoc implements ModuleIO {
   @Override
   public void updateInputs(ModuleIOInputs inputs) {
     // Refresh Drive Kraken status signals
-    inputs.isDriveMotorConnected =
+    inputs.isDriveMotorConnected =  //this refreshAll is taking the largest chunk of processing time.
         BaseStatusSignal.refreshAll(
                 drivePosition,
                 driveVelocity,
@@ -175,7 +175,7 @@ public class ModuleIORealFoc implements ModuleIO {
 
     inputs.isAbsEncoderConnected = encoder.isConnected();
 
-    // Refresh drive motor values
+    // Refresh drive motor valuesp
     inputs.drivePositionUnits     = drivePosition.getValueAsDouble();
     inputs.driveVelocityRPS       = driveVelocity.getValueAsDouble();
     inputs.driveAppliedVolts      = driveAppliedVolts.getValueAsDouble();
