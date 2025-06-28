@@ -26,19 +26,13 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.simulation.ElevatorSim;
 
 public class ElevatorIOSim implements ElevatorIO{
+  
+
   private final DCMotor m_elevatorGearbox = DCMotor.getKrakenX60Foc(2);
   private double targetRotations;
   private double currentRotations;
   private double elevatorVelocity;
   private double elevatorPositionInches;
-
-
-  // private final DCMotorSim m_motorSimModel = new DCMotorSim(
-  //  LinearSystemId.createDCMotorSystem(
-  //     DCMotor.getKrakenX60Foc(2), 0.001, ElevatorConstants.FINAL_RATIO
-  //  ),
-  //  DCMotor.getKrakenX60Foc(2)
-  // );
 
   private PIDController simPidController = new PIDController(0.1, 0.0, 0.0);
   private final ElevatorSim m_elevatorSim =
@@ -61,9 +55,6 @@ public class ElevatorIOSim implements ElevatorIO{
   private final LoggedMechanismRoot2d mechanismRoot = mechanism.getRoot("elevator root", 0.63, 0);
   private final LoggedMechanismLigament2d mechanismElevator = mechanismRoot.append(new LoggedMechanismLigament2d("Elevator", m_elevatorSim.getPositionMeters(), 90));
 
-  private Pose3d stage1 = new Pose3d(0.63, 0, 0, new Rotation3d(90, 0, 0));
-  private final Pose3d[] elevatorPoses = {stage1};
-
   @Override
   public void updateInputs(ElevatorIOInputs inputs) {
     currentRotations = elevatorPositionInches / FINAL_RATIO;
@@ -76,10 +67,10 @@ public class ElevatorIOSim implements ElevatorIO{
 
     elevatorVelocity = m_elevatorSim.getVelocityMetersPerSecond();
     elevatorPositionInches = Units.metersToInches(m_elevatorSim.getPositionMeters());
-    System.out.println("current elevator input " + m_elevatorSim.getInput());
     Logger.recordOutput("Elevator/SimCurrentSpeedMetersPerSecond", elevatorVelocity);
     Logger.recordOutput("Elevator/SimCurrentPositionInches", elevatorPositionInches);
-    Logger.recordOutput("FinalComponentPoses", new Pose3d[] {new Pose3d(0.63, elevatorPositionInches / 2, 0, new Rotation3d(0.0, 90.0, 0.0))});
+    Logger.recordOutput("FinalComponentPoses", new Pose3d[] {new Pose3d(0.0, 0.0, Units.inchesToMeters(elevatorPositionInches) / 2, new Rotation3d(0.0, Math.PI / 2, 0.0)),
+                                                             new Pose3d(0.0, 0.0, Units.inchesToMeters(elevatorPositionInches+1.0), new Rotation3d(0.0, Math.PI / 2, 0.0))});
     mechanismElevator.setLength(0.5 + Units.inchesToMeters(elevatorPositionInches));
     Logger.recordOutput("Mechanism2d/Elevator", mechanism);
   }
@@ -95,5 +86,9 @@ public class ElevatorIOSim implements ElevatorIO{
       double setpointRotations = setpointInches / FINAL_RATIO;
       targetRotations = setpointRotations;
 
+  }
+
+  public double getElevatorPositionInch(){
+    return elevatorPositionInches;
   }
 }

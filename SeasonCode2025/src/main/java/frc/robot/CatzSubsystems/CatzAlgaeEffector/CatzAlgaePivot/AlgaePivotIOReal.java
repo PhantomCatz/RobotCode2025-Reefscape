@@ -124,7 +124,6 @@ public class AlgaePivotIOReal implements AlgaePivotIO {
 
   @Override
   public void runSetpointUp(double targetDegrees, double feedforwardVolts) {
-    // algaePivotMotor.setControl()
 
     double setpointRotations = ((targetDegrees / 360.0) * ALGAE_PIVOT_GEAR_REDUCTION);
     algaePivotMotor.setControl(positionControl.withPosition(setpointRotations)
