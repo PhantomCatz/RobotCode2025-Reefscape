@@ -90,7 +90,7 @@ public class CatzClimb extends SubsystemBase {
   @Override
   public void periodic() {
     io.updateInputs(inputs);
-    Logger.processInputs("RealInputs/Climb", inputs);
+    //.processInputs("RealInputs/Climb", inputs);
     if (DriverStation.isDisabled()) {
       io.setPower(0.0);
       manualPow = 0.0;
@@ -120,7 +120,7 @@ public class CatzClimb extends SubsystemBase {
       }
     }
 
-    Logger.recordOutput("Climb/targetPosition", position);
+    //.recordOutput("Climb/targetPosition", position);
   }
 
   public Command Climb_Home() {

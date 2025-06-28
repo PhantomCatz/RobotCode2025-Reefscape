@@ -43,7 +43,7 @@ public class SwitchableChooser extends LoggedNetworkInput {
     activePublisher = table.getStringTopic("active").publish();
     selectedPublisher = table.getStringTopic("selected").publish();
     selectedInput = new LoggedNetworkString(name + "/selected");
-    Logger.registerDashboardInput(this);
+    //.registerDashboardInput(this);
 
     namePublisher.set(name);
     typePublisher.set("String Chooser");

@@ -111,7 +111,7 @@ public class VisionIOLimelight implements VisionIO {
           try{
             for(var rawSample :megatag1Subscriber.readQueue()){
               if(rawSample.value.length == 0) continue;
-              Logger.recordOutput("Megatag1Pose", parsePose(rawSample.value));
+              //.recordOutput("Megatag1Pose", parsePose(rawSample.value));
 
             }
           }catch (Exception e){

@@ -81,7 +81,7 @@ public class CatzVision extends SubsystemBase {
   public void periodic() {
     for (int i = 0; i < io.length; i++) {
       io[i].updateInputs(inputs[i]);
-      Logger.processInputs("RealInputs/Vision/Camera" + i, inputs[i]);
+      //.processInputs("RealInputs/Vision/Camera" + i, inputs[i]);
     }
     poseObservations = inputs[0].poseObservations;
 
@@ -189,11 +189,11 @@ public class CatzVision extends SubsystemBase {
                     VecBuilder.fill(linearStdDev, linearStdDev, angularStdDev)));
 
         // Log camera datadata
-        Logger.recordOutput("Vision/Camera" + cameraIndex + "/TagPoses", tagPoses.toArray(new Pose3d[tagPoses.size()]));
-        Logger.recordOutput("Vision/Camera" + cameraIndex + "/RobotPoses", robotPoses.toArray(new Pose3d[robotPoses.size()]));
-        Logger.recordOutput("Vision/Camera" + cameraIndex + "/RobotPosesAccepted", robotPosesAccepted.toArray(new Pose3d[robotPosesAccepted.size()]));
-        Logger.recordOutput("Vision/Camera" + cameraIndex + "/RobotPosesRejected", robotPosesRejected.toArray(new Pose3d[robotPosesRejected.size()]));
-        Logger.recordOutput("Vision/Camera" + cameraIndex + "/Standard Deviation", linearStdDev);
+        //.recordOutput("Vision/Camera" + cameraIndex + "/TagPoses", tagPoses.toArray(new Pose3d[tagPoses.size()]));
+        //.recordOutput("Vision/Camera" + cameraIndex + "/RobotPoses", robotPoses.toArray(new Pose3d[robotPoses.size()]));
+        //.recordOutput("Vision/Camera" + cameraIndex + "/RobotPosesAccepted", robotPosesAccepted.toArray(new Pose3d[robotPosesAccepted.size()]));
+        //.recordOutput("Vision/Camera" + cameraIndex + "/RobotPosesRejected", robotPosesRejected.toArray(new Pose3d[robotPosesRejected.size()]));
+        //.recordOutput("Vision/Camera" + cameraIndex + "/Standard Deviation", linearStdDev);
 
         allTagPoses.addAll(tagPoses);
 
@@ -219,10 +219,10 @@ public class CatzVision extends SubsystemBase {
         txTyObservations.put(
             tagId, new TxTyObservation(tagId, cameraIndex, tx, ty, distance, timestamp));
 
-        Logger.recordOutput("Vision/Camera" + cameraIndex + "/TxTyObservation tx" + frameIndex, tx);
-        Logger.recordOutput("Vision/Camera" + cameraIndex + "/TxTyObservation ty" + frameIndex, ty);
-        Logger.recordOutput("Vision/Camera" + cameraIndex + "/TxTyObservation tagID" + frameIndex, tagId);
-        Logger.recordOutput("Vision/Camera" + cameraIndex + "/TxTyObservation distance" + frameIndex, distance);
+        //.recordOutput("Vision/Camera" + cameraIndex + "/TxTyObservation tx" + frameIndex, tx);
+        //.recordOutput("Vision/Camera" + cameraIndex + "/TxTyObservation ty" + frameIndex, ty);
+        //.recordOutput("Vision/Camera" + cameraIndex + "/TxTyObservation tagID" + frameIndex, tagId);
+        //.recordOutput("Vision/Camera" + cameraIndex + "/TxTyObservation distance" + frameIndex, distance);
       }
     }
 

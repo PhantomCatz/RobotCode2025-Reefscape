@@ -103,7 +103,7 @@ public class CatzOuttake extends SubsystemBase {
   @Override
   public void periodic() {
     io.updateInputs(inputs);
-    Logger.processInputs("RealInputs/Outtake", inputs);
+    //.processInputs("RealInputs/Outtake", inputs);
 
     if(DriverStation.isDisabled()) {
       currentState = outtakeStates.STOP;
@@ -146,7 +146,7 @@ public class CatzOuttake extends SubsystemBase {
         break;
     }
 
-    Logger.recordOutput("Outtake/State", currentState.toString());
+    //.recordOutput("Outtake/State", currentState.toString());
 
     previousState = currentState;
   }

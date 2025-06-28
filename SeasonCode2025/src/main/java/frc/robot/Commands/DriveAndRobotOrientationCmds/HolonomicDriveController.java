@@ -122,13 +122,13 @@ public class HolonomicDriveController {
     double xFeedback = m_xController.calculate(currentPose.getX(), trajectoryPose.getX());
     double yFeedback = m_yController.calculate(currentPose.getY(), trajectoryPose.getY());
 
-    Logger.recordOutput("xFF " , xFF);
-    Logger.recordOutput("xFeedback " , xFeedback);
-    Logger.recordOutput("yFF " , yFF);
-    Logger.recordOutput("yFeedback " , yFeedback);
+    //.recordOutput("xFF " , xFF);
+    //.recordOutput("xFeedback " , xFeedback);
+    //.recordOutput("yFF " , yFF);
+    //.recordOutput("yFeedback " , yFeedback);
 
-    Logger.recordOutput("xDerivative " , m_xController.getErrorDerivative());
-    Logger.recordOutput("xError " , m_xController.getError());
+    //.recordOutput("xDerivative " , m_xController.getErrorDerivative());
+    //.recordOutput("xError " , m_xController.getError());
 
     // Return next output.
     return ChassisSpeeds.fromFieldRelativeSpeeds(

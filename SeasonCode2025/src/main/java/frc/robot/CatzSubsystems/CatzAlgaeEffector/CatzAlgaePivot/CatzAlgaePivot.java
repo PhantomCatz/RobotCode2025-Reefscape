@@ -84,7 +84,7 @@ public class CatzAlgaePivot extends SubsystemBase {
   @Override
   public void periodic() {
     io.updateInputs(inputs);
-    Logger.processInputs("RealInputs/AlgaePivot", inputs);
+    //.processInputs("RealInputs/AlgaePivot", inputs);
 
     //-------------------------------------------------------------------------------------------
     //  Tunnable Numbers
@@ -144,8 +144,8 @@ public class CatzAlgaePivot extends SubsystemBase {
     }
 
     // Logging
-    Logger.recordOutput("Algae Pivot/targetPositionDeg", targetPosition.getTargetAngle());
-    Logger.recordOutput("Algae Pivot/ff power", calculateArmFeedFoward());
+    //.recordOutput("Algae Pivot/targetPositionDeg", targetPosition.getTargetAngle());
+    //.recordOutput("Algae Pivot/ff power", calculateArmFeedFoward());
   }
 
   //-------------------------------------------------------------------------------------------

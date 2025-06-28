@@ -83,7 +83,7 @@ public class CatzRampPivot extends SubsystemBase {
   @Override
   public void periodic() {
     io.updateInputs(inputs);
-    Logger.processInputs("RealInputs/RampPivot", inputs);
+    //.processInputs("RealInputs/RampPivot", inputs);
 
 
     if(DriverStation.isDisabled()) {
@@ -105,8 +105,8 @@ public class CatzRampPivot extends SubsystemBase {
       System.out.println("no power");
       io.stop();
     }
-    Logger.recordOutput("RampPivot/targetPos", targetPos);
-    Logger.recordOutput("RampPivot/targetPosEnum", rampPivotPositions.toString());
+    //.recordOutput("RampPivot/targetPos", targetPos);
+    //.recordOutput("RampPivot/targetPosEnum", rampPivotPositions.toString());
 
   }
 

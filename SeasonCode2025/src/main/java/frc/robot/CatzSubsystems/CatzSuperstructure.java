@@ -14,7 +14,6 @@ package frc.robot.CatzSubsystems;
 import java.util.function.BooleanSupplier;
 
 import org.littletonrobotics.junction.AutoLogOutput;
-import org.littletonrobotics.junction.Logger;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -30,25 +29,25 @@ public class CatzSuperstructure extends VirtualSubsystem {
 
     private RobotContainer container;
 
-    static @Getter @Setter @AutoLogOutput(key = "CatzSuperstructure/ChosenGamepiece")
+    static @Getter @Setter //(key = "CatzSuperstructure/ChosenGamepiece")
     private Gamepiece chosenGamepiece = Gamepiece.CORAL;
 
-    @Getter @Setter @AutoLogOutput(key = "CatzSuperstructure/Level")
+    @Getter @Setter //(key = "CatzSuperstructure/Level")
     private int level = 1;
 
-    @Getter @Setter @AutoLogOutput(key = "CatzSuperstructure/CurrentRobotState")
+    @Getter @Setter //(key = "CatzSuperstructure/CurrentRobotState")
     private RobotState currentRobotState = RobotState.STOW;
 
-    @Getter @AutoLogOutput(key = "CatzSuperstructure/CurrentRobotAction")
+    @Getter //(key = "CatzSuperstructure/CurrentRobotAction")
     private RobotAction currentRobotAction = RobotAction.STOW;
 
-    @Getter @AutoLogOutput(key = "CatzSuperstructure/IsClimbEnabled")
+    @Getter //(key = "CatzSuperstructure/IsClimbEnabled")
     private static boolean isClimbEnabled = false;
 
-    @Getter @Setter @AutoLogOutput(key = "CatzSuperstructure/CurrentCoralState")
+    @Getter @Setter //(key = "CatzSuperstructure/CurrentCoralState")
     private static CoralState currentCoralState = CoralState.NOT_IN_OUTTAKE;
 
-    @Getter @AutoLogOutput(key = "CatzSuperstructure/robotactionCommand")
+    @Getter //(key = "CatzSuperstructure/robotactionCommand")
     private Command robotActionCommand = Commands.none();
 
     private Command previousAction = new InstantCommand();
@@ -282,7 +281,7 @@ public class CatzSuperstructure extends VirtualSubsystem {
         }
         previousAction = robotActionCommand;
 
-        Logger.recordOutput("CurrentRobotState/CurrentRobotState", currentRobotState.toString());
+        //.recordOutput("CurrentRobotState/CurrentRobotState", currentRobotState.toString());
 
     }
 

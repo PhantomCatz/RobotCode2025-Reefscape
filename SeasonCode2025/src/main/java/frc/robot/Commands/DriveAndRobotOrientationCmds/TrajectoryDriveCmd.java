@@ -280,7 +280,7 @@ public class TrajectoryDriveCmd extends Command {
     adjustedSpeeds = applyCusp(adjustedSpeeds, translationError, endRotation.minus(currentPose.getRotation()).getDegrees(), CONVERGE_DISTANCE, CONVERGE_ANGLE);
 
     // Logging
-    Logger.recordOutput("CatzRobotTracker/Desired Auto Pose", goal.pose);
+    //.recordOutput("CatzRobotTracker/Desired Auto Pose", goal.pose);
 
     // if(Math.abs(startRot.minus(endRotation).getDegrees()) < 1){
     //   adjustedSpeeds = new ChassisSpeeds(adjustedSpeeds.vxMetersPerSecond, adjustedSpeeds.vyMetersPerSecond, 0.0);
@@ -325,10 +325,10 @@ public class TrajectoryDriveCmd extends Command {
     timer.stop(); // Stop timer
     m_driveTrain.stopDriving();
     m_driveTrain.drive(new ChassisSpeeds());
-    Logger.recordOutput("CatzRobotTracker/Desired Auto Pose", new Pose2d());
+    //.recordOutput("CatzRobotTracker/Desired Auto Pose", new Pose2d());
 
     // PathPlannerAuto.currentPathName = "";
-    // Logger.recordOutput("CatzRobotTracker/Desired Auto Pose", new Pose2d());
+    // //.recordOutput("CatzRobotTracker/Desired Auto Pose", new Pose2d());
 
     if (interrupted) {
       System.out.println("OH NO I WAS INTERRUPTED HOW RUDE");

@@ -470,7 +470,7 @@ public class TeleopPosSelector { //TODO split up the file. it's too big and does
     Translation2d currentPos = currentPose.getTranslation();
     Translation2d direction = goalPos.minus(currentPos).div(2.0);
 
-    Logger.recordOutput("LeftRightGoal", goal);
+    //.recordOutput("LeftRightGoal", goal);
 
     // if (direction.getNorm() <= 1e-3) {
     //   return;

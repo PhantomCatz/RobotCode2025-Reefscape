@@ -116,20 +116,20 @@ public class Robot extends LoggedRobot {
     System.gc();
 
     // Record metadata
-    Logger.recordMetadata("ProjectName", BuildConstants.MAVEN_NAME);
-    Logger.recordMetadata("BuildDate", BuildConstants.BUILD_DATE);
-    Logger.recordMetadata("GitSHA", BuildConstants.GIT_SHA);
-    Logger.recordMetadata("GitDate", BuildConstants.GIT_DATE);
-    Logger.recordMetadata("GitBranch", BuildConstants.GIT_BRANCH);
+    //.recordMetadata("ProjectName", BuildConstants.MAVEN_NAME);
+    //.recordMetadata("BuildDate", BuildConstants.BUILD_DATE);
+    //.recordMetadata("GitSHA", BuildConstants.GIT_SHA);
+    //.recordMetadata("GitDate", BuildConstants.GIT_DATE);
+    //.recordMetadata("GitBranch", BuildConstants.GIT_BRANCH);
     switch (BuildConstants.DIRTY) {
       case 0:
-        Logger.recordMetadata("GitDirty", "All changes committed");
+        //.recordMetadata("GitDirty", "All changes committed");
         break;
       case 1:
-        Logger.recordMetadata("GitDirty", "Uncomitted changes");
+        //.recordMetadata("GitDirty", "Uncomitted changes");
         break;
       default:
-        Logger.recordMetadata("GitDirty", "Unknown");
+        //.recordMetadata("GitDirty", "Unknown");
         break;
     }
 
@@ -137,31 +137,30 @@ public class Robot extends LoggedRobot {
     switch (CatzConstants.hardwareMode) {
       case REAL:
         // Running on a real robot, log to a USB stick ("/U/logs")
-        Logger.addDataReceiver(new WPILOGWriter("/home/lvuser/logs"));
-        Logger.addDataReceiver(new RLOGServer());
-        Logger.addDataReceiver(new WPILOGWriter("/Logs"));
+        //.addDataReceiver(new WPILOGWriter("/home/lvuser/logs"));
+        //.addDataReceiver(new RLOGServer());
+        //.addDataReceiver(new WPILOGWriter("/Logs"));
 
-        Logger.addDataReceiver(new NT4Publisher());
+        //.addDataReceiver(new NT4Publisher());
         break;
 
       case SIM:
         // Running a physics simulator, log to NT
-        // Logger.addDataReceiver(new WPILOGWriter("F:/robotics code projects/loggingfiles/"));
-        Logger.addDataReceiver(new NT4Publisher());
+        // //.addDataReceiver(new WPILOGWriter("F:/robotics code projects/loggingfiles/"));
+        //.addDataReceiver(new NT4Publisher());
         break;
 
       case REPLAY:
         // Replaying a log, set up replay source
         setUseTiming(false); // Run as fast as possible
         String logPath = LogFileUtil.findReplayLog();
-        Logger.setReplaySource(new WPILOGReader(logPath));
-        Logger.addDataReceiver(new WPILOGWriter(LogFileUtil.addPathSuffix(logPath, "_sim")));
+        //.setReplaySource(new WPILOGReader(logPath));
+        //.addDataReceiver(new WPILOGWriter(LogFileUtil.addPathSuffix(logPath, "_sim")));
         break;
     }
 
-    // Start AdvantageKit logger //TODO enable this in autonomous and telop init for comp setting //
+    // Start AdvantageKit // //TODO enable this in autonomous and telop init for comp setting //
     // make advantage kit an on demand feature
-    Logger.start();
 
     // Instantiate robotContainer
     m_robotContainer = new RobotContainer();
@@ -173,9 +172,9 @@ public class Robot extends LoggedRobot {
           String name = command.getName();
           int count = commandCounts.getOrDefault(name, 0) + (active ? 1 : -1);
           commandCounts.put(name, count);
-          Logger.recordOutput(
-              "CommandsUnique/" + name + "_" + Integer.toHexString(command.hashCode()), active);
-          Logger.recordOutput("CommandsAll/" + name, count > 0);
+          //.recordOutput(
+              // "CommandsUnique/" + name + "_" + Integer.toHexString(command.hashCode()), active);
+          //.recordOutput("CommandsAll/" + name, count > 0);
         };
     CommandScheduler.getInstance()
         .onCommandInitialize(
@@ -279,11 +278,11 @@ public class Robot extends LoggedRobot {
       CAN_ERROR_TIMER.restart();
     }
     CAN_ERROR_ALERT.set(!CAN_ERROR_TIMER.hasElapsed(CAN_ERROR_TIME_THRESHOLD) && !CAN_INITIAL_ERROR_TIMER.hasElapsed(CAN_ERROR_TIME_THRESHOLD));
-    Logger.recordOutput("CANErrors/Transmit Errors", canStatus.transmitErrorCount);
-    Logger.recordOutput("CANErrors/Recieve Errors count", canStatus.receiveErrorCount);
-    Logger.recordOutput("CANErrors/Bus Off Count", canStatus.busOffCount);
-    Logger.recordOutput("CANErrors/Percent Utilization", canStatus.percentBusUtilization);
-    Logger.recordOutput("CANErrors/TxFullCount", canStatus.txFullCount);
+    //.recordOutput("CANErrors/Transmit Errors", canStatus.transmitErrorCount);
+    //.recordOutput("CANErrors/Recieve Errors count", canStatus.receiveErrorCount);
+    //.recordOutput("CANErrors/Bus Off Count", canStatus.busOffCount);
+    //.recordOutput("CANErrors/Percent Utilization", canStatus.percentBusUtilization);
+    //.recordOutput("CANErrors/TxFullCount", canStatus.txFullCount);
 
     //------------------------------------------------------------------------------------------------
     // Low battery alert to determine whether necessary to put in new battery

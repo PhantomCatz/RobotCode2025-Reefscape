@@ -92,7 +92,7 @@ public class CatzElevator extends SubsystemBase {
   @Override
   public void periodic() {
     io.updateInputs(inputs);
-    Logger.processInputs("RealInputs/Elevator", inputs);
+    //.processInputs("RealInputs/Elevator", inputs);
 
     isElevatorInPos = isElevatorInPosition();
 
@@ -183,8 +183,8 @@ public class CatzElevator extends SubsystemBase {
     } else if (targetPosition == ElevatorPosition.PosManual) {
       io.runMotor(elevatorSpeed);
 
-      Logger.recordOutput("Elevator/Manual Speed", elevatorSpeed*10);
-      Logger.recordOutput("Elevator/Manual RPS", inputs.velocityInchPerSec/ElevatorConstants.FINAL_RATIO);
+      //.recordOutput("Elevator/Manual Speed", elevatorSpeed*10);
+      //.recordOutput("Elevator/Manual RPS", inputs.velocityInchPerSec/ElevatorConstants.FINAL_RATIO);
     } else {
       // Nothing happening
       io.stop();
@@ -195,11 +195,11 @@ public class CatzElevator extends SubsystemBase {
     //----------------------------------------------------------------------------------------------------------------------------
 
 
-    Logger.recordOutput("Elevator/CurrentRadians", getElevatorPositionInch());
-    Logger.recordOutput("Elevator/prevtargetPosition", prevTargetPositon.getTargetPositionInch());
-    Logger.recordOutput("Elevator/logged prev targetPosition", previousLoggedPosition.getTargetPositionInch());
-    Logger.recordOutput("Elevator/isElevatorInPos", isElevatorInPosition());
-    Logger.recordOutput("Elevator/targetPosition", targetPosition.getTargetPositionInch());
+    //.recordOutput("Elevator/CurrentRadians", getElevatorPositionInch());
+    //.recordOutput("Elevator/prevtargetPosition", prevTargetPositon.getTargetPositionInch());
+    //.recordOutput("Elevator/logged prev targetPosition", previousLoggedPosition.getTargetPositionInch());
+    //.recordOutput("Elevator/isElevatorInPos", isElevatorInPosition());
+    //.recordOutput("Elevator/targetPosition", targetPosition.getTargetPositionInch());
 
     // Target Postioin Logging
     previousLoggedPosition = targetPosition;

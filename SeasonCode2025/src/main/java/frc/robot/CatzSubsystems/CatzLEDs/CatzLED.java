@@ -45,13 +45,13 @@ public class CatzLED extends VirtualSubsystem {
   // ----------------------------------------------------------------------------------------------
   // Robot state LED tracking
   // ----------------------------------------------------------------------------------------------
-  @Getter @Setter @AutoLogOutput (key = "CatzLED/ElevatorLEDState")
+  @Getter @Setter // (key = "CatzLED/ElevatorLEDState")
   public ControllerLEDState controllerState = ControllerLEDState.nuhthing;
 
-  @Getter @Setter @AutoLogOutput (key = "CatzLED/QueueState")
+  @Getter @Setter // (key = "CatzLED/QueueState")
   public QueueLEDState queueLEDState = QueueLEDState.EMPTY;
 
-  @Getter @Setter @AutoLogOutput(key = "CatzSuperstructure/isClimbExtendingOut")
+  @Getter @Setter //(key = "CatzSuperstructure/isClimbExtendingOut")
   private WinchingState climbDirection = WinchingState.IDLE;
 
   public enum QueueLEDState {
@@ -141,14 +141,14 @@ public class CatzLED extends VirtualSubsystem {
     ledStrip = new AddressableLED(LEADER_LED_PWM_PORT);
     buffer = new AddressableLEDBuffer(length); // NOTE -WPILIB doesn't support creation of 2 led objects
     ledStrip.setLength(length);
-    ledStrip.setData(buffer);
-    ledStrip.start();
+    // ledStrip.setData(buffer);
+    // ledStrip.start();
 
     loadingNotifier = new Notifier(
                             () -> {
                               synchronized (this) {
                                 breath(Color.kBlack, Color.kWhiteSmoke, System.currentTimeMillis() / 1000.0);
-                                ledStrip.setData(buffer);
+                                // ledStrip.setData(buffer);
                               }
                             }
     );
@@ -270,7 +270,7 @@ public class CatzLED extends VirtualSubsystem {
     }
 
     // Update LEDs
-    ledStrip.setData(buffer);
+    // ledStrip.setData(buffer);
   } // end of periodic()
 
 
@@ -284,7 +284,7 @@ public class CatzLED extends VirtualSubsystem {
     if (color != null) {
       for (int i = LED_Sidebar_Start_RT; i <= LED_Sidebar_End_LT; i++) {
         if(!(LED_Sidebar_End_RT<i && i<LED_Sidebar_Start_LT)) {
-          buffer.setLED(i, color);
+          // buffer.setLED(i, color);
         }
       }
     }
@@ -306,14 +306,15 @@ public class CatzLED extends VirtualSubsystem {
         double red = (c1.red * (1 - ratio)) + (c2.red * ratio);
         double green = (c1.green * (1 - ratio)) + (c2.green * ratio);
         double blue = (c1.blue * (1 - ratio)) + (c2.blue * ratio);
-        buffer.setLED(i, new Color(red, green, blue));      }
+        // buffer.setLED(i, new Color(red, green, blue));      
+        }
     }
   }
 
   private void setSolidCrossbarColor(Color color) {
     if (color != null) {
       for (int i = LED_Crossbar_Start; i < LED_Crossbar_End; i++) {
-        buffer.setLED(i, color);
+        // buffer.setLED(i, color);
       }
     }
   }
@@ -324,10 +325,10 @@ public class CatzLED extends VirtualSubsystem {
 
   private void solid(double percent, Color color) {
     for (int i = 0; i < MathUtil.clamp(length * percent, 0, length); i++) {
-      buffer.setLED(i, color);
+      // buffer.setLED(i, color);
     }
     for (int i = (int) Math.ceil(MathUtil.clamp(length * percent, 0, length)); i<length; i++) {
-      buffer.setLED(i, Color.kBlack);
+      // buffer.setLED(i, Color.kBlack);
     }
   }
 
@@ -335,12 +336,12 @@ public class CatzLED extends VirtualSubsystem {
     //System.out.println("big bubble" + colored);
     for (int i=0; i<LED_Crossbar_Start; i++) {
       if (i <= colored && ((i - colored % bubbleInterval) + bubbleInterval) % bubbleInterval < bubbleLength) {
-        buffer.setLED(i, color);
-        buffer.setLED(LED_Sidebar_End_LT-i, color);
+        // buffer.setLED(i, color);
+        // buffer.setLED(LED_Sidebar_End_LT-i, color);
       }
       else {
-        buffer.setLED(i, Color.kBlack);
-        buffer.setLED(LED_Sidebar_End_LT-i, Color.kBlack);
+        // buffer.setLED(i, Color.kBlack);
+        // buffer.setLED(LED_Sidebar_End_LT-i, Color.kBlack);
       }
     }
     // buffer.setLED(47, Color.kBlack);

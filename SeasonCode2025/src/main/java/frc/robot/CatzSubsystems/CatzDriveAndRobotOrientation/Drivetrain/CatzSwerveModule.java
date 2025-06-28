@@ -93,7 +93,7 @@ public class CatzSwerveModule {
   public void periodic() {
     // Process and Log Module Inputs
     io.updateInputs(inputs);
-    Logger.processInputs("RealInputs/Drive/Motors " + m_moduleName, inputs);
+    //.processInputs("RealInputs/Drive/Motors " + m_moduleName, inputs);
 
     // Update ff and controllers
     LoggedTunableNumber.ifChanged(
@@ -109,13 +109,13 @@ public class CatzSwerveModule {
   } // -End of CatzSwerveModule Periodic
 
   public void debugLogsSwerve() {
-    Logger.recordOutput("Module " + m_moduleName + "/drive recorded fps", Units.metersToFeet(Conversions.RPSToMPS(inputs.driveVelocityRPS)));
-    Logger.recordOutput("Module " + m_moduleName + "/drive target fps", Units.metersToFeet(m_swerveModuleState.speedMetersPerSecond));
-    Logger.recordOutput("Module " + m_moduleName + "/currentmodule state", m_swerveModuleState.angle.getRadians());
-    Logger.recordOutput("Module " + m_moduleName + "/angle error deg", Math.toDegrees(m_swerveModuleState.angle.getRadians() - getAbsEncRadians()));
-    Logger.recordOutput("Module " + m_moduleName + "/currentmoduleangle rad", getAbsEncRadians());
-    Logger.recordOutput("Module " + m_moduleName + "/current absolute enc", inputs.rawAbsEncValueRotation);
-    // Logger.recordOutput("Module " + m_moduleName + "/targetmoduleangle rad",
+    //.recordOutput("Module " + m_moduleName + "/drive recorded fps", Units.metersToFeet(Conversions.RPSToMPS(inputs.driveVelocityRPS)));
+    //.recordOutput("Module " + m_moduleName + "/drive target fps", Units.metersToFeet(m_swerveModuleState.speedMetersPerSecond));
+    //.recordOutput("Module " + m_moduleName + "/currentmodule state", m_swerveModuleState.angle.getRadians());
+    //.recordOutput("Module " + m_moduleName + "/angle error deg", Math.toDegrees(m_swerveModuleState.angle.getRadians() - getAbsEncRadians()));
+    //.recordOutput("Module " + m_moduleName + "/currentmoduleangle rad", getAbsEncRadians());
+    //.recordOutput("Module " + m_moduleName + "/current absolute enc", inputs.rawAbsEncValueRotation);
+    // //.recordOutput("Module " + m_moduleName + "/targetmoduleangle rad",
     // m_swerveModuleState.angle.getRadians());
 
     // SmartDashboard.putNumber("absencposrad" + m_moduleName,
@@ -194,7 +194,7 @@ public class CatzSwerveModule {
   public SwerveModuleState getModuleState() {
     double velocityMPS = CatzMathUtils.Conversions.RPSToMPS(inputs.driveVelocityRPS);
 
-    Logger.recordOutput("Module " + m_moduleName + "/velocityMPS", velocityMPS);
+    //.recordOutput("Module " + m_moduleName + "/velocityMPS", velocityMPS);
     return new SwerveModuleState(velocityMPS, getCurrentRotation());
   }
 

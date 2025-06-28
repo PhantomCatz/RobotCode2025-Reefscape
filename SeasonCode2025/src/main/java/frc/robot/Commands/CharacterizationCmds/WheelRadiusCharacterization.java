@@ -103,11 +103,11 @@ public class WheelRadiusCharacterization extends Command {
     }
     currentEffectiveWheelRadius = (accumGyroYawRads * driveRadius) / (averageWheelPosition / DriveConstants.MODULE_GAINS_AND_RATIOS.driveReduction());
 
-    Logger.recordOutput("Drive/RadiusCharacterization/DrivePosition", averageWheelPosition);
-    Logger.recordOutput("Drive/RadiusCharacterization/AccumGyroYawRads", accumGyroYawRads);
-    Logger.recordOutput(
-        "Drive/RadiusCharacterization/CurrentWheelRadiusInches",
-        Units.metersToInches(currentEffectiveWheelRadius));
+    //.recordOutput("Drive/RadiusCharacterization/DrivePosition", averageWheelPosition);
+    //.recordOutput("Drive/RadiusCharacterization/AccumGyroYawRads", accumGyroYawRads);
+    //.recordOutput(
+        // "Drive/RadiusCharacterization/CurrentWheelRadiusInches",
+        // Units.metersToInches(currentEffectiveWheelRadius));
   } // end of execute()
 
   // -----------------------------------------------------------------------------------------------

@@ -71,7 +71,7 @@ public class CatzIntakeRollers extends SubsystemBase {
     @Override
     public void periodic() {
         io.updateInputs(inputs);
-        Logger.processInputs("RealInputs/IntakeRollers", inputs);
+        //.processInputs("RealInputs/IntakeRollers", inputs);
 
         if(DriverStation.isDisabled()) {
             currentState = intakeRollersStates.STOP;
@@ -105,7 +105,7 @@ public class CatzIntakeRollers extends SubsystemBase {
             break;
         }
 
-        Logger.recordOutput("IntakeRoller/State", currentState.toString());
+        //.recordOutput("IntakeRoller/State", currentState.toString());
         previousState = currentState;
 
     }

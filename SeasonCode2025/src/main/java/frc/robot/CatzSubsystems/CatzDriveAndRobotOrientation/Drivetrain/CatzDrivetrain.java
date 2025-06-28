@@ -125,7 +125,7 @@ public class CatzDrivetrain extends SubsystemBase {
     // Logging callback for target robot pose
     PathPlannerLogging.setLogTargetPoseCallback(
         (pose) -> {
-          Logger.recordOutput("Drive/targetPos", pose);
+          //.recordOutput("Drive/targetPos", pose);
           field.getObject("target pose").setPose(pose);
         });
 
@@ -156,10 +156,10 @@ public class CatzDrivetrain extends SubsystemBase {
       module.periodic();
     }
 
-    Logger.recordOutput("Drive/DistanceError", distanceError);
+    //.recordOutput("Drive/DistanceError", distanceError);
 
     pose = pose.interpolate(tracker.getEstimatedPose(), 0.05);
-    Logger.recordOutput("CatzRobotTracker/interpolated pose", pose);
+    //.recordOutput("CatzRobotTracker/interpolated pose", pose);
 
     // -----------------------------------------------------------------------------------------------------
     // Attempt to update gyro inputs and log
@@ -169,7 +169,7 @@ public class CatzDrivetrain extends SubsystemBase {
     } catch (Exception e) {
 
     }
-    Logger.processInputs("RealInputs/Drive/gyro ", gyroInputs);
+    //.processInputs("RealInputs/Drive/gyro ", gyroInputs);
     // NOTE Gyro needs to be firmly mounted to rio for accurate results.
     // Set Gyro Disconnect alert to go off when gyro is disconnected
     if (Robot.isReal()) {
@@ -207,9 +207,9 @@ public class CatzDrivetrain extends SubsystemBase {
     // Logging
     // --------------------------------------------------------------
     SmartDashboard.putNumber("Heading", getGyroHeading());
-    Logger.recordOutput("Drive/Odometry module states", getModuleStates());
-    Logger.recordOutput("Drive/Odometry wheel positions", wheelPositions);
-    Logger.recordOutput("Drive/Odometry robot velocity", robotRelativeVelocity);
+    //.recordOutput("Drive/Odometry module states", getModuleStates());
+    //.recordOutput("Drive/Odometry wheel positions", wheelPositions);
+    //.recordOutput("Drive/Odometry robot velocity", robotRelativeVelocity);
   } // end of drivetrain periodic
 
   // --------------------------------------------------------------------------------------------------------------------------
@@ -243,8 +243,8 @@ public class CatzDrivetrain extends SubsystemBase {
     // Logging
     // --------------------------------------------------------
 
-    Logger.recordOutput("Drive/chassispeeds", descreteSpeeds);
-    Logger.recordOutput("Drive/modulestates", optimizedDesiredStates);
+    //.recordOutput("Drive/chassispeeds", descreteSpeeds);
+    //.recordOutput("Drive/modulestates", optimizedDesiredStates);
   }
   public void d(ChassisSpeeds s){
     //nothing
@@ -393,7 +393,7 @@ public class CatzDrivetrain extends SubsystemBase {
   }
 
   /** Returns the measured speeds of the robot in the robot's frame of reference. */
-  @AutoLogOutput(key = "Drive/MeasuredSpeeds")
+  //(key = "Drive/MeasuredSpeeds")
   private Twist2d getTwist2dSpeeds() {
     return DriveConstants.SWERVE_KINEMATICS.toTwist2d(getModulePositions());
   }
