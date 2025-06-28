@@ -3,10 +3,12 @@ package frc.robot;
 
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import frc.robot.Autonomous.AutoRoutineSelector;
 import frc.robot.CatzConstants.RobotHardwareMode;
 import frc.robot.CatzConstants.RobotID;
 import frc.robot.CatzSubsystems.CatzAlgaeEffector.CatzAlgaePivot.CatzAlgaePivot;
@@ -225,6 +227,9 @@ public class Robot extends LoggedRobot {
     }
 
     DriverStation.silenceJoystickConnectionWarning(true);
+
+    SmartDashboard.putData("Auton Selector", AutoRoutineSelector.Instance.getAutoChooser());
+    // CommandScheduler.getInstance().setPeriod(CatzConstants.LOOP_TIME); //TODO should we add this?
   }
 
   @Override

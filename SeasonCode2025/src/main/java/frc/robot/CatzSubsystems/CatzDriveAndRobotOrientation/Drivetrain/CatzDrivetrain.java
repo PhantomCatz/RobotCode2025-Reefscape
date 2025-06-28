@@ -5,6 +5,7 @@ import static frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.Drivetrain.D
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.pathplanner.lib.util.PathPlannerLogging;
 
+import choreo.trajectory.SwerveSample;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Twist2d;
@@ -351,6 +352,10 @@ public class CatzDrivetrain extends SubsystemBase {
     for (CatzSwerveModule module : m_swerveModules) {
       module.resetDriveEncs();
     }
+  }
+
+  public void followChoreoTrajectory(SwerveSample sample){
+    //TODO implement. It will be basically the same thing as the trajectory follow command.
   }
 
   // -----------------------------------------------------------------------------------------------------------
