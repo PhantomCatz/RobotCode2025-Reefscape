@@ -63,6 +63,10 @@ public class CatzAlgaePivot extends SubsystemBase {
           io = new AlgaePivotIOReal() {};
           System.out.println("Algae Pivot Configured for Replayed simulation");
         break;
+        case SIM:
+          io = new AlgaePivotIOSim() {};
+          System.out.println("Algae Pivot Configured for Simulation");
+          break;
         default:
           io = new AlgaePivotIONull();
           System.out.println("Algae Pivot Unconfigured");

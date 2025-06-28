@@ -16,8 +16,6 @@ import edu.wpi.first.wpilibj.DriverStation;
 
 import org.littletonrobotics.junction.Logger;
 
-
-
 public class CatzElevator extends SubsystemBase {
   public static final CatzElevator Instance = new CatzElevator();
 
@@ -73,12 +71,17 @@ public class CatzElevator extends SubsystemBase {
           io = new ElevatorIOReal() {};
           System.out.println("Elevator Configured for Replayed simulation");
         break;
+        case SIM:
+          io = new ElevatorIOSim();
+          System.out.println("Elevator Configured for Simulation");
+        break;
         default:
           io = new ElevatorIONull();
           System.out.println("Elevator Unconfigured");
         break;
       }
     }
+    // SmartDashboard.putData("Mech2d", m_mech2d);
   }
 
   @Override
@@ -162,7 +165,6 @@ public class CatzElevator extends SubsystemBase {
       // Setpoint PID
       if(targetPosition == ElevatorPosition.PosStow) {
         // Safety Stow
-
         if(getElevatorPositionInch() < 2.0) {
           io.stop();
         } else {
@@ -171,6 +173,8 @@ public class CatzElevator extends SubsystemBase {
       } else {
         //Setpoint PID
         io.runSetpointUp(targetPosition.getTargetPositionInch());
+
+
       }
     } else if (targetPosition == ElevatorPosition.PosManual) {
       io.runMotor(elevatorSpeed);
@@ -187,11 +191,12 @@ public class CatzElevator extends SubsystemBase {
     //----------------------------------------------------------------------------------------------------------------------------
 
 
-    Logger.recordOutput("Elevator/CurrentRadians", getElevatorPositionInch());
+    Logger.recordOutput("Elevator/CurrentPosition", getElevatorPositionInch());
     Logger.recordOutput("Elevator/prevtargetPosition", prevTargetPositon.getTargetPositionInch());
     Logger.recordOutput("Elevator/logged prev targetPosition", previousLoggedPosition.getTargetPositionInch());
     Logger.recordOutput("Elevator/isElevatorInPos", isElevatorInPosition());
     Logger.recordOutput("Elevator/targetPosition", targetPosition.getTargetPositionInch());
+
 
     // Target Postioin Logging
     previousLoggedPosition = targetPosition;

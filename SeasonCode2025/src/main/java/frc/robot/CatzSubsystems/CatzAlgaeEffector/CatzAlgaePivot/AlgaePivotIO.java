@@ -33,9 +33,9 @@ public interface AlgaePivotIO {
 
   public default void runCharacterizationMotor(double input) {}
 
-  public default void runSetpointUp(double setpointRotations, double feedforward) {}
+  public default void runSetpointUp(double setpointDegrees, double feedforward) {}
 
-  public default void runSetpointDown(double setpointRotations, double feedforward) {}
+  public default void runSetpointDown(double setpointDegrees, double feedforward) {}
 
 
 }

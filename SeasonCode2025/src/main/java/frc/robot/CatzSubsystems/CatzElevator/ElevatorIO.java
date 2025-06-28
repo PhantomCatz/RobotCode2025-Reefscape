@@ -38,9 +38,9 @@ public interface ElevatorIO {
 
   public default void runCharacterizationMotor(double input) {}
 
-  public default void runSetpointUp(double setpointRotations) {}
+  public default void runSetpointUp(double setpointInches) {}
 
-  public default void runSetpointDown(double setpointRotations) {}
+  public default void runSetpointDown(double setpointInches) {}
 
   public default void setPosition(double pos) {}
 
