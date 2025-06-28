@@ -1,6 +1,7 @@
 package frc.robot;
 
 
+import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -24,6 +25,7 @@ import frc.robot.Utilities.MotorUtil.NeutralMode;
 import lombok.Getter;
 import frc.robot.Utilities.VirtualSubsystem;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
@@ -101,6 +103,8 @@ public class Robot extends LoggedRobot {
 
   private final RobotContainer container = RobotContainer.Instance;
   private final CatzLED LED = CatzLED.Instance;
+
+  private static Pose3d[] simMechanismPoses = new Pose3d[3];
 
   // --------------------------------------------------------------------------------------------------------
   //
@@ -229,6 +233,7 @@ public class Robot extends LoggedRobot {
     DriverStation.silenceJoystickConnectionWarning(true);
 
     SmartDashboard.putData("Auton Selector", AutoRoutineSelector.Instance.getAutoChooser());
+
     // CommandScheduler.getInstance().setPeriod(CatzConstants.LOOP_TIME); //TODO should we add this?
   }
 
@@ -413,4 +418,8 @@ public class Robot extends LoggedRobot {
 
   @Override
   public void testExit() {}
+
+  public static void setSimPose(int index, Pose3d pose) {
+    simMechanismPoses[index] = pose;
+  }
 }

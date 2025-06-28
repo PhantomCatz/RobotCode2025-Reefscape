@@ -1,6 +1,7 @@
 package frc.robot.CatzSubsystems.CatzElevator;
 
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.util.Units;
 import frc.robot.CatzConstants;
 import frc.robot.Utilities.LoggedTunableNumber;
@@ -20,6 +21,7 @@ public class ElevatorConstants {
 
     //inches TODO tune
     public static final double STOW_HEIGHT = 1.0;
+    public static final double START_HEIGHT_GROUND = 5.0;
     public static final double COAST_STOW_HEIGHT = 0.0;
     public static final double L1_HEIGHT   = 11.0; //5.6
     public static final double L2_HEIGHT   = 16.622;
@@ -29,6 +31,8 @@ public class ElevatorConstants {
     public static final double ALGAE_BOT   = 4.766847290;
     public static final double BOT_BOT_ALGAE = 25.6; //15.6
     public static final double BOT_TOP_ALGAE = 42.7; //35.7
+
+    public static final Translation3d ELEVATOR_SIM_OFFSET = new Translation3d(0, 0, 0);
     // Motor ID
     public static final int LEFT_LEADER_ID  = 31;
     public static final int RIGHT_FOLLOWER_ID = 30;

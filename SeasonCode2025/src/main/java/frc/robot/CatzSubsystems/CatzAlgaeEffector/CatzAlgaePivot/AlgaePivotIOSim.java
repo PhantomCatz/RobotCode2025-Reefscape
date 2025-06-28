@@ -9,7 +9,7 @@ import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
 import frc.robot.CatzSubsystems.CatzElevator.CatzElevator;
-import frc.robot.CatzSubsystems.CatzElevator.ElevatorIOSim;
+import frc.robot.CatzSubsystems.CatzElevator.ElevatorConstants;
 
 public class AlgaePivotIOSim implements AlgaePivotIO{
     private final DCMotor m_algaePivotGearbox = DCMotor.getKrakenX60Foc(1);
@@ -17,6 +17,10 @@ public class AlgaePivotIOSim implements AlgaePivotIO{
     private double targetRotations;
     private double algaePivotVelocityRadiansPerSecond;
     private double elevatorHeightInch;
+    private final int ALGAE_PIVOT_INDEX = 2;
+    private Pose3d[] algaePivotPose3d = new Pose3d[] {
+        new Pose3d(0.0, 0.0, Units.inchesToMeters(ElevatorConstants.START_HEIGHT_GROUND), new Rotation3d(0.0, Math.PI / 2, 0.0))
+    };
     
     private PIDController simPidController = new PIDController(0.1, 0.0, 0.0);
     private final SingleJointedArmSim m_algaePivotSim = 
@@ -45,8 +49,7 @@ public class AlgaePivotIOSim implements AlgaePivotIO{
         algaePivotVelocityRadiansPerSecond = m_algaePivotSim.getVelocityRadPerSec();
         Logger.recordOutput("Algae Pivot/SimCurrentRadiansPerSecond", algaePivotVelocityRadiansPerSecond);
         elevatorHeightInch = CatzElevator.Instance.getElevatorPositionInch();
-        Logger.recordOutput("FinalComponentPoses", new Pose3d[] {new Pose3d(0.0, 0.0, Units.inchesToMeters(elevatorHeightInch) / 2, new Rotation3d(0.0, Math.PI / 2, 0.0)),
-                                                                new Pose3d(0.0, 0.0, Units.inchesToMeters(elevatorHeightInch+1.0), new Rotation3d(0.0, Math.PI / 2, 0.0))});
+        algaePivotPose3d[0] = new Pose3d(0.0, 0.0, elevatorHeightInch, new Rotation3d(0.0, Units.radiansToRotations(currentRotations), 0.0));
     }
 
     @Override
@@ -57,5 +60,9 @@ public class AlgaePivotIOSim implements AlgaePivotIO{
     @Override
     public void runSetpointDown(double targetDegrees, double feedforwardVolts) {
         targetRotations = Units.degreesToRotations(targetDegrees) * AlgaePivotConstants.ALGAE_PIVOT_GEAR_REDUCTION;
+    }
+
+    public Pose3d[] getAlgaePivotPose3d() {
+        return algaePivotPose3d;
     }
 }

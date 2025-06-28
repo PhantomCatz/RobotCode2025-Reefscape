@@ -21,9 +21,11 @@ import org.littletonrobotics.junction.mechanism.LoggedMechanismRoot2d;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.simulation.ElevatorSim;
+import frc.robot.Robot;
 
 public class ElevatorIOSim implements ElevatorIO{
   
@@ -33,6 +35,12 @@ public class ElevatorIOSim implements ElevatorIO{
   private double currentRotations;
   private double elevatorVelocity;
   private double elevatorPositionInches;
+  private final int ELEVATOR1_INDEX = 0;
+  private final int ELEVATOR2_INDEX = 1;
+  private Pose3d[] elevatorPose3d = {
+    new Pose3d(0.0, 0.0, Units.inchesToMeters(ElevatorConstants.START_HEIGHT_GROUND), new Rotation3d(0.0, Math.PI / 2, 0.0)),
+    new Pose3d(0.0, 0.0, Units.inchesToMeters(ElevatorConstants.START_HEIGHT_GROUND+1), new Rotation3d(0.0, Math.PI / 2, 0.0))
+  };
 
   private PIDController simPidController = new PIDController(0.1, 0.0, 0.0);
   private final ElevatorSim m_elevatorSim =
@@ -69,8 +77,8 @@ public class ElevatorIOSim implements ElevatorIO{
     elevatorPositionInches = Units.metersToInches(m_elevatorSim.getPositionMeters());
     Logger.recordOutput("Elevator/SimCurrentSpeedMetersPerSecond", elevatorVelocity);
     Logger.recordOutput("Elevator/SimCurrentPositionInches", elevatorPositionInches);
-    Logger.recordOutput("FinalComponentPoses", new Pose3d[] {new Pose3d(0.0, 0.0, Units.inchesToMeters(elevatorPositionInches) / 2, new Rotation3d(0.0, Math.PI / 2, 0.0)),
-                                                             new Pose3d(0.0, 0.0, Units.inchesToMeters(elevatorPositionInches+1.0), new Rotation3d(0.0, Math.PI / 2, 0.0))});
+    Robot.setSimPose(ELEVATOR1_INDEX, new Pose3d(new Translation3d(0.0, 0.0, Units.inchesToMeters(elevatorPositionInches/2)).plus(ElevatorConstants.ELEVATOR_SIM_OFFSET), new Rotation3d(0.0, Math.PI / 2, 0.0)));
+    Robot.setSimPose(ELEVATOR2_INDEX, new Pose3d(new Translation3d(0.0, 0.0, Units.inchesToMeters(elevatorPositionInches + 1)).plus(ElevatorConstants.ELEVATOR_SIM_OFFSET), new Rotation3d(0.0, Math.PI / 2, 0.0)));
     mechanismElevator.setLength(0.5 + Units.inchesToMeters(elevatorPositionInches));
     Logger.recordOutput("Mechanism2d/Elevator", mechanism);
   }
@@ -90,5 +98,9 @@ public class ElevatorIOSim implements ElevatorIO{
 
   public double getElevatorPositionInch(){
     return elevatorPositionInches;
+  }
+
+  public Pose3d[] getElevatorPose3d() {
+    return elevatorPose3d;
   }
 }
