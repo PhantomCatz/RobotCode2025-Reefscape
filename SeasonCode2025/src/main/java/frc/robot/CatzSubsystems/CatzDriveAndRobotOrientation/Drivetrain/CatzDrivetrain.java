@@ -376,7 +376,7 @@ public class CatzDrivetrain extends SubsystemBase {
 
   /**
    * This function only runs the "execute" portion of a command. Initialization and ending should be done elsewhere.
-   * 
+   *
    * @param sample
    */
   public void followChoreoTrajectoryExecute(SwerveSample sample){
@@ -391,6 +391,8 @@ public class CatzDrivetrain extends SubsystemBase {
     Pose2d curPose = CatzRobotTracker.Instance.getEstimatedPose();
     ChassisSpeeds adjustedSpeeds = hoController.calculate(curPose, state, Rotation2d.fromRadians(sample.heading));
 
+    Logger.recordOutput("Target Auton Pose", new Pose2d(sample.x, sample.y, Rotation2d.fromRadians(sample.heading)));
+    System.out.println("following choreooo");
     drive(adjustedSpeeds);
   }
 

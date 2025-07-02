@@ -11,6 +11,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.FunctionalCommand;
+import edu.wpi.first.wpilibj2.command.PrintCommand;
 import frc.robot.CatzConstants;
 import frc.robot.CatzSubsystems.CatzSuperstructure;
 import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.CatzRobotTracker;
@@ -27,7 +28,7 @@ public class AutoRoutineBase {
 
     protected void prepRoutine(Command... sequence){
         routine.active().onTrue(
-            Commands.sequence(sequence)
+            Commands.sequence(sequence).alongWith(new PrintCommand("asdfasdfasdf"))
         );
     }
 
@@ -65,7 +66,7 @@ public class AutoRoutineBase {
     }
 
     protected Command followTrajectoryWithAccuracy(AutoTrajectory traj){
-        return Commands.defer(() -> 
+        return Commands.defer(() ->
                                 new FunctionalCommand
                                 (
                                     () -> {CatzDrivetrain.Instance.followChoreoTrajectoryInit(); traj.cmd().initialize();},
@@ -80,6 +81,7 @@ public class AutoRoutineBase {
     private boolean isAtPose(AutoTrajectory trajectory){
         boolean isAtTrans = translationIsFinished(trajectory, AutonConstants.ACCEPTABLE_DIST_METERS);
         boolean isAtRot = rotationIsFinished(trajectory, AutonConstants.ACCEPTABLE_ANGLE_DEG);
+        System.out.println("finished? " + isAtRot + isAtTrans);
 
         return isAtTrans && isAtRot;
     }
@@ -94,6 +96,7 @@ public class AutoRoutineBase {
     private boolean translationIsFinished(AutoTrajectory trajectory, double epsilonDist) {
 		Pose2d currentPose = CatzRobotTracker.Instance.getEstimatedPose();
 		Pose2d finalPose = trajectory.getFinalPose().get();
+
 
 		return currentPose.getTranslation().getDistance(finalPose.getTranslation()) < epsilonDist;
 	}

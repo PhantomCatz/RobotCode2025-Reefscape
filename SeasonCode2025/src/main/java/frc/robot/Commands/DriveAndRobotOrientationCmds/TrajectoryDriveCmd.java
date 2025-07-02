@@ -118,15 +118,6 @@ public class TrajectoryDriveCmd extends Command {
         usePath = path.flipPath();
       }
 
-      // Pose Reseting
-      if (Robot.isFirstPath && DriverStation.isAutonomous()) {
-        try {
-          tracker.resetPose(usePath.getStartingHolonomicPose().get());
-          Robot.isFirstPath = false;
-        } catch (NoSuchElementException e) {
-          e.printStackTrace();
-        }
-      }
       startRot = tracker.getEstimatedPose().getRotation();
 
       // Collect current drive state

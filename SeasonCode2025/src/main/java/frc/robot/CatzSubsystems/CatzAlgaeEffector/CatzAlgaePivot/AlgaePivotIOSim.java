@@ -17,18 +17,18 @@ public class AlgaePivotIOSim implements AlgaePivotIO{
     private double targetRotations;
     private double algaePivotVelocityRadiansPerSecond;
     private double elevatorHeightInch;
-    
+
     private PIDController simPidController = new PIDController(0.1, 0.0, 0.0);
-    private final SingleJointedArmSim m_algaePivotSim = 
+    private final SingleJointedArmSim m_algaePivotSim =
     new SingleJointedArmSim(
-        m_algaePivotGearbox, 
-        AlgaePivotConstants.ALGAE_PIVOT_GEAR_REDUCTION, 
-        1584.0, 
-        Units.inchesToMeters(16.0), 
-        -Math.PI / 2, 
-        Math.PI / 2, 
-        true, 
-        Units.degreesToRadians(AlgaePivotConstants.PIVOT_INITIAL_POS), 
+        m_algaePivotGearbox,
+        AlgaePivotConstants.ALGAE_PIVOT_GEAR_REDUCTION,
+        1584.0,
+        Units.inchesToMeters(16.0),
+        -Math.PI / 2,
+        Math.PI / 2,
+        true,
+        Units.degreesToRadians(AlgaePivotConstants.PIVOT_INITIAL_POS),
         0.01,
         0.0);
 
