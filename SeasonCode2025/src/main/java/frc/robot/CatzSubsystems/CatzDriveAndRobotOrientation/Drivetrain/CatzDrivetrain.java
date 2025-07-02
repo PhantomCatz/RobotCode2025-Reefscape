@@ -368,7 +368,7 @@ public class CatzDrivetrain extends SubsystemBase {
 
   /**
    * This function only runs the "execute" portion of a command. Initialization and ending should be done elsewhere.
-   * 
+   *
    * @param sample
    */
   public void followChoreoTrajectoryExecute(SwerveSample sample){

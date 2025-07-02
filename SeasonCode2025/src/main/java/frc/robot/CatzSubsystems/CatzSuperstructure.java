@@ -189,7 +189,7 @@ public class CatzSuperstructure extends VirtualSubsystem {
             CatzIntakeRollers.Instance.stopIntaking(),
             CatzElevator.Instance.Elevator_Stow(),
             new InstantCommand(() -> currentRobotState = RobotState.STOW)
-        ).unless(()-> Robot.isSimulation()).alongWith(Commands.print("Stow"));
+        ).alongWith(Commands.print("Stow"));
     }
 
     public Command intakeCoralStation() {
@@ -201,7 +201,7 @@ public class CatzSuperstructure extends VirtualSubsystem {
             CatzElevator.Instance.Elevator_Stow(),
             CatzRampPivot.Instance.Ramp_Intake_Pos(),
             CatzIntakeRollers.Instance.intake()
-        ).unless(()-> Robot.isSimulation()).alongWith(Commands.print("Intake Coral Station")).andThen(new InstantCommand(() -> TeleopPosSelector.Instance.hasCoralSIM = true));
+        ).alongWith(Commands.print("Intake Coral Station")).andThen(new InstantCommand(() -> TeleopPosSelector.Instance.hasCoralSIM = true));
     }
 
     public Command intakeAlgae() {
@@ -214,7 +214,7 @@ public class CatzSuperstructure extends VirtualSubsystem {
             CatzRampPivot.Instance.Ramp_Intake_Pos(),
             CatzIntakeRollers.Instance.stopIntaking()
 
-        ).unless(()-> Robot.isSimulation()).alongWith(Commands.print("intakeAlgae"));
+        ).alongWith(Commands.print("intakeAlgae"));
     }
 
     public Command L1Coral() {
@@ -231,7 +231,7 @@ public class CatzSuperstructure extends VirtualSubsystem {
                 CatzOuttake.Instance.outtakeL1()
             )
         )//.onlyIf(() -> CatzSuperstructure.getCurrentCoralState() == CoralState.IN_OUTTAKE)
-        .unless(()-> Robot.isSimulation()).alongWith(Commands.print("L1 Scoring State"));
+        .alongWith(Commands.print("L1 Scoring State"));
     }
 
     public Command L2Coral() {
@@ -248,7 +248,7 @@ public class CatzSuperstructure extends VirtualSubsystem {
                 CatzOuttake.Instance.startOuttake()
             )
         )//.onlyIf(() -> CatzSuperstructure.getCurrentCoralState() == CoralState.IN_OUTTAKE)
-         .unless(()-> Robot.isSimulation()).alongWith(Commands.print("L2 Scoring State")).unless(()-> Robot.isSimulation());
+        .alongWith(Commands.print("L2 Scoring State"));
     }
 
     public Command L3Coral() {
@@ -265,7 +265,7 @@ public class CatzSuperstructure extends VirtualSubsystem {
                 CatzOuttake.Instance.startOuttake()
             )
         )//.onlyIf(() -> CatzSuperstructure.getCurrentCoralState() == CoralState.IN_OUTTAKE)
-         .unless(()-> Robot.isSimulation()).alongWith(Commands.print("L3 scoring state"));
+        .alongWith(Commands.print("L3 scoring state"));
     }
 
     public Command L4Coral() {
@@ -284,7 +284,7 @@ public class CatzSuperstructure extends VirtualSubsystem {
                 Commands.waitUntil(() -> CatzElevator.Instance.isElevatorInPos()).withTimeout(2.0)
             )
         )
-         .unless(()-> Robot.isSimulation()).alongWith(Commands.print("L4 Scoring State"));
+        .alongWith(Commands.print("L4 Scoring State"));
     }
 
     public Command LXCoral(int level){
@@ -373,7 +373,7 @@ public class CatzSuperstructure extends VirtualSubsystem {
             // Commands.waitUntil(() -> CatzRampPivot.Instance.isSafeToRaiseElevator()),
             // new PrintCommand("safe to raise CatzElevator.Instance!!"),
             CatzElevator.Instance.Elevator_LX(level)
-        ).unless(()-> Robot.isSimulation()).alongWith(Commands.print("L" + level+" CatzElevator.Instance Raise")).unless(()-> Robot.isSimulation());
+        ).alongWith(Commands.print("L" + level+" CatzElevator.Instance Raise"));
     }
 
     public Command botAlgae() {
@@ -392,7 +392,7 @@ public class CatzSuperstructure extends VirtualSubsystem {
                 CatzAlgaePivot.Instance.AlgaePivot_BotBot(),
                 CatzAlgaeRemover.Instance.eatAlgae()
             )
-        ).unless(()-> Robot.isSimulation()).alongWith(Commands.print("Bot Algae"));
+        ).alongWith(Commands.print("Bot Algae"));
     }
 
     public Command topAlgae() {
@@ -407,7 +407,7 @@ public class CatzSuperstructure extends VirtualSubsystem {
                 CatzAlgaePivot.Instance.AlgaePivot_BotTop().alongWith(Commands.waitSeconds(0.2)),
                 CatzAlgaeRemover.Instance.eatAlgae()
             )
-        ).unless(()-> Robot.isSimulation()).alongWith(Commands.print("Top Algae"));
+        ).alongWith(Commands.print("Top Algae"));
     }
 
      public Command XAlgae(int level){
@@ -432,7 +432,7 @@ public class CatzSuperstructure extends VirtualSubsystem {
             CatzIntakeRollers.Instance.stopIntaking(),
             CatzElevator.Instance.Elevator_Coast_Stow(),
             CatzAlgaeRemover.Instance.holdAlgae()
-        ).unless(()-> Robot.isSimulation()).alongWith(Commands.print("Stow"));
+        ).alongWith(Commands.print("Stow"));
     }
 
     public Command extendClimb() {
@@ -446,7 +446,7 @@ public class CatzSuperstructure extends VirtualSubsystem {
             ).alongWith(Commands.waitSeconds(0.1)), //TBD TESITNG
 
             CatzClimb.Instance.extendClimb()
-        ).unless(()-> Robot.isSimulation()).alongWith(Commands.print("EXTENDING CLIMB/////////////////////////////"));
+        ).alongWith(Commands.print("EXTENDING CLIMB/////////////////////////////"));
     }
 
 

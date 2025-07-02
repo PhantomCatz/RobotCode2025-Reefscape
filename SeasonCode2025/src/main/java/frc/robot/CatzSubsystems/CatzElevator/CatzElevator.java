@@ -169,11 +169,12 @@ public class CatzElevator extends SubsystemBase {
           io.stop();
         } else {
           io.runSetpointDown(targetPosition.getTargetPositionInch());
+          // System.out.println("setpoint down");
         }
       } else {
         //Setpoint PID
         io.runSetpointUp(targetPosition.getTargetPositionInch());
-
+        // System.out.println("setpoint up");
 
       }
     } else if (targetPosition == ElevatorPosition.PosManual) {

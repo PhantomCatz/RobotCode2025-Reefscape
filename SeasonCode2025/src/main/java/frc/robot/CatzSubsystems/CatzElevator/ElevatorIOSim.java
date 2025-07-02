@@ -1,14 +1,3 @@
-//------------------------------------------------------------------------------------
-// 2025 FRC 2637
-// https://github.com/PhantomCatz
-//
-// Use of this source code is governed by an MIT-style
-// license that can be found in the LICENSE file at
-// the root directory of this project. 
-//
-//        "6 hours of debugging can save you 5 minutes of reading documentation."
-//
-//------------------------------------------------------------------------------------
 package frc.robot.CatzSubsystems.CatzElevator;
 
 import static frc.robot.CatzSubsystems.CatzElevator.ElevatorConstants.FINAL_RATIO;
@@ -28,7 +17,7 @@ import edu.wpi.first.wpilibj.simulation.ElevatorSim;
 import frc.robot.Robot;
 
 public class ElevatorIOSim implements ElevatorIO{
-  
+
 
   private final DCMotor m_elevatorGearbox = DCMotor.getKrakenX60Foc(2);
   private double targetRotations;
@@ -87,13 +76,13 @@ public class ElevatorIOSim implements ElevatorIO{
   public void runSetpointUp(double setpointInches) {
       double setpointRotations = setpointInches / FINAL_RATIO;
       targetRotations = setpointRotations;
-
+    // System.out.println("New elevator target: "+targetRotations);
   }
   @Override
   public void runSetpointDown(double setpointInches) {
       double setpointRotations = setpointInches / FINAL_RATIO;
       targetRotations = setpointRotations;
-
+      // System.out.println("New elevator target: "+targetRotations);
   }
 
   public double getElevatorPositionInch(){

@@ -10,7 +10,7 @@ public interface AlgaePivotIO {
     public double positionDegrees = 0.0;
     public double sparkPosMechs;
     public double velocityRpm = 0.0;
-    public double velocityRads = 0.0;
+    public double velocityRadPerSecond = 0.0;
     public double appliedVolts = 0.0;
     public double supplyCurrentAmps = 0.0;
     public double torqueCurrentAmps = 0.0;

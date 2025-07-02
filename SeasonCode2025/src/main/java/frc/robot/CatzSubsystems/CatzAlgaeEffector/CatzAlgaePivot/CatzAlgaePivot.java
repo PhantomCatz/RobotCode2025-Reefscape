@@ -211,6 +211,7 @@ public class CatzAlgaePivot extends SubsystemBase {
     return runOnce(() -> setAlgaePivotPos(AlgaePivotPosition.AlgaeBotTransition));
   }
   public Command AlgaePivot_BotBot() {
+    System.out.println("bot bot");
     return runOnce(() -> setAlgaePivotPos(AlgaePivotPosition.BOTBOT));
   }
 
@@ -227,6 +228,7 @@ public class CatzAlgaePivot extends SubsystemBase {
   }
 
   public void setAlgaePivotPos(AlgaePivotPosition target) {
+    System.out.println("set pose");
     targetPosition = target;
   }
 

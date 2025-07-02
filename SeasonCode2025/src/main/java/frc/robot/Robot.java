@@ -419,6 +419,11 @@ public class Robot extends LoggedRobot {
   @Override
   public void testExit() {}
 
+  @Override
+  public void simulationPeriodic() {
+    Logger.recordOutput("FinalComponentPoses", simMechanismPoses);
+  }
+
   public static void setSimPose(int index, Pose3d pose) {
     simMechanismPoses[index] = pose;
   }
