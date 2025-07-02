@@ -12,7 +12,6 @@
 package frc.robot.CatzSubsystems.CatzIntakeRollers;
 import static frc.robot.CatzSubsystems.CatzIntakeRollers.IntakeRollersConstants.*;
 
-import org.littletonrobotics.junction.Logger;
 
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -23,7 +22,6 @@ import frc.robot.CatzSubsystems.CatzOuttake.CatzOuttake;
 import lombok.Getter;
 import lombok.Setter;
 
-import org.littletonrobotics.junction.Logger;
 
 public class CatzIntakeRollers extends SubsystemBase {
 

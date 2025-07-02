@@ -23,7 +23,6 @@ import frc.robot.CatzSubsystems.CatzSuperstructure.CoralState;
 import lombok.Getter;
 import lombok.Setter;
 
-import org.littletonrobotics.junction.Logger;
 
 public class CatzOuttake extends SubsystemBase {
 

@@ -21,7 +21,6 @@ import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.Drivetrain.DriveCon
 import frc.robot.Utilities.LoggedTunableNumber;
 import java.util.function.DoubleSupplier;
 import lombok.RequiredArgsConstructor;
-import org.littletonrobotics.junction.Logger;
 
 /**************************************************************************************************
  *

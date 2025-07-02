@@ -24,7 +24,6 @@ import frc.robot.Utilities.LoggedTunableNumber;
 import lombok.RequiredArgsConstructor;
 import edu.wpi.first.wpilibj.DriverStation;
 
-import org.littletonrobotics.junction.Logger;
 
 
 

@@ -30,7 +30,6 @@ import lombok.Setter;
 import java.util.List;
 import java.util.Optional;
 
-import org.littletonrobotics.junction.AutoLogOutput;
 
 public class CatzLED extends VirtualSubsystem {
   private static CatzLED instance = null;
@@ -306,7 +305,7 @@ public class CatzLED extends VirtualSubsystem {
         double red = (c1.red * (1 - ratio)) + (c2.red * ratio);
         double green = (c1.green * (1 - ratio)) + (c2.green * ratio);
         double blue = (c1.blue * (1 - ratio)) + (c2.blue * ratio);
-        // buffer.setLED(i, new Color(red, green, blue));      
+        // buffer.setLED(i, new Color(red, green, blue));
         }
     }
   }

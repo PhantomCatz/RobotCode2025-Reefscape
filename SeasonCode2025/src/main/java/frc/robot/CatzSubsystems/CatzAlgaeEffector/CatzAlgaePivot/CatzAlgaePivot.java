@@ -24,7 +24,6 @@ import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
 
 import lombok.RequiredArgsConstructor;
-import org.littletonrobotics.junction.Logger;
 
 public class CatzAlgaePivot extends SubsystemBase {
 

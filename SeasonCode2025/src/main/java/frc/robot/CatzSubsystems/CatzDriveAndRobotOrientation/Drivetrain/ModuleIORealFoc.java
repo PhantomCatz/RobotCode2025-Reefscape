@@ -29,7 +29,6 @@ import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.Voltage;
 import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.Drivetrain.DriveConstants.ModuleIDs;
-import org.littletonrobotics.junction.Logger;
 
 public class ModuleIORealFoc implements ModuleIO {
   // Hardware

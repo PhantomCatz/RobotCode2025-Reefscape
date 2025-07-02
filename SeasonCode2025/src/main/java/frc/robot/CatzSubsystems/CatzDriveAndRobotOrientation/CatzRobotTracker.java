@@ -28,14 +28,11 @@ import frc.robot.Utilities.GeomUtil;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.NoSuchElementException;
 import java.util.function.Supplier;
 
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.ExtensionMethod;
-import org.littletonrobotics.junction.AutoLogOutput;
-import org.littletonrobotics.junction.Logger;
 
 
 @ExtensionMethod({GeomUtil.class})

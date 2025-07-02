@@ -16,7 +16,6 @@ import frc.robot.CatzConstants;
 
 import static frc.robot.CatzSubsystems.CatzAlgaeEffector.CatzAlgaeRemover.AlgaeRemoverConstants.*;
 
-import org.littletonrobotics.junction.Logger;
 
 public class CatzAlgaeRemover extends SubsystemBase {
 

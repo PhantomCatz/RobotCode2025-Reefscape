@@ -13,25 +13,12 @@ package frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.Vision;
 
 import static frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.Vision.VisionConstants.*;
 
-import edu.wpi.first.math.VecBuilder;
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Alert.AlertType;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.Robot;
-import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.CatzRobotTracker;
-import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.CatzRobotTracker.TxTyObservation;
-import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.CatzRobotTracker.VisionObservation;
 import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.Vision.VisionIO.PoseObservation;
-import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.Vision.VisionIO.PoseObservationType;
 
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
 
-import org.littletonrobotics.junction.Logger;
 
 public class CatzVision extends SubsystemBase {
   private final VisionIO[] io;
@@ -79,152 +66,152 @@ public class CatzVision extends SubsystemBase {
 
   @Override
   public void periodic() {
-    for (int i = 0; i < io.length; i++) {
-      io[i].updateInputs(inputs[i]);
-      //.processInputs("RealInputs/Vision/Camera" + i, inputs[i]);
-    }
-    poseObservations = inputs[0].poseObservations;
+    // for (int i = 0; i < io.length; i++) {
+    //   io[i].updateInputs(inputs[i]);
+    //   //.processInputs("RealInputs/Vision/Camera" + i, inputs[i]);
+    // }
+    // poseObservations = inputs[0].poseObservations;
 
-    // Initialize logging values
-    List<Pose3d> allTagPoses = new LinkedList<>();
-    List<Pose3d> allRobotPoses = new LinkedList<>();
-    List<Pose3d> allRobotPosesAccepted = new LinkedList<>();
-    List<Pose3d> allRobotPosesRejected = new LinkedList<>();
-    Map<Integer, TxTyObservation> allTxTyObservations = new HashMap<>();
-    Map<Integer, TxTyObservation> txTyObservations = new HashMap<>();
-    Pose2d robotPose = CatzRobotTracker.getInstance().getEstimatedPose();
+    // // Initialize logging values
+    // List<Pose3d> allTagPoses = new LinkedList<>();
+    // List<Pose3d> allRobotPoses = new LinkedList<>();
+    // List<Pose3d> allRobotPosesAccepted = new LinkedList<>();
+    // List<Pose3d> allRobotPosesRejected = new LinkedList<>();
+    // Map<Integer, TxTyObservation> allTxTyObservations = new HashMap<>();
+    // Map<Integer, TxTyObservation> txTyObservations = new HashMap<>();
+    // Pose2d robotPose = CatzRobotTracker.getInstance().getEstimatedPose();
 
-    //------------------------------------------------------------------------------------------------------------------------------------
-    // Get Global Pose observation data
-    //------------------------------------------------------------------------------------------------------------------------------------
-    for (int cameraIndex = 0; cameraIndex < io.length; cameraIndex++) {
-      // Update disconnected alert
-      disconnectedAlerts[cameraIndex].set(!inputs[cameraIndex].connected);
+    // //------------------------------------------------------------------------------------------------------------------------------------
+    // // Get Global Pose observation data
+    // //------------------------------------------------------------------------------------------------------------------------------------
+    // for (int cameraIndex = 0; cameraIndex < io.length; cameraIndex++) {
+    //   // Update disconnected alert
+    //   disconnectedAlerts[cameraIndex].set(!inputs[cameraIndex].connected);
 
-      // Initialize logging values
-      List<Pose3d> tagPoses = new LinkedList<>();
-      List<Pose3d> robotPoses = new LinkedList<>();
-      List<Pose3d> robotPosesAccepted = new LinkedList<>();
-      List<Pose3d> robotPosesRejected = new LinkedList<>();
+    //   // Initialize logging values
+    //   List<Pose3d> tagPoses = new LinkedList<>();
+    //   List<Pose3d> robotPoses = new LinkedList<>();
+    //   List<Pose3d> robotPosesAccepted = new LinkedList<>();
+    //   List<Pose3d> robotPosesRejected = new LinkedList<>();
 
-      // Add tag poses
-      for (int tagId : inputs[cameraIndex].tagIds) {
-        var tagPose = aprilTagLayout.getTagPose(tagId);
-        if (tagPose.isPresent()) {
-          tagPoses.add(tagPose.get());
-        }
-      }
+    //   // Add tag poses
+    //   for (int tagId : inputs[cameraIndex].tagIds) {
+    //     var tagPose = aprilTagLayout.getTagPose(tagId);
+    //     if (tagPose.isPresent()) {
+    //       tagPoses.add(tagPose.get());
+    //     }
+    //   }
 
-      //------------------------------------------------------------------------------------------------------------------------------------
-      // Loop over pose observations for megatag 1 and 2
-      //------------------------------------------------------------------------------------------------------------------------------------
-      for (var observation : inputs[cameraIndex].poseObservations) {
-        if(inputs[cameraIndex].tagIds.length == 0){
-          continue;
-        }
+    //   //------------------------------------------------------------------------------------------------------------------------------------
+    //   // Loop over pose observations for megatag 1 and 2
+    //   //------------------------------------------------------------------------------------------------------------------------------------
+    //   for (var observation : inputs[cameraIndex].poseObservations) {
+    //     if(inputs[cameraIndex].tagIds.length == 0){
+    //       continue;
+    //     }
 
-        int tagId = inputs[cameraIndex].tagIds[0];
-        Pose3d observationPose = observation.pose();
-        // try{
-        //   // Pose2d apriltagPose = FieldConstants.APRILTAG_LAYOUT.getTagPose(tagId).get().toPose2d();
-        //   // Translation2d limelightError = VisionConstants.LIMELIGHT_ERROR[cameraIndex].times(apriltagPose.getTranslation().minus(robotPose.getTranslation()).getNorm()).rotateBy(apriltagPose.getRotation());
-        //   // observationPose = observationPose.plus(new Transform3d(limelightError.getX(), limelightError.getY(), 0.0, new Rotation3d()));
-        // }catch (Exception e){
-        //   System.out.println("Apriltag not found!");
-        //   e.printStackTrace();
-        // }
-
-
-        boolean rejectPose =
-            ((observation.tagCount() == 0) // Must have at least one tag
-                // || (observation.tagCount() == 1  && observation.ambiguity() > maxAmbiguity) //
-                // Cannot be high ambiguity // TODO add back in
-                // || inputs[cameraIndex].ta < 2 //TODO add scalar for distance to the ta for standard devs
-                || (Math.abs(observationPose.getZ())
-                    >= maxZError) // Must have realistic Z coordinate
-                // Must be within the field boundaries
-                || (observationPose.getX() < 0.0)
-                || (observationPose.getX() > aprilTagLayout.getFieldLength())
-                || (observationPose.getY() < 0.0)
-                || (observationPose.getY() > aprilTagLayout.getFieldWidth()))
-                // Filter out megatag 1 observations
-                || (!VisionConstants.USE_MEGATAG1 && observation.type() == PoseObservationType.MEGATAG_1)
-                || observation.timestamp() < Robot.autoStart;
-        // Add pose to log
-        robotPoses.add(observationPose);
-        if (rejectPose) {
-          robotPosesRejected.add(observationPose);
-        } else {
-          robotPosesAccepted.add(observationPose);
-        }
-
-        // Skip if rejected
-        if (rejectPose) {
-          continue;
-        }
-
-        //------------------------------------------------------------------------------------------------------------------------------------
-        // Calculate standard deviations
-        //------------------------------------------------------------------------------------------------------------------------------------
-        double stdDevFactor = Math.pow(observation.averageTagDistance(), 2.0) / observation.tagCount(); //TODO tune
-        double linearStdDev = LINEAR_STD_DEV_BASELINE * stdDevFactor;
-        double angularStdDev = ANGULAR_STD_DEV_BASELINE * stdDevFactor;
-        if (observation.type() == PoseObservationType.MEGATAG_2) {
-          linearStdDev *= LINEAR_STD_DEV_MEGATAG2_SCALE_FACTOR;
-          angularStdDev *= ANGULAR_STD_DEV_MEGATAG2_SCALE_FACTOR;
-        }
-        if (cameraIndex < cameraStdDevFactors.length) {
-          linearStdDev *= cameraStdDevFactors[cameraIndex];
-          angularStdDev *= cameraStdDevFactors[cameraIndex];
-        }
+    //     int tagId = inputs[cameraIndex].tagIds[0];
+    //     Pose3d observationPose = observation.pose();
+    //     // try{
+    //     //   // Pose2d apriltagPose = FieldConstants.APRILTAG_LAYOUT.getTagPose(tagId).get().toPose2d();
+    //     //   // Translation2d limelightError = VisionConstants.LIMELIGHT_ERROR[cameraIndex].times(apriltagPose.getTranslation().minus(robotPose.getTranslation()).getNorm()).rotateBy(apriltagPose.getRotation());
+    //     //   // observationPose = observationPose.plus(new Transform3d(limelightError.getX(), limelightError.getY(), 0.0, new Rotation3d()));
+    //     // }catch (Exception e){
+    //     //   System.out.println("Apriltag not found!");
+    //     //   e.printStackTrace();
+    //     // }
 
 
-        // Send vision observation
-        CatzRobotTracker.getInstance()
-            .addVisionObservation(
-                new VisionObservation(
-                    inputs[cameraIndex].name,
-                    observationPose.toPose2d(),
-                    observation.timestamp(),
-                    VecBuilder.fill(linearStdDev, linearStdDev, angularStdDev)));
+    //     boolean rejectPose =
+    //         ((observation.tagCount() == 0) // Must have at least one tag
+    //             // || (observation.tagCount() == 1  && observation.ambiguity() > maxAmbiguity) //
+    //             // Cannot be high ambiguity // TODO add back in
+    //             // || inputs[cameraIndex].ta < 2 //TODO add scalar for distance to the ta for standard devs
+    //             || (Math.abs(observationPose.getZ())
+    //                 >= maxZError) // Must have realistic Z coordinate
+    //             // Must be within the field boundaries
+    //             || (observationPose.getX() < 0.0)
+    //             || (observationPose.getX() > aprilTagLayout.getFieldLength())
+    //             || (observationPose.getY() < 0.0)
+    //             || (observationPose.getY() > aprilTagLayout.getFieldWidth()))
+    //             // Filter out megatag 1 observations
+    //             || (!VisionConstants.USE_MEGATAG1 && observation.type() == PoseObservationType.MEGATAG_1)
+    //             || observation.timestamp() < Robot.autoStart;
+    //     // Add pose to log
+    //     robotPoses.add(observationPose);
+    //     if (rejectPose) {
+    //       robotPosesRejected.add(observationPose);
+    //     } else {
+    //       robotPosesAccepted.add(observationPose);
+    //     }
 
-        // Log camera datadata
-        //.recordOutput("Vision/Camera" + cameraIndex + "/TagPoses", tagPoses.toArray(new Pose3d[tagPoses.size()]));
-        //.recordOutput("Vision/Camera" + cameraIndex + "/RobotPoses", robotPoses.toArray(new Pose3d[robotPoses.size()]));
-        //.recordOutput("Vision/Camera" + cameraIndex + "/RobotPosesAccepted", robotPosesAccepted.toArray(new Pose3d[robotPosesAccepted.size()]));
-        //.recordOutput("Vision/Camera" + cameraIndex + "/RobotPosesRejected", robotPosesRejected.toArray(new Pose3d[robotPosesRejected.size()]));
-        //.recordOutput("Vision/Camera" + cameraIndex + "/Standard Deviation", linearStdDev);
+    //     // Skip if rejected
+    //     if (rejectPose) {
+    //       continue;
+    //     }
 
-        allTagPoses.addAll(tagPoses);
+    //     //------------------------------------------------------------------------------------------------------------------------------------
+    //     // Calculate standard deviations
+    //     //------------------------------------------------------------------------------------------------------------------------------------
+    //     double stdDevFactor = Math.pow(observation.averageTagDistance(), 2.0) / observation.tagCount(); //TODO tune
+    //     double linearStdDev = LINEAR_STD_DEV_BASELINE * stdDevFactor;
+    //     double angularStdDev = ANGULAR_STD_DEV_BASELINE * stdDevFactor;
+    //     if (observation.type() == PoseObservationType.MEGATAG_2) {
+    //       linearStdDev *= LINEAR_STD_DEV_MEGATAG2_SCALE_FACTOR;
+    //       angularStdDev *= ANGULAR_STD_DEV_MEGATAG2_SCALE_FACTOR;
+    //     }
+    //     if (cameraIndex < cameraStdDevFactors.length) {
+    //       linearStdDev *= cameraStdDevFactors[cameraIndex];
+    //       angularStdDev *= cameraStdDevFactors[cameraIndex];
+    //     }
 
-        allRobotPoses.addAll(robotPoses);
-        allRobotPosesAccepted.addAll(robotPosesAccepted);
-        allRobotPosesRejected.addAll(robotPosesRejected);
-      }
 
-      //------------------------------------------------------------------------------------------------------------------------------------
-      // Get tag tx ty observation data
-      //------------------------------------------------------------------------------------------------------------------------------------
-      // Get tag tx ty observation data
-      for (int frameIndex = 0; frameIndex < inputs[cameraIndex].latestTargetObservations.length;
-          frameIndex++) {
-        var timestamp = inputs[cameraIndex].latestTargetObservations[frameIndex].timestamp();
-        var values = inputs[cameraIndex].latestTargetObservations[frameIndex];
+    //     // Send vision observation
+    //     CatzRobotTracker.getInstance()
+    //         .addVisionObservation(
+    //             new VisionObservation(
+    //                 inputs[cameraIndex].name,
+    //                 observationPose.toPose2d(),
+    //                 observation.timestamp(),
+    //                 VecBuilder.fill(linearStdDev, linearStdDev, angularStdDev)));
 
-        double tx = values.tx();
-        double ty = values.ty();
-        int tagId = (int) values.tagID();
-        double distance = values.distance();
+    //     // Log camera datadata
+    //     //.recordOutput("Vision/Camera" + cameraIndex + "/TagPoses", tagPoses.toArray(new Pose3d[tagPoses.size()]));
+    //     //.recordOutput("Vision/Camera" + cameraIndex + "/RobotPoses", robotPoses.toArray(new Pose3d[robotPoses.size()]));
+    //     //.recordOutput("Vision/Camera" + cameraIndex + "/RobotPosesAccepted", robotPosesAccepted.toArray(new Pose3d[robotPosesAccepted.size()]));
+    //     //.recordOutput("Vision/Camera" + cameraIndex + "/RobotPosesRejected", robotPosesRejected.toArray(new Pose3d[robotPosesRejected.size()]));
+    //     //.recordOutput("Vision/Camera" + cameraIndex + "/Standard Deviation", linearStdDev);
 
-        txTyObservations.put(
-            tagId, new TxTyObservation(tagId, cameraIndex, tx, ty, distance, timestamp));
+    //     allTagPoses.addAll(tagPoses);
 
-        //.recordOutput("Vision/Camera" + cameraIndex + "/TxTyObservation tx" + frameIndex, tx);
-        //.recordOutput("Vision/Camera" + cameraIndex + "/TxTyObservation ty" + frameIndex, ty);
-        //.recordOutput("Vision/Camera" + cameraIndex + "/TxTyObservation tagID" + frameIndex, tagId);
-        //.recordOutput("Vision/Camera" + cameraIndex + "/TxTyObservation distance" + frameIndex, distance);
-      }
-    }
+    //     allRobotPoses.addAll(robotPoses);
+    //     allRobotPosesAccepted.addAll(robotPosesAccepted);
+    //     allRobotPosesRejected.addAll(robotPosesRejected);
+    //   }
+
+    //   //------------------------------------------------------------------------------------------------------------------------------------
+    //   // Get tag tx ty observation data
+    //   //------------------------------------------------------------------------------------------------------------------------------------
+    //   // Get tag tx ty observation data
+    //   for (int frameIndex = 0; frameIndex < inputs[cameraIndex].latestTargetObservations.length;
+    //       frameIndex++) {
+    //     var timestamp = inputs[cameraIndex].latestTargetObservations[frameIndex].timestamp();
+    //     var values = inputs[cameraIndex].latestTargetObservations[frameIndex];
+
+    //     double tx = values.tx();
+    //     double ty = values.ty();
+    //     int tagId = (int) values.tagID();
+    //     double distance = values.distance();
+
+    //     txTyObservations.put(
+    //         tagId, new TxTyObservation(tagId, cameraIndex, tx, ty, distance, timestamp));
+
+    //     //.recordOutput("Vision/Camera" + cameraIndex + "/TxTyObservation tx" + frameIndex, tx);
+    //     //.recordOutput("Vision/Camera" + cameraIndex + "/TxTyObservation ty" + frameIndex, ty);
+    //     //.recordOutput("Vision/Camera" + cameraIndex + "/TxTyObservation tagID" + frameIndex, tagId);
+    //     //.recordOutput("Vision/Camera" + cameraIndex + "/TxTyObservation distance" + frameIndex, distance);
+    //   }
+    // }
 
   }
 

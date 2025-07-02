@@ -31,7 +31,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.function.Supplier;
 
-import org.littletonrobotics.junction.Logger;
 
 /** IO implementation for real Limelight hardware. */
 public class VisionIOLimelight implements VisionIO {

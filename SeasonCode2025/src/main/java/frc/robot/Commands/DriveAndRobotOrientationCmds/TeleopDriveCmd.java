@@ -19,7 +19,6 @@ import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.Drivetrain.CatzDriv
 import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.Drivetrain.DriveConstants;
 import frc.robot.Utilities.AllianceFlipUtil;
 import java.util.function.Supplier;
-import org.littletonrobotics.junction.Logger;
 import frc.robot.CatzSubsystems.CatzSuperstructure;
 
 /**************************************************************************************************

@@ -37,7 +37,6 @@ import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.function.Supplier;
 
-import org.littletonrobotics.junction.Logger;
 
 /**************************************************************************************************
  *

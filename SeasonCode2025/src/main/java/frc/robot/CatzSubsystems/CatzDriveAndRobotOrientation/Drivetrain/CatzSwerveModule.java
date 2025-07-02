@@ -25,7 +25,6 @@ import frc.robot.Utilities.Alert;
 import frc.robot.Utilities.CatzMathUtils;
 import frc.robot.Utilities.CatzMathUtils.Conversions;
 import frc.robot.Utilities.LoggedTunableNumber;
-import org.littletonrobotics.junction.Logger;
 
 public class CatzSwerveModule {
 
