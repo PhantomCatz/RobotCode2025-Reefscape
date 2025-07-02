@@ -5,6 +5,7 @@ import static frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.Drivetrain.D
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.pathplanner.lib.util.PathPlannerLogging;
 
+import choreo.auto.AutoTrajectory;
 import choreo.trajectory.SwerveSample;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -41,6 +42,9 @@ public class CatzDrivetrain extends SubsystemBase {
   public static final CatzDrivetrain Instance = new CatzDrivetrain();
 
   private double distanceError = 999999.9; //meters
+
+  private Pose2d choreoGoal = new Pose2d();
+  private double choreoDistanceError = 9999999.9; //meters //set this to a high number initially just in case the trajectory thinks it's at goal as soon as it starts
 
   // Gyro input/output interface
   private final GyroIO gyroIO;
@@ -370,8 +374,9 @@ public class CatzDrivetrain extends SubsystemBase {
   /**
    * Make sure to run this before every new trajectory
    */
-  public void followChoreoTrajectoryInit(){
+  public void followChoreoTrajectoryInit(AutoTrajectory traj){
     hoController = DriveConstants.getNewHolController();
+    choreoGoal = traj.getFinalPose().get();
   }
 
   /**
@@ -390,6 +395,8 @@ public class CatzDrivetrain extends SubsystemBase {
 
     Pose2d curPose = CatzRobotTracker.Instance.getEstimatedPose();
     ChassisSpeeds adjustedSpeeds = hoController.calculate(curPose, state, Rotation2d.fromRadians(sample.heading));
+
+    choreoDistanceError = curPose.minus(choreoGoal).getTranslation().getNorm();
 
     Logger.recordOutput("Target Auton Pose", new Pose2d(sample.x, sample.y, Rotation2d.fromRadians(sample.heading)));
     System.out.println("following choreooo");

@@ -410,6 +410,18 @@ public class CatzSuperstructure extends VirtualSubsystem {
         ).unless(()-> Robot.isSimulation()).alongWith(Commands.print("Top Algae"));
     }
 
+    public Command scoreInAuto(int level){
+        return Commands.sequence
+        (
+            CatzElevator.Instance.Elevator_LX(level),
+            Commands.waitUntil()
+        );
+    }
+
+    private boolean readyToScore(){
+        return CatzDrivetrain.Instance.get
+    }
+
      public Command XAlgae(int level){
         switch(level){
             case 2:

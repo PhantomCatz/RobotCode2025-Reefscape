@@ -33,6 +33,7 @@ public class AutoRoutineBase {
     }
 
     protected Command followTrajectoryAndScore(AutoTrajectory trajectory, int level){
+
         return Commands.parallel
         (
             Commands.sequence
@@ -69,7 +70,7 @@ public class AutoRoutineBase {
         return Commands.defer(() ->
                                 new FunctionalCommand
                                 (
-                                    () -> {CatzDrivetrain.Instance.followChoreoTrajectoryInit(); traj.cmd().initialize();},
+                                    () -> {CatzDrivetrain.Instance.followChoreoTrajectoryInit(traj); traj.cmd().initialize();},
                                     traj.cmd()::execute,
                                     traj.cmd()::end,
                                     () -> isAtPose(traj)
