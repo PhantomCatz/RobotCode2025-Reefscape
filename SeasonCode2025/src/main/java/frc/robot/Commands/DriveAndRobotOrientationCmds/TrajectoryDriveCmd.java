@@ -255,6 +255,7 @@ public class TrajectoryDriveCmd extends Command {
     // }else{
     // }
 
+    //TODO? only do this with trajectory follow with accuracy
     adjustedSpeeds = applyCusp(adjustedSpeeds, translationError, endRotation.minus(currentPose.getRotation()).getDegrees(), CONVERGE_DISTANCE, CONVERGE_ANGLE);
 
     // Logging

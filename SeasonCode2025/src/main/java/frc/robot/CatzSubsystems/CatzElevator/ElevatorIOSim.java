@@ -85,7 +85,6 @@ public class ElevatorIOSim implements ElevatorIO{
   public void runSetpointDown(double setpointInches) {
       double setpointRotations = setpointInches / FINAL_RATIO;
       targetRotations = setpointRotations;
-
   }
 
   public double getElevatorPositionInch(){

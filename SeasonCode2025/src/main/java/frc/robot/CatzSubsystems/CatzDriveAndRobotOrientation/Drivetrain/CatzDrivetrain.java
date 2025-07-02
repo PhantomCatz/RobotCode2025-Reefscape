@@ -346,6 +346,14 @@ public class CatzDrivetrain extends SubsystemBase {
     }
   }
 
+  public boolean closeEnoughToRaiseElevator(){
+    return distanceError <= DriveConstants.PREDICT_DISTANCE_SCORE;
+  }
+
+  public boolean closeEnoughToStartIntake(){
+    return distanceError <= DriveConstants.PREDICT_DISTANCE_INTAKE;
+  }
+
   /** command to cancel running auto trajectories */
   public Command cancelTrajectory() {
     Command cancel = new InstantCommand();
@@ -376,12 +384,14 @@ public class CatzDrivetrain extends SubsystemBase {
       sample.t,
       Math.hypot(sample.vx,sample.vy),
       0.0,
-      new Pose2d(new Translation2d(sample.x, sample.y), Rotation2d.fromRadians(sample.heading)),
+      new Pose2d(new Translation2d(sample.x, sample.y), Rotation2d.fromRadians(Math.atan2(sample.vy, sample.vx))),
       0.0
     );
 
     Pose2d curPose = CatzRobotTracker.Instance.getEstimatedPose();
-    // ChassisSpeeds adjustedSpeeds = hoController.calculate(curPose, state, sample.)
+    ChassisSpeeds adjustedSpeeds = hoController.calculate(curPose, state, Rotation2d.fromRadians(sample.heading));
+
+    drive(adjustedSpeeds);
   }
 
   // -----------------------------------------------------------------------------------------------------------

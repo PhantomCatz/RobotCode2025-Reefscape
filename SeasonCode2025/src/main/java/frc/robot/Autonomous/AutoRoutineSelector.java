@@ -7,7 +7,7 @@ import frc.robot.Autonomous.routines.Test2Piece;
 public class AutoRoutineSelector {
     public static final AutoRoutineSelector Instance = new AutoRoutineSelector();
 
-    private AutoChooser autoSelector;
+    private AutoChooser autoSelector = new AutoChooser();
 
     private AutoRoutineSelector(){
         autoSelector.addRoutine("Test 2 Piece", () -> new Test2Piece().getRoutine());
