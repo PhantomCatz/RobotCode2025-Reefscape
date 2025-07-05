@@ -28,6 +28,7 @@ import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.CatzRobotTracker.Od
 import frc.robot.CatzSubsystems.CatzOuttake.CatzOuttake;
 import frc.robot.Commands.DriveAndRobotOrientationCmds.HolonomicDriveController;
 import frc.robot.Robot;
+import frc.robot.Autonomous.AutonConstants;
 import frc.robot.Utilities.Alert;
 import frc.robot.Utilities.EqualsUtil;
 import frc.robot.Utilities.SwerveSetpoint;
@@ -351,11 +352,11 @@ public class CatzDrivetrain extends SubsystemBase {
   }
 
   public boolean closeEnoughToRaiseElevator(){
-    return distanceError <= DriveConstants.PREDICT_DISTANCE_SCORE;
+    return choreoDistanceError <= DriveConstants.PREDICT_DISTANCE_SCORE;
   }
 
   public boolean closeEnoughToStartIntake(){
-    return distanceError <= DriveConstants.PREDICT_DISTANCE_INTAKE;
+    return choreoDistanceError <= DriveConstants.PREDICT_DISTANCE_INTAKE;
   }
 
   /** command to cancel running auto trajectories */
@@ -399,8 +400,11 @@ public class CatzDrivetrain extends SubsystemBase {
     choreoDistanceError = curPose.minus(choreoGoal).getTranslation().getNorm();
 
     Logger.recordOutput("Target Auton Pose", new Pose2d(sample.x, sample.y, Rotation2d.fromRadians(sample.heading)));
-    System.out.println("following choreooo");
     drive(adjustedSpeeds);
+  }
+
+  public boolean isRobotAtPoseChoreo(){
+    return choreoDistanceError <= AutonConstants.ACCEPTABLE_DIST_METERS;
   }
 
   // -----------------------------------------------------------------------------------------------------------

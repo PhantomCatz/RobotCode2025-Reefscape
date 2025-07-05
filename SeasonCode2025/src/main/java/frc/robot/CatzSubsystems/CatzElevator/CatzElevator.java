@@ -7,8 +7,10 @@ import java.util.function.Supplier;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.PrintCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.CatzConstants;
+import frc.robot.Robot;
 import frc.robot.CatzSubsystems.CatzOuttake.CatzOuttake;
 import frc.robot.Utilities.LoggedTunableNumber;
 import lombok.RequiredArgsConstructor;
@@ -208,23 +210,32 @@ public class CatzElevator extends SubsystemBase {
   //
   //--------------------------------------------------------------------------------------------------------------------------
   public Command Elevator_LX(int level){
+    Command cmd;
+
     switch (level){
       case 1:
-        return Elevator_L1();
+        cmd = Elevator_L1();
+      break;
 
       case 2:
-        return Elevator_L2();
+        cmd = Elevator_L2();
+      break;
 
       case 3:
-        return Elevator_L3();
+        cmd = Elevator_L3();
+      break;
 
       case 4:
-        return Elevator_L4();
+        cmd = Elevator_L4();
+      break;
 
       default:
         System.out.println("Invalid elevator level!");
-        return new InstantCommand();
+        cmd = new InstantCommand();
+      break;
+
     }
+    return cmd.unless(() -> Robot.isSimulation()).alongWith(new PrintCommand("Elevator " + level));
   }
 
   public boolean isElevatorInPos(){

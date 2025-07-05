@@ -269,22 +269,14 @@ public class CatzSuperstructure extends VirtualSubsystem {
     }
 
     public Command L4Coral() {
-        return new ParallelCommandGroup(
-            CatzRampPivot.Instance.Ramp_Intake_Pos(),
-            CatzAlgaeRemover.Instance.stopAlgae(),
-            CatzAlgaePivot.Instance.AlgaePivot_Stow(),
-            CatzIntakeRollers.Instance.stopIntaking(),
-
-            new SequentialCommandGroup(
-                CatzElevator.Instance.Elevator_L4(),
-                Commands.waitUntil(() -> CatzElevator.Instance.isElevatorInPos()).withTimeout(2.0),
-                CatzOuttake.Instance.outtakeL4(),
-                new WaitCommand(0.1),
-                CatzElevator.Instance.Elevator_L4_Adj(),
-                Commands.waitUntil(() -> CatzElevator.Instance.isElevatorInPos()).withTimeout(2.0)
-            )
-        )
-         .unless(()-> Robot.isSimulation()).alongWith(Commands.print("L4 Scoring State"));
+        return new SequentialCommandGroup(
+            CatzElevator.Instance.Elevator_L4(),
+            Commands.waitUntil(() -> CatzElevator.Instance.isElevatorInPos()).withTimeout(2.0),
+            CatzOuttake.Instance.outtakeL4(),
+            new WaitCommand(0.1),
+            CatzElevator.Instance.Elevator_L4_Adj(),
+            Commands.waitUntil(() -> CatzElevator.Instance.isElevatorInPos()).withTimeout(2.0)
+        ).unless(()-> Robot.isSimulation()).alongWith(Commands.print("L4 Scoring State"));
     }
 
     public Command LXCoral(int level){
@@ -341,6 +333,51 @@ public class CatzSuperstructure extends VirtualSubsystem {
         }, Set.of());
     }
 
+    public Command LXShoot(int level){
+        return new DeferredCommand(() -> {
+            switch(level){
+                case 1:
+                    return L1Shoot().andThen(new InstantCommand(()-> {TeleopPosSelector.Instance.hasCoralSIM = false;}));
+
+                case 2:
+                    return L2Shoot().andThen(new InstantCommand(()-> {TeleopPosSelector.Instance.hasCoralSIM = false;}));
+
+                case 3:
+                    return L3Shoot().andThen(new InstantCommand(()-> {TeleopPosSelector.Instance.hasCoralSIM = false;}));
+
+                case 4:
+                    return L4Shoot().andThen(new InstantCommand(()-> {TeleopPosSelector.Instance.hasCoralSIM = false;}));
+
+                default:
+                    return new PrintCommand("Invalid Level: " + level);
+            }
+        }, Set.of());
+    }
+
+    public Command L1Shoot(){
+        return CatzOuttake.Instance.outtakeL1();
+    }
+
+    public Command L2Shoot(){
+        return CatzOuttake.Instance.startOuttake();
+    }
+
+    public Command L3Shoot(){
+        return CatzOuttake.Instance.startOuttake();
+    }
+
+    /**
+     *
+     * @return Command to eject in L4 with elevator adjust. Does not wait for the elevator to go up to adjust height.
+     */
+    public Command L4Shoot(){
+        return Commands.sequence(
+            CatzOuttake.Instance.outtakeL4(),
+            new WaitCommand(0.1),
+            CatzElevator.Instance.Elevator_L4_Adj()
+        );
+    }
+
     public Command intake(){
         return new DeferredCommand(() -> {
             if(chosenGamepiece == Gamepiece.CORAL) {
@@ -365,10 +402,6 @@ public class CatzSuperstructure extends VirtualSubsystem {
     public Command LXElevator(int level){
 
         return new SequentialCommandGroup(
-            CatzAlgaeRemover.Instance.stopAlgae(),
-            CatzAlgaePivot.Instance.AlgaePivot_Stow(),
-            CatzRampPivot.Instance.Ramp_Intake_Pos(),
-            CatzIntakeRollers.Instance.stopIntaking(),
             // new PrintCommand("not yet"),
             // Commands.waitUntil(() -> CatzRampPivot.Instance.isSafeToRaiseElevator()),
             // new PrintCommand("safe to raise CatzElevator.Instance!!"),
@@ -414,12 +447,18 @@ public class CatzSuperstructure extends VirtualSubsystem {
         return Commands.sequence
         (
             CatzElevator.Instance.Elevator_LX(level),
-            Commands.waitUntil()
+            Commands.waitUntil(() -> readyToScoreAuton()),
+            LXShoot(level),
+            Commands.waitUntil(() -> CatzOuttake.Instance.isDesiredCoralState(true))
         );
     }
 
-    private boolean readyToScore(){
-        return CatzDrivetrain.Instance.get
+    private boolean readyToScoreAuton(){
+        if(Robot.isSimulation()){
+            return CatzDrivetrain.Instance.isRobotAtPoseChoreo();
+        }else{
+            return CatzDrivetrain.Instance.isRobotAtPoseChoreo() && CatzElevator.Instance.isElevatorInPos();
+        }
     }
 
      public Command XAlgae(int level){

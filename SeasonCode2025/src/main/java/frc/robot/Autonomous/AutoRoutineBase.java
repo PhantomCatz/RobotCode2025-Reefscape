@@ -6,17 +6,14 @@ import choreo.auto.AutoRoutine;
 import choreo.auto.AutoTrajectory;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.units.measure.Distance;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.FunctionalCommand;
-import edu.wpi.first.wpilibj2.command.PrintCommand;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import frc.robot.CatzConstants;
 import frc.robot.CatzSubsystems.CatzSuperstructure;
 import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.CatzRobotTracker;
 import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.Drivetrain.CatzDrivetrain;
-import frc.robot.CatzSubsystems.CatzElevator.CatzElevator;
 import frc.robot.CatzSubsystems.CatzOuttake.CatzOuttake;
 
 public class AutoRoutineBase {
@@ -26,27 +23,25 @@ public class AutoRoutineBase {
         routine = CatzConstants.autoFactory.newRoutine(name);
     }
 
-    protected void prepRoutine(Command... sequence){
+    protected void prepRoutine(AutoTrajectory startTraj, Command... sequence){
         routine.active().onTrue(
-            Commands.sequence(sequence).alongWith(new PrintCommand("asdfasdfasdf"))
+            new InstantCommand(() -> CatzRobotTracker.Instance.resetPose(startTraj.getInitialPose().get()))
+            .andThen(Commands.sequence(sequence))
         );
     }
 
     protected Command followTrajectoryAndScore(AutoTrajectory trajectory, int level){
-
         return Commands.parallel
         (
             Commands.sequence
             (
+                Commands.print("hello???"),
                 Commands.waitUntil(CatzDrivetrain.Instance::closeEnoughToRaiseElevator),
-                CatzSuperstructure.Instance.LXElevator(level)
+                CatzSuperstructure.Instance.LXElevator(level),
+                CatzSuperstructure.Instance.scoreInAuto(level)
             ),
-            Commands.sequence
-            (
-                followTrajectoryWithAccuracy(trajectory),
-                Commands.waitUntil(CatzElevator.Instance::isElevatorInPos),
-                CatzSuperstructure.Instance.LXCoral(level)
-            )
+            followTrajectoryWithAccuracy(trajectory)
+
         );
     }
 
@@ -82,7 +77,6 @@ public class AutoRoutineBase {
     private boolean isAtPose(AutoTrajectory trajectory){
         boolean isAtTrans = translationIsFinished(trajectory, AutonConstants.ACCEPTABLE_DIST_METERS);
         boolean isAtRot = rotationIsFinished(trajectory, AutonConstants.ACCEPTABLE_ANGLE_DEG);
-        System.out.println("finished? " + isAtRot + isAtTrans);
 
         return isAtTrans && isAtRot;
     }

@@ -12,6 +12,8 @@ public class Test2Piece extends AutoRoutineBase{
         AutoTrajectory TopLoadToJ = getTrajectory("TopLoad to J");
 
         prepRoutine(
+            start3ToI,
+
             followTrajectoryAndScore(start3ToI, 4),
             followTrajectoryAndIntake(ItoTopLoad),
             waitUntilCoralIntaked(),

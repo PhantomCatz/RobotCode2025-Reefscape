@@ -3,7 +3,7 @@ package frc.robot.Autonomous;
 import choreo.auto.AutoChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.Autonomous.routines.Test2Piece;
+import frc.robot.Autonomous.routines.*;
 
 public class AutoRoutineSelector {
     public static final AutoRoutineSelector Instance = new AutoRoutineSelector();
