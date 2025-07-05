@@ -104,7 +104,7 @@ public class Robot extends LoggedRobot {
   private final RobotContainer container = RobotContainer.Instance;
   private final CatzLED LED = CatzLED.Instance;
 
-  private static Pose3d[] simMechanismPoses = new Pose3d[3];
+  private static Pose3d[] simMechanismPoses = new Pose3d[4];
 
   // --------------------------------------------------------------------------------------------------------
   //

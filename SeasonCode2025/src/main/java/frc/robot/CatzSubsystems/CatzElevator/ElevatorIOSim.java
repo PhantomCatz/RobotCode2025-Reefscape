@@ -22,8 +22,6 @@ public class ElevatorIOSim implements ElevatorIO{
   private final DCMotor m_elevatorGearbox = DCMotor.getKrakenX60Foc(2);
   private double targetRotations;
   private double currentRotations;
-  private double elevatorVelocity;
-  private double elevatorPositionInches;
   private final int ELEVATOR1_INDEX = 0;
   private final int ELEVATOR2_INDEX = 1;
   private Pose3d[] elevatorPose3d = {
@@ -54,7 +52,7 @@ public class ElevatorIOSim implements ElevatorIO{
 
   @Override
   public void updateInputs(ElevatorIOInputs inputs) {
-    currentRotations = elevatorPositionInches / FINAL_RATIO;
+    currentRotations = inputs.positionInch / FINAL_RATIO;
     Logger.recordOutput("Elevator/SimTargetRotations", targetRotations);
     Logger.recordOutput("Elevator/SimRotations", currentRotations);
 
@@ -62,13 +60,13 @@ public class ElevatorIOSim implements ElevatorIO{
     m_elevatorSim.setInputVoltage(setVoltage);
     m_elevatorSim.update(0.02);
 
-    elevatorVelocity = m_elevatorSim.getVelocityMetersPerSecond();
-    elevatorPositionInches = Units.metersToInches(m_elevatorSim.getPositionMeters());
-    Logger.recordOutput("Elevator/SimCurrentSpeedMetersPerSecond", elevatorVelocity);
-    Logger.recordOutput("Elevator/SimCurrentPositionInches", elevatorPositionInches);
-    Robot.setSimPose(ELEVATOR1_INDEX, new Pose3d(new Translation3d(0.0, 0.0, Units.inchesToMeters(elevatorPositionInches/2)).plus(ElevatorConstants.ELEVATOR_SIM_OFFSET), new Rotation3d(0.0, Math.PI / 2, 0.0)));
-    Robot.setSimPose(ELEVATOR2_INDEX, new Pose3d(new Translation3d(0.0, 0.0, Units.inchesToMeters(elevatorPositionInches + 1)).plus(ElevatorConstants.ELEVATOR_SIM_OFFSET), new Rotation3d(0.0, Math.PI / 2, 0.0)));
-    mechanismElevator.setLength(0.5 + Units.inchesToMeters(elevatorPositionInches));
+    inputs.velocityInchPerSec = Units.metersToInches(m_elevatorSim.getVelocityMetersPerSecond());
+    inputs.positionInch = Units.metersToInches(m_elevatorSim.getPositionMeters());
+    Logger.recordOutput("Elevator/SimCurrentSpeedInchesPerSecond", inputs.velocityInchPerSec);
+    Logger.recordOutput("Elevator/SimCurrentPositionInches", inputs.positionInch);
+    Robot.setSimPose(ELEVATOR1_INDEX, new Pose3d(new Translation3d(0.0, 0.0, Units.inchesToMeters(inputs.positionInch/2)).plus(ElevatorConstants.ELEVATOR_SIM_OFFSET), new Rotation3d(0.0, Math.PI / 2, 0.0)));
+    Robot.setSimPose(ELEVATOR2_INDEX, new Pose3d(new Translation3d(0.0, 0.0, Units.inchesToMeters(inputs.positionInch + 1)).plus(ElevatorConstants.ELEVATOR_SIM_OFFSET), new Rotation3d(0.0, Math.PI / 2, 0.0)));
+    mechanismElevator.setLength(0.5 + Units.inchesToMeters(inputs.positionInch));
     Logger.recordOutput("Mechanism2d/Elevator", mechanism);
   }
 
@@ -76,17 +74,13 @@ public class ElevatorIOSim implements ElevatorIO{
   public void runSetpointUp(double setpointInches) {
       double setpointRotations = setpointInches / FINAL_RATIO;
       targetRotations = setpointRotations;
-    // System.out.println("New elevator target: "+targetRotations);
+    System.out.println("New elevator target: "+targetRotations);
   }
   @Override
   public void runSetpointDown(double setpointInches) {
       double setpointRotations = setpointInches / FINAL_RATIO;
       targetRotations = setpointRotations;
-      // System.out.println("New elevator target: "+targetRotations);
-  }
-
-  public double getElevatorPositionInch(){
-    return elevatorPositionInches;
+      System.out.println("New elevator target: "+targetRotations);
   }
 
   public Pose3d[] getElevatorPose3d() {

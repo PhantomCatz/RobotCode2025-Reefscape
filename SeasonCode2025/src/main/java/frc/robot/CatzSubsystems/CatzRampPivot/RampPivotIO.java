@@ -10,7 +10,7 @@ public interface RampPivotIO {
     public static class RampPivotIOInputs {
 
       public boolean isRampPivotMotorConnected = true;
-
+      public double positionDegrees = 120.0;
       public double positionMechs = 0.0;
       public double velocityRpm = 0.0;
       public double appliedVolts = 0.0;

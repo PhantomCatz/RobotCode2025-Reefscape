@@ -1,5 +1,6 @@
 package frc.robot.CatzSubsystems.CatzRampPivot;
 
+import edu.wpi.first.math.geometry.Translation3d;
 import frc.robot.CatzConstants;
 import frc.robot.Utilities.MotorUtil.Gains;
 import frc.robot.Utilities.MotorUtil.MotionMagicParameters;
@@ -20,6 +21,9 @@ public class RampPivotConstants {
     public static final double RAMP_CLIMB = 34.810546;
     public static final double RAMP_L1_SCORE = 20.0;
     public static final double heightPlaceholder = 10;
+
+    public static final double GEAR_RATIO = 48/14;
+    public static final Translation3d RAMP_PIVOT_SIM_OFFSET = new Translation3d(0, 0, 0);
 
     // Initial PIDF and motion magic assignment
     public static final Gains gains =
