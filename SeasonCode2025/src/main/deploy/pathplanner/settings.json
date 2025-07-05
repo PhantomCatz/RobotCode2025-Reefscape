@@ -29,8 +29,8 @@
     "New",
     "Straight Auto"
   ],
-  "defaultMaxVel": 4.3,
-  "defaultMaxAccel": 5.5,
+  "defaultMaxVel": 3.5,
+  "defaultMaxAccel": 4.0,
   "defaultMaxAngVel": 540.0,
   "defaultMaxAngAccel": 720.0,
   "defaultNominalVoltage": 12.0,
