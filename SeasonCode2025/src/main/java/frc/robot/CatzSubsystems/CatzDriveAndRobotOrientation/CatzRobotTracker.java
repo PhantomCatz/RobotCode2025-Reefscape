@@ -60,7 +60,7 @@ public class CatzRobotTracker {
   private Pose2d odometryPose = new Pose2d();
 
   @Getter
-  private Pose2d estimatedPose = new Pose2d();
+  private Pose2d estimatedPose = new Pose2d(0, 0, Rotation2d.k180deg);
 
   @Getter
   @AutoLogOutput(key = "CatzRobotTracker/TxTyPose")
