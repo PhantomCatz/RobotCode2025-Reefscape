@@ -5,7 +5,7 @@ package frc.robot.CatzSubsystems.CatzIntakeRollers;
 public class IntakeRollersConstants {
 
     // Subsystem safety disable
-    public static final boolean isIntakeRollersDisabled = false;
+    public static final boolean isIntakeRollersDisabled = true;
 
     public static final int RAMP_BB_BACK_PORT = 8; //TODO TODO TODO TODO TODO TODO TODO
     public static final int RAMP_BB_FRNT_PORT = 9; //TODO TODO TODO TODO TODO TODO TODO

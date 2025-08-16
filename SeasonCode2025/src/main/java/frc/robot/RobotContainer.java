@@ -42,6 +42,9 @@ public class RobotContainer {
 
   private final double SCORE_TRIGGER_THRESHHOLD = 0.8;
 
+  private final double Drivetrain_Scale_Turn        = 0.5;
+  private final double Drivetrain_Scale_Translation = 0.5;
+
   // ------------------------------------------------------------------------------------------------------------------
   // Drive Controller Declaration
   // -----------------------------------------------------------------------------------------------------------------
@@ -148,7 +151,7 @@ public class RobotContainer {
 
     escapeTrajectory.onTrue(CatzDrivetrain.Instance.cancelTrajectory());
 
-    CatzDrivetrain.Instance.setDefaultCommand(new TeleopDriveCmd(() -> xboxDrv.getLeftX(), () -> xboxDrv.getLeftY(), () -> xboxDrv.getRightX(), CatzDrivetrain.Instance));
+    CatzDrivetrain.Instance.setDefaultCommand(new TeleopDriveCmd(() -> xboxDrv.getLeftX()*Drivetrain_Scale_Translation, () -> xboxDrv.getLeftY()*Drivetrain_Scale_Translation, () -> xboxDrv.getRightX()*Drivetrain_Scale_Turn, CatzDrivetrain.Instance));
     //---------------------------------------------------------------------------------------------------------------------
     // XBOX AUX
     //------------------------------------------------------------------------------
