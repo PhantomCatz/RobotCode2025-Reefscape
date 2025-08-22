@@ -49,7 +49,7 @@ public class CatzRampPivot extends SubsystemBase {
     }
   }
   private CatzRampPivot() {
-        if(isRampPivotDisabled) { //Comes from Algae Remover Constants
+    if(isRampPivotDisabled) { //Comes from Algae Remover Constants
       io = new RampPivotIONull();
       System.out.println("Ramp Pivot Unconfigured");
     } else {
