@@ -85,6 +85,7 @@ public class AlgaePivotIOReal implements AlgaePivotIO {
       algaePivotMotor.getConfigurator().apply(config, 1.0);
 
       algaePivotMotor.setPosition(PIVOT_INITIAL_POS);
+
     }
 
   @Override

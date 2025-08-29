@@ -1,6 +1,8 @@
 package frc.robot;
 
 
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -15,6 +17,7 @@ import frc.robot.CatzSubsystems.CatzAlgaeEffector.CatzAlgaePivot.CatzAlgaePivot;
 import frc.robot.CatzSubsystems.CatzAlgaeEffector.CatzAlgaePivot.CatzAlgaePivot.AlgaePivotPosition;
 import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.CatzRobotTracker;
 import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.Vision.CatzVision;
+import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.Vision.LimelightOffsetCalculator.LimelightOffsets;
 import frc.robot.CatzSubsystems.CatzLEDs.CatzLED;
 import frc.robot.CatzSubsystems.CatzLEDs.CatzLED.ControllerLEDState;
 import frc.robot.CatzSubsystems.CatzRampPivot.CatzRampPivot;
@@ -38,7 +41,7 @@ import org.littletonrobotics.junction.rlog.RLOGServer;
 import org.littletonrobotics.junction.wpilog.WPILOGReader;
 import org.littletonrobotics.junction.wpilog.WPILOGWriter;
 
-
+import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.Vision.LimelightOffsetCalculator;
 
 
 public class Robot extends LoggedRobot {
@@ -406,6 +409,17 @@ public class Robot extends LoggedRobot {
   public void testInit() {
     CommandScheduler.getInstance().cancelAll();
     CatzRobotTracker.Instance.resetPose(CatzVision.Instance.getPoseObservation()[0].pose().toPose2d());
+
+    Pose2d knownRobotPose = new Pose2d(1.0, 0.5, Rotation2d.fromDegrees(30));
+    System.out.println("Known Robot Pose: " + knownRobotPose);
+
+    Pose2d limelightReportedPose = new Pose2d(0.8, 0.7, Rotation2d.fromDegrees(25));
+    System.out.println("Limelight Reported Pose (no offsets): " + limelightReportedPose);
+    System.out.println("----------------------------------------");
+
+    LimelightOffsets calculatedOffsets = LimelightOffsetCalculator.calculateOffsets(knownRobotPose, limelightReportedPose);
+
+    System.out.println(calculatedOffsets);
   }
 
   @Override
