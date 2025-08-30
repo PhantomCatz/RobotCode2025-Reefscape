@@ -23,7 +23,9 @@ public class LimelightOffsetCalculator {
     public static class LimelightOffsets {
         public final double offsetX;
         public final double offsetY;
-        public final Rotation3d offsetRotation;
+        public final double offsetRoll;
+        public final double offsetPitch;
+        public final double offsetYaw;
 
         /**
          * Constructs a LimelightOffsets object.
@@ -32,10 +34,12 @@ public class LimelightOffsetCalculator {
          * @param offsetY The calculated offset in the y-direction (meters).
          * @param offsetRotation The calculated rotational offset.
          */
-        public LimelightOffsets(double offsetX, double offsetY, Rotation3d offsetRotation) {
+        public LimelightOffsets(double offsetX, double offsetY, double offsetRoll, double offsetPitch, double offsetYaw) {
             this.offsetX = offsetX;
             this.offsetY = offsetY;
-            this.offsetRotation = offsetRotation;
+            this.offsetRoll = offsetRoll;
+            this.offsetPitch = offsetPitch;
+            this.offsetYaw = offsetYaw;
         }
 
         @Override
@@ -47,7 +51,7 @@ public class LimelightOffsetCalculator {
                 "  Roll: %.4f degrees\n" +
                 "  Pitch: %.4f degrees\n" +
                 "  Yaw: %.4f degrees\n",
-                offsetX, offsetY, offsetRotation.getMeasureX(), offsetRotation.getMeasureY(), offsetRotation.getMeasureZ()
+                offsetX, offsetY, offsetRoll, offsetPitch, offsetYaw
             );
         }
     }
@@ -59,7 +63,7 @@ public class LimelightOffsetCalculator {
      * @param limelightReportedPose The pose calculated by the Limelight, assuming zero offsets.
      * @return A {@link LimelightOffsets} object containing the calculated x, y, and rotational offsets.
      */
-    public static LimelightOffsets calculateOffsets(Pose3d knownRobotPose, Pose3d limelightReportedPose) {
+    public static LimelightOffsets calculateOffsets(Pose3d knownRobotPose, Translation3d limelightReportedTranslation, double reportedRoll, double reportedPitch, double reportedYaw) {
         // The transform from the robot's actual pose to the pose reported by the Limelight
         // represents the offset of the Limelight itself.
         // We can find this transform by getting the difference between the two poses.

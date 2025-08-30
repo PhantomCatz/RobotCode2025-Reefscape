@@ -45,6 +45,7 @@ import org.littletonrobotics.junction.wpilog.WPILOGReader;
 import org.littletonrobotics.junction.wpilog.WPILOGWriter;
 
 import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.Vision.LimelightOffsetCalculator;
+import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.Vision.LimelightOffsetField;
 
 
 public class Robot extends LoggedRobot {
@@ -413,10 +414,14 @@ public class Robot extends LoggedRobot {
     CommandScheduler.getInstance().cancelAll();
     // CatzRobotTracker.Instance.resetPose(CatzVision.Instance.getPoseObservation()[0].pose().toPose2d());
 
+    // LimelightOffsetField.exportCustomField(LimelightOffsetField.createLayout());
     Pose3d knownRobotPose = new Pose3d(new Translation3d(-1.1176, 0.0, 0.0), new Rotation3d(0.0, 0.0, 0.0));
     System.out.println("Known Robot Pose: " + knownRobotPose);
 
-    Pose3d limelightReportedPose = CatzVision.Instance.getPoseObservation()[0].pose();
+    Timer.delay(2.0);
+
+    // Pose3d limelightReportedPose = CatzVision.Instance.getPoseObservation()[0].pose();
+    Pose3d limelightReportedPose = new Pose3d(new Translation3d(-0.92, -0.3, 0.25), new Rotation3d(-0.8, -19.1, 16.3));
     System.out.println("Limelight Reported Pose (no offsets): " + limelightReportedPose);
     System.out.println("----------------------------------------");
 
