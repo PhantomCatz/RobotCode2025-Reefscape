@@ -1,9 +1,9 @@
 package frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.Vision;
 
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Transform2d;
-import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.geometry.Transform3d;
+import edu.wpi.first.math.geometry.Translation3d;
 
 /**
  * Calculates the physical offset of a Limelight camera on a robot.
@@ -23,7 +23,7 @@ public class LimelightOffsetCalculator {
     public static class LimelightOffsets {
         public final double offsetX;
         public final double offsetY;
-        public final Rotation2d offsetRotation;
+        public final Rotation3d offsetRotation;
 
         /**
          * Constructs a LimelightOffsets object.
@@ -32,7 +32,7 @@ public class LimelightOffsetCalculator {
          * @param offsetY The calculated offset in the y-direction (meters).
          * @param offsetRotation The calculated rotational offset.
          */
-        public LimelightOffsets(double offsetX, double offsetY, Rotation2d offsetRotation) {
+        public LimelightOffsets(double offsetX, double offsetY, Rotation3d offsetRotation) {
             this.offsetX = offsetX;
             this.offsetY = offsetY;
             this.offsetRotation = offsetRotation;
@@ -44,8 +44,10 @@ public class LimelightOffsetCalculator {
                 "Limelight Offsets:\n" +
                 "  X: %.4f meters\n" +
                 "  Y: %.4f meters\n" +
-                "  Rotation: %.4f degrees",
-                offsetX, offsetY, offsetRotation.getDegrees()
+                "  Roll: %.4f degrees\n" +
+                "  Pitch: %.4f degrees\n" +
+                "  Yaw: %.4f degrees\n",
+                offsetX, offsetY, offsetRotation.getMeasureX(), offsetRotation.getMeasureY(), offsetRotation.getMeasureZ()
             );
         }
     }
@@ -57,17 +59,17 @@ public class LimelightOffsetCalculator {
      * @param limelightReportedPose The pose calculated by the Limelight, assuming zero offsets.
      * @return A {@link LimelightOffsets} object containing the calculated x, y, and rotational offsets.
      */
-    public static LimelightOffsets calculateOffsets(Pose2d knownRobotPose, Pose2d limelightReportedPose) {
+    public static LimelightOffsets calculateOffsets(Pose3d knownRobotPose, Pose3d limelightReportedPose) {
         // The transform from the robot's actual pose to the pose reported by the Limelight
         // represents the offset of the Limelight itself.
         // We can find this transform by getting the difference between the two poses.
-        Transform2d offsetTransform = knownRobotPose.minus(limelightReportedPose);
+        Transform3d offsetTransform = knownRobotPose.minus(limelightReportedPose);
 
         // The translation component of the transform is the (x, y) offset of the Limelight.
-        Translation2d translationOffset = offsetTransform.getTranslation();
+        Translation3d translationOffset = offsetTransform.getTranslation();
 
         // The rotation component of the transform is the rotational offset.
-        Rotation2d rotationOffset = offsetTransform.getRotation();
+        Rotation3d rotationOffset = offsetTransform.getRotation();
 
         return new LimelightOffsets(translationOffset.getX(), translationOffset.getY(), rotationOffset);
     }

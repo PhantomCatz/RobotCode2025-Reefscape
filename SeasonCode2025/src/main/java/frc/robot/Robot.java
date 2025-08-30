@@ -2,7 +2,10 @@ package frc.robot;
 
 
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -408,12 +411,12 @@ public class Robot extends LoggedRobot {
   @Override
   public void testInit() {
     CommandScheduler.getInstance().cancelAll();
-    CatzRobotTracker.Instance.resetPose(CatzVision.Instance.getPoseObservation()[0].pose().toPose2d());
+    // CatzRobotTracker.Instance.resetPose(CatzVision.Instance.getPoseObservation()[0].pose().toPose2d());
 
-    Pose2d knownRobotPose = new Pose2d(1.0, 0.5, Rotation2d.fromDegrees(30));
+    Pose3d knownRobotPose = new Pose3d(new Translation3d(-1.1176, 0.0, 0.0), new Rotation3d(0.0, 0.0, 0.0));
     System.out.println("Known Robot Pose: " + knownRobotPose);
 
-    Pose2d limelightReportedPose = new Pose2d(0.8, 0.7, Rotation2d.fromDegrees(25));
+    Pose3d limelightReportedPose = CatzVision.Instance.getPoseObservation()[0].pose();
     System.out.println("Limelight Reported Pose (no offsets): " + limelightReportedPose);
     System.out.println("----------------------------------------");
 
