@@ -35,6 +35,8 @@ public class CatzElevator extends SubsystemBase {
 
   private boolean isElevatorInPos = false;
 
+  private boolean canMoveElevator = false;
+
   @RequiredArgsConstructor
   public static enum ElevatorPosition {
       //TO CHANGE HEIGHT GO TO ElevatorConstants.java
@@ -53,7 +55,7 @@ public class CatzElevator extends SubsystemBase {
       PosNull(() -> -1.0);
 
     private final DoubleSupplier elevatorSetpointSupplier;
-
+    private final double[] scoreHeights = {L1_HEIGHT, L2_HEIGHT, L3_HEIGHT, L4_HEIGHT, BOT_BOT_ALGAE, BOT_TOP_ALGAE};
     private double getTargetPositionInch() {
       return elevatorSetpointSupplier.getAsDouble();
     }
@@ -172,7 +174,7 @@ public class CatzElevator extends SubsystemBase {
         } else {
           io.runSetpointDown(targetPosition.getTargetPositionInch());
         }
-      } else {
+      } else if (canMoveElevator) {
         //Setpoint PID
         io.runSetpointUp(targetPosition.getTargetPositionInch());
 
@@ -335,5 +337,29 @@ public class CatzElevator extends SubsystemBase {
   public Command elevatorFullManual(Supplier<Double> manuaSupplier) {
 
     return run(() -> elevatorFullManual(manuaSupplier.get()));
+  }
+
+  public Command setCanMoveElevator(boolean setValue) {
+    return run(() -> this.canMoveElevator = setValue);
+  }
+
+  public Command incrementElevatorPosition() {
+    return run(() -> {
+      if (targetPosition != ElevatorPosition.PosL4) {
+        targetPosition = ElevatorPosition.values()[targetPosition.ordinal() + 1];
+      }
+    });
+  }
+
+  public Command decrementElevatorPosition() {
+    return run(() -> {
+      if (targetPosition != ElevatorPosition.PosL1) {
+        targetPosition = ElevatorPosition.values()[targetPosition.ordinal() - 1];
+      }
+    });
+  }
+
+  public ElevatorPosition getElevatorTargetPosition() {
+    return targetPosition;
   }
 }

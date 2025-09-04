@@ -30,6 +30,7 @@ import frc.robot.CatzSubsystems.CatzSuperstructure;
 import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.CatzRobotTracker;
 import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.Drivetrain.CatzDrivetrain;
 import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.Drivetrain.DriveConstants;
+import frc.robot.CatzSubsystems.CatzElevator.CatzElevator;
 import frc.robot.CatzSubsystems.CatzOuttake.CatzOuttake;
 import frc.robot.Commands.DriveAndRobotOrientationCmds.TrajectoryDriveCmd;
 
@@ -282,7 +283,7 @@ public class TeleopPosSelector { //TODO split up the file. it's too big and does
 
       Command prematureCommand;
       if(CatzSuperstructure.Instance.getChosenGamepiece() == Gamepiece.CORAL){
-        prematureCommand = CatzSuperstructure.Instance.LXElevator(CatzSuperstructure.Instance.getLevel());
+        prematureCommand = CatzElevator.Instance.setCanMoveElevator(true).andThen(CatzSuperstructure.Instance.LXElevator(CatzSuperstructure.Instance.getLevel()));
       }else{ //algae
         prematureCommand = new InstantCommand();
       }

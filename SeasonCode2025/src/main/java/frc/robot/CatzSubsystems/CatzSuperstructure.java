@@ -333,6 +333,26 @@ public class CatzSuperstructure extends VirtualSubsystem {
         }, Set.of());
     }
 
+    public Command ElevatorHeightShoot() {
+        return new DeferredCommand(() -> {
+            switch (CatzElevator.Instance.getElevatorTargetPosition()) {
+                case PosL1:
+                    return L1Shoot().alongWith(Commands.print("SHOOT L1")).andThen(new InstantCommand(()-> {TeleopPosSelector.Instance.hasCoralSIM = false;}));
+                case PosL2:
+                    return L2Shoot().alongWith(Commands.print("SHOOT L2")).andThen(new InstantCommand(()-> {TeleopPosSelector.Instance.hasCoralSIM = false;}));
+
+                case PosL3:
+                    return L3Shoot().alongWith(Commands.print("SHOOT L3")).andThen(new InstantCommand(()-> {TeleopPosSelector.Instance.hasCoralSIM = false;}));
+
+                case PosL4:
+                    return L4Shoot().alongWith(Commands.print("SHOOT L4")).andThen(new InstantCommand(()-> {TeleopPosSelector.Instance.hasCoralSIM = false;}));
+
+                default:
+                    return new PrintCommand("Invalid Level: " + level);
+            }
+        }, Set.of());
+    }
+
     public Command LXShoot(int level){
         return new DeferredCommand(() -> {
             switch(level){
@@ -405,6 +425,7 @@ public class CatzSuperstructure extends VirtualSubsystem {
             // new PrintCommand("not yet"),
             // Commands.waitUntil(() -> CatzRampPivot.Instance.isSafeToRaiseElevator()),
             // new PrintCommand("safe to raise CatzElevator.Instance!!"),
+            Commands.print("LXElevator run"),
             CatzElevator.Instance.Elevator_LX(level)
         ).unless(()-> Robot.isSimulation()).alongWith(Commands.print("L" + level+" CatzElevator.Instance Raise")).unless(()-> Robot.isSimulation());
     }

@@ -11,6 +11,7 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
+import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Autonomous.CatzAutonomous;
@@ -32,6 +33,7 @@ import frc.robot.Utilities.Alert;
 import frc.robot.Utilities.AllianceFlipUtil;
 import frc.robot.Utilities.DoublePressTracker;
 import frc.robot.Utilities.OverrideSwitch;
+import frc.robot.Utilities.waituntil;
 import frc.robot.Utilities.Alert.AlertType;
 
 import org.littletonrobotics.junction.networktables.LoggedNetworkNumber;
@@ -41,6 +43,9 @@ public class RobotContainer {
   public static final RobotContainer Instance = new RobotContainer();
 
   private final double SCORE_TRIGGER_THRESHHOLD = 0.8;
+
+  private boolean isScoring = false;
+  private boolean canShoot = false;
 
   // ------------------------------------------------------------------------------------------------------------------
   // Drive Controller Declaration
@@ -116,25 +121,73 @@ public class RobotContainer {
     }));
 
     // Climb
-    Trigger climbMode = xboxDrv.povLeft();
+    Trigger climbMode = xboxDrv.start();
     xboxDrv.b().onTrue(CatzSuperstructure.Instance.extendClimb());
     climbMode.toggleOnTrue(Commands.startEnd(()->CatzSuperstructure.Instance.setClimbOverride(()->true), ()->CatzSuperstructure.Instance.setClimbOverride(()->false)));
 
     //NBA
-    xboxDrv.rightTrigger().onTrue(TeleopPosSelector.Instance.runToNearestBranch().alongWith(Commands.runOnce(()->CatzLED.Instance.setControllerState(ControllerLEDState.NBA)))
-                                                               .onlyWhile(xboxDrv.rightTrigger())
-                                                               .unless(()->CatzSuperstructure.isClimbEnabled())
-                                                               .alongWith(CatzClimb.Instance.ClimbManualMode(()-> ((-xboxDrv.getRightTriggerAxis()-0.5)*2.0))
-                                                               .onlyIf(()-> CatzSuperstructure.isClimbEnabled()))
-    );
-    xboxDrv.rightTrigger().onFalse(Commands.runOnce(()->CatzLED.Instance.setControllerState(ControllerLEDState.FULL_MANUAL))
-                                           .unless(()-> CatzSuperstructure.isClimbEnabled())
-                                           .alongWith(CatzClimb.Instance.CancelClimb())
-    );
+    // xboxDrv.rightTrigger().onTrue(TeleopPosSelector.Instance.runToNearestBranch().alongWith(Commands.runOnce(()->CatzLED.Instance.setControllerState(ControllerLEDState.NBA)))
+    //                                                            .onlyWhile(xboxDrv.rightTrigger())
+    //                                                            .unless(()->CatzSuperstructure.isClimbEnabled())
+    //                                                            .alongWith(CatzClimb.Instance.ClimbManualMode(()-> ((-xboxDrv.getRightTriggerAxis()-0.5)*2.0))
+    //                                                            .onlyIf(()-> CatzSuperstructure.isClimbEnabled()))
+    // );
+    // xboxDrv.rightTrigger().onFalse(Commands.runOnce(()->CatzLED.Instance.setControllerState(ControllerLEDState.FULL_MANUAL))
+    //                                        .unless(()-> CatzSuperstructure.isClimbEnabled())
+    //                                        .alongWith(CatzClimb.Instance.CancelClimb())
+    // );
 
     // Left Right
-    xboxDrv.leftBumper().onTrue(TeleopPosSelector.Instance.runLeftRight(LeftRight.LEFT).unless(()->CatzSuperstructure.isClimbEnabled()));
-    xboxDrv.rightBumper().onTrue(TeleopPosSelector.Instance.runLeftRight(LeftRight.RIGHT).unless(()->CatzSuperstructure.isClimbEnabled()));
+    xboxDrv.x().onTrue(TeleopPosSelector.Instance.runLeftRight(LeftRight.LEFT).unless(()->CatzSuperstructure.isClimbEnabled()));
+    xboxDrv.b().onTrue(TeleopPosSelector.Instance.runLeftRight(LeftRight.RIGHT).unless(()->CatzSuperstructure.isClimbEnabled()));
+
+    // Drive to Reefc
+    xboxDrv.leftTrigger().onTrue(TeleopPosSelector.Instance.runToNearestBranch()
+    .alongWith(new InstantCommand(() -> CatzSuperstructure.Instance.setLevel(2)))
+    .alongWith(Commands.runOnce(()->CatzLED.Instance.setControllerState(ControllerLEDState.NBA)))
+    .alongWith(new InstantCommand(() -> isScoring = true))
+    .alongWith(new InstantCommand(() -> canShoot = false))
+    .andThen(Commands.print("finish alongwith things"))
+    .andThen(new WaitUntilCommand((() -> CatzElevator.Instance.isElevatorInPos() && canShoot)))
+    .andThen(Commands.print("finish waiting"))
+    .andThen(CatzSuperstructure.Instance.ElevatorHeightShoot()));
+
+    xboxDrv.rightTrigger().onTrue(TeleopPosSelector.Instance.runToNearestBranch()
+    .alongWith(new InstantCommand(() -> CatzSuperstructure.Instance.setLevel(1))
+    .alongWith(Commands.runOnce(()->CatzLED.Instance.setControllerState(ControllerLEDState.NBA))
+    .alongWith(new InstantCommand(() -> isScoring = true))
+    .alongWith(new InstantCommand(() -> canShoot = false))
+    .andThen(new WaitUntilCommand((() -> CatzElevator.Instance.isElevatorInPos() && canShoot)))))
+    .andThen(CatzSuperstructure.Instance.ElevatorHeightShoot()));
+
+    xboxDrv.leftBumper().onTrue(TeleopPosSelector.Instance.runToNearestBranch()
+    .alongWith(new InstantCommand(() -> CatzSuperstructure.Instance.setLevel(4))
+    .alongWith(Commands.runOnce(()->CatzLED.Instance.setControllerState(ControllerLEDState.NBA))
+    .alongWith(new InstantCommand(() -> isScoring = true))
+    .alongWith(new InstantCommand(() -> canShoot = false))
+    .andThen(new WaitUntilCommand((() -> CatzElevator.Instance.isElevatorInPos() && canShoot)))))
+    .andThen(CatzSuperstructure.Instance.ElevatorHeightShoot()));
+
+    xboxDrv.rightBumper().onTrue(TeleopPosSelector.Instance.runToNearestBranch()
+    .alongWith(new InstantCommand(() -> CatzSuperstructure.Instance.setLevel(3))
+    .alongWith(Commands.runOnce(()->CatzLED.Instance.setControllerState(ControllerLEDState.NBA))
+    .alongWith(new InstantCommand(() -> isScoring = true))
+    .alongWith(new InstantCommand(() -> canShoot = false))
+    .andThen(new WaitUntilCommand((() -> CatzElevator.Instance.isElevatorInPos() && canShoot)))))
+    .andThen(CatzSuperstructure.Instance.ElevatorHeightShoot()));
+
+    xboxDrv.leftTrigger().onFalse(new InstantCommand(() -> canShoot = true));
+    xboxDrv.rightTrigger().onFalse(new InstantCommand(() -> canShoot = true));
+    xboxDrv.leftBumper().onFalse(new InstantCommand(() -> canShoot = true));
+    xboxDrv.rightBumper().onFalse(new InstantCommand(() -> canShoot = true));
+
+    xboxDrv.a().onTrue(CatzElevator.Instance.decrementElevatorPosition().onlyIf(() -> isScoring));
+    xboxDrv.y().onTrue(CatzElevator.Instance.incrementElevatorPosition().onlyIf(() -> isScoring));
+
+    // cancel drive to reef
+    xboxDrv.rightStick().onTrue(CatzDrivetrain.Instance.cancelTrajectory()
+    .alongWith(new InstantCommand(() -> isScoring = false))
+    .alongWith(Commands.print("cancelling path")));
 
     //     // Manual Climb Control
     // xboxDrv.povUp().onTrue(CatzClimb.Instance.ClimbManualMode(()-> 0.4));
