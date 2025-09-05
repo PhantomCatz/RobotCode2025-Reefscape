@@ -25,14 +25,11 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.CatzConstants;
 import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.CatzRobotTracker;
 import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.CatzRobotTracker.OdometryObservation;
-import frc.robot.CatzSubsystems.CatzOuttake.CatzOuttake;
 import frc.robot.Commands.DriveAndRobotOrientationCmds.HolonomicDriveController;
 import frc.robot.Robot;
 import frc.robot.Autonomous.AutonConstants;
 import frc.robot.Utilities.Alert;
 import frc.robot.Utilities.EqualsUtil;
-import frc.robot.Utilities.SwerveSetpoint;
-import frc.robot.Utilities.SwerveSetpointGenerator;
 
 import java.util.Arrays;
 import org.littletonrobotics.junction.AutoLogOutput;
@@ -66,16 +63,17 @@ public class CatzDrivetrain extends SubsystemBase {
 
   private HolonomicDriveController hoController = DriveConstants.getNewHolController();
 
-  private SwerveSetpoint currentSetpoint =
-      new SwerveSetpoint(
-          new ChassisSpeeds(),
-          new SwerveModuleState[] {
-            new SwerveModuleState(),
-            new SwerveModuleState(),
-            new SwerveModuleState(),
-            new SwerveModuleState()
-          });
-  private final SwerveSetpointGenerator swerveSetpointGenerator;
+  // TODO Remmove this if we are not going to use it
+  // private SwerveSetpoint currentSetpoint =
+  //     new SwerveSetpoint(
+  //         new ChassisSpeeds(),
+  //         new SwerveModuleState[] {
+  //           new SwerveModuleState(),
+  //           new SwerveModuleState(),
+  //           new SwerveModuleState(),
+  //           new SwerveModuleState()
+  //         });
+  // private final SwerveSetpointGenerator swerveSetpointGenerator;
 
   private final Field2d field;
 
@@ -108,9 +106,9 @@ public class CatzDrivetrain extends SubsystemBase {
     m_swerveModules[INDEX_BL] = LT_BACK_MODULE;
     m_swerveModules[INDEX_FL] = LT_FRNT_MODULE;
 
-    swerveSetpointGenerator =
-        new SwerveSetpointGenerator(DriveConstants.SWERVE_KINEMATICS, DriveConstants.MODULE_TRANSLATIONS);
-
+    // swerveSetpointGenerator =
+    //     new SwerveSetpointGenerator(DriveConstants.SWERVE_KINEMATICS, DriveConstants.MODULE_TRANSLATIONS);
+    // TODO Remmove this if we are not going to use it
 
     field = new Field2d();
     SmartDashboard.putData("Field", field);

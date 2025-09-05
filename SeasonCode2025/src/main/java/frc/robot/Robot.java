@@ -11,6 +11,7 @@ import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import frc.robot.Autonomous.AutoRoutineSelector;
 import frc.robot.CatzConstants.RobotHardwareMode;
 import frc.robot.CatzConstants.RobotID;
+import frc.robot.CatzSubsystems.CatzSuperstructure;
 import frc.robot.CatzSubsystems.CatzAlgaeEffector.CatzAlgaePivot.CatzAlgaePivot;
 import frc.robot.CatzSubsystems.CatzAlgaeEffector.CatzAlgaePivot.CatzAlgaePivot.AlgaePivotPosition;
 import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.CatzRobotTracker;
@@ -293,6 +294,7 @@ public class Robot extends LoggedRobot {
       LOW_BATTERY_ALERT.set(true);
       LED.setControllerState(ControllerLEDState.lowBatteryAlert);
     }
+
   }
 
   // --------------------------------------------------------------------------------------------------------
@@ -348,8 +350,11 @@ public class Robot extends LoggedRobot {
     LAST_DEPLOYMENT_WARNING.set(true);
     CatzRampPivot.Instance.setNeutralMode(NeutralMode.BRAKE);
     CatzAlgaePivot.Instance.setAlgaePivotPos(AlgaePivotPosition.STOW);
+
+
     autoStart = Timer.getFPGATimestamp();
-    m_autonomousCommand = AutoRoutineSelector.Instance.getSelectedCommand();
+    m_autonomousCommand = CatzSuperstructure.Instance.scoreLevelTwoAutomated();
+    //m_autonomousCommand = AutoRoutineSelector.Instance.getSelectedCommand();
     CatzRampPivot.Instance.Ramp_Intake_Pos().withTimeout(1.0);
     if (m_autonomousCommand != null) {
       m_autonomousCommand.schedule();

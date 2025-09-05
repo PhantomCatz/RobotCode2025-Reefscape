@@ -11,7 +11,6 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.math.util.Units;
-import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.FieldConstants;
@@ -23,7 +22,6 @@ import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.Vision.CatzVision;
 import frc.robot.Utilities.AllianceFlipUtil;
 
 import java.util.List;
-import java.util.NoSuchElementException;
 import java.util.function.Supplier;
 
 import org.littletonrobotics.junction.Logger;
@@ -325,7 +323,7 @@ public class TrajectoryDriveCmd extends Command {
       return false;
     }
 
-    System.out.println("vision: " + tracker.getVisionPoseShift().getNorm());
+   // System.out.println("vision: " + tracker.getVisionPoseShift().getNorm());
     if (CatzVision.Instance.isSeeingApriltag() && autoalign && tracker.getVisionPoseShift().getNorm() > ALLOWABLE_VISION_ADJUST) {
       // If trailing pose is within margin
       System.out.println("not visioning");
@@ -369,8 +367,8 @@ public class TrajectoryDriveCmd extends Command {
     double currentRPS = Units.radiansToDegrees(currentChassisSpeeds.omegaRadiansPerSecond);
 
     double rotationError = Math.abs(desiredRotation - currentRotation);
-    if (rotationError > 180) {
-      rotationError = 360 - rotationError;
+    if (rotationError > 180.0) {
+      rotationError = 360.0 - rotationError;
     }
 
     // Desperate Throwing
@@ -385,8 +383,9 @@ public class TrajectoryDriveCmd extends Command {
 
     CatzRobotTracker.Instance.setReachedGoal(isPoseWithinThreshold(poseError));
 
-    return isPoseWithinThreshold(poseError) && rotationError < ALLOWABLE_ROTATION_ERROR &&
-    (desiredMPS != 0.0 || (currentMPS < ALLOWABLE_VEL_ERROR && currentRPS < ALLOWABLE_OMEGA_ERROR));
+    return isPoseWithinThreshold(poseError) &&
+           rotationError < ALLOWABLE_ROTATION_ERROR &&
+          (desiredMPS != 0.0 || (currentMPS < ALLOWABLE_VEL_ERROR && currentRPS < ALLOWABLE_OMEGA_ERROR));
   }
 
   public boolean isPoseWithinThreshold(double poseError) {

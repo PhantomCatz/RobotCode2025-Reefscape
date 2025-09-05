@@ -110,6 +110,7 @@ public class VisionIOLimelight implements VisionIO {
           //----------------------------------------------------------------------------------------------
           // Megatag 1 estimation
           //----------------------------------------------------------------------------------------------
+          // TODO Remove this
           // for (var rawSample : megatag1Subscriber.readQueue()) {
           //   // if sample is invalid, skip
           //   if (rawSample.value.length == 0) continue;

@@ -228,7 +228,7 @@ public class CatzVision extends SubsystemBase {
         return true;
       }
     }
-    System.out.println("NOT WEEING ANYTHING");
+    //System.out.println("NOT WEEING ANYTHING");
     return false;
   }
 }

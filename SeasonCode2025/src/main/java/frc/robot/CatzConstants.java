@@ -1,11 +1,14 @@
 package frc.robot;
 
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.util.Color;
 import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.CatzRobotTracker;
 import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.Drivetrain.CatzDrivetrain;
 import frc.robot.Utilities.Alert;
 import frc.robot.Utilities.Alert.AlertType;
+
 
 import choreo.auto.AutoFactory;
 
@@ -78,6 +81,9 @@ public final class CatzConstants {
       }
     }
   }
+
+  public static final Pose2d defaultPose = new Pose2d();
+  public static final Pose2d startMiddle = new Pose2d(8.0, 4.0, Rotation2d.k180deg);
 
   public static enum RobotID {
     SN1,

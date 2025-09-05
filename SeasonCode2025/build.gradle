@@ -236,6 +236,7 @@ spotless {
         trimTrailingWhitespace()
         endWithNewline()
         licenseHeader('')
+        removeUnusedImports()
         //licenseHeader("//\n//        \"6 hours of debugging can save you 5 minutes of reading documentation.\"\n//\n//------------------------------------------------------------------------------------")
     }
     groovyGradle {

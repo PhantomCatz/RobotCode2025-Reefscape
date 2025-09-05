@@ -9,7 +9,6 @@ import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
 import frc.robot.CatzSubsystems.CatzElevator.CatzElevator;
-import frc.robot.CatzSubsystems.CatzElevator.ElevatorIOSim;
 
 public class AlgaePivotIOSim implements AlgaePivotIO{
     private final DCMotor m_algaePivotGearbox = DCMotor.getKrakenX60Foc(1);

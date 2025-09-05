@@ -20,11 +20,9 @@ import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import frc.robot.Robot;
 import frc.robot.TeleopPosSelector;
-import frc.robot.Autonomous.CatzAutonomous;
 import frc.robot.CatzSubsystems.CatzAlgaeEffector.CatzAlgaePivot.CatzAlgaePivot;
 import frc.robot.CatzSubsystems.CatzAlgaeEffector.CatzAlgaeRemover.CatzAlgaeRemover;
 import frc.robot.CatzSubsystems.CatzClimb.CatzClimb;
-import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.CatzRobotTracker;
 import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.Drivetrain.CatzDrivetrain;
 import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.Drivetrain.DriveConstants;
 import frc.robot.CatzSubsystems.CatzElevator.CatzElevator;
@@ -42,6 +40,9 @@ import lombok.Setter;
 public class CatzSuperstructure extends VirtualSubsystem {
     public static final CatzSuperstructure Instance = new CatzSuperstructure();
 
+    //--------------------------------------------------------------------------------
+    // Robot Operational State variables
+    //--------------------------------------------------------------------------------
     static @Getter @Setter @AutoLogOutput(key = "CatzSuperstructure/ChosenGamepiece")
     private Gamepiece chosenGamepiece = Gamepiece.CORAL;
 
@@ -65,6 +66,15 @@ public class CatzSuperstructure extends VirtualSubsystem {
 
     private Command previousAction = new InstantCommand();
 
+    @Getter @AutoLogOutput(key = "CatzSuperstructure/IsScoring")
+    private boolean isScoring = false;
+
+    @Getter @AutoLogOutput(key = "CatzSuperstructure/CanShoot")
+    private boolean canShoot = false;
+
+    //--------------------------------------------------------------------------------
+    // RobotOperationalState Enums
+    //--------------------------------------------------------------------------------
     public enum Gamepiece{
         CORAL,
         ALGAE
@@ -122,16 +132,20 @@ public class CatzSuperstructure extends VirtualSubsystem {
         this.level = 1;
     }
 
-    public void cycleGamePieceSelection() {
-        if(chosenGamepiece == Gamepiece.CORAL) {
-            chosenGamepiece = Gamepiece.ALGAE;
-            System.out.println("Gamepiece: ALGAE");
-        } else {
-            chosenGamepiece = Gamepiece.CORAL;
-            System.out.println("Gamepiece: CORAL");
-        }
-    }
+    // TODO: One driver controller should handle this, remove method
+    // public void cycleGamePieceSelection() {
+    //     if(chosenGamepiece == Gamepiece.CORAL) {
+    //         chosenGamepiece = Gamepiece.ALGAE;
+    //         System.out.println("Gamepiece: ALGAE");
+    //     } else {
+    //         chosenGamepiece = Gamepiece.CORAL;
+    //         System.out.println("Gamepiece: CORAL");
+    //     }
+    // }
 
+    //--------------------------------------------------------------------------------
+    // Climb setting
+    //--------------------------------------------------------------------------------
     public void setClimbOverride(BooleanSupplier isClimbEnabled) {
         CatzSuperstructure.isClimbEnabled = isClimbEnabled.getAsBoolean();
         if (isClimbEnabled()) {
@@ -143,6 +157,23 @@ public class CatzSuperstructure extends VirtualSubsystem {
         System.out.println("CLimb Enabled" + isClimbEnabled);
     }
 
+    public Command extendClimb() {
+
+        return new SequentialCommandGroup(
+            new ParallelCommandGroup(
+                CatzOuttake.Instance.stopOuttake(),
+                CatzAlgaeRemover.Instance.stopAlgae(),
+                CatzRampPivot.Instance.Ramp_Climb_Pos(),
+                CatzIntakeRollers.Instance.stopIntaking()
+            ).alongWith(Commands.waitSeconds(0.1)), //TBD TESITNG
+
+            CatzClimb.Instance.extendClimb()
+        ).unless(()-> Robot.isSimulation()).alongWith(Commands.print("EXTENDING CLIMB/////////////////////////////"));
+    }
+
+    //--------------------------------------------------------------------------------
+    // Automated simple drivng and scoring commands
+    //--------------------------------------------------------------------------------
     public Command driveToScore(PathPlannerPath pathToReadyPose, int level){
 
         return new SequentialCommandGroup(
@@ -180,6 +211,29 @@ public class CatzSuperstructure extends VirtualSubsystem {
         );
     }
 
+    //--------------------------------------------------------------------------------
+    // One Drive Abstraction Commands
+    //--------------------------------------------------------------------------------
+    public Command scoreLevelTwoAutomated(){
+        return Commands.sequence(
+            Commands.print("start score level 2 auto"),
+            Commands.parallel(
+                TeleopPosSelector.Instance.runToNearestBranch(), // this works
+                new InstantCommand(() -> CatzSuperstructure.Instance.setLevel(2)),
+                Commands.runOnce(() -> CatzLED.Instance.setControllerState(ControllerLEDState.NBA)),
+                new InstantCommand(() -> isScoring = true),
+                new InstantCommand(() -> canShoot = false)
+            ),
+            Commands.print("finish alongwith things"),
+            new WaitUntilCommand(() -> CatzElevator.Instance.isElevatorInPos() && canShoot),
+            Commands.print("finish waiting"),
+            CatzSuperstructure.Instance.ElevatorHeightShoot()
+        );
+    }
+
+    //--------------------------------------------------------------------------------
+    // Mechanism Action Commands
+    //--------------------------------------------------------------------------------
     public Command stow(){
         return new ParallelCommandGroup(
             CatzAlgaeRemover.Instance.stopAlgae(),
@@ -279,6 +333,9 @@ public class CatzSuperstructure extends VirtualSubsystem {
         ).unless(()-> Robot.isSimulation()).alongWith(Commands.print("L4 Scoring State"));
     }
 
+    //--------------------------------------------------------------------------------
+    // Level Selector scoring
+    //--------------------------------------------------------------------------------
     public Command LXCoral(int level){
         TeleopPosSelector selector = TeleopPosSelector.Instance;
 
@@ -333,6 +390,9 @@ public class CatzSuperstructure extends VirtualSubsystem {
         }, Set.of());
     }
 
+    //--------------------------------------------------------------------------------
+    // Level Selector Coral shooting
+    //--------------------------------------------------------------------------------
     public Command ElevatorHeightShoot() {
         return new DeferredCommand(() -> {
             switch (CatzElevator.Instance.getElevatorTargetPosition()) {
@@ -430,6 +490,10 @@ public class CatzSuperstructure extends VirtualSubsystem {
         ).unless(()-> Robot.isSimulation()).alongWith(Commands.print("L" + level+" CatzElevator.Instance Raise")).unless(()-> Robot.isSimulation());
     }
 
+    //--------------------------------------------------------------------------------
+    // Algae Level Selector and Scoring
+    //--------------------------------------------------------------------------------
+
     public Command botAlgae() {
 
         return new SequentialCommandGroup(
@@ -464,6 +528,33 @@ public class CatzSuperstructure extends VirtualSubsystem {
         ).unless(()-> Robot.isSimulation()).alongWith(Commands.print("Top Algae"));
     }
 
+    public Command XAlgae(int level){
+        switch(level){
+            case 2:
+            return topAlgae();
+
+            case 4:
+            return botAlgae();
+
+            default:
+            return new PrintCommand("Invalid Algae Level!");
+        }
+    }
+
+    public Command algaeStow() {
+        return new ParallelCommandGroup(
+            CatzOuttake.Instance.stopOuttake(),
+            CatzAlgaePivot.Instance.AlgaePivot_Punch(),
+            CatzRampPivot.Instance.Ramp_Intake_Pos(),  //TBD intake ramp pivot holds at intaking position for the duration of the match
+            CatzIntakeRollers.Instance.stopIntaking(),
+            CatzElevator.Instance.Elevator_Coast_Stow(),
+            CatzAlgaeRemover.Instance.holdAlgae()
+        ).unless(()-> Robot.isSimulation()).alongWith(Commands.print("Stow"));
+    }
+
+    //--------------------------------------------------------------------------------
+    // Autonomous specific commands
+    //--------------------------------------------------------------------------------
     public Command scoreInAuto(int level){
         return Commands.sequence
         (
@@ -482,45 +573,6 @@ public class CatzSuperstructure extends VirtualSubsystem {
         }
     }
 
-     public Command XAlgae(int level){
-        switch(level){
-            case 2:
-            return topAlgae();
-
-            case 4:
-            return botAlgae();
-
-            default:
-            return new PrintCommand("Invalid Algae Level!");
-        }
-    }
-
-
-    public Command algaeStow() {
-        return new ParallelCommandGroup(
-            CatzOuttake.Instance.stopOuttake(),
-            CatzAlgaePivot.Instance.AlgaePivot_Punch(),
-            CatzRampPivot.Instance.Ramp_Intake_Pos(),  //TBD intake ramp pivot holds at intaking position for the duration of the match
-            CatzIntakeRollers.Instance.stopIntaking(),
-            CatzElevator.Instance.Elevator_Coast_Stow(),
-            CatzAlgaeRemover.Instance.holdAlgae()
-        ).unless(()-> Robot.isSimulation()).alongWith(Commands.print("Stow"));
-    }
-
-    public Command extendClimb() {
-
-        return new SequentialCommandGroup(
-            new ParallelCommandGroup(
-                CatzOuttake.Instance.stopOuttake(),
-                CatzAlgaeRemover.Instance.stopAlgae(),
-                CatzRampPivot.Instance.Ramp_Climb_Pos(),
-                CatzIntakeRollers.Instance.stopIntaking()
-            ).alongWith(Commands.waitSeconds(0.1)), //TBD TESITNG
-
-            CatzClimb.Instance.extendClimb()
-        ).unless(()-> Robot.isSimulation()).alongWith(Commands.print("EXTENDING CLIMB/////////////////////////////"));
-    }
-
 
     @Override
     public void periodic() {
@@ -535,6 +587,8 @@ public class CatzSuperstructure extends VirtualSubsystem {
         getCurrentCoralState();
         isClimbEnabled();
 
+        isCanShoot();
+        isScoring();
     }
 
 
