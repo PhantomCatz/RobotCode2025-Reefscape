@@ -21,6 +21,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.DeferredCommand;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RepeatCommand;
+import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import frc.robot.FieldConstants.Reef;
 import frc.robot.Utilities.AllianceFlipUtil;
 import frc.robot.Utilities.CornerTrackingPathfinder;
@@ -31,6 +32,7 @@ import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.CatzRobotTracker;
 import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.Drivetrain.CatzDrivetrain;
 import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.Drivetrain.DriveConstants;
 import frc.robot.CatzSubsystems.CatzOuttake.CatzOuttake;
+import frc.robot.Commands.DriveAndRobotOrientationCmds.PIDDriveCmd;
 import frc.robot.Commands.DriveAndRobotOrientationCmds.TrajectoryDriveCmd;
 
 @SuppressWarnings({ "rawtypes", "unchecked" })
@@ -287,11 +289,16 @@ public class TeleopPosSelector { //TODO split up the file. it's too big and does
         prematureCommand = new InstantCommand();
       }
 
-      PathPlannerPath path = getStraightLinePath(CatzRobotTracker.Instance.getEstimatedPose(), calculateReefPose(getClosestReefPos().getFirst(), true, false), DriveConstants.PATHFINDING_CONSTRAINTS);
+      // PathPlannerPath path = getStraightLinePath(CatzRobotTracker.Instance.getEstimatedPose(), calculateReefPose(getClosestReefPos().getFirst(), true, false), DriveConstants.PATHFINDING_CONSTRAINTS);
 
-      Command prepareScorePos = new TrajectoryDriveCmd(path, true, true)
-                                        .deadlineFor(new RepeatCommand(prematureCommand.onlyIf(() -> CatzDrivetrain.Instance.getDistanceError() < DriveConstants.PREDICT_DISTANCE_SCORE)))
-                                        .andThen(RobotContainer.Instance.controllerRumbleCommand());
+      // Command prepareScorePos = new TrajectoryDriveCmd(path, true, true)
+      //                                   .deadlineFor(new RepeatCommand(prematureCommand.onlyIf(() -> CatzDrivetrain.Instance.getDistanceError() < DriveConstants.PREDICT_DISTANCE_SCORE)))
+      //                                   .andThen(RobotContainer.Instance.controllerRumbleCommand());
+
+      Command prepareScorePos = new PIDDriveCmd(calculateReefPose(getClosestReefPos().getFirst(), true, false))
+                                  .andThen(new WaitUntilCommand(() -> CatzDrivetrain.Instance.getDistanceError() < DriveConstants.PREDICT_DISTANCE_SCORE))
+                                  .andThen(prematureCommand)
+                                  .andThen(RobotContainer.Instance.controllerRumbleCommand());
 
       return prepareScorePos;
     }, Set.of(CatzDrivetrain.Instance));
