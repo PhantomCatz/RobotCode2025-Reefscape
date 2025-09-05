@@ -139,15 +139,17 @@ public class RobotContainer {
     xboxDrv.b().onTrue(TeleopPosSelector.Instance.runLeftRight(LeftRight.RIGHT).unless(()->CatzSuperstructure.isClimbEnabled()));
 
     // Drive to Reefc
-    xboxDrv.leftTrigger().onTrue(TeleopPosSelector.Instance.runToNearestBranch()
-    .alongWith(new InstantCommand(() -> CatzSuperstructure.Instance.setLevel(2)))
-    .alongWith(Commands.runOnce(()->CatzLED.Instance.setControllerState(ControllerLEDState.NBA)))
-    .alongWith(new InstantCommand(() -> isScoring = true))
-    .alongWith(new InstantCommand(() -> canShoot = false))
-    .andThen(Commands.print("finish alongwith things"))
-    .andThen(new WaitUntilCommand((() -> CatzElevator.Instance.isElevatorInPos() && canShoot)))
-    .andThen(Commands.print("finish waiting"))
-    .andThen(CatzSuperstructure.Instance.ElevatorHeightShoot()));
+    xboxDrv.leftTrigger().onTrue(CatzSuperstructure.Instance.scoreLevelTwoAutomated());
+
+    // xboxDrv.leftTrigger().onTrue(TeleopPosSelector.Instance.runToNearestBranch()
+    // .alongWith(new InstantCommand(() -> CatzSuperstructure.Instance.setLevel(2)))
+    // .alongWith(Commands.runOnce(()->CatzLED.Instance.setControllerState(ControllerLEDState.NBA)))
+    // .alongWith(new InstantCommand(() -> isScoring = true))
+    // .alongWith(new InstantCommand(() -> canShoot = false))
+    // .andThen(Commands.print("finish alongwith things"))
+    // .andThen(new WaitUntilCommand((() -> CatzElevator.Instance.isElevatorInPos() && canShoot)))
+    // .andThen(Commands.print("finish waiting"))
+    // .andThen(CatzSuperstructure.Instance.ElevatorHeightShoot()));
 
     xboxDrv.rightTrigger().onTrue(TeleopPosSelector.Instance.runToNearestBranch()
     .alongWith(new InstantCommand(() -> CatzSuperstructure.Instance.setLevel(1))
@@ -329,7 +331,7 @@ public class RobotContainer {
         () -> {
           xboxDrv.getHID().setRumble(RumbleType.kBothRumble, 0.0);
           xboxAux.getHID().setRumble(RumbleType.kBothRumble, 0.0);
-        });
+        }).withTimeout(1.0);
   }
 
   public Command rumbleDrvController(double strength, double duration){

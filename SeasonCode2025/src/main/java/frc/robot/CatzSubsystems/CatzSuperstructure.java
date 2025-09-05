@@ -66,10 +66,10 @@ public class CatzSuperstructure extends VirtualSubsystem {
 
     private Command previousAction = new InstantCommand();
 
-    @Getter @AutoLogOutput(key = "CatzSuperstructure/IsScoring")
+    @Getter @Setter @AutoLogOutput(key = "CatzSuperstructure/IsScoring")
     private boolean isScoring = false;
 
-    @Getter @AutoLogOutput(key = "CatzSuperstructure/CanShoot")
+    @Getter @Setter @AutoLogOutput(key = "CatzSuperstructure/CanShoot")
     private boolean canShoot = false;
 
     //--------------------------------------------------------------------------------
@@ -218,18 +218,20 @@ public class CatzSuperstructure extends VirtualSubsystem {
         return Commands.sequence(
             Commands.print("start score level 2 auto"),
             Commands.parallel(
-                TeleopPosSelector.Instance.runToNearestBranch(), // this works
+                TeleopPosSelector.Instance.runToNearestBranch(),
                 new InstantCommand(() -> CatzSuperstructure.Instance.setLevel(2)),
                 Commands.runOnce(() -> CatzLED.Instance.setControllerState(ControllerLEDState.NBA)),
-                new InstantCommand(() -> isScoring = true),
+                new InstantCommand(() -> isScoring = true), // TODO these booleans will not change states due to nature of changing variables withing command type methods
                 new InstantCommand(() -> canShoot = false)
             ),
-            Commands.print("finish alongwith things"),
+            Commands.print("finish alongwith things" + isScoring + canShoot),
             new WaitUntilCommand(() -> CatzElevator.Instance.isElevatorInPos() && canShoot),
             Commands.print("finish waiting"),
             CatzSuperstructure.Instance.ElevatorHeightShoot()
         );
     }
+
+
 
     //--------------------------------------------------------------------------------
     // Mechanism Action Commands

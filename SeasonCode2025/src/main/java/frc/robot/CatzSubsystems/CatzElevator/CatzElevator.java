@@ -236,7 +236,7 @@ public class CatzElevator extends SubsystemBase {
       break;
 
     }
-    return cmd.unless(() -> Robot.isSimulation()).alongWith(new PrintCommand("Elevator " + level));
+    return cmd.unless(() -> Robot.isSimulation()).alongWith(new PrintCommand("Elevator " + level)); // TODO this part is redundant
   }
 
   public boolean isElevatorInPos(){
