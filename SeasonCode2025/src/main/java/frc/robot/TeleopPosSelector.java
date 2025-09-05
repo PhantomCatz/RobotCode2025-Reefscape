@@ -296,8 +296,11 @@ public class TeleopPosSelector { //TODO split up the file. it's too big and does
       //                                   .andThen(RobotContainer.Instance.controllerRumbleCommand());
 
       Command prepareScorePos = new PIDDriveCmd(calculateReefPose(getClosestReefPos().getFirst(), true, false))
-                                  .andThen(new WaitUntilCommand(() -> CatzDrivetrain.Instance.getDistanceError() < DriveConstants.PREDICT_DISTANCE_SCORE))
-                                  .andThen(prematureCommand)
+                                  .alongWith
+                                  (
+                                    new WaitUntilCommand(() -> CatzDrivetrain.Instance.getDistanceError() < DriveConstants.PREDICT_DISTANCE_SCORE)
+                                    .andThen(prematureCommand)
+                                  )
                                   .andThen(RobotContainer.Instance.controllerRumbleCommand());
 
       return prepareScorePos;
