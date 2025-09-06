@@ -257,9 +257,9 @@ public class TeleopPosSelector { //TODO split up the file. it's too big and does
 
       Logger.recordOutput("LeftRightGoal", goal);
 
-      PathPlannerPath path = getStraightLinePath(currentPose, goal, DriveConstants.PATHFINDING_CONSTRAINTS); //TODO might need to scale constraints based off of distance from reef?
-
-      return new TrajectoryDriveCmd(path, true, true).andThen(RobotContainer.Instance.rumbleDrvAuxController(1.0, 0.2));
+      // PathPlannerPath path = getStraightLinePath(currentPose, goal, DriveConstants.PATHFINDING_CONSTRAINTS); //TODO might need to scale constraints based off of distance from reef?
+      return new PIDDriveCmd(goal);
+      // return new TrajectoryDriveCmd(path, true, true).andThen(RobotContainer.Instance.rumbleDrvAuxController(1.0, 0.2));
     }, Set.of(CatzDrivetrain.Instance));
 
   }
