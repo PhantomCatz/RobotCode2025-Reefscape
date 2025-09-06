@@ -1,5 +1,8 @@
 package frc.robot.Commands.DriveAndRobotOrientationCmds;
 
+import org.littletonrobotics.junction.Logger;
+
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -22,14 +25,12 @@ public class PIDDriveCmd extends Command{
     // Define tolerances for position and velocity to determine if the goal is reached
     private final double POSITION_TOLERANCE_METERS = 0.05; // 5 centimeters
     private final double VELOCITY_TOLERANCE_MPS = 0.1;     // 10 centimeters per second
+    private final double ANGLE_TOLERANCE_DEGREES = 2.0;
 
     public PIDDriveCmd(Pose2d goal){
         addRequirements(CatzDrivetrain.Instance);
 
         this.goalPos = goal;
-
-        // Note: These PID and TrapezoidProfile values are starting points.
-        // They will need to be tuned for your specific robot's characteristics.
 
         // Configure the translation controller
         var translationConstraints = new TrapezoidProfile.Constraints(
@@ -45,32 +46,38 @@ public class PIDDriveCmd extends Command{
         );
         this.rotationController = new ProfiledPIDController(0.4, 0.0, 0.0, rotationConstraints);
 
-        // Enable continuous input for the rotation controller to handle wrapping from -180 to 180 degrees
-        this.rotationController.enableContinuousInput(-180.0, 180.0);
+        this.rotationController.enableContinuousInput(0, 360);
     }
 
     @Override
     public void initialize(){
-        Pose2d currentPose = CatzRobotTracker.Instance.getEstimatedPose();
-        Translation2d poseError = goalPos.minus(currentPose).getTranslation();
-
-        direction = poseError.getAngle();
+        Logger.recordOutput("PID Target Pose", goalPos);
     }
 
     @Override
     public void execute(){
         Pose2d currentPose = CatzRobotTracker.Instance.getEstimatedPose();
 
-        double currentDistance = goalPos.getTranslation().getDistance(currentPose.getTranslation());
+        Translation2d poseError = goalPos.minus(currentPose).getTranslation();
+        double currentDistance = poseError.getNorm();
+        direction = poseError.getAngle();
+        Logger.recordOutput("Pose Error Angle", direction.getDegrees());
 
         // The goal of the translation controller is to drive the distance error to zero
-        double targetVel = translationController.calculate(currentDistance, 0.0);
+        double targetVel = Math.abs(translationController.calculate(currentDistance, 0.0));
+        Logger.recordOutput("Pose Error Target Vel", targetVel);
+        Logger.recordOutput("Pose Error Cosine", direction.getCos());
+        Logger.recordOutput("Pose Error Sine", direction.getSin());
 
         // The goal of the rotation controller is to drive the angle to the target angle
-        double targetOmega = rotationController.calculate(currentPose.getRotation().getDegrees(), goalPos.getRotation().getDegrees());
+        Logger.recordOutput("Pose Error RotDif", MathUtil.inputModulus(MathUtil.inputModulus(goalPos.getRotation().getDegrees(), 0.0, 360.0) - currentPose.getRotation().getDegrees(), 0.0, 360.0));
+        double targetOmega = rotationController.calculate(MathUtil.inputModulus(currentPose.getRotation().getDegrees(), 0.0, 360.0), MathUtil.inputModulus(goalPos.getRotation().getDegrees(), 0.0, 360.0));
+        Logger.recordOutput("Pose Error Omega", targetOmega);
 
         ChassisSpeeds goalChassisSpeeds = new ChassisSpeeds(targetVel * direction.getCos(), targetVel * direction.getSin(), targetOmega);
         CatzDrivetrain.Instance.drive(goalChassisSpeeds);
+
+        CatzDrivetrain.Instance.setDistanceError(currentDistance);
     }
 
     @Override
@@ -78,27 +85,23 @@ public class PIDDriveCmd extends Command{
         return isAtTargetState();
     }
 
-    /**
-    * Checks if the robot has reached its target position and its velocity is near zero.
-    * @return true if the robot is at the target state, false otherwise.
-    */
     private boolean isAtTargetState(){
         Pose2d currentPose = CatzRobotTracker.Instance.getEstimatedPose();
         ChassisSpeeds currentSpeed = CatzRobotTracker.Instance.getRobotChassisSpeeds();
 
-        // Calculate the error in distance to the target position
         double distanceError = currentPose.getTranslation().getDistance(goalPos.getTranslation());
-        
-        // Calculate the robot's current linear velocity magnitude
+
         double linearVelocity = Math.hypot(currentSpeed.vxMetersPerSecond, currentSpeed.vyMetersPerSecond);
 
-        // The command is finished if the robot is within the position tolerance AND its velocity is below the tolerance
-        return distanceError < POSITION_TOLERANCE_METERS && linearVelocity < VELOCITY_TOLERANCE_MPS;
+        double rotationError = Math.abs(goalPos.minus(currentPose).getRotation().getDegrees());
+
+        return distanceError < POSITION_TOLERANCE_METERS && linearVelocity < VELOCITY_TOLERANCE_MPS && rotationError < ANGLE_TOLERANCE_DEGREES;
     }
 
     @Override
     public void end(boolean interrupted) {
-        // Stop the drivetrain by sending zero speeds
+        System.out.println("finished!!!!!! yayayay");
+
         CatzDrivetrain.Instance.drive(new ChassisSpeeds());
     }
 }
