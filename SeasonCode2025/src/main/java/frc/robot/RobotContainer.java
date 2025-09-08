@@ -11,7 +11,6 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
-import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.CatzSubsystems.CatzSuperstructure;
@@ -23,8 +22,6 @@ import frc.robot.CatzSubsystems.CatzClimb.CatzClimb;
 import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.CatzRobotTracker;
 import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.Drivetrain.CatzDrivetrain;
 import frc.robot.CatzSubsystems.CatzElevator.*;
-import frc.robot.CatzSubsystems.CatzLEDs.CatzLED;
-import frc.robot.CatzSubsystems.CatzLEDs.CatzLED.ControllerLEDState;
 import frc.robot.CatzSubsystems.CatzRampPivot.CatzRampPivot;
 import frc.robot.Commands.DriveAndRobotOrientationCmds.TeleopDriveCmd;
 import frc.robot.Utilities.Alert;
@@ -140,6 +137,30 @@ public class RobotContainer {
 
     // Drive to Reefc
     xboxDrv.leftTrigger().onTrue(CatzSuperstructure.Instance.scoreLevelTwoAutomated());
+    //TODO add more automated commands for one driver
+
+    xboxDrv.leftTrigger().onFalse(new InstantCommand(() -> {
+      CatzSuperstructure.Instance.setCanShoot(() -> true);
+      CatzSuperstructure.Instance.setIsScoring(() -> false);
+    }));
+
+    xboxDrv.rightTrigger().onFalse(new InstantCommand(() -> {
+      CatzSuperstructure.Instance.setCanShoot(() -> true);
+      CatzSuperstructure.Instance.setIsScoring(() -> false);
+    }));
+
+    xboxDrv.leftBumper().onFalse(new InstantCommand(() -> {
+      CatzSuperstructure.Instance.setCanShoot(() -> true);
+      CatzSuperstructure.Instance.setIsScoring(() -> false);
+    }));
+
+    xboxDrv.rightBumper().onFalse(new InstantCommand(() -> {
+      CatzSuperstructure.Instance.setCanShoot(() -> true);
+      CatzSuperstructure.Instance.setIsScoring(() -> false);
+    }));
+
+    xboxDrv.a().onTrue(CatzElevator.Instance.decrementElevatorPosition().onlyIf(()-> CatzSuperstructure.Instance.getIsScoring().get()));
+    xboxDrv.y().onTrue(CatzElevator.Instance.incrementElevatorPosition().onlyIf(() -> CatzSuperstructure.Instance.getIsScoring().get()));
 
     // xboxDrv.leftTrigger().onTrue(TeleopPosSelector.Instance.runToNearestBranch()
     // .alongWith(new InstantCommand(() -> CatzSuperstructure.Instance.setLevel(2)))
@@ -151,37 +172,31 @@ public class RobotContainer {
     // .andThen(Commands.print("finish waiting"))
     // .andThen(CatzSuperstructure.Instance.ElevatorHeightShoot()));
 
-    xboxDrv.rightTrigger().onTrue(TeleopPosSelector.Instance.runToNearestBranch()
-    .alongWith(new InstantCommand(() -> CatzSuperstructure.Instance.setLevel(1))
-    .alongWith(Commands.runOnce(()->CatzLED.Instance.setControllerState(ControllerLEDState.NBA))
-    .alongWith(new InstantCommand(() -> isScoring = true))
-    .alongWith(new InstantCommand(() -> canShoot = false))
-    .andThen(new WaitUntilCommand((() -> CatzElevator.Instance.isElevatorInPos() && canShoot)))))
-    .andThen(CatzSuperstructure.Instance.ElevatorHeightShoot()));
+    // xboxDrv.rightTrigger().onTrue(TeleopPosSelector.Instance.runToNearestBranch()
+    // .alongWith(new InstantCommand(() -> CatzSuperstructure.Instance.setLevel(1))
+    // .alongWith(Commands.runOnce(()->CatzLED.Instance.setControllerState(ControllerLEDState.NBA))
+    // .alongWith(new InstantCommand(() -> isScoring = true))
+    // .alongWith(new InstantCommand(() -> canShoot = false))
+    // .andThen(new WaitUntilCommand((() -> CatzElevator.Instance.isElevatorInPos() && canShoot)))))
+    // .andThen(CatzSuperstructure.Instance.ElevatorHeightShoot()));
 
-    xboxDrv.leftBumper().onTrue(TeleopPosSelector.Instance.runToNearestBranch()
-    .alongWith(new InstantCommand(() -> CatzSuperstructure.Instance.setLevel(4))
-    .alongWith(Commands.runOnce(()->CatzLED.Instance.setControllerState(ControllerLEDState.NBA))
-    .alongWith(new InstantCommand(() -> isScoring = true))
-    .alongWith(new InstantCommand(() -> canShoot = false))
-    .andThen(new WaitUntilCommand((() -> CatzElevator.Instance.isElevatorInPos() && canShoot)))))
-    .andThen(CatzSuperstructure.Instance.ElevatorHeightShoot()));
+    // xboxDrv.leftBumper().onTrue(TeleopPosSelector.Instance.runToNearestBranch()
+    // .alongWith(new InstantCommand(() -> CatzSuperstructure.Instance.setLevel(4))
+    // .alongWith(Commands.runOnce(()->CatzLED.Instance.setControllerState(ControllerLEDState.NBA))
+    // .alongWith(new InstantCommand(() -> isScoring = true))
+    // .alongWith(new InstantCommand(() -> canShoot = false))
+    // .andThen(new WaitUntilCommand((() -> CatzElevator.Instance.isElevatorInPos() && canShoot)))))
+    // .andThen(CatzSuperstructure.Instance.ElevatorHeightShoot()));
 
-    xboxDrv.rightBumper().onTrue(TeleopPosSelector.Instance.runToNearestBranch()
-    .alongWith(new InstantCommand(() -> CatzSuperstructure.Instance.setLevel(3))
-    .alongWith(Commands.runOnce(()->CatzLED.Instance.setControllerState(ControllerLEDState.NBA))
-    .alongWith(new InstantCommand(() -> isScoring = true))
-    .alongWith(new InstantCommand(() -> canShoot = false))
-    .andThen(new WaitUntilCommand((() -> CatzElevator.Instance.isElevatorInPos() && canShoot)))))
-    .andThen(CatzSuperstructure.Instance.ElevatorHeightShoot()));
+    // xboxDrv.rightBumper().onTrue(TeleopPosSelector.Instance.runToNearestBranch()
+    // .alongWith(new InstantCommand(() -> CatzSuperstructure.Instance.setLevel(3))
+    // .alongWith(Commands.runOnce(()->CatzLED.Instance.setControllerState(ControllerLEDState.NBA))
+    // .alongWith(new InstantCommand(() -> isScoring = true))
+    // .alongWith(new InstantCommand(() -> canShoot = false))
+    // .andThen(new WaitUntilCommand((() -> CatzElevator.Instance.isElevatorInPos() && canShoot)))))
+    // .andThen(CatzSuperstructure.Instance.ElevatorHeightShoot()));
 
-    xboxDrv.leftTrigger().onFalse(new InstantCommand(() -> canShoot = true));
-    xboxDrv.rightTrigger().onFalse(new InstantCommand(() -> canShoot = true));
-    xboxDrv.leftBumper().onFalse(new InstantCommand(() -> canShoot = true));
-    xboxDrv.rightBumper().onFalse(new InstantCommand(() -> canShoot = true));
 
-    xboxDrv.a().onTrue(CatzElevator.Instance.decrementElevatorPosition().onlyIf(() -> isScoring));
-    xboxDrv.y().onTrue(CatzElevator.Instance.incrementElevatorPosition().onlyIf(() -> isScoring));
 
     // cancel drive to reef
     xboxDrv.rightStick().onTrue(CatzDrivetrain.Instance.cancelTrajectory()
@@ -197,7 +212,6 @@ public class RobotContainer {
 
     // Default driving
     Trigger escapeTrajectory = new Trigger(()->(xboxDrv.getLeftY() > 0.8));
-
     escapeTrajectory.onTrue(CatzDrivetrain.Instance.cancelTrajectory());
 
     CatzDrivetrain.Instance.setDefaultCommand(new TeleopDriveCmd(() -> xboxDrv.getLeftX(), () -> xboxDrv.getLeftY(), () -> xboxDrv.getRightX(), CatzDrivetrain.Instance));

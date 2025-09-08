@@ -64,13 +64,11 @@ public class CatzSuperstructure extends VirtualSubsystem {
     @Getter @AutoLogOutput(key = "CatzSuperstructure/robotactionCommand")
     private Command robotActionCommand = Commands.none();
 
-    private Command previousAction = new InstantCommand();
+    @Getter @Setter @AutoLogOutput(key = "CatzSuperstructure/isScoring")
+    private Supplier<Boolean> isScoring = () -> false;
 
-    @Getter @Setter @AutoLogOutput(key = "CatzSuperstructure/IsScoring")
-    private boolean isScoring = false;
-
-    @Getter @Setter @AutoLogOutput(key = "CatzSuperstructure/CanShoot")
-    private boolean canShoot = false;
+    @Getter @Setter @AutoLogOutput(key = "CatzSuperstructure/canShoot")
+    private Supplier<Boolean> canShoot = () -> false;
 
     //--------------------------------------------------------------------------------
     // RobotOperationalState Enums
@@ -216,16 +214,15 @@ public class CatzSuperstructure extends VirtualSubsystem {
     //--------------------------------------------------------------------------------
     public Command scoreLevelTwoAutomated(){
         return Commands.sequence(
+            Commands.runOnce(()-> {
+                isScoring = () -> true;
+                canShoot = () -> false;
+                CatzSuperstructure.Instance.setLevel(2);
+                Commands.runOnce(() -> CatzLED.Instance.setControllerState(ControllerLEDState.NBA));
+            }),
             Commands.print("start score level 2 auto"),
-            Commands.parallel(
-                TeleopPosSelector.Instance.runToNearestBranch(),
-                new InstantCommand(() -> CatzSuperstructure.Instance.setLevel(2)),
-                Commands.runOnce(() -> CatzLED.Instance.setControllerState(ControllerLEDState.NBA)),
-                new InstantCommand(() -> isScoring = true), // TODO these booleans will not change states due to nature of changing variables withing command type methods
-                new InstantCommand(() -> canShoot = false)
-            ),
-            Commands.print("finish alongwith things" + isScoring + canShoot),
-            new WaitUntilCommand(() -> CatzElevator.Instance.isElevatorInPos() && canShoot),
+            TeleopPosSelector.Instance.runToNearestBranch(),
+            new WaitUntilCommand(() -> CatzElevator.Instance.isElevatorInPos() && canShoot.get()),
             Commands.print("finish waiting"),
             CatzSuperstructure.Instance.ElevatorHeightShoot()
         );
@@ -589,8 +586,6 @@ public class CatzSuperstructure extends VirtualSubsystem {
         getCurrentCoralState();
         isClimbEnabled();
 
-        isCanShoot();
-        isScoring();
     }
 
 
