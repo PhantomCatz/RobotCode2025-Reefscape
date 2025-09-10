@@ -22,9 +22,8 @@ public class PIDDriveCmd extends Command{
 
     private Rotation2d direction;
 
-    // Define tolerances for position and velocity to determine if the goal is reached
-    private final double POSITION_TOLERANCE_METERS = 0.02; // 5 centimeters
-    private final double VELOCITY_TOLERANCE_MPS = 0.1;     // 10 centimeters per second
+    private final double POSITION_TOLERANCE_METERS = 0.02;
+    private final double VELOCITY_TOLERANCE_MPS = 0.1;
     private final double ANGLE_TOLERANCE_DEGREES = 2.0;
 
     public PIDDriveCmd(Pose2d goal){
@@ -34,15 +33,15 @@ public class PIDDriveCmd extends Command{
 
         // Configure the translation controller
         var translationConstraints = new TrapezoidProfile.Constraints(
-            4.0, // Max velocity in meters per second
-            4.0  // Max acceleration in meters per second squared
+            4.0,
+            4.0
         );
         this.translationController = new ProfiledPIDController(3.0, 0.0, 0.0, translationConstraints);
 
         // Configure the rotation controller
         var rotationConstraints = new TrapezoidProfile.Constraints(
-            360.0, // Max angular velocity in degrees per second
-            720.0  // Max angular acceleration in degrees per second squared
+            360.0,
+            720.0
         );
         this.rotationController = new ProfiledPIDController(0.1, 0.0, 0.0, rotationConstraints);
 
