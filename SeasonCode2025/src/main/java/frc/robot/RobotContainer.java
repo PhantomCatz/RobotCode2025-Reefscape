@@ -136,7 +136,10 @@ public class RobotContainer {
     xboxDrv.b().onTrue(TeleopPosSelector.Instance.runLeftRight(LeftRight.RIGHT).unless(()->CatzSuperstructure.isClimbEnabled()));
 
     // Drive to Reefc
-    xboxDrv.leftTrigger().onTrue(CatzSuperstructure.Instance.scoreLevelTwoAutomated());
+    xboxDrv.leftTrigger().onTrue(CatzSuperstructure.Instance.scoreLevelXAutomated(2));
+    xboxDrv.rightTrigger().onTrue(CatzSuperstructure.Instance.scoreLevelXAutomated(1));
+    xboxDrv.leftBumper().onTrue(CatzSuperstructure.Instance.scoreLevelXAutomated(4));
+    xboxDrv.rightBumper().onTrue(CatzSuperstructure.Instance.scoreLevelXAutomated(3));
     //TODO add more automated commands for one driver
 
     xboxDrv.leftTrigger().onFalse(new InstantCommand(() -> {
@@ -159,8 +162,8 @@ public class RobotContainer {
       CatzSuperstructure.Instance.setIsScoring(() -> false);
     }));
 
-    xboxDrv.a().onTrue(CatzElevator.Instance.decrementElevatorPosition().onlyIf(()-> CatzSuperstructure.Instance.getIsScoring().get()));
-    xboxDrv.y().onTrue(CatzElevator.Instance.incrementElevatorPosition().onlyIf(() -> CatzSuperstructure.Instance.getIsScoring().get()));
+    xboxDrv.a().toggleOnTrue(CatzElevator.Instance.decrementElevatorPosition().onlyIf(()-> CatzSuperstructure.Instance.getIsScoring().get()));
+    xboxDrv.y().toggleOnTrue(CatzElevator.Instance.incrementElevatorPosition().onlyIf(() -> CatzSuperstructure.Instance.getIsScoring().get()));
 
     // xboxDrv.leftTrigger().onTrue(TeleopPosSelector.Instance.runToNearestBranch()
     // .alongWith(new InstantCommand(() -> CatzSuperstructure.Instance.setLevel(2)))

@@ -212,19 +212,25 @@ public class CatzSuperstructure extends VirtualSubsystem {
     //--------------------------------------------------------------------------------
     // One Drive Abstraction Commands
     //--------------------------------------------------------------------------------
-    public Command scoreLevelTwoAutomated(){
+    public Command scoreLevelXAutomated(int level){
         return Commands.sequence(
             Commands.runOnce(()-> {
                 isScoring = () -> true;
                 canShoot = () -> false;
-                CatzSuperstructure.Instance.setLevel(2);
+                CatzSuperstructure.Instance.setLevel(level);
                 Commands.runOnce(() -> CatzLED.Instance.setControllerState(ControllerLEDState.NBA));
             }),
-            Commands.print("start score level 2 auto"),
-            TeleopPosSelector.Instance.runToNearestBranch(),
+            Commands.print("start score level"+level+" auto"),
+            Commands.parallel(
+                TeleopPosSelector.Instance.runToNearestBranch(),
+                new WaitUntilCommand(() -> CatzDrivetrain.Instance.getDistanceError() < 0.1)
+                .andThen(CatzElevator.Instance.Elevator_LX(level).asProxy())
+            ),
+            Commands.print("finish running"),
+            new InstantCommand(() -> System.out.println("isScoring: " + isScoring.get())),
             new WaitUntilCommand(() -> CatzElevator.Instance.isElevatorInPos() && canShoot.get()),
             Commands.print("finish waiting"),
-            CatzSuperstructure.Instance.ElevatorHeightShoot()
+            CatzSuperstructure.Instance.ElevatorHeightShoot().asProxy()
         );
     }
 

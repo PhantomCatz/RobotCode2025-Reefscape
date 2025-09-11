@@ -1,6 +1,7 @@
 package frc.robot;
 
 
+import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -11,7 +12,6 @@ import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import frc.robot.Autonomous.AutoRoutineSelector;
 import frc.robot.CatzConstants.RobotHardwareMode;
 import frc.robot.CatzConstants.RobotID;
-import frc.robot.CatzSubsystems.CatzSuperstructure;
 import frc.robot.CatzSubsystems.CatzAlgaeEffector.CatzAlgaePivot.CatzAlgaePivot;
 import frc.robot.CatzSubsystems.CatzAlgaeEffector.CatzAlgaePivot.CatzAlgaePivot.AlgaePivotPosition;
 import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.CatzRobotTracker;
@@ -102,6 +102,8 @@ public class Robot extends LoggedRobot {
 
   private final RobotContainer container = RobotContainer.Instance;
   private final CatzLED LED = CatzLED.Instance;
+
+  private static Pose3d[] simMechanismPoses = new Pose3d[4];
 
   // --------------------------------------------------------------------------------------------------------
   //
@@ -353,7 +355,7 @@ public class Robot extends LoggedRobot {
 
 
     autoStart = Timer.getFPGATimestamp();
-    m_autonomousCommand = CatzSuperstructure.Instance.scoreLevelTwoAutomated();
+    // m_autonomousCommand = CatzSuperstructure.Instance.scoreLevelTwoAutomated();
     //m_autonomousCommand = AutoRoutineSelector.Instance.getSelectedCommand();
     CatzRampPivot.Instance.Ramp_Intake_Pos().withTimeout(1.0);
     if (m_autonomousCommand != null) {
@@ -418,4 +420,8 @@ public class Robot extends LoggedRobot {
 
   @Override
   public void testExit() {}
+
+  public static void setSimPose(int index, Pose3d pose) {
+    simMechanismPoses[index] = pose;
+  }
 }

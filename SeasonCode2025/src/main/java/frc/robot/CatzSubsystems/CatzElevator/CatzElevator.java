@@ -10,7 +10,6 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.PrintCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.CatzConstants;
-import frc.robot.Robot;
 import frc.robot.Utilities.LoggedTunableNumber;
 import lombok.RequiredArgsConstructor;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -236,7 +235,7 @@ public class CatzElevator extends SubsystemBase {
       break;
 
     }
-    return cmd.unless(() -> Robot.isSimulation()).alongWith(new PrintCommand("Elevator " + level)); // TODO this part is redundant
+    return cmd.alongWith(new PrintCommand("Elevator " + level)); // TODO this part is redundant
   }
 
   public boolean isElevatorInPos(){
@@ -339,11 +338,12 @@ public class CatzElevator extends SubsystemBase {
   }
 
   public Command setCanMoveElevator(boolean setValue) {
-    return run(() -> this.canMoveElevator = setValue);
+    return runOnce(() -> this.canMoveElevator = setValue);
   }
 
   public Command incrementElevatorPosition() {
-    return run(() -> {
+    return runOnce(() -> {
+      System.out.println("increment to "+targetPosition);
       if (targetPosition != ElevatorPosition.PosL4) {
         targetPosition = ElevatorPosition.values()[targetPosition.ordinal() + 1];
       }
@@ -351,7 +351,8 @@ public class CatzElevator extends SubsystemBase {
   }
 
   public Command decrementElevatorPosition() {
-    return run(() -> {
+    return runOnce(() -> {
+      System.out.println("decrement from "+targetPosition);
       if (targetPosition != ElevatorPosition.PosL1) {
         targetPosition = ElevatorPosition.values()[targetPosition.ordinal() - 1];
       }

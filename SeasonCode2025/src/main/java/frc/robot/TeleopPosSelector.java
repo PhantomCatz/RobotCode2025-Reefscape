@@ -21,8 +21,6 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.DeferredCommand;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.ParallelDeadlineGroup;
-import edu.wpi.first.wpilibj2.command.RepeatCommand;
 import frc.robot.FieldConstants.Reef;
 import frc.robot.Utilities.AllianceFlipUtil;
 import frc.robot.Utilities.CornerTrackingPathfinder;
@@ -32,7 +30,6 @@ import frc.robot.CatzSubsystems.CatzSuperstructure;
 import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.CatzRobotTracker;
 import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.Drivetrain.CatzDrivetrain;
 import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.Drivetrain.DriveConstants;
-import frc.robot.CatzSubsystems.CatzElevator.CatzElevator;
 import frc.robot.Commands.DriveAndRobotOrientationCmds.TrajectoryDriveCmd;
 
 @SuppressWarnings({ "rawtypes", "unchecked" })
@@ -282,25 +279,10 @@ public class TeleopPosSelector { //TODO split up the file. it's too big and does
     return new DeferredCommand(() -> {
       recentNBAPos = getClosestReefPos().getFirst();
 
-      // run elevator early
-      Command prematureCommand;
-      if(CatzSuperstructure.Instance.getChosenGamepiece() == Gamepiece.CORAL){
-        prematureCommand = Commands.sequence(
-            CatzElevator.Instance.setCanMoveElevator(true), // TODO This has no end condidion
-            CatzSuperstructure.Instance.LXElevator(CatzSuperstructure.Instance.getLevel()) // TODO this has no end condition
-        );
-      }else{ //algae
-        prematureCommand = new InstantCommand();
-      }
-
       PathPlannerPath path = getStraightLinePath(CatzRobotTracker.Instance.getEstimatedPose(), calculateReefPose(getClosestReefPos().getFirst(), true, false), DriveConstants.PATHFINDING_CONSTRAINTS);
 
       Command prepareScorePos = Commands.sequence(
-                                    new ParallelDeadlineGroup(new TrajectoryDriveCmd(path, true, true),
-                                                              new RepeatCommand(prematureCommand.onlyIf(
-                                                                      () -> CatzDrivetrain.Instance.getDistanceError() < DriveConstants.PREDICT_DISTANCE_SCORE)
-                                                              )
-                                        ),
+                                    new TrajectoryDriveCmd(path, true, true),
                                     RobotContainer.Instance.controllerRumbleCommand().withTimeout(0.1)
                                 );
 
