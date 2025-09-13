@@ -119,18 +119,6 @@ public class RobotContainer {
     xboxDrv.b().onTrue(CatzSuperstructure.Instance.extendClimb());
     climbMode.toggleOnTrue(Commands.startEnd(()->CatzSuperstructure.Instance.setClimbOverride(()->true), ()->CatzSuperstructure.Instance.setClimbOverride(()->false)));
 
-    //NBA
-    // xboxDrv.rightTrigger().onTrue(TeleopPosSelector.Instance.runToNearestBranch().alongWith(Commands.runOnce(()->CatzLED.Instance.setControllerState(ControllerLEDState.NBA)))
-    //                                                            .onlyWhile(xboxDrv.rightTrigger())
-    //                                                            .unless(()->CatzSuperstructure.isClimbEnabled())
-    //                                                            .alongWith(CatzClimb.Instance.ClimbManualMode(()-> ((-xboxDrv.getRightTriggerAxis()-0.5)*2.0))
-    //                                                            .onlyIf(()-> CatzSuperstructure.isClimbEnabled()))
-    // );
-    // xboxDrv.rightTrigger().onFalse(Commands.runOnce(()->CatzLED.Instance.setControllerState(ControllerLEDState.FULL_MANUAL))
-    //                                        .unless(()-> CatzSuperstructure.isClimbEnabled())
-    //                                        .alongWith(CatzClimb.Instance.CancelClimb())
-    // );
-
     // Left Right
     xboxDrv.x().onTrue(TeleopPosSelector.Instance.runLeftRight(LeftRight.LEFT).unless(()->CatzSuperstructure.isClimbEnabled()));
     xboxDrv.b().onTrue(TeleopPosSelector.Instance.runLeftRight(LeftRight.RIGHT).unless(()->CatzSuperstructure.isClimbEnabled()));
@@ -140,7 +128,6 @@ public class RobotContainer {
     xboxDrv.rightTrigger().onTrue(CatzSuperstructure.Instance.scoreLevelXAutomated(1));
     xboxDrv.leftBumper().onTrue(CatzSuperstructure.Instance.scoreLevelXAutomated(4));
     xboxDrv.rightBumper().onTrue(CatzSuperstructure.Instance.scoreLevelXAutomated(3));
-    //TODO add more automated commands for one driver
 
     xboxDrv.leftTrigger().onFalse(new InstantCommand(() -> {
       CatzSuperstructure.Instance.setCanShoot(() -> true);
@@ -165,40 +152,6 @@ public class RobotContainer {
     xboxDrv.a().toggleOnTrue(CatzElevator.Instance.decrementElevatorPosition().onlyIf(()-> CatzSuperstructure.Instance.getIsScoring().get()));
     xboxDrv.y().toggleOnTrue(CatzElevator.Instance.incrementElevatorPosition().onlyIf(() -> CatzSuperstructure.Instance.getIsScoring().get()));
 
-    // xboxDrv.leftTrigger().onTrue(TeleopPosSelector.Instance.runToNearestBranch()
-    // .alongWith(new InstantCommand(() -> CatzSuperstructure.Instance.setLevel(2)))
-    // .alongWith(Commands.runOnce(()->CatzLED.Instance.setControllerState(ControllerLEDState.NBA)))
-    // .alongWith(new InstantCommand(() -> isScoring = true))
-    // .alongWith(new InstantCommand(() -> canShoot = false))
-    // .andThen(Commands.print("finish alongwith things"))
-    // .andThen(new WaitUntilCommand((() -> CatzElevator.Instance.isElevatorInPos() && canShoot)))
-    // .andThen(Commands.print("finish waiting"))
-    // .andThen(CatzSuperstructure.Instance.ElevatorHeightShoot()));
-
-    // xboxDrv.rightTrigger().onTrue(TeleopPosSelector.Instance.runToNearestBranch()
-    // .alongWith(new InstantCommand(() -> CatzSuperstructure.Instance.setLevel(1))
-    // .alongWith(Commands.runOnce(()->CatzLED.Instance.setControllerState(ControllerLEDState.NBA))
-    // .alongWith(new InstantCommand(() -> isScoring = true))
-    // .alongWith(new InstantCommand(() -> canShoot = false))
-    // .andThen(new WaitUntilCommand((() -> CatzElevator.Instance.isElevatorInPos() && canShoot)))))
-    // .andThen(CatzSuperstructure.Instance.ElevatorHeightShoot()));
-
-    // xboxDrv.leftBumper().onTrue(TeleopPosSelector.Instance.runToNearestBranch()
-    // .alongWith(new InstantCommand(() -> CatzSuperstructure.Instance.setLevel(4))
-    // .alongWith(Commands.runOnce(()->CatzLED.Instance.setControllerState(ControllerLEDState.NBA))
-    // .alongWith(new InstantCommand(() -> isScoring = true))
-    // .alongWith(new InstantCommand(() -> canShoot = false))
-    // .andThen(new WaitUntilCommand((() -> CatzElevator.Instance.isElevatorInPos() && canShoot)))))
-    // .andThen(CatzSuperstructure.Instance.ElevatorHeightShoot()));
-
-    // xboxDrv.rightBumper().onTrue(TeleopPosSelector.Instance.runToNearestBranch()
-    // .alongWith(new InstantCommand(() -> CatzSuperstructure.Instance.setLevel(3))
-    // .alongWith(Commands.runOnce(()->CatzLED.Instance.setControllerState(ControllerLEDState.NBA))
-    // .alongWith(new InstantCommand(() -> isScoring = true))
-    // .alongWith(new InstantCommand(() -> canShoot = false))
-    // .andThen(new WaitUntilCommand((() -> CatzElevator.Instance.isElevatorInPos() && canShoot)))))
-    // .andThen(CatzSuperstructure.Instance.ElevatorHeightShoot()));
-
 
 
     // cancel drive to reef
@@ -220,7 +173,7 @@ public class RobotContainer {
     CatzDrivetrain.Instance.setDefaultCommand(new TeleopDriveCmd(() -> xboxDrv.getLeftX(), () -> xboxDrv.getLeftY(), () -> xboxDrv.getRightX(), CatzDrivetrain.Instance));
     //---------------------------------------------------------------------------------------------------------------------
     // XBOX AUX
-    //------------------------------------------------------------------------------
+    //---------------------------------------------------------------------------------------------------------------------
 
     // Full Manual
     xboxAux.leftStick().and(xboxAux.rightStick()).onTrue(CatzElevator.Instance.elevatorFullManual(() -> -xboxAux.getLeftY()).alongWith(Commands.print("Elevator Manual"))); // TODO make an override button for
