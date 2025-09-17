@@ -97,7 +97,7 @@ public final class CatzConstants {
     public static final int XBOX_AUX_PORT = 1;
 
     // Deadbands
-    public static final double kDeadband = 0.1;
+    public static final double kDeadband = 0.05;
   }
 
   // COLOR CONSTANTS

@@ -7,7 +7,7 @@ import frc.robot.Utilities.MotorUtil.MotionMagicParameters;
 /** Add your docs here. */
 public class RampPivotConstants {
 
-    public static final boolean isRampPivotDisabled = true;
+    public static final boolean isRampPivotDisabled = false;
 
     public static final int RAMP_PIVOT_MTR_ID = 41;
 

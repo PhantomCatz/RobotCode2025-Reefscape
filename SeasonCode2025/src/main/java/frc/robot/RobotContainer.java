@@ -43,7 +43,7 @@ public class RobotContainer {
   private final double SCORE_TRIGGER_THRESHHOLD = 0.8;
 
   private final double Drivetrain_Scale_Turn        = 0.5;
-  private final double Drivetrain_Scale_Translation = 0.5;
+  private final double Drivetrain_Scale_Translation = 0.15;
 
   // ------------------------------------------------------------------------------------------------------------------
   // Drive Controller Declaration
