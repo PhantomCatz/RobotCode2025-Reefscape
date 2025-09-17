@@ -147,6 +147,7 @@ public class CatzDrivetrain extends SubsystemBase {
     this.distanceError = d;
   }
 
+  public double offsetAngle = 0.0;
   @Override
   public void periodic() {
     // ----------------------------------------------------------------------------------------------------
@@ -184,7 +185,7 @@ public class CatzDrivetrain extends SubsystemBase {
     Rotation2d gyroAngle2d =
         (CatzConstants.hardwareMode == CatzConstants.RobotHardwareMode.SIM)
             ? null
-            : getRotation2d();
+            : getRotation2d().plus(Rotation2d.fromDegrees(offsetAngle));
 
     // Add observations to robot tracker
     OdometryObservation observation = new OdometryObservation(

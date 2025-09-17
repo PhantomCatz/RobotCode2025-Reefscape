@@ -161,8 +161,11 @@ public class RobotContainer {
     isRampPivotFullManual.onTrue(CatzRampPivot.Instance.rampPivotManual(()->-xboxAux.getLeftY()).alongWith(Commands.print("Manual Ramp")));
 
     // Gamepiece Selection
-    xboxAux.leftTrigger().onTrue(Commands.runOnce(()-> CatzSuperstructure.setChosenGamepiece(Gamepiece.CORAL)));
-    xboxAux.rightTrigger().onTrue(Commands.runOnce(()-> CatzSuperstructure.setChosenGamepiece(Gamepiece.ALGAE)));
+    // xboxAux.leftTrigger().onTrue(Commands.runOnce(()-> CatzSuperstructure.setChosenGamepiece(Gamepiece.CORAL)));
+    // xboxAux.rightTrigger().onTrue(Commands.runOnce(()-> CatzSuperstructure.setChosenGamepiece(Gamepiece.ALGAE)));
+    xboxAux.rightTrigger(0.8).onTrue(new InstantCommand(() -> CatzDrivetrain.Instance.offsetAngle = 30.0));
+    xboxAux.leftTrigger(0.8).onTrue(new InstantCommand(() -> CatzDrivetrain.Instance.offsetAngle = 0.0));
+
 
     // Scoring Action
     xboxAux.x().onTrue(CatzSuperstructure.Instance.intake().alongWith(Commands.print("INTAKE")));
