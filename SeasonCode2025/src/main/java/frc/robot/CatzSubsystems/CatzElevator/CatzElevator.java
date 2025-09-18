@@ -2,6 +2,7 @@ package frc.robot.CatzSubsystems.CatzElevator;
 
 import static frc.robot.CatzSubsystems.CatzElevator.ElevatorConstants.*;
 
+import java.util.HashMap;
 import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
 
@@ -34,6 +35,15 @@ public class CatzElevator extends SubsystemBase {
   private boolean isElevatorInPos = false;
 
   private boolean canMoveElevator = false;
+
+  private final ElevatorPosition[] scoringPositionsList = {ElevatorPosition.PosL1, ElevatorPosition.PosL2, ElevatorPosition.PosL3, ElevatorPosition.PosL4};
+
+  private final HashMap<ElevatorPosition, Integer> scoringPositions  = new HashMap<>() {{
+    put(ElevatorPosition.PosL1, 0);
+    put(ElevatorPosition.PosL2, 1);
+    put(ElevatorPosition.PosL3, 2);
+    put(ElevatorPosition.PosL4, 3);
+}};;
 
   @RequiredArgsConstructor
   public static enum ElevatorPosition {
@@ -343,9 +353,9 @@ public class CatzElevator extends SubsystemBase {
 
   public Command incrementElevatorPosition() {
     return runOnce(() -> {
-      System.out.println("increment to "+targetPosition);
+      System.out.println("increment from "+targetPosition);
       if (targetPosition != ElevatorPosition.PosL4) {
-        targetPosition = ElevatorPosition.values()[targetPosition.ordinal() + 1];
+        targetPosition = scoringPositionsList[scoringPositions.get(targetPosition)+1];
       }
     });
   }
@@ -354,12 +364,16 @@ public class CatzElevator extends SubsystemBase {
     return runOnce(() -> {
       System.out.println("decrement from "+targetPosition);
       if (targetPosition != ElevatorPosition.PosL1) {
-        targetPosition = ElevatorPosition.values()[targetPosition.ordinal() - 1];
+        targetPosition = scoringPositionsList[scoringPositions.get(targetPosition)-1];
       }
     });
   }
 
   public ElevatorPosition getElevatorTargetPosition() {
     return targetPosition;
+  }
+
+  public void setElevatorTargetPosition(int setPosition) {
+    targetPosition = scoringPositionsList[setPosition-1];
   }
 }

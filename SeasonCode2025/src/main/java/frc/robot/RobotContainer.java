@@ -135,7 +135,7 @@ public class RobotContainer {
     xboxDrv.x().onTrue(TeleopPosSelector.Instance.runLeftRight(LeftRight.LEFT).unless(()->CatzSuperstructure.isClimbEnabled()));
     xboxDrv.b().onTrue(TeleopPosSelector.Instance.runLeftRight(LeftRight.RIGHT).unless(()->CatzSuperstructure.isClimbEnabled()));
 
-    // Drive to Reefc
+    // Drive to Reef
     xboxDrv.leftTrigger().onTrue(CatzSuperstructure.Instance.scoreLevelXAutomated(2));
     xboxDrv.rightTrigger().onTrue(CatzSuperstructure.Instance.scoreLevelXAutomated(1));
     xboxDrv.leftBumper().onTrue(CatzSuperstructure.Instance.scoreLevelXAutomated(4));
@@ -204,7 +204,8 @@ public class RobotContainer {
     // cancel drive to reef
     xboxDrv.rightStick().onTrue(CatzDrivetrain.Instance.cancelTrajectory()
     .alongWith(new InstantCommand(() -> isScoring = false))
-    .alongWith(Commands.print("cancelling path")));
+    .alongWith(Commands.print("cancelling path"))
+    .alongWith(CatzElevator.Instance.Elevator_Stow()));
 
     //     // Manual Climb Control
     // xboxDrv.povUp().onTrue(CatzClimb.Instance.ClimbManualMode(()-> 0.4));

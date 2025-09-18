@@ -217,20 +217,23 @@ public class CatzSuperstructure extends VirtualSubsystem {
             Commands.runOnce(()-> {
                 isScoring = () -> true;
                 canShoot = () -> false;
+                CatzElevator.Instance.setCanMoveElevator(false).asProxy();
                 CatzSuperstructure.Instance.setLevel(level);
+                CatzElevator.Instance.setElevatorTargetPosition(level);
                 Commands.runOnce(() -> CatzLED.Instance.setControllerState(ControllerLEDState.NBA));
             }),
             Commands.print("start score level"+level+" auto"),
             Commands.parallel(
                 TeleopPosSelector.Instance.runToNearestBranch(),
                 new WaitUntilCommand(() -> CatzDrivetrain.Instance.getDistanceError() < 0.1)
-                .andThen(CatzElevator.Instance.Elevator_LX(level).asProxy())
+                .andThen(CatzElevator.Instance.setCanMoveElevator(true).asProxy())
             ),
             Commands.print("finish running"),
             new InstantCommand(() -> System.out.println("isScoring: " + isScoring.get())),
             new WaitUntilCommand(() -> CatzElevator.Instance.isElevatorInPos() && canShoot.get()),
             Commands.print("finish waiting"),
-            CatzSuperstructure.Instance.ElevatorHeightShoot().asProxy()
+            CatzSuperstructure.Instance.ElevatorHeightShoot().asProxy(),
+            CatzElevator.Instance.setCanMoveElevator(false).asProxy()
         );
     }
 
