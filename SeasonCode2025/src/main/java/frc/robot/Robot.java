@@ -233,6 +233,10 @@ public class Robot extends LoggedRobot {
 
     SmartDashboard.putData("Auton Selector", AutoRoutineSelector.Instance.getAutoChooser());
     // CommandScheduler.getInstance().setPeriod(CatzConstants.LOOP_TIME); //TODO should we add this?
+
+
+    System.out.println("We need to access this from somewhere to activate it"+CatzVision.Instance.getName());
+
   }
 
   @Override
@@ -330,9 +334,9 @@ public class Robot extends LoggedRobot {
     garbageCollectionCounter++;
 
     // Checked leds
-    if(CatzVision.Instance.getTagId(1) == 263 || CatzVision.Instance.getTagId(0) == 263) {
-      LED.setControllerState(ControllerLEDState.ledChecked);
-    }
+    // if(CatzVision.Instance.getTagId(1) == 263 || CatzVision.Instance.getTagId(0) == 263) {
+    //   LED.setControllerState(ControllerLEDState.ledChecked);
+    // }
   }
 
   @Override
@@ -399,6 +403,7 @@ public class Robot extends LoggedRobot {
   @Override
   public void teleopPeriodic() {
     teleElapsedTime = Timer.getFPGATimestamp() - teleStart;
+
   }
 
   @Override
