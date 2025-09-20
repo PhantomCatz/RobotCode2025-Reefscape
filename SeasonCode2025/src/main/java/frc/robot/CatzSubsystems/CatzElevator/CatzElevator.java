@@ -373,6 +373,10 @@ public class CatzElevator extends SubsystemBase {
     return targetPosition;
   }
 
+  /**
+   *
+   * @param setPosition 1-4 for level 1-4
+   */
   public void setElevatorTargetPosition(int setPosition) {
     targetPosition = scoringPositionsList[setPosition-1];
   }

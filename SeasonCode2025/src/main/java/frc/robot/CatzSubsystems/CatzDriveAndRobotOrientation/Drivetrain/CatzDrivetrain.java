@@ -77,6 +77,8 @@ public class CatzDrivetrain extends SubsystemBase {
 
   private final Field2d field;
 
+  private Pose2d pidGoalPose = new Pose2d();
+
   private CatzDrivetrain() {
 
     // Gyro Instantiation
@@ -453,5 +455,13 @@ public class CatzDrivetrain extends SubsystemBase {
     return Arrays.stream(DriveConstants.MODULE_TRANSLATIONS)
         .map(translation -> translation.getAngle().plus(new Rotation2d(Math.PI / 2.0)))
         .toArray(Rotation2d[]::new);
+  }
+
+  public Pose2d getPIDGoalPose(){
+    return pidGoalPose;
+  }
+
+  public void setPIDGoalPose(Pose2d p){
+    this.pidGoalPose = p;
   }
 }

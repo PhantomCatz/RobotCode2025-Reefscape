@@ -18,6 +18,7 @@ import edu.wpi.first.wpilibj2.command.RepeatCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
+import edu.wpi.first.wpilibj2.command.Command.InterruptionBehavior;
 import frc.robot.Robot;
 import frc.robot.TeleopPosSelector;
 import frc.robot.CatzSubsystems.CatzAlgaeEffector.CatzAlgaePivot.CatzAlgaePivot;
@@ -230,11 +231,11 @@ public class CatzSuperstructure extends VirtualSubsystem {
             ),
             Commands.print("finish running"),
             new InstantCommand(() -> System.out.println("isScoring: " + isScoring.get())),
-            new WaitUntilCommand(() -> CatzElevator.Instance.isElevatorInPos() && canShoot.get()),
+            new WaitUntilCommand(() -> CatzElevator.Instance.isElevatorInPos()),
             Commands.print("finish waiting"),
             CatzSuperstructure.Instance.ElevatorHeightShoot().asProxy(),
             CatzElevator.Instance.setCanMoveElevator(false).asProxy()
-        );
+        ).withInterruptBehavior(InterruptionBehavior.kCancelSelf);
     }
 
 

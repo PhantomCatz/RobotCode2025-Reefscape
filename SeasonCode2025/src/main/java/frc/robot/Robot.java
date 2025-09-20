@@ -15,9 +15,11 @@ import frc.robot.CatzConstants.RobotID;
 import frc.robot.CatzSubsystems.CatzAlgaeEffector.CatzAlgaePivot.CatzAlgaePivot;
 import frc.robot.CatzSubsystems.CatzAlgaeEffector.CatzAlgaePivot.CatzAlgaePivot.AlgaePivotPosition;
 import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.CatzRobotTracker;
+import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.Drivetrain.CatzDrivetrain;
 import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.Vision.CatzVision;
 import frc.robot.CatzSubsystems.CatzLEDs.CatzLED;
 import frc.robot.CatzSubsystems.CatzLEDs.CatzLED.ControllerLEDState;
+import frc.robot.CatzSubsystems.CatzOuttake.CatzOuttake;
 import frc.robot.CatzSubsystems.CatzRampPivot.CatzRampPivot;
 import frc.robot.Utilities.Alert;
 import frc.robot.Utilities.Alert.AlertType;
@@ -38,6 +40,8 @@ import org.littletonrobotics.junction.networktables.NT4Publisher;
 import org.littletonrobotics.junction.rlog.RLOGServer;
 import org.littletonrobotics.junction.wpilog.WPILOGReader;
 import org.littletonrobotics.junction.wpilog.WPILOGWriter;
+
+import choreo.auto.AutoFactory;
 
 
 
@@ -236,6 +240,21 @@ public class Robot extends LoggedRobot {
 
 
     System.out.println("We need to access this from somewhere to activate it"+CatzVision.Instance.getName());
+    System.out.println("Initializing " + CatzDrivetrain.Instance.getName());
+    System.out.println("Initializing " + CatzAlgaePivot.Instance.getName());
+    System.out.println("Initializing " + CatzRampPivot.Instance.getName());
+    System.out.println("Initializing " + CatzRobotTracker.Instance);
+    System.out.println("Initializing " + CatzVision.Instance.getName());
+    System.out.println("Initializing " + CatzLED.Instance);
+    System.out.println("Initializing " + CatzOuttake.Instance.getName());
+
+    CatzConstants.autoFactory = new AutoFactory(
+                                                  CatzRobotTracker.Instance::getEstimatedPose,
+                                                  CatzRobotTracker.Instance::resetPose,
+                                                  CatzDrivetrain.Instance::followChoreoTrajectoryExecute,
+                                                  true,
+                                                  CatzDrivetrain.Instance
+                                                ); //it is apparently a good idea to initialize these variables not statically because there can be race conditions
 
   }
 

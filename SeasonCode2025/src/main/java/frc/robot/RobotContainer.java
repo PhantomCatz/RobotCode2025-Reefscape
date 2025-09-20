@@ -116,18 +116,18 @@ public class RobotContainer {
 
     // Climb
     Trigger climbMode = xboxDrv.start();
-    xboxDrv.b().onTrue(CatzSuperstructure.Instance.extendClimb());
     climbMode.toggleOnTrue(Commands.startEnd(()->CatzSuperstructure.Instance.setClimbOverride(()->true), ()->CatzSuperstructure.Instance.setClimbOverride(()->false)));
+    // xboxDrv.b().onTrue(CatzSuperstructure.Instance.extendClimb());
 
     // Left Right
     xboxDrv.x().onTrue(TeleopPosSelector.Instance.runLeftRight(LeftRight.LEFT).unless(()->CatzSuperstructure.isClimbEnabled()));
     xboxDrv.b().onTrue(TeleopPosSelector.Instance.runLeftRight(LeftRight.RIGHT).unless(()->CatzSuperstructure.isClimbEnabled()));
 
     // Drive to Reef
-    xboxDrv.leftTrigger().onTrue(CatzSuperstructure.Instance.scoreLevelXAutomated(2));
     xboxDrv.rightTrigger().onTrue(CatzSuperstructure.Instance.scoreLevelXAutomated(1));
-    xboxDrv.leftBumper().onTrue(CatzSuperstructure.Instance.scoreLevelXAutomated(4));
+    xboxDrv.leftTrigger().onTrue(CatzSuperstructure.Instance.scoreLevelXAutomated(2));
     xboxDrv.rightBumper().onTrue(CatzSuperstructure.Instance.scoreLevelXAutomated(3));
+    xboxDrv.leftBumper().onTrue(CatzSuperstructure.Instance.scoreLevelXAutomated(4));
 
     xboxDrv.leftTrigger().onFalse(new InstantCommand(() -> {
       CatzSuperstructure.Instance.setCanShoot(() -> true);
@@ -152,6 +152,8 @@ public class RobotContainer {
     xboxDrv.a().toggleOnTrue(CatzElevator.Instance.decrementElevatorPosition().onlyIf(()-> CatzSuperstructure.Instance.getIsScoring().get()));
     xboxDrv.y().toggleOnTrue(CatzElevator.Instance.incrementElevatorPosition().onlyIf(() -> CatzSuperstructure.Instance.getIsScoring().get()));
 
+    xboxDrv.b().toggleOnTrue(TeleopPosSelector.Instance.runLeftRight(LeftRight.RIGHT).unless(()->CatzSuperstructure.isClimbEnabled()));
+    xboxDrv.x().toggleOnTrue(TeleopPosSelector.Instance.runLeftRight(LeftRight.LEFT).unless(()->CatzSuperstructure.isClimbEnabled()));
 
 
     // cancel drive to reef
@@ -168,8 +170,8 @@ public class RobotContainer {
 
 
     // Default driving
-    Trigger escapeTrajectory = new Trigger(()->(xboxDrv.getLeftY() > 0.8));
-    escapeTrajectory.onTrue(CatzDrivetrain.Instance.cancelTrajectory());
+    // Trigger escapeTrajectory = new Trigger(()->(xboxDrv.getLeftY() > 0.8));
+    // escapeTrajectory.onTrue(CatzDrivetrain.Instance.cancelTrajectory());
 
     CatzDrivetrain.Instance.setDefaultCommand(new TeleopDriveCmd(() -> xboxDrv.getLeftX(), () -> xboxDrv.getLeftY(), () -> xboxDrv.getRightX(), CatzDrivetrain.Instance));
     //---------------------------------------------------------------------------------------------------------------------
@@ -305,7 +307,12 @@ public class RobotContainer {
         }).withTimeout(1.0);
   }
 
-  public Command rumbleDrvController(double strength, double duration){
+  public void rumbleDrvController(double strength){
+    xboxDrv.getHID().setRumble(RumbleType.kBothRumble, strength);
+  }
+
+
+  public Command rumbleDrvControllerCmd(double strength, double duration){
     return new SequentialCommandGroup(
       new InstantCommand(() ->xboxDrv.getHID().setRumble(RumbleType.kBothRumble, strength)),
       new WaitCommand(duration),
@@ -313,7 +320,7 @@ public class RobotContainer {
     ).finallyDo(()->xboxDrv.getHID().setRumble(RumbleType.kBothRumble, 0.0));
   }
 
-  public Command rumbleAuxController(double strength, double duration){
+  public Command rumbleAuxControllerCmd(double strength, double duration){
     return new SequentialCommandGroup(
       new InstantCommand(() ->xboxAux.getHID().setRumble(RumbleType.kBothRumble, strength)),
       new WaitCommand(duration),
@@ -323,8 +330,8 @@ public class RobotContainer {
 
   public Command rumbleDrvAuxController(double strength, double duration){
     return new ParallelCommandGroup(
-      rumbleAuxController(strength, duration),
-      rumbleDrvController(strength, duration)
+      rumbleAuxControllerCmd(strength, duration),
+      rumbleDrvControllerCmd(strength, duration)
     );
   }
 
