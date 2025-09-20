@@ -13,6 +13,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.CatzRobotTracker;
 import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.Drivetrain.CatzDrivetrain;
 import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.Drivetrain.DriveConstants;
+import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.Vision.CatzVision;
 
 public class PIDDriveCmd extends Command{
     private final Pose2d goalPos;
@@ -20,11 +21,10 @@ public class PIDDriveCmd extends Command{
     private final ProfiledPIDController translationController;
     private final ProfiledPIDController rotationController;
 
-    private Rotation2d direction;
-
     private final double POSITION_TOLERANCE_METERS = 0.02;
     private final double VELOCITY_TOLERANCE_MPS = 0.1;
     private final double ANGLE_TOLERANCE_DEGREES = 2.0;
+    private final double ALLOWABLE_VISION_ADJUST = 4e-3; //TODO tune
 
     public PIDDriveCmd(Pose2d goal){
         addRequirements(CatzDrivetrain.Instance);
@@ -44,8 +44,7 @@ public class PIDDriveCmd extends Command{
             720.0
         );
         this.rotationController = new ProfiledPIDController(0.1, 0.0, 0.0, rotationConstraints);
-
-        this.rotationController.enableContinuousInput(0, 360);
+        this.rotationController.enableContinuousInput(-180.0, 180.0);
     }
 
     @Override
@@ -56,11 +55,13 @@ public class PIDDriveCmd extends Command{
     @Override
     public void execute(){
         Pose2d currentPose = CatzRobotTracker.Instance.getEstimatedPose();
-
         Translation2d poseError = goalPos.minus(currentPose).getTranslation();
+
         double currentDistance = poseError.getNorm();
-        direction = poseError.getAngle();
-        Logger.recordOutput("Pose Error Angle", direction.getDegrees());
+        Rotation2d direction = poseError.getAngle();
+        double angleError = MathUtil.inputModulus(goalPos.getRotation().getDegrees() - currentPose.getRotation().getDegrees(), -180.0, 180.0);
+
+        Logger.recordOutput("Pose Error Angle", angleError);
 
         // The goal of the translation controller is to drive the distance error to zero
         double targetVel = Math.abs(translationController.calculate(currentDistance, 0.0));
@@ -69,8 +70,7 @@ public class PIDDriveCmd extends Command{
         Logger.recordOutput("Pose Error Sine", direction.getSin());
 
         // The goal of the rotation controller is to drive the angle to the target angle
-        Logger.recordOutput("Pose Error RotDif", MathUtil.inputModulus(MathUtil.inputModulus(goalPos.getRotation().getDegrees(), 0.0, 360.0) - currentPose.getRotation().getDegrees(), 0.0, 360.0));
-        double targetOmega = rotationController.calculate(MathUtil.inputModulus(currentPose.getRotation().getDegrees(), 0.0, 360.0), MathUtil.inputModulus(goalPos.getRotation().getDegrees(), 0.0, 360.0));
+        double targetOmega = rotationController.calculate(0.0, angleError);
         Logger.recordOutput("Pose Error Omega", targetOmega);
 
         ChassisSpeeds goalChassisSpeeds = new ChassisSpeeds(targetVel * direction.getCos(), targetVel * direction.getSin(), targetOmega);
@@ -81,7 +81,7 @@ public class PIDDriveCmd extends Command{
 
     @Override
     public boolean isFinished(){
-        return isAtTargetState();
+        return isAtTargetState() && CatzVision.Instance.isSeeingApriltag() && CatzRobotTracker.Instance.getVisionPoseShift().getNorm() < ALLOWABLE_VISION_ADJUST;
     }
 
     private boolean isAtTargetState(){
@@ -89,12 +89,15 @@ public class PIDDriveCmd extends Command{
         ChassisSpeeds currentSpeed = CatzRobotTracker.Instance.getRobotChassisSpeeds();
 
         double distanceError = currentPose.getTranslation().getDistance(goalPos.getTranslation());
-
         double linearVelocity = Math.hypot(currentSpeed.vxMetersPerSecond, currentSpeed.vyMetersPerSecond);
 
-        double rotationError = Math.abs(goalPos.minus(currentPose).getRotation().getDegrees());
-
-        return distanceError < POSITION_TOLERANCE_METERS && linearVelocity < VELOCITY_TOLERANCE_MPS && rotationError < ANGLE_TOLERANCE_DEGREES;
+        double rotationError = Math.abs(MathUtil.inputModulus(goalPos.getRotation().getDegrees() - currentPose.getRotation().getDegrees(), -180.0, 180.0));
+        Logger.recordOutput("Rotation Error", rotationError < ANGLE_TOLERANCE_DEGREES);
+        Logger.recordOutput("Distance Error", distanceError < POSITION_TOLERANCE_METERS);
+        Logger.recordOutput("Linear Velocity", linearVelocity < VELOCITY_TOLERANCE_MPS);
+        return distanceError < POSITION_TOLERANCE_METERS &&
+               linearVelocity < VELOCITY_TOLERANCE_MPS &&
+               rotationError < ANGLE_TOLERANCE_DEGREES;
     }
 
     @Override
