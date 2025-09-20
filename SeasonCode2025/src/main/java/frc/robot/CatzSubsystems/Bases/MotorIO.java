@@ -9,9 +9,10 @@ public interface MotorIO {
 
     public boolean isLeaderMotorConnected = false;
     public boolean isFollowerMotorConnected = false;
-    public boolean isBotLimitSwitched = false;
-    public boolean bbreak0Triggered;
+    public boolean isBotLimitSwitched1 = false;
+    public boolean isBotLimitSwitched2 = false;
     public boolean bbreak1Triggered;
+    public boolean bbreak2Triggered;
 
     public double positionInch = 0.0;
     public double absoluteEncoderPositionRads = 0.0;
