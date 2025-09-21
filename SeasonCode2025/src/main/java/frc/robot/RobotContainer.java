@@ -114,8 +114,8 @@ public class RobotContainer {
     }));
 
     // Climb
-    Trigger climbMode = xboxDrv.start();
-    climbMode.toggleOnTrue(Commands.startEnd(()->CatzSuperstructure.Instance.setClimbOverride(()->true), ()->CatzSuperstructure.Instance.setClimbOverride(()->false)));
+    // Trigger climbMode = xboxDrv.start();
+    // climbMode.toggleOnTrue(Commands.startEnd(()->CatzSuperstructure.Instance.setClimbOverride(()->true), ()->CatzSuperstructure.Instance.setClimbOverride(()->false)));
 
     // Manual Climb Control
     xboxDrv.povUp().onTrue(CatzClimb.Instance.ClimbManualMode(()-> 0.4));
@@ -123,7 +123,7 @@ public class RobotContainer {
     xboxDrv.povDown().onTrue(CatzClimb.Instance.ClimbManualMode(()-> -1.0));
     xboxDrv.povDown().onFalse(CatzClimb.Instance.CancelClimb());
 
-    climbMode.toggleOnTrue(CatzSuperstructure.Instance.extendClimb());
+    // climbMode.toggleOnTrue(CatzSuperstructure.Instance.extendClimb());
 
     // Left Right
     xboxDrv.povLeft().onTrue(TeleopPosSelector.Instance.runLeftRight(LeftRight.LEFT).unless(()->CatzSuperstructure.isClimbEnabled()));

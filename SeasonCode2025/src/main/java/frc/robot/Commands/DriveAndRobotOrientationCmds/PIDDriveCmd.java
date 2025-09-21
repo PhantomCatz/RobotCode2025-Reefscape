@@ -46,8 +46,10 @@ public class PIDDriveCmd extends Command{
             360.0,
             720.0
         );
-        this.rotationController = new ProfiledPIDController(0.5, 0.0, 0.0, rotationConstraints);
+        this.rotationController = new ProfiledPIDController(3.0, 0.0, 0.0, rotationConstraints);
         this.rotationController.enableContinuousInput(-180.0, 180.0);
+        // this.rotationController.enableContinuousInput(0.0, 360.0);
+
     }
 
     @Override
@@ -69,6 +71,8 @@ public class PIDDriveCmd extends Command{
         double currentDistance = poseError.getNorm();
         Rotation2d direction = poseError.getAngle();
         double angleError = MathUtil.inputModulus(goalPos.getRotation().getDegrees() - currentPose.getRotation().getDegrees(), -180.0, 180.0);
+        // double angleError = MathUtil.inputModulus(goalPos.getRotation().getDegrees() - currentPose.getRotation().getDegrees(), 0, 360.0);
+
 
         Logger.recordOutput("Pose Error Angle", angleError);
 

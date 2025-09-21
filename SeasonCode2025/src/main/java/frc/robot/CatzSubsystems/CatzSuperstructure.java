@@ -234,6 +234,8 @@ public class CatzSuperstructure extends VirtualSubsystem {
             new WaitUntilCommand(() -> CatzElevator.Instance.isElevatorInPos()),
             Commands.print("finish waiting"),
             CatzSuperstructure.Instance.ElevatorHeightShoot().asProxy(),
+            new WaitCommand(0.5),
+            CatzElevator.Instance.Elevator_Stow().asProxy(),
             CatzElevator.Instance.setCanMoveElevator(false).asProxy()
         ).withInterruptBehavior(InterruptionBehavior.kCancelSelf);
     }
