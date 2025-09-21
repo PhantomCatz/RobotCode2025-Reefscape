@@ -10,6 +10,7 @@ import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import frc.robot.Autonomous.AutoRoutineSelector;
+import frc.robot.Autonomous.CatzAutonomous;
 import frc.robot.CatzConstants.RobotHardwareMode;
 import frc.robot.CatzConstants.RobotID;
 import frc.robot.CatzSubsystems.CatzAlgaeEffector.CatzAlgaePivot.CatzAlgaePivot;
@@ -247,6 +248,8 @@ public class Robot extends LoggedRobot {
     System.out.println("Initializing " + CatzVision.Instance.getName());
     System.out.println("Initializing " + CatzLED.Instance);
     System.out.println("Initializing " + CatzOuttake.Instance.getName());
+    System.out.println("Initializing " + CatzAutonomous.Instance.getName());
+
 
     CatzConstants.autoFactory = new AutoFactory(
                                                   CatzRobotTracker.Instance::getEstimatedPose,
@@ -380,6 +383,7 @@ public class Robot extends LoggedRobot {
     autoStart = Timer.getFPGATimestamp();
     // m_autonomousCommand = CatzSuperstructure.Instance.scoreLevelTwoAutomated();
     //m_autonomousCommand = AutoRoutineSelector.Instance.getSelectedCommand();
+    m_autonomousCommand = CatzAutonomous.Instance.getCommand();
     CatzRampPivot.Instance.Ramp_Intake_Pos().withTimeout(1.0);
     if (m_autonomousCommand != null) {
       m_autonomousCommand.schedule();

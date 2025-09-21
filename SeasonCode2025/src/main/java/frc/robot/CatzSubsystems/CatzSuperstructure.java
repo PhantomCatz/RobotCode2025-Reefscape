@@ -177,7 +177,7 @@ public class CatzSuperstructure extends VirtualSubsystem {
 
         return new SequentialCommandGroup(
             new TrajectoryDriveCmd(pathToReadyPose, true, false).deadlineFor(
-                new RepeatCommand(LXElevator(level).alongWith(new PrintCommand("elevavavava")).onlyIf(() -> CatzDrivetrain.Instance.getDistanceError() < DriveConstants.PREDICT_DISTANCE_SCORE))
+                new RepeatCommand(LXElevator(level).onlyIf(() -> CatzDrivetrain.Instance.getDistanceError() < DriveConstants.PREDICT_DISTANCE_SCORE))
             ),
             // new WaitUntilCommand(() -> !CatzOuttake.Instance.isDesiredCoralState(true)),
             LXCoral(level),
@@ -190,7 +190,7 @@ public class CatzSuperstructure extends VirtualSubsystem {
 
         return new SequentialCommandGroup(
             new TrajectoryDriveCmd(pathToReadyPose, true, false).deadlineFor(
-                new RepeatCommand(LXElevator(level).alongWith(new PrintCommand("elevavavava")).onlyIf(() -> CatzDrivetrain.Instance.getDistanceError() < DriveConstants.PREDICT_DISTANCE_SCORE))
+                new RepeatCommand(LXElevator(level).onlyIf(() -> CatzDrivetrain.Instance.getDistanceError() < DriveConstants.PREDICT_DISTANCE_SCORE))
             ),
             // new WaitUntilCommand(() -> !CatzOuttake.Instance.isDesiredCoralState(true)),
             new WaitCommand(delay),
