@@ -163,7 +163,7 @@ public class CatzSuperstructure extends VirtualSubsystem {
                 CatzAlgaeRemover.Instance.stopAlgae(),
                 CatzRampPivot.Instance.Ramp_Climb_Pos(),
                 CatzIntakeRollers.Instance.stopIntaking()
-            ).alongWith(Commands.waitSeconds(0.1)), //TBD TESITNG
+            ).alongWith(Commands.waitSeconds(0.1)).unless(() -> !isClimbEnabled), //TBD TESITNG
 
             CatzClimb.Instance.extendClimb()
         ).unless(()-> Robot.isSimulation()).alongWith(Commands.print("EXTENDING CLIMB/////////////////////////////"));

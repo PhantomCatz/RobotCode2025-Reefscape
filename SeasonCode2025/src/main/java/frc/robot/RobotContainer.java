@@ -116,12 +116,19 @@ public class RobotContainer {
 
     // Climb
     Trigger climbMode = xboxDrv.start();
-    xboxDrv.b().onTrue(CatzSuperstructure.Instance.extendClimb());
     climbMode.toggleOnTrue(Commands.startEnd(()->CatzSuperstructure.Instance.setClimbOverride(()->true), ()->CatzSuperstructure.Instance.setClimbOverride(()->false)));
+    
+    // Manual Climb Control
+    xboxDrv.povUp().onTrue(CatzClimb.Instance.ClimbManualMode(()-> 0.4));
+    xboxDrv.povUp().onFalse(CatzClimb.Instance.CancelClimb());
+    xboxDrv.povDown().onTrue(CatzClimb.Instance.ClimbManualMode(()-> -1.0));
+    xboxDrv.povDown().onFalse(CatzClimb.Instance.CancelClimb());
+    
+    climbMode.toggleOnTrue(CatzSuperstructure.Instance.extendClimb());
 
     // Left Right
-    xboxDrv.x().onTrue(TeleopPosSelector.Instance.runLeftRight(LeftRight.LEFT).unless(()->CatzSuperstructure.isClimbEnabled()));
-    xboxDrv.b().onTrue(TeleopPosSelector.Instance.runLeftRight(LeftRight.RIGHT).unless(()->CatzSuperstructure.isClimbEnabled()));
+    xboxDrv.povLeft().onTrue(TeleopPosSelector.Instance.runLeftRight(LeftRight.LEFT).unless(()->CatzSuperstructure.isClimbEnabled()));
+    xboxDrv.povRight().onTrue(TeleopPosSelector.Instance.runLeftRight(LeftRight.RIGHT).unless(()->CatzSuperstructure.isClimbEnabled()));
 
     // Drive to Reef
     xboxDrv.leftTrigger().onTrue(CatzSuperstructure.Instance.scoreLevelXAutomated(2));
@@ -155,21 +162,17 @@ public class RobotContainer {
 
 
     // cancel drive to reef
-    xboxDrv.rightStick().onTrue(CatzDrivetrain.Instance.cancelTrajectory()
+    xboxDrv.x().onTrue(CatzDrivetrain.Instance.cancelTrajectory()
     .alongWith(new InstantCommand(() -> isScoring = false))
     .alongWith(Commands.print("cancelling path"))
     .alongWith(CatzElevator.Instance.Elevator_Stow()));
 
-    //     // Manual Climb Control
-    // xboxDrv.povUp().onTrue(CatzClimb.Instance.ClimbManualMode(()-> 0.4));
-    // xboxDrv.povUp().onFalse(CatzClimb.Instance.CancelClimb());
-    // xboxDrv.povDown().onTrue(CatzClimb.Instance.ClimbManualMode(()-> -1.0));
-    // xboxDrv.povDown().onFalse(CatzClimb.Instance.CancelClimb());
+   
 
 
     // Default driving
-    Trigger escapeTrajectory = new Trigger(()->(xboxDrv.getLeftY() > 0.8));
-    escapeTrajectory.onTrue(CatzDrivetrain.Instance.cancelTrajectory());
+    // Trigger escapeTrajectory = new Trigger(()->(xboxDrv.getLeftY() > 0.8));
+    // escapeTrajectory.onTrue(CatzDrivetrain.Instance.cancelTrajectory());
 
     CatzDrivetrain.Instance.setDefaultCommand(new TeleopDriveCmd(() -> xboxDrv.getLeftX(), () -> xboxDrv.getLeftY(), () -> xboxDrv.getRightX(), CatzDrivetrain.Instance));
     //---------------------------------------------------------------------------------------------------------------------
@@ -184,14 +187,14 @@ public class RobotContainer {
     isRampPivotFullManual.onTrue(CatzRampPivot.Instance.rampPivotManual(()->-xboxAux.getLeftY()).alongWith(Commands.print("Manual Ramp")));
 
     // Gamepiece Selection
-    xboxAux.leftTrigger().onTrue(Commands.runOnce(()-> CatzSuperstructure.setChosenGamepiece(Gamepiece.CORAL)));
-    xboxAux.rightTrigger().onTrue(Commands.runOnce(()-> CatzSuperstructure.setChosenGamepiece(Gamepiece.ALGAE)));
+    // xboxAux.leftTrigger().onTrue(Commands.runOnce(()-> CatzSuperstructure.setChosenGamepiece(Gamepiece.CORAL)));
+    // xboxAux.rightTrigger().onTrue(Commands.runOnce(()-> CatzSuperstructure.setChosenGamepiece(Gamepiece.ALGAE)));
 
-    // Scoring Action
-    xboxAux.x().onTrue(CatzSuperstructure.Instance.intake().alongWith(Commands.print("INTAKE")));
-    xboxAux.y().onTrue(CatzSuperstructure.Instance.LXCoral().alongWith(Commands.print("OUTTAKE L" + CatzSuperstructure.Instance.getLevel())));
-    xboxAux.a().onTrue(CatzSuperstructure.Instance.stow().alongWith(Commands.print("STOWWW")));
-    xboxAux.b().onTrue(CatzSuperstructure.Instance.algaeStow());
+    // // Scoring Action
+    // xboxAux.x().onTrue(CatzSuperstructure.Instance.intake().alongWith(Commands.print("INTAKE")));
+    // xboxAux.y().onTrue(CatzSuperstructure.Instance.LXCoral().alongWith(Commands.print("OUTTAKE L" + CatzSuperstructure.Instance.getLevel())));
+    // xboxAux.a().onTrue(CatzSuperstructure.Instance.stow().alongWith(Commands.print("STOWWW")));
+    // xboxAux.b().onTrue(CatzSuperstructure.Instance.algaeStow());
 
 
     // algae punch
