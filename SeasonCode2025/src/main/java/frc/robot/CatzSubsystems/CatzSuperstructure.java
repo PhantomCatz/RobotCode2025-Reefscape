@@ -18,6 +18,7 @@ import edu.wpi.first.wpilibj2.command.RepeatCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
+import edu.wpi.first.wpilibj2.command.Command.InterruptionBehavior;
 import frc.robot.Robot;
 import frc.robot.TeleopPosSelector;
 import frc.robot.CatzSubsystems.CatzAlgaeEffector.CatzAlgaePivot.CatzAlgaePivot;
@@ -163,7 +164,7 @@ public class CatzSuperstructure extends VirtualSubsystem {
                 CatzAlgaeRemover.Instance.stopAlgae(),
                 CatzRampPivot.Instance.Ramp_Climb_Pos(),
                 CatzIntakeRollers.Instance.stopIntaking()
-            ).alongWith(Commands.waitSeconds(0.1)).unless(() -> !isClimbEnabled), //TBD TESITNG
+            ).alongWith(Commands.waitSeconds(0.1)), //TBD TESITNG
 
             CatzClimb.Instance.extendClimb()
         ).unless(()-> Robot.isSimulation()).alongWith(Commands.print("EXTENDING CLIMB/////////////////////////////"));
@@ -176,7 +177,7 @@ public class CatzSuperstructure extends VirtualSubsystem {
 
         return new SequentialCommandGroup(
             new TrajectoryDriveCmd(pathToReadyPose, true, false).deadlineFor(
-                new RepeatCommand(LXElevator(level).alongWith(new PrintCommand("elevavavava")).onlyIf(() -> CatzDrivetrain.Instance.getDistanceError() < DriveConstants.PREDICT_DISTANCE_SCORE))
+                new RepeatCommand(LXElevator(level).onlyIf(() -> CatzDrivetrain.Instance.getDistanceError() < DriveConstants.PREDICT_DISTANCE_SCORE))
             ),
             // new WaitUntilCommand(() -> !CatzOuttake.Instance.isDesiredCoralState(true)),
             LXCoral(level),
@@ -189,7 +190,7 @@ public class CatzSuperstructure extends VirtualSubsystem {
 
         return new SequentialCommandGroup(
             new TrajectoryDriveCmd(pathToReadyPose, true, false).deadlineFor(
-                new RepeatCommand(LXElevator(level).alongWith(new PrintCommand("elevavavava")).onlyIf(() -> CatzDrivetrain.Instance.getDistanceError() < DriveConstants.PREDICT_DISTANCE_SCORE))
+                new RepeatCommand(LXElevator(level).onlyIf(() -> CatzDrivetrain.Instance.getDistanceError() < DriveConstants.PREDICT_DISTANCE_SCORE))
             ),
             // new WaitUntilCommand(() -> !CatzOuttake.Instance.isDesiredCoralState(true)),
             new WaitCommand(delay),
@@ -230,11 +231,11 @@ public class CatzSuperstructure extends VirtualSubsystem {
             ),
             Commands.print("finish running"),
             new InstantCommand(() -> System.out.println("isScoring: " + isScoring.get())),
-            new WaitUntilCommand(() -> CatzElevator.Instance.isElevatorInPos() && canShoot.get()),
+            new WaitUntilCommand(() -> CatzElevator.Instance.isElevatorInPos()),
             Commands.print("finish waiting"),
             CatzSuperstructure.Instance.ElevatorHeightShoot().asProxy(),
             CatzElevator.Instance.setCanMoveElevator(false).asProxy()
-        );
+        ).withInterruptBehavior(InterruptionBehavior.kCancelSelf);
     }
 
 

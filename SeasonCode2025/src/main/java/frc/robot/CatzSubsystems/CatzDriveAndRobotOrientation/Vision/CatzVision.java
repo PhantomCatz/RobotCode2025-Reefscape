@@ -25,7 +25,7 @@ import org.littletonrobotics.junction.Logger;
 public class CatzVision extends SubsystemBase {
   public static final CatzVision Instance = new CatzVision(
                                                 new VisionIOLimelight("limelight-gyoza"),
-                                                new VisionIOLimelight("limelight-tempura")
+                                                new VisionIOLimelight("limelight-soba")
                                             );
 
   private final VisionIO[] io;

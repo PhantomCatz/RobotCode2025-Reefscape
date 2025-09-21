@@ -4,8 +4,6 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.util.Color;
-import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.CatzRobotTracker;
-import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.Drivetrain.CatzDrivetrain;
 import frc.robot.Utilities.Alert;
 import frc.robot.Utilities.Alert.AlertType;
 
@@ -27,13 +25,7 @@ public final class CatzConstants {
 
   public static final double LOOP_TIME = 0.02;
 
-  public static final AutoFactory autoFactory = new AutoFactory(
-                                                  CatzRobotTracker.Instance::getEstimatedPose,
-                                                  CatzRobotTracker.Instance::resetPose,
-                                                  CatzDrivetrain.Instance::followChoreoTrajectoryExecute,
-                                                  true,
-                                                  CatzDrivetrain.Instance
-                                                );
+  public static AutoFactory autoFactory;
 
   public static enum RobotScenario {
     TUNING, // In PID enviroment with logged tunable numbers

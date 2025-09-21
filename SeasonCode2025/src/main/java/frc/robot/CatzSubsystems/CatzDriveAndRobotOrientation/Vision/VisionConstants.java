@@ -60,7 +60,7 @@ public class VisionConstants {
 
   public static final HashMap<String, Double> PING_MAP = new HashMap<>() {{
     put("limelight-gyoza", 76.25);
-    put("limelight-udon", 76.25);
+    put("limelight-soba", 76.25);
 
   }};
 

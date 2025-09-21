@@ -10,14 +10,17 @@ import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import frc.robot.Autonomous.AutoRoutineSelector;
+import frc.robot.Autonomous.CatzAutonomous;
 import frc.robot.CatzConstants.RobotHardwareMode;
 import frc.robot.CatzConstants.RobotID;
 import frc.robot.CatzSubsystems.CatzAlgaeEffector.CatzAlgaePivot.CatzAlgaePivot;
 import frc.robot.CatzSubsystems.CatzAlgaeEffector.CatzAlgaePivot.CatzAlgaePivot.AlgaePivotPosition;
 import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.CatzRobotTracker;
+import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.Drivetrain.CatzDrivetrain;
 import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.Vision.CatzVision;
 import frc.robot.CatzSubsystems.CatzLEDs.CatzLED;
 import frc.robot.CatzSubsystems.CatzLEDs.CatzLED.ControllerLEDState;
+import frc.robot.CatzSubsystems.CatzOuttake.CatzOuttake;
 import frc.robot.CatzSubsystems.CatzRampPivot.CatzRampPivot;
 import frc.robot.Utilities.Alert;
 import frc.robot.Utilities.Alert.AlertType;
@@ -38,6 +41,8 @@ import org.littletonrobotics.junction.networktables.NT4Publisher;
 import org.littletonrobotics.junction.rlog.RLOGServer;
 import org.littletonrobotics.junction.wpilog.WPILOGReader;
 import org.littletonrobotics.junction.wpilog.WPILOGWriter;
+
+import choreo.auto.AutoFactory;
 
 
 
@@ -233,6 +238,27 @@ public class Robot extends LoggedRobot {
 
     SmartDashboard.putData("Auton Selector", AutoRoutineSelector.Instance.getAutoChooser());
     // CommandScheduler.getInstance().setPeriod(CatzConstants.LOOP_TIME); //TODO should we add this?
+
+
+    System.out.println("We need to access this from somewhere to activate it"+CatzVision.Instance.getName());
+    System.out.println("Initializing " + CatzDrivetrain.Instance.getName());
+    System.out.println("Initializing " + CatzAlgaePivot.Instance.getName());
+    System.out.println("Initializing " + CatzRampPivot.Instance.getName());
+    System.out.println("Initializing " + CatzRobotTracker.Instance);
+    System.out.println("Initializing " + CatzVision.Instance.getName());
+    System.out.println("Initializing " + CatzLED.Instance);
+    System.out.println("Initializing " + CatzOuttake.Instance.getName());
+    System.out.println("Initializing " + CatzAutonomous.Instance.getName());
+
+
+    CatzConstants.autoFactory = new AutoFactory(
+                                                  CatzRobotTracker.Instance::getEstimatedPose,
+                                                  CatzRobotTracker.Instance::resetPose,
+                                                  CatzDrivetrain.Instance::followChoreoTrajectoryExecute,
+                                                  true,
+                                                  CatzDrivetrain.Instance
+                                                ); //it is apparently a good idea to initialize these variables not statically because there can be race conditions
+
   }
 
   @Override
@@ -330,9 +356,9 @@ public class Robot extends LoggedRobot {
     garbageCollectionCounter++;
 
     // Checked leds
-    if(CatzVision.Instance.getTagId(1) == 263 || CatzVision.Instance.getTagId(0) == 263) {
-      LED.setControllerState(ControllerLEDState.ledChecked);
-    }
+    // if(CatzVision.Instance.getTagId(1) == 263 || CatzVision.Instance.getTagId(0) == 263) {
+    //   LED.setControllerState(ControllerLEDState.ledChecked);
+    // }
   }
 
   @Override
@@ -357,6 +383,7 @@ public class Robot extends LoggedRobot {
     autoStart = Timer.getFPGATimestamp();
     // m_autonomousCommand = CatzSuperstructure.Instance.scoreLevelTwoAutomated();
     //m_autonomousCommand = AutoRoutineSelector.Instance.getSelectedCommand();
+    m_autonomousCommand = CatzAutonomous.Instance.getCommand();
     CatzRampPivot.Instance.Ramp_Intake_Pos().withTimeout(1.0);
     if (m_autonomousCommand != null) {
       m_autonomousCommand.schedule();
@@ -399,6 +426,7 @@ public class Robot extends LoggedRobot {
   @Override
   public void teleopPeriodic() {
     teleElapsedTime = Timer.getFPGATimestamp() - teleStart;
+
   }
 
   @Override

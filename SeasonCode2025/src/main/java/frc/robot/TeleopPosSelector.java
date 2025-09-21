@@ -5,7 +5,6 @@ import java.util.HashMap;
 import java.util.Set;
 import java.util.function.Supplier;
 
-import org.littletonrobotics.junction.Logger;
 
 import com.pathplanner.lib.path.GoalEndState;
 import com.pathplanner.lib.path.PathConstraints;
@@ -21,6 +20,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.DeferredCommand;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.FieldConstants.Reef;
 import frc.robot.Utilities.AllianceFlipUtil;
 import frc.robot.Utilities.CornerTrackingPathfinder;
@@ -30,7 +30,9 @@ import frc.robot.CatzSubsystems.CatzSuperstructure;
 import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.CatzRobotTracker;
 import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.Drivetrain.CatzDrivetrain;
 import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.Drivetrain.DriveConstants;
-import frc.robot.Commands.DriveAndRobotOrientationCmds.TrajectoryDriveCmd;
+import frc.robot.CatzSubsystems.CatzElevator.CatzElevator;
+import frc.robot.CatzSubsystems.CatzElevator.CatzElevator.ElevatorPosition;
+import frc.robot.Commands.DriveAndRobotOrientationCmds.PIDDriveCmd;
 
 @SuppressWarnings({ "rawtypes", "unchecked" })
 public class TeleopPosSelector { //TODO split up the file. it's too big and does too much stuff
@@ -247,17 +249,27 @@ public class TeleopPosSelector { //TODO split up the file. it's too big and does
 
   public Command runLeftRight(LeftRight leftRight){
     return new DeferredCommand(() -> {
-      if(recentNBAPos == null) return new InstantCommand(); //the driver did not NBA yet, so there is no left right to go to
-
-      Pose2d currentPose = CatzRobotTracker.Instance.getEstimatedPose();
+      if(recentNBAPos == null || !CatzSuperstructure.Instance.getIsScoring().get()) return new InstantCommand(); //the driver did not NBA yet, so there is no left right to go to
+      //TODO only allow left right when the scoring sequence is activated
       Pose2d goal = calculateReefPose(new Pair<Integer, LeftRight>(recentNBAPos.getFirst(), leftRight), true, false); //TODO decide whether or not to have distanced
 
-      Logger.recordOutput("LeftRightGoal", goal);
+      return Commands.sequence(
+                Commands.defer(()-> {
+                  Command lower = new InstantCommand();
+                  Command raise = new InstantCommand();
 
-      PathPlannerPath path = getStraightLinePath(currentPose, goal, DriveConstants.PATHFINDING_CONSTRAINTS); //TODO might need to scale constraints based off of distance from reef?
-
-      return new TrajectoryDriveCmd(path, true, true).andThen(RobotContainer.Instance.rumbleDrvAuxController(1.0, 0.2));
-    }, Set.of(CatzDrivetrain.Instance));
+                  if(CatzElevator.Instance.getElevatorTargetPosition() == ElevatorPosition.PosL4){
+                    lower = new InstantCommand(() -> CatzElevator.Instance.setElevatorTargetPosition(2));
+                    raise = new WaitCommand(0.5).andThen(new InstantCommand(() -> CatzElevator.Instance.setElevatorTargetPosition(4)));
+                  }
+                  return Commands.sequence(
+                    lower,
+                    new InstantCommand(() -> CatzDrivetrain.Instance.setPIDGoalPose(goal)),
+                    raise
+                  );
+                }, Set.of())
+             );
+    }, Set.of());
 
   }
 
@@ -279,12 +291,14 @@ public class TeleopPosSelector { //TODO split up the file. it's too big and does
     return new DeferredCommand(() -> {
       recentNBAPos = getClosestReefPos().getFirst();
 
-      PathPlannerPath path = getStraightLinePath(CatzRobotTracker.Instance.getEstimatedPose(), calculateReefPose(getClosestReefPos().getFirst(), true, false), DriveConstants.PATHFINDING_CONSTRAINTS);
+      // PathPlannerPath path = getStraightLinePath(CatzRobotTracker.Instance.getEstimatedPose(), calculateReefPose(getClosestReefPos().getFirst(), true, false), DriveConstants.PATHFINDING_CONSTRAINTS);
+
+      // Command prepareScorePos = new TrajectoryDriveCmd(path, true, true)
+      //                                   .deadlineFor(new RepeatCommand(prematureCommand.onlyIf(() -> CatzDrivetrain.Instance.getDistanceError() < DriveConstants.PREDICT_DISTANCE_SCORE)))
+      //                                   .andThen(RobotContainer.Instance.controllerRumbleCommand());
 
       Command prepareScorePos = Commands.sequence(
-                                    new TrajectoryDriveCmd(path, true, true),
-                                    RobotContainer.Instance.controllerRumbleCommand().withTimeout(0.1)
-                                );
+                                  new PIDDriveCmd(calculateReefPose(getClosestReefPos().getFirst(), true, false))                                );
 
       return prepareScorePos;
     }, Set.of(CatzDrivetrain.Instance));

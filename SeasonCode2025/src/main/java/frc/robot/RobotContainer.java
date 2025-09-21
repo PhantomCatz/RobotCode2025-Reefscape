@@ -4,7 +4,6 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.GenericHID.RumbleType;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
@@ -117,13 +116,13 @@ public class RobotContainer {
     // Climb
     Trigger climbMode = xboxDrv.start();
     climbMode.toggleOnTrue(Commands.startEnd(()->CatzSuperstructure.Instance.setClimbOverride(()->true), ()->CatzSuperstructure.Instance.setClimbOverride(()->false)));
-    
+
     // Manual Climb Control
     xboxDrv.povUp().onTrue(CatzClimb.Instance.ClimbManualMode(()-> 0.4));
     xboxDrv.povUp().onFalse(CatzClimb.Instance.CancelClimb());
     xboxDrv.povDown().onTrue(CatzClimb.Instance.ClimbManualMode(()-> -1.0));
     xboxDrv.povDown().onFalse(CatzClimb.Instance.CancelClimb());
-    
+
     climbMode.toggleOnTrue(CatzSuperstructure.Instance.extendClimb());
 
     // Left Right
@@ -131,10 +130,10 @@ public class RobotContainer {
     xboxDrv.povRight().onTrue(TeleopPosSelector.Instance.runLeftRight(LeftRight.RIGHT).unless(()->CatzSuperstructure.isClimbEnabled()));
 
     // Drive to Reef
-    xboxDrv.leftTrigger().onTrue(CatzSuperstructure.Instance.scoreLevelXAutomated(2));
     xboxDrv.rightTrigger().onTrue(CatzSuperstructure.Instance.scoreLevelXAutomated(1));
-    xboxDrv.leftBumper().onTrue(CatzSuperstructure.Instance.scoreLevelXAutomated(4));
+    xboxDrv.leftTrigger().onTrue(CatzSuperstructure.Instance.scoreLevelXAutomated(2));
     xboxDrv.rightBumper().onTrue(CatzSuperstructure.Instance.scoreLevelXAutomated(3));
+    xboxDrv.leftBumper().onTrue(CatzSuperstructure.Instance.scoreLevelXAutomated(4));
 
     xboxDrv.leftTrigger().onFalse(new InstantCommand(() -> {
       CatzSuperstructure.Instance.setCanShoot(() -> true);
@@ -159,15 +158,18 @@ public class RobotContainer {
     xboxDrv.a().toggleOnTrue(CatzElevator.Instance.decrementElevatorPosition().onlyIf(()-> CatzSuperstructure.Instance.getIsScoring().get()));
     xboxDrv.y().toggleOnTrue(CatzElevator.Instance.incrementElevatorPosition().onlyIf(() -> CatzSuperstructure.Instance.getIsScoring().get()));
 
+    xboxDrv.b().toggleOnTrue(TeleopPosSelector.Instance.runLeftRight(LeftRight.RIGHT).unless(()->CatzSuperstructure.isClimbEnabled()));
+    xboxDrv.x().toggleOnTrue(TeleopPosSelector.Instance.runLeftRight(LeftRight.LEFT).unless(()->CatzSuperstructure.isClimbEnabled()));
 
 
     // cancel drive to reef
     xboxDrv.x().onTrue(CatzDrivetrain.Instance.cancelTrajectory()
     .alongWith(new InstantCommand(() -> isScoring = false))
     .alongWith(Commands.print("cancelling path"))
-    .alongWith(CatzElevator.Instance.Elevator_Stow()));
+    .alongWith(CatzSuperstructure.Instance.stow()));
 
-   
+
+    xboxDrv.b().onTrue(CatzSuperstructure.Instance.intake().alongWith(Commands.print("INTAKE")));
 
 
     // Default driving
@@ -207,10 +209,10 @@ public class RobotContainer {
     isClimbFullManualEnabled.onTrue(Commands.print("CatzClimb.Instance full man"));
 
     // Scoring Level
-    xboxAux.povRight().onTrue(Commands.runOnce(()-> {CatzSuperstructure.Instance.setLevel(1); SmartDashboard.putNumber("Reef Level", 1);}));
-    xboxAux.povUp().onTrue(Commands.runOnce(() -> {CatzSuperstructure.Instance.setLevel(2); SmartDashboard.putNumber("Reef Level", 2);}));
-    xboxAux.povLeft().onTrue(Commands.runOnce(() -> {CatzSuperstructure.Instance.setLevel(3); SmartDashboard.putNumber("Reef Level", 3);}));
-    xboxAux.povDown().onTrue(Commands.runOnce(() -> {CatzSuperstructure.Instance.setLevel(4); SmartDashboard.putNumber("Reef Level", 4);}));
+    // xboxAux.povRight().onTrue(Commands.runOnce(()-> {CatzSuperstructure.Instance.setLevel(1); SmartDashboard.putNumber("Reef Level", 1);}));
+    // xboxAux.povUp().onTrue(Commands.runOnce(() -> {CatzSuperstructure.Instance.setLevel(2); SmartDashboard.putNumber("Reef Level", 2);}));
+    // xboxAux.povLeft().onTrue(Commands.runOnce(() -> {CatzSuperstructure.Instance.setLevel(3); SmartDashboard.putNumber("Reef Level", 3);}));
+    // xboxAux.povDown().onTrue(Commands.runOnce(() -> {CatzSuperstructure.Instance.setLevel(4); SmartDashboard.putNumber("Reef Level", 4);}));
     //------------------------------------------------------------------------------------------------------------------------------
     //  XBOX test controls
     //------------------------------------------------------------------------------------------------------------------------------
@@ -308,7 +310,12 @@ public class RobotContainer {
         }).withTimeout(1.0);
   }
 
-  public Command rumbleDrvController(double strength, double duration){
+  public void rumbleDrvController(double strength){
+    xboxDrv.getHID().setRumble(RumbleType.kBothRumble, strength);
+  }
+
+
+  public Command rumbleDrvControllerCmd(double strength, double duration){
     return new SequentialCommandGroup(
       new InstantCommand(() ->xboxDrv.getHID().setRumble(RumbleType.kBothRumble, strength)),
       new WaitCommand(duration),
@@ -316,7 +323,7 @@ public class RobotContainer {
     ).finallyDo(()->xboxDrv.getHID().setRumble(RumbleType.kBothRumble, 0.0));
   }
 
-  public Command rumbleAuxController(double strength, double duration){
+  public Command rumbleAuxControllerCmd(double strength, double duration){
     return new SequentialCommandGroup(
       new InstantCommand(() ->xboxAux.getHID().setRumble(RumbleType.kBothRumble, strength)),
       new WaitCommand(duration),
@@ -326,8 +333,8 @@ public class RobotContainer {
 
   public Command rumbleDrvAuxController(double strength, double duration){
     return new ParallelCommandGroup(
-      rumbleAuxController(strength, duration),
-      rumbleDrvController(strength, duration)
+      rumbleAuxControllerCmd(strength, duration),
+      rumbleDrvControllerCmd(strength, duration)
     );
   }
 
