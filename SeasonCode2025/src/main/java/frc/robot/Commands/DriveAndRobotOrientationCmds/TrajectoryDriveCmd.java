@@ -11,6 +11,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.FieldConstants;
@@ -22,6 +23,7 @@ import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.Vision.CatzVision;
 import frc.robot.Utilities.AllianceFlipUtil;
 
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.function.Supplier;
 
 import org.littletonrobotics.junction.Logger;
@@ -114,6 +116,16 @@ public class TrajectoryDriveCmd extends Command {
       }
       if(AllianceFlipUtil.shouldFlipToRed()) {
         usePath = path.flipPath();
+      }
+
+       // Pose Reseting
+      if (Robot.isFirstPath && DriverStation.isAutonomous()) {
+        try {
+          tracker.resetPose(usePath.getStartingHolonomicPose().get());
+          Robot.isFirstPath = false;
+        } catch (NoSuchElementException e) {
+          e.printStackTrace();
+        }
       }
 
       startRot = tracker.getEstimatedPose().getRotation();
