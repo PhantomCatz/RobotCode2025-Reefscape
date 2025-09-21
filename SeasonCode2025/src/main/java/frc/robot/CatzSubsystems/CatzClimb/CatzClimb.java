@@ -5,6 +5,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.CatzConstants;
+import frc.robot.CatzSubsystems.CatzSuperstructure;
 import frc.robot.CatzSubsystems.CatzLEDs.CatzLED;
 import frc.robot.CatzSubsystems.CatzLEDs.CatzLED.WinchingState;
 import frc.robot.Utilities.LoggedTunableNumber;
@@ -149,7 +150,7 @@ public class CatzClimb extends SubsystemBase {
   }
 
   public Command ClimbManualMode(Supplier<Double> manualSupplier) {
-    return run(() -> climbFullManual(manualSupplier.get())).alongWith(Commands.print("hi"));
+    return run(() -> climbFullManual(manualSupplier.get())).alongWith(Commands.print("hi")).onlyIf(() -> CatzSuperstructure.isClimbEnabled());
   }
 
   public Command CancelClimb() {

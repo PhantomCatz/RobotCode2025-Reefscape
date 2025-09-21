@@ -15,7 +15,6 @@ import frc.robot.RobotContainer;
 import frc.robot.CatzSubsystems.CatzSuperstructure;
 import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.CatzRobotTracker;
 import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.Drivetrain.CatzDrivetrain;
-import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.Vision.CatzVision;
 
 public class PIDDriveCmd extends Command{
 
@@ -49,6 +48,8 @@ public class PIDDriveCmd extends Command{
         );
         this.rotationController = new ProfiledPIDController(3.0, 0.0, 0.0, rotationConstraints);
         this.rotationController.enableContinuousInput(-180.0, 180.0);
+        // this.rotationController.enableContinuousInput(0.0, 360.0);
+
     }
 
     @Override
@@ -65,9 +66,13 @@ public class PIDDriveCmd extends Command{
         Pose2d currentPose = CatzRobotTracker.Instance.getEstimatedPose();
         Translation2d poseError = goalPos.minus(currentPose).getTranslation();
 
+        if(poseError.getNorm() < 0.0001) return;
+
         double currentDistance = poseError.getNorm();
         Rotation2d direction = poseError.getAngle();
         double angleError = MathUtil.inputModulus(goalPos.getRotation().getDegrees() - currentPose.getRotation().getDegrees(), -180.0, 180.0);
+        // double angleError = MathUtil.inputModulus(goalPos.getRotation().getDegrees() - currentPose.getRotation().getDegrees(), 0, 360.0);
+
 
         Logger.recordOutput("Pose Error Angle", angleError);
 
@@ -89,7 +94,7 @@ public class PIDDriveCmd extends Command{
 
     @Override
     public boolean isFinished(){
-        readyToScore = isAtTargetState() && CatzVision.Instance.isSeeingApriltag() && CatzRobotTracker.Instance.getVisionPoseShift().getNorm() < ALLOWABLE_VISION_ADJUST;
+        readyToScore = isAtTargetState();// && CatzVision.Instance.isSeeingApriltag() && CatzRobotTracker.Instance.getVisionPoseShift().getNorm() < ALLOWABLE_VISION_ADJUST;
         if(readyToScore){
             RobotContainer.Instance.rumbleDrvController(0.5);
         }else{

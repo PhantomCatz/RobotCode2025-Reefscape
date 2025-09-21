@@ -182,7 +182,7 @@ public class CatzElevator extends SubsystemBase {
         } else {
           io.runSetpointDown(targetPosition.getTargetPositionInch());
         }
-      } else if (canMoveElevator) {
+      } else if (canMoveElevator || DriverStation.isAutonomous()) {
         //Setpoint PID
         io.runSetpointUp(targetPosition.getTargetPositionInch());
 
