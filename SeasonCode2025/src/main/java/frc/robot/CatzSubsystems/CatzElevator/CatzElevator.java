@@ -7,6 +7,7 @@ import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
 
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.PrintCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -35,6 +36,7 @@ public class CatzElevator extends SubsystemBase {
   private boolean isElevatorInPos = false;
 
   private boolean canMoveElevator = false;
+  private boolean raiseOverride = false;
 
   private final ElevatorPosition[] scoringPositionsList = {ElevatorPosition.PosL1, ElevatorPosition.PosL2, ElevatorPosition.PosL3, ElevatorPosition.PosL4};
 
@@ -209,7 +211,6 @@ public class CatzElevator extends SubsystemBase {
     Logger.recordOutput("Elevator/isElevatorInPos", isElevatorInPosition());
     Logger.recordOutput("Elevator/targetPosition", targetPosition.getTargetPositionInch());
 
-
     // Target Postioin Logging
     previousLoggedPosition = targetPosition;
   }
@@ -348,7 +349,15 @@ public class CatzElevator extends SubsystemBase {
   }
 
   public Command setCanMoveElevator(boolean setValue) {
-    return runOnce(() -> this.canMoveElevator = setValue);
+    return runOnce(() -> this.canMoveElevator = setValue).alongWith(Commands.print("set can move elevator"+setValue));
+  }
+
+  public Command setRaiseOverride(boolean setValue) {
+    return runOnce(() -> this.raiseOverride = setValue).alongWith(Commands.print("set raise override"+setValue));
+  }
+
+  public boolean getRaiseOverride() {
+    return raiseOverride;
   }
 
   public Command incrementElevatorPosition() {

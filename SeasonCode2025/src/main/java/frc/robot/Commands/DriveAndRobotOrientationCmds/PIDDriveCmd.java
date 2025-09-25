@@ -15,6 +15,7 @@ import frc.robot.RobotContainer;
 import frc.robot.CatzSubsystems.CatzSuperstructure;
 import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.CatzRobotTracker;
 import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.Drivetrain.CatzDrivetrain;
+import frc.robot.CatzSubsystems.CatzElevator.CatzElevator;
 
 public class PIDDriveCmd extends Command{
 
@@ -83,7 +84,7 @@ public class PIDDriveCmd extends Command{
         Logger.recordOutput("Pose Error Sine", direction.getSin());
 
         // The goal of the rotation controller is to drive the angle to the target angle
-        double targetOmega = Math.toRadians(rotationController.calculate(0.0, angleError));
+        double targetOmega = -Math.toRadians(rotationController.calculate(angleError, 0.0));
         Logger.recordOutput("Pose Error Omega", targetOmega);
 
         ChassisSpeeds goalChassisSpeeds = new ChassisSpeeds(targetVel * direction.getCos(), targetVel * direction.getSin(), targetOmega);
@@ -100,7 +101,7 @@ public class PIDDriveCmd extends Command{
         }else{
             RobotContainer.Instance.rumbleDrvController(0.0);
         }
-        return readyToScore && CatzSuperstructure.Instance.getCanShoot().get();
+        return (readyToScore && CatzSuperstructure.Instance.getCanShoot().get()) || CatzElevator.Instance.getRaiseOverride();
     }
 
     private boolean isAtTargetState(){

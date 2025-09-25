@@ -24,7 +24,6 @@ import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.FieldConstants.Reef;
 import frc.robot.Utilities.AllianceFlipUtil;
 import frc.robot.Utilities.CornerTrackingPathfinder;
-import frc.robot.CatzSubsystems.CatzSuperstructure.Gamepiece;
 import frc.robot.CatzSubsystems.CatzSuperstructure.LeftRight;
 import frc.robot.CatzSubsystems.CatzSuperstructure;
 import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.CatzRobotTracker;
@@ -149,9 +148,9 @@ public class TeleopPosSelector { //TODO split up the file. it's too big and does
       leftRight = leftRight.times(-1);
     }
 
-    if(CatzSuperstructure.Instance.getChosenGamepiece() == Gamepiece.ALGAE){
-      leftRight = new Translation2d();
-    }
+    // if(CatzSuperstructure.Instance.getChosenGamepiece() == Gamepiece.ALGAE){
+    //   leftRight = new Translation2d();
+    // }
 
     Translation2d scoringPos = radius.plus(leftRight).plus(Reef.center);
     return AllianceFlipUtil.apply(new Pose2d(scoringPos, selectedAngle.plus(Rotation2d.k180deg)));
@@ -298,7 +297,7 @@ public class TeleopPosSelector { //TODO split up the file. it's too big and does
       //                                   .andThen(RobotContainer.Instance.controllerRumbleCommand());
 
       Command prepareScorePos = Commands.sequence(
-                                  new PIDDriveCmd(calculateReefPose(getClosestReefPos().getFirst(), true, false))                                );
+                                  new PIDDriveCmd(calculateReefPose(getClosestReefPos().getFirst(), true, false)));
 
       return prepareScorePos;
     }, Set.of(CatzDrivetrain.Instance));

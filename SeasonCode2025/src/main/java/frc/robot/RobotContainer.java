@@ -105,7 +105,7 @@ public class RobotContainer {
     // XBOX Drive
     //---------------------------------------------------------------------------------------------------------------------
     // Reset odometry
-    DoublePressTracker.createTrigger(xboxDrv.button(8).and(xboxDrv.button(7))).onTrue(new InstantCommand(() -> {
+    DoublePressTracker.createTrigger(xboxDrv.back()).onTrue(new InstantCommand(() -> {
       if(AllianceFlipUtil.shouldFlipToRed()){
         CatzRobotTracker.Instance.resetPose(new Pose2d(CatzRobotTracker.Instance.getEstimatedPose().getTranslation(), Rotation2d.k180deg));
       }else{
@@ -114,8 +114,8 @@ public class RobotContainer {
     }));
 
     // Climb
-    // Trigger climbMode = xboxDrv.start();
-    // climbMode.toggleOnTrue(Commands.startEnd(()->CatzSuperstructure.Instance.setClimbOverride(()->true), ()->CatzSuperstructure.Instance.setClimbOverride(()->false)));
+    Trigger climbMode = xboxDrv.start();
+    climbMode.toggleOnTrue(Commands.startEnd(()->CatzSuperstructure.Instance.setClimbOverride(()->true), ()->CatzSuperstructure.Instance.setClimbOverride(()->false)));
 
     // Manual Climb Control
     xboxDrv.povUp().onTrue(CatzClimb.Instance.ClimbManualMode(()-> 0.4));
@@ -123,7 +123,7 @@ public class RobotContainer {
     xboxDrv.povDown().onTrue(CatzClimb.Instance.ClimbManualMode(()-> -1.0));
     xboxDrv.povDown().onFalse(CatzClimb.Instance.CancelClimb());
 
-    // climbMode.toggleOnTrue(CatzSuperstructure.Instance.extendClimb());
+    climbMode.toggleOnTrue(CatzSuperstructure.Instance.extendClimb());
 
     // Left Right
     xboxDrv.povLeft().onTrue(TeleopPosSelector.Instance.runLeftRight(LeftRight.LEFT).unless(()->CatzSuperstructure.isClimbEnabled()));
@@ -168,6 +168,8 @@ public class RobotContainer {
     .alongWith(Commands.print("cancelling path"))
     .alongWith(CatzSuperstructure.Instance.stow()));
 
+    // override score
+    xboxDrv.povUp().toggleOnTrue(CatzElevator.Instance.setRaiseOverride(true).alongWith(Commands.print("override score")));
 
     xboxDrv.b().onTrue(CatzSuperstructure.Instance.intake().alongWith(Commands.print("INTAKE")));
 
