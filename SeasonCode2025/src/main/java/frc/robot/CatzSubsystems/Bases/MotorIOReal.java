@@ -9,9 +9,14 @@ import com.ctre.phoenix6.controls.*;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.*;
 
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ThreadPoolExecutor;
+import edu.wpi.first.units.Units;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Current;
+import edu.wpi.first.units.measure.Dimensionless;
 import edu.wpi.first.units.measure.Temperature;
 import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj.DigitalInput;
@@ -46,7 +51,15 @@ public class MotorIOReal implements MotorIO {
     private final List<StatusSignal<Temperature>> tempCelsius;
 
     private double Final_Ratio;
+
+    private final ControlRequestGetter requestGetter = new ControlRequestGetter();
+
+    private BlockingQueue<Runnable> queue = new LinkedBlockingQueue<>();
+    private ThreadPoolExecutor threadPoolExecutor = new ThreadPoolExecutor(1, 1, 5, java.util.concurrent.TimeUnit.MILLISECONDS, queue);
     
+    private Setpoint setpoint = Setpoint.withNeutralSetpoint();
+    private boolean enabled = true;
+
     /**
      * basic, not done
      * 1 motor
@@ -57,6 +70,7 @@ public class MotorIOReal implements MotorIO {
      * @param mmP motion magic parameters
      */
     public MotorIOReal(TalonFX leader, double FL, Gains s0g, Gains s1g, MotionMagicParameters mmP) {
+
         leaderTalon = leader;
         followerTalon = null;
 
@@ -705,26 +719,26 @@ public class MotorIOReal implements MotorIO {
     }
 
     @Override
-  public void stop() {
-    leaderTalon.setControl(new DutyCycleOut(0.0));
-  }
+    public void stop() {
+        leaderTalon.setControl(new DutyCycleOut(0.0));
+    }
 
-  @Override
-  public void setPosition(double pos) {
-    leaderTalon.setPosition(pos);
-  }
+    @Override
+    public void setPosition(double pos) {
+        leaderTalon.setPosition(pos);
+    }
 
-  @Override
-  public void setGainsSlot0(double kP, double kI, double kD, double kS, double kV, double kA, double kG) {
-    config.Slot0.kP = kP;
-    config.Slot0.kI = kI;
-    config.Slot0.kD = kD;
-    config.Slot0.kS = kS;
-    config.Slot0.kV = kV;
-    config.Slot0.kA = kA;
-    config.Slot0.kG = kG;
-    leaderTalon.getConfigurator().apply(config);
-  }
+    @Override
+    public void setGainsSlot0(double kP, double kI, double kD, double kS, double kV, double kA, double kG) {
+        config.Slot0.kP = kP;
+        config.Slot0.kI = kI;
+        config.Slot0.kD = kD;
+        config.Slot0.kS = kS;
+        config.Slot0.kV = kV;
+        config.Slot0.kA = kA;
+        config.Slot0.kG = kG;
+        leaderTalon.getConfigurator().apply(config);
+    }
 
     @Override
     public void setGainsSlot1(double kP, double kI, double kD, double kS, double kV, double kA, double kG) {
@@ -770,5 +784,85 @@ public class MotorIOReal implements MotorIO {
         config.Slot0.kA = kA;
         leaderTalon.getConfigurator().apply(config);
     }
+
+    public MotorIOInputs getMotorIOInputs() {
+        return new MotorIO.MotorIOInputs();
+    }
+
+    public static class ControlRequestGetter {
+		public ControlRequest getVoltageRequest(Voltage voltage) {
+			return new VoltageOut(voltage.in(Units.Volts)).withEnableFOC(false);
+		}
+
+		public ControlRequest getDutyCycleRequest(Dimensionless percent) {
+			return new DutyCycleOut(percent.in(Units.Percent));
+		}
+
+		public ControlRequest getMotionMagicRequest(Angle mechanismPosition) {
+			return new MotionMagicExpoVoltage(mechanismPosition).withSlot(0).withEnableFOC(true);
+		}
+
+		public ControlRequest getVelocityRequest(AngularVelocity mechanismVelocity) {
+			return new VelocityTorqueCurrentFOC(mechanismVelocity).withSlot(1);
+		}
+
+		public ControlRequest getPositionRequest(Angle mechanismPosition) {
+			return new PositionTorqueCurrentFOC(mechanismPosition).withSlot(2);
+		}
+	}
+
+    public final void applySetpoint(Setpoint setpointToApply) {
+		setpoint = setpointToApply;
+		if (enabled) {
+			setpointToApply.apply(this);
+		}
+	}
+
+
+    private void setControl(ControlRequest request) {
+		leaderTalon.setControl(request);
+	}
+
+    @Override
+	public void setNeutralSetpoint() {
+		setControl(new NeutralOut());
+	}
+
+	@Override
+	public void setCoastSetpoint() {
+		setControl(new CoastOut());
+	}
+
+	@Override
+	public void setVoltageSetpoint(Voltage voltage) {
+		setControl(requestGetter.getVoltageRequest(voltage));
+	}
+
+	@Override
+	public void setDutyCycleSetpoint(Dimensionless percent) {
+		setControl(requestGetter.getDutyCycleRequest(percent));
+	}
+
+	@Override
+	public void setMotionMagicSetpoint(Angle mechanismPosition) {
+		setControl(requestGetter.getMotionMagicRequest(mechanismPosition));
+	}
+
+	@Override
+	public void setVelocitySetpoint(AngularVelocity mechanismVelocity) {
+		setControl(requestGetter.getVelocityRequest(mechanismVelocity));
+	}
+
+	@Override
+	public void setPositionSetpoint(Angle mechanismPosition) {
+		setControl(requestGetter.getPositionRequest(mechanismPosition));
+	}
+
+	@Override
+	public void setCurrentPosition(Angle mechanismPosition) {
+		threadPoolExecutor.submit(() -> {
+			leaderTalon.setPosition(mechanismPosition);
+		});
+	}
 
 }
