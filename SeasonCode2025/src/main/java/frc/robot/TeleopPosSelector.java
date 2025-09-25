@@ -14,6 +14,7 @@ import com.pathplanner.lib.path.Waypoint;
 import edu.wpi.first.math.Pair;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -323,5 +324,17 @@ public class TeleopPosSelector { //TODO split up the file. it's too big and does
     }
 
     return path;
+  }
+
+  public PathPlannerPath getSwipePath() {
+    Pair<Integer, LeftRight> nearestBranch = getClosestReefPos().getFirst();
+    Pose2d branchPose = calculateReefPose(nearestBranch, true, false);
+    Rotation2d selectedAngle = new Rotation2d();
+    if (nearestBranch.getSecond() == LeftRight.LEFT) {
+      selectedAngle = Rotation2d.fromRotations(nearestBranch.getFirst() / 6.0).plus(new Rotation2d(Math.PI / 4));
+    } else {
+      selectedAngle = Rotation2d.fromRotations(nearestBranch.getFirst() / 6.0).minus(new Rotation2d(Math.PI / 4));
+    }
+    Pose2d sidePose = branchPose.plus(new Transform2d(new Translation2d(1.0, selectedAngle), new Rotation2d()));
   }
 }
