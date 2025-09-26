@@ -3,6 +3,7 @@ package frc.robot.CatzSubsystems.CatzClimb;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.PrintCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.CatzConstants;
 import frc.robot.CatzSubsystems.CatzSuperstructure;
@@ -122,7 +123,7 @@ public class CatzClimb extends SubsystemBase {
   }
 
   public Command extendClimb() {
-    return runOnce(() -> setClimbPos(ClimbPosition.EXTENDING));
+    return runOnce(() -> setClimbPos(ClimbPosition.EXTENDING)).alongWith(new PrintCommand("Extending Climb!"));
   }
 
   public Command Climb_Tunnable() {
@@ -151,6 +152,10 @@ public class CatzClimb extends SubsystemBase {
 
   public Command ClimbManualMode(Supplier<Double> manualSupplier) {
     return run(() -> climbFullManual(manualSupplier.get())).alongWith(Commands.print("hi")).onlyIf(() -> CatzSuperstructure.isClimbEnabled());
+  }
+
+  public Command ClimbManualModeAux(Supplier<Double> manualSupplier) {
+    return run(() -> climbFullManual(manualSupplier.get()));
   }
 
   public Command CancelClimb() {

@@ -4,6 +4,7 @@ import static frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.Drivetrain.D
 
 import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.StatusSignal;
+import com.ctre.phoenix6.configs.GyroTrimConfigs;
 import com.ctre.phoenix6.configs.Pigeon2Configuration;
 import com.ctre.phoenix6.hardware.Pigeon2;
 import edu.wpi.first.math.util.Units;
@@ -24,6 +25,8 @@ public class GyroIOPigeon implements GyroIO {
 
     pigeon.getConfigurator().apply(new Pigeon2Configuration());
     pigeon.getConfigurator().setYaw(0.0);
+    pigeon.getConfigurator().apply(new GyroTrimConfigs().withGyroScalarY(3.0));
+    
     yaw.setUpdateFrequency(DriveConstants.GYRO_UPDATE_FREQUENCY);
     yawVelocity.setUpdateFrequency(100.0);
     pigeon.optimizeBusUtilization();
@@ -32,7 +35,14 @@ public class GyroIOPigeon implements GyroIO {
   @Override
   public void updateInputs(GyroIOInputs inputs) {
     inputs.gyroConnected = BaseStatusSignal.refreshAll(yaw, yawVelocity).isOK();
-    inputs.gyroAngle = yaw.getValueAsDouble();
     inputs.gyroYawVel = Units.degreesToRadians(yawVelocity.getValueAsDouble());
+    // if(Math.signum(inputs.gyroYawVel) == 1){
+    //   inputs.gyroAngle = yaw.getValueAsDouble() * 0.99;
+    // }else if(Math.signum(inputs.gyroYawVel) == -1){
+    //   inputs.gyroAngle = yaw.getValueAsDouble() * 1.01;
+    // }else{
+    //   inputs.gyroAngle = yaw.getValueAsDouble(); 
+    // }
+    inputs.gyroAngle = yaw.getValueAsDouble();
   }
 }

@@ -114,7 +114,7 @@ public class RobotContainer {
     }));
 
     // Climb
-    Trigger climbMode = xboxDrv.start();
+    Trigger climbMode = DoublePressTracker.createTrigger(xboxDrv.start()); //the trigger value is reset when robot is disabled.
     climbMode.toggleOnTrue(Commands.startEnd(()->CatzSuperstructure.Instance.setClimbOverride(()->true), ()->CatzSuperstructure.Instance.setClimbOverride(()->false)));
 
     // Manual Climb Control
@@ -163,7 +163,7 @@ public class RobotContainer {
 
 
     // cancel drive to reef
-    xboxDrv.x().onTrue(CatzDrivetrain.Instance.cancelTrajectory()
+  xboxDrv.x().onTrue(CatzDrivetrain.Instance.cancelTrajectory()
     .alongWith(new InstantCommand(() -> isScoring = false))
     .alongWith(Commands.print("cancelling path"))
     .alongWith(CatzSuperstructure.Instance.stow()));
@@ -192,6 +192,17 @@ public class RobotContainer {
     xboxAux.leftStick().and(xboxAux.rightStick()).onTrue(CatzAlgaePivot.Instance.AlgaePivotFullManualCommand(()->xboxAux.getRightY()).alongWith(Commands.print("Algae Manual")));
     isAlgaePivotFullManual.onTrue(CatzAlgaePivot.Instance.AlgaePivotFullManualCommand(()->xboxAux.getRightY()).alongWith(Commands.print("Algae Manual")));
     isRampPivotFullManual.onTrue(CatzRampPivot.Instance.rampPivotManual(()->-xboxAux.getLeftY()).alongWith(Commands.print("Manual Ramp")));
+
+    Trigger auxClimbMode = DoublePressTracker.createTrigger(xboxAux.start());
+
+    auxClimbMode.toggleOnTrue(CatzRampPivot.Instance.Ramp_Climb_Pos());
+    auxClimbMode.toggleOnFalse(CatzRampPivot.Instance.Ramp_Stow_Pos());
+
+    xboxAux.povUp().onTrue(CatzClimb.Instance.ClimbManualModeAux(()-> 0.4));
+    xboxAux.povUp().onFalse(CatzClimb.Instance.CancelClimb());
+    xboxAux.povDown().onTrue(CatzClimb.Instance.ClimbManualModeAux(()-> -1.0));
+    xboxAux.povDown().onFalse(CatzClimb.Instance.CancelClimb());
+
 
     // Gamepiece Selection
     // xboxAux.leftTrigger().onTrue(Commands.runOnce(()-> CatzSuperstructure.setChosenGamepiece(Gamepiece.CORAL)));

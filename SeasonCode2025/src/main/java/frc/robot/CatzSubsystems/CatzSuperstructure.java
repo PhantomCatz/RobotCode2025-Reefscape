@@ -153,17 +153,14 @@ public class CatzSuperstructure extends VirtualSubsystem {
         else {
             CatzLED.Instance.setControllerState(ControllerLEDState.FULL_MANUAL);
         }
-        System.out.println("CLimb Enabled" + isClimbEnabled);
+        System.out.println("CLimb Enabled: " + isClimbEnabled.getAsBoolean());
     }
 
     public Command extendClimb() {
 
         return new SequentialCommandGroup(
             new ParallelCommandGroup(
-                CatzOuttake.Instance.stopOuttake(),
-                CatzAlgaeRemover.Instance.stopAlgae(),
-                CatzRampPivot.Instance.Ramp_Climb_Pos(),
-                CatzIntakeRollers.Instance.stopIntaking()
+                CatzRampPivot.Instance.Ramp_Climb_Pos()
             ).alongWith(Commands.waitSeconds(0.1)), //TBD TESITNG
 
             CatzClimb.Instance.extendClimb()
