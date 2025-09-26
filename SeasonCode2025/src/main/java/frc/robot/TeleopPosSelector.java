@@ -33,6 +33,7 @@ import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.Drivetrain.DriveCon
 import frc.robot.CatzSubsystems.CatzElevator.CatzElevator;
 import frc.robot.CatzSubsystems.CatzElevator.CatzElevator.ElevatorPosition;
 import frc.robot.Commands.DriveAndRobotOrientationCmds.PIDDriveCmd;
+import frc.robot.Commands.DriveAndRobotOrientationCmds.TrajectoryDriveCmd;
 
 @SuppressWarnings({ "rawtypes", "unchecked" })
 public class TeleopPosSelector { //TODO split up the file. it's too big and does too much stuff
@@ -327,14 +328,47 @@ public class TeleopPosSelector { //TODO split up the file. it's too big and does
   }
 
   public PathPlannerPath getSwipePath() {
-    Pair<Integer, LeftRight> nearestBranch = getClosestReefPos().getFirst();
-    Pose2d branchPose = calculateReefPose(nearestBranch, true, false);
-    Rotation2d selectedAngle = new Rotation2d();
-    if (nearestBranch.getSecond() == LeftRight.LEFT) {
-      selectedAngle = Rotation2d.fromRotations(nearestBranch.getFirst() / 6.0).plus(new Rotation2d(Math.PI / 4));
-    } else {
-      selectedAngle = Rotation2d.fromRotations(nearestBranch.getFirst() / 6.0).minus(new Rotation2d(Math.PI / 4));
+    Pose2d startPos = CatzRobotTracker.Instance.getEstimatedPose();
+    Pair<Integer, LeftRight> closestReefBranch = getClosestReefPos().getFirst();
+    Pose2d closestReefPos = calculateReefPose(closestReefBranch, true, false);
+    Rotation2d sideAngle = Rotation2d.fromRotations(closestReefBranch.getFirst() / 6.0).plus(Rotation2d.kCW_90deg);
+    if (closestReefBranch.getSecond() == LeftRight.RIGHT) {
+      sideAngle = sideAngle.minus(Rotation2d.k180deg);
     }
-    Pose2d sidePose = branchPose.plus(new Transform2d(new Translation2d(1.0, selectedAngle), new Rotation2d()));
+    // 1 meter towards nearest side
+    Pose2d sidePos = closestReefPos.plus(new Transform2d(new Translation2d(1.0, sideAngle), new Rotation2d()));
+    // 2 meters towards opposite side
+    Pose2d endPos = closestReefPos.plus(new Transform2d(new Translation2d(2.0, sideAngle.minus(Rotation2d.k180deg)), new Rotation2d()));
+
+    Translation2d start = startPos.getTranslation();
+    Translation2d side = sidePos.getTranslation();
+    Translation2d end = endPos.getTranslation();
+    Translation2d direction = side.minus(start).div(2.0);
+    Translation2d direction2 = end.minus(side).div(2.0);
+
+    PathPlannerPath path = new PathPlannerPath(
+      Arrays.asList(new Waypoint[] {
+        new Waypoint(null, start, start.plus(direction)),
+        new Waypoint(side.minus(direction), side, side.plus(direction2)),
+        new Waypoint(end.minus(direction2), end, null)
+      }),
+      DriveConstants.PATHFINDING_CONSTRAINTS,
+      null,
+      new GoalEndState(0, endPos.getRotation()));
+
+    if (AllianceFlipUtil.shouldFlipToRed()) {
+      path = path.flipPath();
+    }
+    return path;
+  }
+
+  @SuppressWarnings("static-access")
+  public Command runSwipe() {
+
+    return new DeferredCommand(() -> {
+      Command swipePos = new TrajectoryDriveCmd(getSwipePath(), true, true);
+
+      return swipePos;
+    }, Set.of(CatzDrivetrain.Instance));
   }
 }

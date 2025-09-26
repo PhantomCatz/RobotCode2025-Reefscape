@@ -171,6 +171,9 @@ public class RobotContainer {
     // override score
     xboxDrv.povUp().toggleOnTrue(CatzElevator.Instance.setRaiseOverride(true).alongWith(Commands.print("override score")));
 
+    // swipe
+    xboxDrv.povDown().toggleOnTrue(TeleopPosSelector.Instance.runSwipe().alongWith(Commands.print("hello swipe")));
+
     xboxDrv.b().onTrue(CatzSuperstructure.Instance.intake().alongWith(Commands.print("INTAKE")));
 
 
