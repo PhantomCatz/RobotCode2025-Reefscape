@@ -130,10 +130,10 @@ public class RobotContainer {
     xboxDrv.povRight().onTrue(TeleopPosSelector.Instance.runLeftRight(LeftRight.RIGHT).unless(()->CatzSuperstructure.isClimbEnabled()));
 
     // Drive to Reef
-    xboxDrv.rightTrigger().onTrue(CatzSuperstructure.Instance.scoreLevelXAutomated(1));
-    xboxDrv.leftTrigger().onTrue(CatzSuperstructure.Instance.scoreLevelXAutomated(2));
-    xboxDrv.rightBumper().onTrue(CatzSuperstructure.Instance.scoreLevelXAutomated(3));
-    xboxDrv.leftBumper().onTrue(CatzSuperstructure.Instance.scoreLevelXAutomated(4));
+    // xboxDrv.rightTrigger().onTrue(CatzSuperstructure.Instance.scoreLevelXAutomated(1));
+    // xboxDrv.leftTrigger().onTrue(CatzSuperstructure.Instance.scoreLevelXAutomated(2));
+    // xboxDrv.rightBumper().onTrue(CatzSuperstructure.Instance.scoreLevelXAutomated(3));
+    // xboxDrv.leftBumper().onTrue(CatzSuperstructure.Instance.scoreLevelXAutomated(4));
 
     xboxDrv.leftTrigger().onFalse(new InstantCommand(() -> {
       CatzSuperstructure.Instance.setCanShoot(() -> true);
