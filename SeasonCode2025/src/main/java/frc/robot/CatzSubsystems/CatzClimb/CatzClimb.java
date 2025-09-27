@@ -54,7 +54,7 @@ public class CatzClimb extends SubsystemBase {
     }
   }
 
-  private ClimbPosition targetPosition = ClimbPosition.HOME;
+  private ClimbPosition targetPosition = ClimbPosition.FULL_MANUAL;
 
   private CatzClimb() {
     if(isClimbDisabled) { //Comes from Climb Constants
@@ -85,7 +85,8 @@ public class CatzClimb extends SubsystemBase {
     if (DriverStation.isDisabled()) {
       io.setPower(0.0);
       manualPow = 0.0;
-      targetPosition = ClimbPosition.MANUAL;
+      // targetPosition = ClimbPosition.MANUAL;
+      targetPosition = ClimbPosition.FULL_MANUAL;
 
     } else {
       if(isManual || targetPosition == ClimbPosition.FULL_MANUAL) {

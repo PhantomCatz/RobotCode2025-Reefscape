@@ -36,7 +36,7 @@ public class DriveConstants {
   public static final int TRAJ_INDEX_BL = 2;
   public static final int TRAJ_INDEX_BR = 3;
 
-  public static final int GYRO_ID = 18;
+  public static final int GYRO_ID = 10;
 
 
   public static final double PREDICT_DISTANCE_SCORE = 0.3;

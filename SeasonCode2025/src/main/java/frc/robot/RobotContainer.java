@@ -193,10 +193,12 @@ public class RobotContainer {
     isAlgaePivotFullManual.onTrue(CatzAlgaePivot.Instance.AlgaePivotFullManualCommand(()->xboxAux.getRightY()).alongWith(Commands.print("Algae Manual")));
     isRampPivotFullManual.onTrue(CatzRampPivot.Instance.rampPivotManual(()->-xboxAux.getLeftY()).alongWith(Commands.print("Manual Ramp")));
 
-    Trigger auxClimbMode = DoublePressTracker.createTrigger(xboxAux.start());
+    Trigger auxRampDown = DoublePressTracker.createTrigger(xboxAux.start());
+    Trigger auxRampUp = DoublePressTracker.createTrigger(xboxAux.back());
 
-    auxClimbMode.toggleOnTrue(CatzRampPivot.Instance.Ramp_Climb_Pos());
-    auxClimbMode.toggleOnFalse(CatzRampPivot.Instance.Ramp_Stow_Pos());
+
+    auxRampDown.toggleOnTrue(CatzRampPivot.Instance.Ramp_Climb_Pos());
+    auxRampUp.toggleOnTrue(CatzRampPivot.Instance.Ramp_Stow_Pos());
 
     xboxAux.povUp().onTrue(CatzClimb.Instance.ClimbManualModeAux(()-> 0.4));
     xboxAux.povUp().onFalse(CatzClimb.Instance.CancelClimb());
