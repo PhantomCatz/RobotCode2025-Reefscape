@@ -169,10 +169,10 @@ public class RobotContainer {
     .alongWith(CatzSuperstructure.Instance.stow()));
 
     // override score
-    xboxDrv.povUp().toggleOnTrue(CatzElevator.Instance.setRaiseOverride(true).alongWith(Commands.print("override score")));
+    xboxDrv.povUp().toggleOnTrue(CatzElevator.Instance.setRaiseOverride(true).unless(() -> CatzSuperstructure.isClimbEnabled()).alongWith(Commands.print("override score")));
 
     // swipe
-    xboxDrv.povDown().toggleOnTrue(TeleopPosSelector.Instance.runSwipe().alongWith(Commands.print("hello swipe")));
+    // xboxDrv.povDown().toggleOnTrue(TeleopPosSelector.Instance.runSwipe().alongWith(Commands.print("hello swipe")).unless(()->CatzSuperstructure.isClimbEnabled()));
 
     xboxDrv.b().onTrue(CatzSuperstructure.Instance.intake().alongWith(Commands.print("INTAKE")));
 
@@ -193,15 +193,22 @@ public class RobotContainer {
     isAlgaePivotFullManual.onTrue(CatzAlgaePivot.Instance.AlgaePivotFullManualCommand(()->xboxAux.getRightY()).alongWith(Commands.print("Algae Manual")));
     isRampPivotFullManual.onTrue(CatzRampPivot.Instance.rampPivotManual(()->-xboxAux.getLeftY()).alongWith(Commands.print("Manual Ramp")));
 
-    Trigger auxClimbMode = DoublePressTracker.createTrigger(xboxAux.start());
+    Trigger auxRampDown = DoublePressTracker.createTrigger(xboxAux.start());
+    Trigger auxRampUp = DoublePressTracker.createTrigger(xboxAux.back());
 
-    auxClimbMode.toggleOnTrue(CatzRampPivot.Instance.Ramp_Climb_Pos());
-    auxClimbMode.toggleOnFalse(CatzRampPivot.Instance.Ramp_Stow_Pos());
+
+    auxRampDown.toggleOnTrue(CatzRampPivot.Instance.Ramp_Climb_Pos());
+    auxRampUp.toggleOnTrue(CatzRampPivot.Instance.Ramp_Stow_Pos());
 
     xboxAux.povUp().onTrue(CatzClimb.Instance.ClimbManualModeAux(()-> 0.4));
     xboxAux.povUp().onFalse(CatzClimb.Instance.CancelClimb());
     xboxAux.povDown().onTrue(CatzClimb.Instance.ClimbManualModeAux(()-> -1.0));
     xboxAux.povDown().onFalse(CatzClimb.Instance.CancelClimb());
+
+    xboxAux.a().onTrue(CatzSuperstructure.Instance.topAlgae());
+    xboxAux.rightStick().onTrue(CatzClimb.Instance.reZero());
+
+    xboxAux.x().onTrue(CatzSuperstructure.Instance.stow());
 
 
     // Gamepiece Selection

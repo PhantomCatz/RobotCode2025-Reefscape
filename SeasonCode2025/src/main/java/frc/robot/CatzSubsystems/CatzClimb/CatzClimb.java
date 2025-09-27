@@ -40,9 +40,9 @@ public class CatzClimb extends SubsystemBase {
 
   @RequiredArgsConstructor
   public enum ClimbPosition { //In Rotations //TBD
-    RETRACT(() -> 46), //TBD
-    HOME(() -> -10.0), //TBD
-    EXTENDING(() -> -320.0), //TBD
+    RETRACT(() -> 0.0), //TBD
+    HOME(() -> 0.0), //TBD
+    EXTENDING(() -> -160.0), //TBD
     MANUAL(() -> 0.0),
     FULL_MANUAL(() -> 0.0),
     TUNNABLE(tunnablePos);
@@ -54,7 +54,7 @@ public class CatzClimb extends SubsystemBase {
     }
   }
 
-  private ClimbPosition targetPosition = ClimbPosition.HOME;
+  private ClimbPosition targetPosition = ClimbPosition.FULL_MANUAL;
 
   private CatzClimb() {
     if(isClimbDisabled) { //Comes from Climb Constants
@@ -85,7 +85,8 @@ public class CatzClimb extends SubsystemBase {
     if (DriverStation.isDisabled()) {
       io.setPower(0.0);
       manualPow = 0.0;
-      targetPosition = ClimbPosition.MANUAL;
+      // targetPosition = ClimbPosition.MANUAL;
+      targetPosition = ClimbPosition.FULL_MANUAL;
 
     } else {
       if(isManual || targetPosition == ClimbPosition.FULL_MANUAL) {
@@ -116,6 +117,10 @@ public class CatzClimb extends SubsystemBase {
 
   public Command Climb_Home() {
     return runOnce(() -> setClimbPos(ClimbPosition.HOME));
+  }
+
+  public Command reZero(){
+    return runOnce(() -> io.setZero());
   }
 
   public Command fullClimb() {
