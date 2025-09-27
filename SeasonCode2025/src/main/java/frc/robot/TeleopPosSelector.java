@@ -332,9 +332,10 @@ public class TeleopPosSelector { //TODO split up the file. it's too big and does
     Pose2d startPos = CatzRobotTracker.Instance.getEstimatedPose();
     Pair<Integer, LeftRight> closestReefBranch = getClosestReefPos().getFirst();
     Pose2d closestReefPos = calculateReefPose(closestReefBranch, true, false);
-    Rotation2d branchAngle = Rotation2d.fromRotations(closestReefBranch.getFirst() / 6.0);
+    Rotation2d branchAngle = Rotation2d.fromRotations((closestReefBranch.getFirst()) / 6.0);
     Rotation2d sideAngle = branchAngle.plus(Rotation2d.kCW_90deg);
     Rotation2d backAngle = branchAngle.plus(Rotation2d.k180deg);
+    System.out.println("Branch angle" + branchAngle.getDegrees());
     if (closestReefBranch.getSecond() == LeftRight.RIGHT) {
       sideAngle = sideAngle.minus(Rotation2d.k180deg);
     }
