@@ -4,6 +4,7 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.GenericHID.RumbleType;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
@@ -209,7 +210,7 @@ public class RobotContainer {
     xboxAux.rightStick().onTrue(CatzClimb.Instance.reZero());
 
     xboxAux.x().onTrue(CatzSuperstructure.Instance.stow());
-
+    xboxAux.y().onTrue(CatzSuperstructure.Instance.LXElevator(CatzSuperstructure.Instance.getLevel()));
 
     // Gamepiece Selection
     // xboxAux.leftTrigger().onTrue(Commands.runOnce(()-> CatzSuperstructure.setChosenGamepiece(Gamepiece.CORAL)));
@@ -232,10 +233,10 @@ public class RobotContainer {
     isClimbFullManualEnabled.onTrue(Commands.print("CatzClimb.Instance full man"));
 
     // Scoring Level
-    // xboxAux.povRight().onTrue(Commands.runOnce(()-> {CatzSuperstructure.Instance.setLevel(1); SmartDashboard.putNumber("Reef Level", 1);}));
-    // xboxAux.povUp().onTrue(Commands.runOnce(() -> {CatzSuperstructure.Instance.setLevel(2); SmartDashboard.putNumber("Reef Level", 2);}));
-    // xboxAux.povLeft().onTrue(Commands.runOnce(() -> {CatzSuperstructure.Instance.setLevel(3); SmartDashboard.putNumber("Reef Level", 3);}));
-    // xboxAux.povDown().onTrue(Commands.runOnce(() -> {CatzSuperstructure.Instance.setLevel(4); SmartDashboard.putNumber("Reef Level", 4);}));
+    xboxAux.povRight().onTrue(Commands.runOnce(()-> {CatzSuperstructure.Instance.setLevel(1); SmartDashboard.putNumber("Reef Level", 1);}));
+    xboxAux.povUp().onTrue(Commands.runOnce(() -> {CatzSuperstructure.Instance.setLevel(2); SmartDashboard.putNumber("Reef Level", 2);}));
+    xboxAux.povLeft().onTrue(Commands.runOnce(() -> {CatzSuperstructure.Instance.setLevel(3); SmartDashboard.putNumber("Reef Level", 3);}));
+    xboxAux.povDown().onTrue(Commands.runOnce(() -> {CatzSuperstructure.Instance.setLevel(4); SmartDashboard.putNumber("Reef Level", 4);}));
     //------------------------------------------------------------------------------------------------------------------------------
     //  XBOX test controls
     //------------------------------------------------------------------------------------------------------------------------------
