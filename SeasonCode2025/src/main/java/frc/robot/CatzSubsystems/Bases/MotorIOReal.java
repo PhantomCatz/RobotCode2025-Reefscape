@@ -22,6 +22,7 @@ import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj.DigitalInput;
 import frc.robot.Utilities.MotorUtil.Gains;
 import frc.robot.Utilities.MotorUtil.MotionMagicParameters;
+import frc.robot.Utilities.MotorUtil.NeutralMode;
 
 public class MotorIOReal implements MotorIO {
 
@@ -63,16 +64,94 @@ public class MotorIOReal implements MotorIO {
     /**
      * basic, not done
      * 1 motor
+     * @param motor motor
+     * @param FL Final Ratio
+     * @param s0g slot 0 gains
+     * @param mmP motion magic parameters
+     */
+    public MotorIOReal(TalonFX motor, double FL, Gains s0g, MotionMagicParameters mmP, NeutralModeValue motorMode) {
+
+        leaderTalon = motor;
+
+        Final_Ratio = FL;
+
+        slot0_gainsM = s0g;
+
+        motionMagicParameters = mmP;
+
+        internalPositionRotations = leaderTalon.getPosition();
+        velocityRps = leaderTalon.getVelocity();
+        appliedVoltage = List.of(leaderTalon.getMotorVoltage(), followerTalon.getMotorVoltage());
+        supplyCurrent = List.of(leaderTalon.getSupplyCurrent(), followerTalon.getSupplyCurrent());
+        torqueCurrent = List.of(leaderTalon.getTorqueCurrent(), followerTalon.getTorqueCurrent());
+        tempCelsius = List.of(leaderTalon.getDeviceTemp(), followerTalon.getDeviceTemp());
+
+        BaseStatusSignal.setUpdateFrequencyForAll(
+        100,
+        internalPositionRotations,
+        velocityRps,
+        appliedVoltage.get(0),
+        appliedVoltage.get(1),
+        supplyCurrent.get(0),
+        supplyCurrent.get(1),
+        torqueCurrent.get(0),
+        torqueCurrent.get(1),
+        tempCelsius.get(0),
+        tempCelsius.get(1));
+
+        // PID configs
+        config.Slot0.kS = slot0_gainsM.kS();
+        config.Slot0.kV = slot0_gainsM.kV();
+        config.Slot0.kA = slot0_gainsM.kA();
+        config.Slot0.kP = slot0_gainsM.kP();
+        config.Slot0.kI = slot0_gainsM.kI();
+        config.Slot0.kD = slot0_gainsM.kD();
+        config.Slot0.kG = slot0_gainsM.kG();
+        config.Slot0.GravityType = GravityTypeValue.Elevator_Static;
+
+        config.Slot1.kS = slot1_gainsM.kS();
+        config.Slot1.kV = slot1_gainsM.kV();
+        config.Slot1.kA = slot1_gainsM.kA();
+        config.Slot1.kP = slot1_gainsM.kP();
+        config.Slot1.kI = slot1_gainsM.kI();
+        config.Slot1.kD = slot1_gainsM.kD();
+        config.Slot1.kG = slot1_gainsM.kG();
+        config.Slot1.GravityType = GravityTypeValue.Elevator_Static;
+
+
+        // Supply Current Limits
+        config.TorqueCurrent.PeakForwardTorqueCurrent =  80.0;
+        config.TorqueCurrent.PeakReverseTorqueCurrent = -80.0;
+        config.CurrentLimits.SupplyCurrentLimitEnable = true;
+        config.CurrentLimits.SupplyCurrentLimit = 100.0;
+        config.MotorOutput.NeutralMode = motorMode;
+
+        // Motion Magic Parameters
+        config.MotionMagic.MotionMagicCruiseVelocity = motionMagicParameters.mmCruiseVelocity();
+        config.MotionMagic.MotionMagicAcceleration = motionMagicParameters.mmAcceleration();
+        config.MotionMagic.MotionMagicJerk = motionMagicParameters.mmJerk();
+        config.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
+
+
+        leaderTalon.setPosition(0);
+
+        leaderTalon.getConfigurator().apply(config, 1.0);
+
+    }
+
+
+    /**
+     * basic, not done
+     * 1 motor
      * @param leader motor
-     * @param FL Final Ration
+     * @param FL Final Ratio
      * @param s0g slot 0 gains
      * @param s1g slot 1 gains
      * @param mmP motion magic parameters
      */
-    public MotorIOReal(TalonFX leader, double FL, Gains s0g, Gains s1g, MotionMagicParameters mmP) {
+    public MotorIOReal(TalonFX motor, double FL, Gains s0g, Gains s1g, MotionMagicParameters mmP) {
 
-        leaderTalon = leader;
-        followerTalon = null;
+        leaderTalon = motor;
 
         Final_Ratio = FL;
 
@@ -773,8 +852,8 @@ public class MotorIOReal implements MotorIO {
 
     @Override
     public void runMotor(double speed) {
-        System.out.println(speed);
-        leaderTalon.setControl(new VoltageOut(speed));
+        // System.out.println(speed);
+        leaderTalon.set(speed);
     }
 
     @Override
@@ -817,6 +896,11 @@ public class MotorIOReal implements MotorIO {
 			setpointToApply.apply(this);
 		}
 	}
+    
+    @Override
+    public void setNeutralMode(NeutralModeValue mode) {
+        config.MotorOutput.NeutralMode = mode;
+    }
 
 
     private void setControl(ControlRequest request) {
@@ -824,14 +908,19 @@ public class MotorIOReal implements MotorIO {
 	}
 
     @Override
-	public void setNeutralSetpoint() {
+	public void setNeutralOut() {
 		setControl(new NeutralOut());
 	}
 
 	@Override
-	public void setCoastSetpoint() {
+	public void setCoastOut() {
 		setControl(new CoastOut());
 	}
+
+    @Override
+    public void runPercentOutput(double percent) {
+        setControl(new DutyCycleOut(percent));
+    }
 
 	@Override
 	public void setVoltageSetpoint(Voltage voltage) {
