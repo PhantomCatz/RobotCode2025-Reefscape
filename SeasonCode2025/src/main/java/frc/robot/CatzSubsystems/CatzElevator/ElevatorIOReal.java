@@ -214,7 +214,7 @@ public class ElevatorIOReal implements ElevatorIO {
 
   @Override
   public void runMotor(double speed) {
-    System.out.println(speed);
+    // System.out.println(speed);
     leaderTalon.setControl(new VoltageOut(speed));
   }
 
