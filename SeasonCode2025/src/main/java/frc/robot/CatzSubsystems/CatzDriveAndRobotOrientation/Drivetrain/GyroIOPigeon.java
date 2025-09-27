@@ -19,14 +19,14 @@ public class GyroIOPigeon implements GyroIO {
   private final StatusSignal<AngularVelocity> yawVelocity;
 
   public GyroIOPigeon() {
-    pigeon = new Pigeon2(GYRO_ID, "*");
+    pigeon = new Pigeon2(GYRO_ID);
     yaw = pigeon.getYaw();
     yawVelocity = pigeon.getAngularVelocityZWorld();
 
     pigeon.getConfigurator().apply(new Pigeon2Configuration());
     pigeon.getConfigurator().setYaw(0.0);
     pigeon.getConfigurator().apply(new GyroTrimConfigs().withGyroScalarY(3.0));
-    
+
     yaw.setUpdateFrequency(DriveConstants.GYRO_UPDATE_FREQUENCY);
     yawVelocity.setUpdateFrequency(100.0);
     pigeon.optimizeBusUtilization();
@@ -41,7 +41,7 @@ public class GyroIOPigeon implements GyroIO {
     // }else if(Math.signum(inputs.gyroYawVel) == -1){
     //   inputs.gyroAngle = yaw.getValueAsDouble() * 1.01;
     // }else{
-    //   inputs.gyroAngle = yaw.getValueAsDouble(); 
+    //   inputs.gyroAngle = yaw.getValueAsDouble();
     // }
     inputs.gyroAngle = yaw.getValueAsDouble();
   }
