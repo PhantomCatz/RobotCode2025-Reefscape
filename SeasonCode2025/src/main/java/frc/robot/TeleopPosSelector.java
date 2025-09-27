@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.Set;
 import java.util.function.Supplier;
 
+import org.littletonrobotics.junction.Logger;
 
 import com.pathplanner.lib.path.GoalEndState;
 import com.pathplanner.lib.path.PathConstraints;
@@ -331,26 +332,38 @@ public class TeleopPosSelector { //TODO split up the file. it's too big and does
     Pose2d startPos = CatzRobotTracker.Instance.getEstimatedPose();
     Pair<Integer, LeftRight> closestReefBranch = getClosestReefPos().getFirst();
     Pose2d closestReefPos = calculateReefPose(closestReefBranch, true, false);
-    Rotation2d sideAngle = Rotation2d.fromRotations(closestReefBranch.getFirst() / 6.0).plus(Rotation2d.kCW_90deg);
+    Rotation2d branchAngle = Rotation2d.fromRotations(closestReefBranch.getFirst() / 6.0);
+    Rotation2d sideAngle = branchAngle.plus(Rotation2d.kCW_90deg);
+    Rotation2d backAngle = branchAngle.plus(Rotation2d.k180deg);
     if (closestReefBranch.getSecond() == LeftRight.RIGHT) {
       sideAngle = sideAngle.minus(Rotation2d.k180deg);
     }
     // 1 meter towards nearest side
     Pose2d sidePos = closestReefPos.plus(new Transform2d(new Translation2d(1.0, sideAngle), new Rotation2d()));
     // 2 meters towards opposite side
-    Pose2d endPos = closestReefPos.plus(new Transform2d(new Translation2d(2.0, sideAngle.minus(Rotation2d.k180deg)), new Rotation2d()));
+    Pose2d endPos = closestReefPos.plus(new Transform2d(new Translation2d(1.0, sideAngle.minus(Rotation2d.k180deg)), new Rotation2d()));
+    // go backwards at end
+    Pose2d backPos = closestReefPos.plus(new Transform2d(new Translation2d(1.0, backAngle), new Rotation2d()));
 
     Translation2d start = startPos.getTranslation();
     Translation2d side = sidePos.getTranslation();
     Translation2d end = endPos.getTranslation();
+    Translation2d back = backPos.getTranslation();
     Translation2d direction = side.minus(start).div(2.0);
     Translation2d direction2 = end.minus(side).div(2.0);
-
+    Translation2d direction3 = back.minus(end).div(2.0);
+    Logger.recordOutput("Swipe/start", start);
+    Logger.recordOutput("Swipe/side", side);
+    Logger.recordOutput("Swipe/end", end);
+    Logger.recordOutput("Swipe/back", back);
+    Translation2d reef = closestReefPos.getTranslation();
+    Logger.recordOutput("Swipe/reef", reef);
     PathPlannerPath path = new PathPlannerPath(
       Arrays.asList(new Waypoint[] {
         new Waypoint(null, start, start.plus(direction)),
         new Waypoint(side.minus(direction), side, side.plus(direction2)),
-        new Waypoint(end.minus(direction2), end, null)
+        new Waypoint(end.minus(direction2), end, end.plus(direction3)),
+        new Waypoint(back.minus(direction3), back, null)
       }),
       DriveConstants.PATHFINDING_CONSTRAINTS,
       null,
