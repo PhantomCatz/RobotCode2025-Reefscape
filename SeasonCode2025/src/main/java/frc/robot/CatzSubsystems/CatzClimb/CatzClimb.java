@@ -40,9 +40,9 @@ public class CatzClimb extends SubsystemBase {
 
   @RequiredArgsConstructor
   public enum ClimbPosition { //In Rotations //TBD
-    RETRACT(() -> 46), //TBD
-    HOME(() -> -10.0), //TBD
-    EXTENDING(() -> -320.0), //TBD
+    RETRACT(() -> 0.0), //TBD
+    HOME(() -> 0.0), //TBD
+    EXTENDING(() -> -160.0), //TBD
     MANUAL(() -> 0.0),
     FULL_MANUAL(() -> 0.0),
     TUNNABLE(tunnablePos);
@@ -117,6 +117,10 @@ public class CatzClimb extends SubsystemBase {
 
   public Command Climb_Home() {
     return runOnce(() -> setClimbPos(ClimbPosition.HOME));
+  }
+
+  public Command reZero(){
+    return runOnce(() -> io.setZero());
   }
 
   public Command fullClimb() {

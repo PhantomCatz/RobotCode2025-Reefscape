@@ -205,6 +205,11 @@ public class RobotContainer {
     xboxAux.povDown().onTrue(CatzClimb.Instance.ClimbManualModeAux(()-> -1.0));
     xboxAux.povDown().onFalse(CatzClimb.Instance.CancelClimb());
 
+    xboxAux.a().onTrue(CatzSuperstructure.Instance.topAlgae());
+    xboxAux.rightStick().onTrue(CatzClimb.Instance.reZero());
+
+    xboxAux.x().onTrue(CatzSuperstructure.Instance.stow());
+
 
     // Gamepiece Selection
     // xboxAux.leftTrigger().onTrue(Commands.runOnce(()-> CatzSuperstructure.setChosenGamepiece(Gamepiece.CORAL)));

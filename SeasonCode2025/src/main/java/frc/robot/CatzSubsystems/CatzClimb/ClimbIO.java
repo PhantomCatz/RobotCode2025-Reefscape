@@ -35,4 +35,6 @@ public interface ClimbIO {
 
   public default void setPower(double joystickPower) {}
 
+  public default void setZero(){}
+
 }

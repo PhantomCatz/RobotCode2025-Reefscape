@@ -127,4 +127,9 @@ public class ClimbIOReal implements ClimbIO {
     climbMotor.getConfigurator().apply(config);
   }
 
+  @Override
+  public void setZero(){
+    climbMotor.setPosition(0.0);
+  }
+
 }

@@ -507,9 +507,6 @@ public class CatzSuperstructure extends VirtualSubsystem {
 
         return new SequentialCommandGroup(
             new ParallelCommandGroup(
-                CatzOuttake.Instance.stopOuttake(),
-                CatzRampPivot.Instance.Ramp_Intake_Pos(),
-                CatzIntakeRollers.Instance.stopIntaking(),
                 CatzAlgaePivot.Instance.Algae_Transition_Bot(),
                 CatzElevator.Instance.Elevator_Bot_Transition()
             ),
