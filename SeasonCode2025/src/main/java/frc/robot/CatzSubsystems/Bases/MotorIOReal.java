@@ -151,7 +151,7 @@ public class MotorIOReal implements MotorIO {
      * @param s1g slot 1 gains
      * @param mmP motion magic parameters
      */
-    public MotorIOReal(TalonFX leader, TalonFX followerMotor, double FL, Gains s0g, Gains s1g, MotionMagicParameters mmP) {
+    public MotorIOReal(TalonFX leader, TalonFX followerMotor, double FL, Gains s0g, Gains s1g, MotionMagicParameters mmP) { // TODO we should look into finding ways to split it up.
         leaderTalon = leader;
         followerTalon = followerMotor;
 
@@ -526,14 +526,14 @@ public class MotorIOReal implements MotorIO {
         config.MotionMagic.MotionMagicCruiseVelocity = motionMagicParameters.mmCruiseVelocity();
         config.MotionMagic.MotionMagicAcceleration = motionMagicParameters.mmAcceleration();
         config.MotionMagic.MotionMagicJerk = motionMagicParameters.mmJerk();
-        config.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
+        config.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive; //TODO should be a parameter
 
 
         leaderTalon.setPosition(0);
 
         leaderTalon.getConfigurator().apply(config, 1.0);
 
-    }
+    } 
     
     /**
      * basic, not done
@@ -549,11 +549,11 @@ public class MotorIOReal implements MotorIO {
      * @param s1g slot 1 gains
      * @param mmP motion magic parameters
      */
-    public MotorIOReal(TalonFX leader, TalonFX followerMotor, DigitalInput di1, String type1, DigitalInput di2, String type2, double FL, Gains s0g, Gains s1g, MotionMagicParameters mmP) {
+    public MotorIOReal(TalonFX leader, TalonFX followerMotor, DigitalInput di1, String type1, DigitalInput di2, String type2, double FL, Gains s0g, Gains s1g, MotionMagicParameters mmP) { //TODO too many parameters, need to find a way to make this less cluttered
         leaderTalon = leader;
         followerTalon = followerMotor;
 
-        switch(type1){
+        switch(type1){ // TODO not fully a fan with doing a string to determine type, should use an overloaded constructor that takes in a limit switch or beam break object
             case "LS1":
                 Limit_Switch1 = di1;
                 break;
@@ -618,7 +618,7 @@ public class MotorIOReal implements MotorIO {
         config.Slot0.kI = slot0_gainsM.kI();
         config.Slot0.kD = slot0_gainsM.kD();
         config.Slot0.kG = slot0_gainsM.kG();
-        config.Slot0.GravityType = GravityTypeValue.Elevator_Static;
+        config.Slot0.GravityType = GravityTypeValue.Elevator_Static; // How are we going to reconcile if it's a pivot vs a full elevator?
 
         config.Slot1.kS = slot1_gainsM.kS();
         config.Slot1.kV = slot1_gainsM.kV();
@@ -669,7 +669,7 @@ public class MotorIOReal implements MotorIO {
                 tempCelsius.get(0))
             .isOK();
 
-        inputs.isFollowerMotorConnected =
+        inputs.isFollowerMotorConnected = // TODO Some mechanisms may not have a followerer for their subtsystem rendering this redundant
             BaseStatusSignal.refreshAll(
                 appliedVoltage.get(1),
                 supplyCurrent.get(1),
@@ -677,7 +677,7 @@ public class MotorIOReal implements MotorIO {
                 tempCelsius.get(1))
             .isOK();
 
-        inputs.positionInch = internalPositionRotations.getValueAsDouble() * Final_Ratio;
+        inputs.positionInch = internalPositionRotations.getValueAsDouble() * Final_Ratio; //TODO Constants should be ALL_CAPS
         inputs.velocityInchPerSec = velocityRps.getValueAsDouble() * Final_Ratio;
         inputs.appliedVolts =     appliedVoltage.stream()
                                                 .mapToDouble(StatusSignal::getValueAsDouble)
@@ -789,7 +789,7 @@ public class MotorIOReal implements MotorIO {
         return new MotorIO.MotorIOInputs();
     }
 
-    public static class ControlRequestGetter {
+    public static class ControlRequestGetter { // TODO pretty cool! 
 		public ControlRequest getVoltageRequest(Voltage voltage) {
 			return new VoltageOut(voltage.in(Units.Volts)).withEnableFOC(false);
 		}
