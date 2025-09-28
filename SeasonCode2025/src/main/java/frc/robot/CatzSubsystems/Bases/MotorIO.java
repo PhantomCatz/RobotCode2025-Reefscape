@@ -4,6 +4,8 @@ import java.util.function.UnaryOperator;
 
 import org.littletonrobotics.junction.AutoLog;
 
+import com.ctre.phoenix6.signals.NeutralModeValue;
+
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Dimensionless;
 import edu.wpi.first.units.measure.Voltage;
@@ -52,9 +54,13 @@ public interface MotorIO {
 
   public default void runSetpointBack(double setpointInches) {}
 
+  public default void runPercentOutput(double percent) {}
+
   public default void setPosition(double pos) {}
 
   public default void setBrakeMode(boolean enabled) {}
+
+  public default void setNeutralMode(NeutralModeValue mode) {}
 
   public default void setMotionMagicParameters(double cruiseVelocity, double acceleration, double jerk) {}
 
@@ -72,9 +78,9 @@ public interface MotorIO {
 
   public default void setVoltageSetpoint(Voltage voltage) {}
 
-  public default void setCoastSetpoint() {}
+  public default void setCoastOut() {}
 
-  public default void setNeutralSetpoint() {}
+  public default void setNeutralOut() {}
 
   public default void setCurrentPosition(Angle mechanismPosition) {}
 
@@ -243,7 +249,7 @@ public interface MotorIO {
 		 */
 		public static Setpoint withNeutralSetpoint() {
 			UnaryOperator<MotorIO> applier = (MotorIO io) -> {
-				io.setNeutralSetpoint();
+				io.setNeutralOut();
 				return io;
 			};
 			return new Setpoint(applier, Mode.IDLE, 0.0);
@@ -256,7 +262,7 @@ public interface MotorIO {
 		 */
 		public static Setpoint withCoastSetpoint() {
 			UnaryOperator<MotorIO> applier = (MotorIO io) -> {
-				io.setCoastSetpoint();
+				io.setCoastOut();
 				return io;
 			};
 			return new Setpoint(applier, Mode.IDLE, 0.0);

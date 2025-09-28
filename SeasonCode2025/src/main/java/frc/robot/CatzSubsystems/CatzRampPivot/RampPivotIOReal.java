@@ -12,6 +12,8 @@ import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.Temperature;
 import edu.wpi.first.units.measure.Voltage;
+import frc.robot.CatzSubsystems.Bases.MotorIOReal;
+import frc.robot.Utilities.MotorUtil.MotionMagicParameters;
 import frc.robot.Utilities.MotorUtil.NeutralMode;
 
 import static frc.robot.CatzSubsystems.CatzRampPivot.RampPivotConstants.*;
@@ -30,34 +32,20 @@ public class RampPivotIOReal implements RampPivotIO{
     private final StatusSignal<Temperature> rampPivotTempCelsius;
     private final StatusSignal<Angle> rampPivotPosition;
 
+    private MotorIOReal rampPivotMtr;
+
     public RampPivotIOReal() {
         rampPivotMotor = new TalonFX(RAMP_PIVOT_MTR_ID);
 
-        config.CurrentLimits.SupplyCurrentLimit = 100;
-        config.CurrentLimits.SupplyCurrentLimitEnable = true;
-        config.MotorOutput.NeutralMode = NeutralModeValue.Coast;
+        rampPivotMtr = new MotorIOReal(rampPivotMotor, MANUAL_SCALE, gains, motionMagicParameters, NeutralModeValue.Coast);
+        // config.CurrentLimits.SupplyCurrentLimit = 100;
+        // config.CurrentLimits.SupplyCurrentLimitEnable = true;
 
         rampPivotPosition = rampPivotMotor.getPosition();
         rampPivotAppliedVolts = rampPivotMotor.getMotorVoltage();
         rampPivotSupplyCurrent = rampPivotMotor.getSupplyCurrent();
         rampPivotTorqueCurrent = rampPivotMotor.getTorqueCurrent();
         rampPivotTempCelsius = rampPivotMotor.getDeviceTemp();
-
-        // PID configs
-        config.Slot0.kS = gains.kS();
-        config.Slot0.kV = gains.kV();
-        config.Slot0.kA = gains.kA();
-        config.Slot0.kP = gains.kP();
-        config.Slot0.kI = gains.kI();
-        config.Slot0.kD = gains.kD();
-
-        config.MotionMagic.MotionMagicCruiseVelocity = motionMagicParameters.mmCruiseVelocity();
-        config.MotionMagic.MotionMagicAcceleration = motionMagicParameters.mmAcceleration();
-        config.MotionMagic.MotionMagicJerk = motionMagicParameters.mmJerk();
-
-        rampPivotMotor.getConfigurator().apply(config, 1.0);
-
-        rampPivotMotor.setPosition(0.0);
     }
 
     @Override
@@ -78,14 +66,14 @@ public class RampPivotIOReal implements RampPivotIO{
     }
 
     @Override
-    public void runPercentOutput(double speed) {
-        rampPivotMotor.setControl(new DutyCycleOut(speed));
+    public void runPercentOutput(double percent) {
+        rampPivotMtr.runPercentOutput(percent);
     }
 
     @Override
     public void runMotor(double speed) {
         // System.out.println("pivot motor running at " + speed);
-        rampPivotMotor.set(speed);
+        rampPivotMtr.runMotor(speed);
     }
 
     @Override
@@ -100,7 +88,7 @@ public class RampPivotIOReal implements RampPivotIO{
     }
 
     @Override
-    public void setNeutralMode(NeutralMode mode) {
+    public void setNeutralMode(NeutralModeValue mode) {
         if(mode == NeutralMode.BRAKE) {
             config.MotorOutput.NeutralMode = NeutralModeValue.Brake;
         } else {
