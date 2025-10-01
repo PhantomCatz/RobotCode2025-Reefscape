@@ -159,6 +159,33 @@ public class TeleopPosSelector { //TODO split up the file. it's too big and does
     return AllianceFlipUtil.apply(new Pose2d(scoringPos, selectedAngle.plus(Rotation2d.k180deg)));
   }
 
+  @SuppressWarnings("static-access")
+  public Pose2d calculateReefPoseRobotPOV(int reefAngle, LeftRight leftRightPos, boolean isDistanced) {
+    Rotation2d selectedAngle = Rotation2d.fromRotations(reefAngle / 6.0);
+
+    //A unit vector with its origin placed at the center of the reef pointing orthogonally to the selected side.
+    Translation2d unitRadius = new Translation2d(selectedAngle.getCos(), selectedAngle.getSin());
+
+    //Rotate the unit vector 90 degrees to the left to account for branch distances
+    Translation2d unitLeftRight = unitRadius.rotateBy(Rotation2d.fromDegrees(90));
+
+    //This vector is now pointing at the scoring position of the robot, but not accounting for the left right distances
+    Translation2d radius = unitRadius.times(Reef.reefOrthogonalRadius + Reef.scoringDistance);
+
+    if(isDistanced){
+      radius = radius.plus(unitRadius.times(Reef.backDistance));
+    }
+
+    Translation2d leftRight = unitLeftRight.times(leftRightPos.NUM * Reef.leftRightDistance);
+
+    // if(CatzSuperstructure.Instance.getChosenGamepiece() == Gamepiece.ALGAE){
+    //   leftRight = new Translation2d();
+    // }
+
+    Translation2d scoringPos = radius.plus(leftRight).plus(Reef.center);
+    return AllianceFlipUtil.apply(new Pose2d(scoringPos, selectedAngle.plus(Rotation2d.k180deg)));
+  }
+
   public Pose2d calculateReefPose(Pair<Integer, LeftRight> pair, boolean isNBA, boolean isDistanced) {
     if (isNBA) {
       recentNBAPos = pair;
@@ -167,6 +194,17 @@ public class TeleopPosSelector { //TODO split up the file. it's too big and does
       return null;
     } else {
       return calculateReefPose(pair.getFirst(), pair.getSecond(), isDistanced);
+    }
+  }
+
+  public Pose2d calculateReefPoseRobotPOV(Pair<Integer, LeftRight> pair, boolean isNBA, boolean isDistanced) {
+    if (isNBA) {
+      recentNBAPos = pair;
+    }
+    if (pair == null) {
+      return null;
+    } else {
+      return calculateReefPoseRobotPOV(pair.getFirst(), pair.getSecond(), isDistanced);
     }
   }
 
@@ -331,19 +369,13 @@ public class TeleopPosSelector { //TODO split up the file. it's too big and does
   public PathPlannerPath getSwipePath() {
     Pose2d startPos = CatzRobotTracker.Instance.getEstimatedPose();
     Pair<Integer, LeftRight> closestReefBranch = getClosestReefPos().getFirst();
-    Pose2d closestReefPos = calculateReefPose(closestReefBranch, true, false);
-    Rotation2d branchAngle = Rotation2d.fromRotations((closestReefBranch.getFirst()) / 6.0);
+    Pose2d closestReefPos = calculateReefPoseRobotPOV(closestReefBranch, true, false);
     Rotation2d sideAngle = Rotation2d.kCW_90deg;
-    if (closestReefBranch.getSecond() == LeftRight.LEFT) {
+    if (closestReefBranch.getSecond() == LeftRight.RIGHT) {
+      System.out.println("righttt");
       sideAngle = Rotation2d.kCCW_90deg;
     }
-    Rotation2d backAngle = branchAngle.plus(Rotation2d.k180deg);
-    System.out.println("Branch angle" + branchAngle.getDegrees());
-    System.out.println("Side angle" + sideAngle.getDegrees());
-    System.out.println("Back angle" + backAngle.getDegrees());
-    if (closestReefBranch.getSecond() == LeftRight.RIGHT) {
-      sideAngle = sideAngle.minus(Rotation2d.k180deg);
-    }
+
     // 1 meter towards nearest side
     Pose2d sidePos = closestReefPos.plus(new Transform2d(new Translation2d(1.0, sideAngle), new Rotation2d()));
     // 2 meters towards opposite side
@@ -358,12 +390,12 @@ public class TeleopPosSelector { //TODO split up the file. it's too big and does
     Translation2d direction = side.minus(start).div(2.0);
     Translation2d direction2 = end.minus(side).div(2.0);
     Translation2d direction3 = back.minus(end).div(2.0);
-    Logger.recordOutput("Swipe/start", start);
-    Logger.recordOutput("Swipe/side", side);
-    Logger.recordOutput("Swipe/end", end);
-    Logger.recordOutput("Swipe/back", back);
+    Logger.recordOutput("Swipe/start", startPos);
+    Logger.recordOutput("Swipe/side", sidePos);
+    Logger.recordOutput("Swipe/end", endPos);
+    Logger.recordOutput("Swipe/back", backPos);
     Translation2d reef = closestReefPos.getTranslation();
-    Logger.recordOutput("Swipe/reef", reef);
+    Logger.recordOutput("Swipe/reef", closestReefPos);
     PathPlannerPath path = new PathPlannerPath(
       Arrays.asList(new Waypoint[] {
         new Waypoint(null, start, start.plus(direction)),
