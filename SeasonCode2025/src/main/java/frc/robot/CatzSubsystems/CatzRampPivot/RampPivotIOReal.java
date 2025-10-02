@@ -37,7 +37,7 @@ public class RampPivotIOReal implements RampPivotIO{
     public RampPivotIOReal() {
         rampPivotMotor = new TalonFX(RAMP_PIVOT_MTR_ID);
 
-        rampPivotMtr = new MotorIOReal(rampPivotMotor, MANUAL_SCALE, gains, motionMagicParameters, NeutralModeValue.Coast);
+        rampPivotMtr = new MotorIOReal(rampPivotMotor, MANUAL_SCALE, gains, NeutralModeValue.Coast);
         // config.CurrentLimits.SupplyCurrentLimit = 100;
         // config.CurrentLimits.SupplyCurrentLimitEnable = true;
 
@@ -89,7 +89,7 @@ public class RampPivotIOReal implements RampPivotIO{
 
     @Override
     public void setNeutralMode(NeutralModeValue mode) {
-        if(mode == NeutralMode.BRAKE) {
+        if(mode == NeutralModeValue.Brake) {
             config.MotorOutput.NeutralMode = NeutralModeValue.Brake;
         } else {
             config.MotorOutput.NeutralMode = NeutralModeValue.Coast;

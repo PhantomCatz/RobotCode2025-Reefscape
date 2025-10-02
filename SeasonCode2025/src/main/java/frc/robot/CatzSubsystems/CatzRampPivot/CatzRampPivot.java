@@ -17,6 +17,8 @@ import java.util.function.Supplier;
 
 import org.littletonrobotics.junction.Logger;
 
+import com.ctre.phoenix6.signals.NeutralModeValue;
+
 public class CatzRampPivot extends SubsystemBase {
   public static final CatzRampPivot Instance = new CatzRampPivot();
 
@@ -108,7 +110,7 @@ public class CatzRampPivot extends SubsystemBase {
     return runOnce(() -> rampPivotPosManual(manualSupplier.get())).alongWith(Commands.print("pos manual"));
   }
 
-  public void setNeutralMode(NeutralMode mode) {
+  public void setNeutralMode(NeutralModeValue mode) {
     io.setNeutralMode(mode);
   }
 

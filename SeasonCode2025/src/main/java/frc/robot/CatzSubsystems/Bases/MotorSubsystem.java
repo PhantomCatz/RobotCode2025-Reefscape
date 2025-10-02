@@ -1,10 +1,9 @@
 package frc.robot.CatzSubsystems.Bases;
 
 import frc.robot.CatzSubsystems.Bases.*;
-import frc.robot.CatzSubsystems.Bases.MotorIO.Setpoint;
+import frc.robot.CatzSubsystems.Bases.ServoMotorIO.Setpoint;
+import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-
-
 
 public class MotorSubsystem<IO extends MotorIO> extends SubsystemBase {
     protected final IO io;
@@ -19,9 +18,7 @@ public class MotorSubsystem<IO extends MotorIO> extends SubsystemBase {
     @Override
 	public void periodic() {
 		io.updateInputs(io.getMotorIOInputs());
+		//System.out.println("it worked!!!! base");
 	}
 
-    public void applySetpoint(Setpoint setpoint) {
-		io.applySetpoint(setpoint);
-	}
 }

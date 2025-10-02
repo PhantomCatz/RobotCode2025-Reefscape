@@ -2,6 +2,8 @@ package frc.robot.CatzSubsystems.CatzRampPivot;
 
 import org.littletonrobotics.junction.AutoLog;
 
+import com.ctre.phoenix6.signals.NeutralModeValue;
+
 import frc.robot.Utilities.MotorUtil.NeutralMode;
 
 public interface RampPivotIO {
@@ -29,5 +31,6 @@ public interface RampPivotIO {
 
     public default void stop() {}
 
-    public default void setNeutralMode(NeutralMode mode) {}
+    public default void setNeutralMode(NeutralModeValue mode) {}
+
   }
