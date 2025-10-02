@@ -249,4 +249,5 @@ public class CatzOuttake extends SubsystemBase {
   public boolean isHoldingCoral() {
     return inputs.bbreakBackTriggered && inputs.bbreakFrntTriggered;
   }
+
 }

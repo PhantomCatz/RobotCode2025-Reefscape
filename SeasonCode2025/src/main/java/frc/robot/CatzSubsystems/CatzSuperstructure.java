@@ -20,6 +20,7 @@ import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import edu.wpi.first.wpilibj2.command.Command.InterruptionBehavior;
 import frc.robot.Robot;
+import frc.robot.RobotContainer;
 import frc.robot.TeleopPosSelector;
 import frc.robot.CatzSubsystems.CatzAlgaeEffector.CatzAlgaePivot.CatzAlgaePivot;
 import frc.robot.CatzSubsystems.CatzAlgaeEffector.CatzAlgaeRemover.CatzAlgaeRemover;
@@ -263,7 +264,12 @@ public class CatzSuperstructure extends VirtualSubsystem {
             CatzOuttake.Instance.startIntaking(),
             CatzElevator.Instance.Elevator_Stow(),
             CatzRampPivot.Instance.Ramp_Intake_Pos(),
-            CatzIntakeRollers.Instance.intake()
+            CatzIntakeRollers.Instance.intake(),
+            new SequentialCommandGroup(
+                new InstantCommand(() -> RobotContainer.Instance.rumbleDrvController(1)),
+                Commands.waitUntil((() -> CatzOuttake.Instance.isHoldingCoral() == true)),
+                new InstantCommand(() -> RobotContainer.Instance.rumbleDrvController(0))
+            )
         ).unless(()-> Robot.isSimulation()).alongWith(Commands.print("Intake Coral Station")).andThen(new InstantCommand(() -> TeleopPosSelector.Instance.hasCoralSIM = true));
     }
 
