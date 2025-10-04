@@ -38,6 +38,8 @@ import org.littletonrobotics.junction.rlog.RLOGServer;
 import org.littletonrobotics.junction.wpilog.WPILOGReader;
 import org.littletonrobotics.junction.wpilog.WPILOGWriter;
 
+import com.ctre.phoenix6.signals.NeutralModeValue;
+
 
 
 
@@ -302,7 +304,7 @@ public class Robot extends LoggedRobot {
   // --------------------------------------------------------------------------------------------------------
   @Override
   public void disabledInit() {
-    CatzRampPivot.Instance.setNeutralMode(NeutralMode.COAST);
+    CatzRampPivot.Instance.setNeutralMode(NeutralModeValue.Coast);
     isResetPositionUsedInAuto = false;
   }
 
@@ -346,7 +348,7 @@ public class Robot extends LoggedRobot {
     isFirstPath = true;
     // deployment benchmark
     LAST_DEPLOYMENT_WARNING.set(true);
-    CatzRampPivot.Instance.setNeutralMode(NeutralMode.BRAKE);
+    CatzRampPivot.Instance.setNeutralMode(NeutralModeValue.Brake);
     CatzAlgaePivot.Instance.setAlgaePivotPos(AlgaePivotPosition.STOW);
     autoStart = Timer.getFPGATimestamp();
     m_autonomousCommand = AutoRoutineSelector.Instance.getSelectedCommand();
@@ -382,7 +384,7 @@ public class Robot extends LoggedRobot {
 
 
     teleStart = Timer.getFPGATimestamp();
-    CatzRampPivot.Instance.setNeutralMode(NeutralMode.BRAKE);
+    CatzRampPivot.Instance.setNeutralMode(NeutralModeValue.Brake);
     CatzAlgaePivot.Instance.setAlgaePivotPos(AlgaePivotPosition.STOW);
     //CatzRobotTracker.Instance.resetPose(m_robotContainer.getAutonomous().calculateReefPos(2, LeftRight.LEFT));
     //For limelight error calculations CatzRobotTracker.Instance.resetPose(FlippingUtil.flipFieldPose(new Pose2d(Reef.center.minus(new Translation2d(Units.inchesToMeters(32.305+14.5), 0)), Rotation2d.kZero)));
