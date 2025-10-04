@@ -5,7 +5,7 @@ import frc.robot.CatzSubsystems.Bases.ServoMotorIO.Setpoint;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
-public class MotorSubsystem<IO extends MotorIO> extends SubsystemBase {
+public class MotorSubsystem<IO extends MotorIOReal> extends SubsystemBase {
     protected final IO io;
 	protected final String name;
 
