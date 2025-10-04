@@ -360,7 +360,7 @@ public class MotorIOReal implements MotorIO {
                 tempCelsius.get(0))
             .isOK();
 
-        inputs.isFollowerMotorConnected =
+        inputs.isFollowerMotorConnected = // TODO Some mechanisms may not have a followerer for their subtsystem rendering this redundant
             BaseStatusSignal.refreshAll(
                 appliedVoltage.get(1),
                 supplyCurrent.get(1),
@@ -368,7 +368,7 @@ public class MotorIOReal implements MotorIO {
                 tempCelsius.get(1))
             .isOK();
 
-        inputs.positionInch = internalPositionRotations.getValueAsDouble() * Final_Ratio;
+        inputs.positionInch = internalPositionRotations.getValueAsDouble() * Final_Ratio; //TODO Constants should be ALL_CAPS
         inputs.velocityInchPerSec = velocityRps.getValueAsDouble() * Final_Ratio;
         inputs.appliedVolts =     appliedVoltage.stream()
                                                 .mapToDouble(StatusSignal::getValueAsDouble)
@@ -447,7 +447,7 @@ public class MotorIOReal implements MotorIO {
         return new MotorIO.MotorIOInputs();
     }
 
-    public static class ControlRequestGetter {
+    public static class ControlRequestGetter { // TODO pretty cool! 
 		public ControlRequest getVoltageRequest(Voltage voltage) {
 			return new VoltageOut(voltage.in(Units.Volts)).withEnableFOC(false);
 		}
