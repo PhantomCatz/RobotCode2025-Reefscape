@@ -1,14 +1,3 @@
-//------------------------------------------------------------------------------------
-// 2025 FRC 2637
-// https://github.com/PhantomCatz
-//
-// Use of this source code is governed by an MIT-style
-// license that can be found in the LICENSE file at
-// the root directory of this project. 
-//
-//        "6 hours of debugging can save you 5 minutes of reading documentation."
-//
-//------------------------------------------------------------------------------------
 package frc.robot;
 
 
@@ -82,7 +71,7 @@ public class FieldConstants {
         new Translation2d(Units.inchesToMeters(176.746), Units.inchesToMeters(158.501));
     public static final double faceToZoneLine =
         Units.inchesToMeters(12); // Side of the reef to the inside of the reef zone line
-    public static final double scoringDistance = Units.inchesToMeters(19); // Scoring distance from the side of the reef
+    public static final double scoringDistance = Units.inchesToMeters(21); // Scoring distance from the side of the reef
     public static final double backDistance = Units.inchesToMeters(12);
     public static final double reefOrthogonalRadius =
         Units.inchesToMeters(32.305); // Distance from the center to the side of the reef

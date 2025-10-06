@@ -3,45 +3,45 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 5.814036885245901,
-        "y": 3.839190573770491
+        "x": 5.84,
+        "y": 3.8511782786885242
       },
       "prevControl": null,
       "nextControl": {
-        "x": 6.4309553322996775,
-        "y": 3.0827159200676886
+        "x": 6.456918447053776,
+        "y": 3.094703624985722
       },
       "isLocked": false,
       "linkedName": "Reef-G"
     },
     {
       "anchor": {
-        "x": 6.677151639344262,
-        "y": 1.1179815573770497
+        "x": 6.4155,
+        "y": 1.2267499999999996
       },
       "prevControl": {
-        "x": 7.4615234753838955,
-        "y": 2.1630966723212612
+        "x": 7.199871836039633,
+        "y": 2.2718651149442124
       },
       "nextControl": {
-        "x": 5.941615468654764,
-        "y": 0.1379362086593816
+        "x": 5.679963829310502,
+        "y": 0.2467046512823312
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 1.6543032786885246,
-        "y": 0.722387295081968
+        "x": 1.4984631147540983,
+        "y": 0.5545594262295083
       },
       "prevControl": {
-        "x": 3.881187877790803,
-        "y": 1.019837847267735
+        "x": 3.725347713856378,
+        "y": 0.8520099784152753
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": "Lower Station"
+      "linkedName": "TiltedLowerStation"
     }
   ],
   "rotationTargets": [],
@@ -49,16 +49,16 @@
   "pointTowardsZones": [],
   "eventMarkers": [],
   "globalConstraints": {
-    "maxVelocity": 17.0,
-    "maxAcceleration": 16.5,
-    "maxAngularVelocity": 600.0,
-    "maxAngularAcceleration": 60.0,
+    "maxVelocity": 4.3,
+    "maxAcceleration": 5.5,
+    "maxAngularVelocity": 540.0,
+    "maxAngularAcceleration": 720.0,
     "nominalVoltage": 12.0,
     "unlimited": false
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 53.8
+    "rotation": 52.52382043863866
   },
   "reversed": false,
   "folder": "L4 G Paths",

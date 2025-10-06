@@ -3,25 +3,25 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 7.389473684210526,
-        "y": 4.169325657894737
+        "x": 7.120696721311476,
+        "y": 3.8511782786885242
       },
       "prevControl": null,
       "nextControl": {
-        "x": 7.687830276903164,
-        "y": 4.144234765132625
+        "x": 6.806863007919615,
+        "y": 3.845065241182907
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 5.814036885245901,
-        "y": 3.839190573770491
+        "x": 5.84,
+        "y": 3.8511782786885242
       },
       "prevControl": {
-        "x": 5.557837465445653,
-        "y": 3.842581242048544
+        "x": 5.590018242433282,
+        "y": 3.85419835879584
       },
       "nextControl": null,
       "isLocked": false,
@@ -33,10 +33,10 @@
   "pointTowardsZones": [],
   "eventMarkers": [],
   "globalConstraints": {
-    "maxVelocity": 17.0,
-    "maxAcceleration": 16.5,
-    "maxAngularVelocity": 600.0,
-    "maxAngularAcceleration": 60.0,
+    "maxVelocity": 4.3,
+    "maxAcceleration": 5.5,
+    "maxAngularVelocity": 540.0,
+    "maxAngularAcceleration": 720.0,
     "nominalVoltage": 12.0,
     "unlimited": false
   },
@@ -48,7 +48,7 @@
   "folder": "L4 G Paths",
   "idealStartingState": {
     "velocity": 0,
-    "rotation": 178.83086067209254
+    "rotation": 180.0
   },
   "useDefaultConstraints": true
 }

@@ -4,12 +4,12 @@
     {
       "anchor": {
         "x": 7.1,
-        "y": 0.7823258196721316
+        "y": 2.978
       },
       "prevControl": null,
       "nextControl": {
         "x": 7.064036885245901,
-        "y": 1.8372438524590144
+        "y": 4.032918032786883
       },
       "isLocked": false,
       "linkedName": "Start3"
@@ -34,7 +34,7 @@
   "eventMarkers": [],
   "globalConstraints": {
     "maxVelocity": 4.3,
-    "maxAcceleration": 4.3,
+    "maxAcceleration": 5.5,
     "maxAngularVelocity": 540.0,
     "maxAngularAcceleration": 720.0,
     "nominalVoltage": 12.0,

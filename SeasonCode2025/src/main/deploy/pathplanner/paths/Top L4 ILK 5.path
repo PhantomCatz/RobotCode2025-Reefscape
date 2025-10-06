@@ -3,25 +3,25 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 1.6303278688524592,
-        "y": 7.23171106557377
+        "x": 1.5104508196721311,
+        "y": 7.495440573770491
       },
       "prevControl": null,
       "nextControl": {
-        "x": 2.481454918032788,
-        "y": 6.860092213114753
+        "x": 2.36157786885246,
+        "y": 7.123821721311474
       },
       "isLocked": false,
       "linkedName": "Coral-Top"
     },
     {
       "anchor": {
-        "x": 4.00389344262295,
-        "y": 5.241752049180327
+        "x": 3.954,
+        "y": 5.285
       },
       "prevControl": {
-        "x": 3.4644467213114742,
-        "y": 5.793186475409835
+        "x": 3.414553278688524,
+        "y": 5.836434426229507
       },
       "nextControl": null,
       "isLocked": false,
@@ -34,7 +34,7 @@
   "eventMarkers": [],
   "globalConstraints": {
     "maxVelocity": 4.3,
-    "maxAcceleration": 4.3,
+    "maxAcceleration": 5.5,
     "maxAngularVelocity": 540.0,
     "maxAngularAcceleration": 720.0,
     "nominalVoltage": 12.0,

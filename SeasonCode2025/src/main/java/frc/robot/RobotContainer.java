@@ -1,14 +1,3 @@
-//------------------------------------------------------------------------------------
-// 2025 FRC 2637
-// https://github.com/PhantomCatz
-//
-// Use of this source code is governed by an MIT-style
-// license that can be found in the LICENSE file at
-// the root directory of this project. 
-//
-//        "6 hours of debugging can save you 5 minutes of reading documentation."
-//
-//------------------------------------------------------------------------------------
 package frc.robot;
 
 import edu.wpi.first.math.geometry.Pose2d;
@@ -25,26 +14,20 @@ import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Autonomous.CatzAutonomous;
-import frc.robot.CatzSubsystems.CatzStateCommands;
 import frc.robot.CatzSubsystems.CatzSuperstructure;
 import frc.robot.CatzSubsystems.CatzAlgaeEffector.CatzAlgaePivot.CatzAlgaePivot;
 import frc.robot.CatzSubsystems.CatzAlgaeEffector.CatzAlgaeRemover.CatzAlgaeRemover;
 import frc.robot.CatzSubsystems.CatzSuperstructure.Gamepiece;
 import frc.robot.CatzSubsystems.CatzSuperstructure.LeftRight;
-import frc.robot.CatzSubsystems.CatzSuperstructure.RobotAction;
 import frc.robot.CatzSubsystems.CatzClimb.CatzClimb;
 import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.CatzRobotTracker;
 import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.Drivetrain.CatzDrivetrain;
-import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.Vision.CatzVision;
-import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.Vision.VisionIOLimelight;
 import frc.robot.CatzSubsystems.CatzElevator.*;
-import frc.robot.CatzSubsystems.CatzIntakeRollers.CatzIntakeRollers;
 import frc.robot.CatzSubsystems.CatzLEDs.CatzLED;
 import frc.robot.CatzSubsystems.CatzLEDs.CatzLED.ControllerLEDState;
 import frc.robot.CatzSubsystems.CatzOuttake.CatzOuttake;
 import frc.robot.CatzSubsystems.CatzRampPivot.CatzRampPivot;
 import frc.robot.Commands.DriveAndRobotOrientationCmds.TeleopDriveCmd;
-import frc.robot.TeleopPosSelector.CancellationSource;
 import frc.robot.Utilities.Alert;
 import frc.robot.Utilities.AllianceFlipUtil;
 import frc.robot.Utilities.DoublePressTracker;
@@ -55,28 +38,9 @@ import org.littletonrobotics.junction.networktables.LoggedNetworkNumber;
 
 
 public class RobotContainer {
+  public static final RobotContainer Instance = new RobotContainer();
 
   private final double SCORE_TRIGGER_THRESHHOLD = 0.8;
-
-  // -------------------------------------------------------------------------------------------------------------------
-  // Subsystem Declaration
-  // -------------------------------------------------------------------------------------------------------------------
-  // Primary subsystem declaration
-  private static CatzDrivetrain drive = new CatzDrivetrain();
-
-  // Assistance Subsystem declaration
-  private CatzLED led = CatzLED.getInstance();
-  private CatzRobotTracker robotTracker = CatzRobotTracker.getInstance();
-  private CatzVision vision = new CatzVision(new VisionIOLimelight("limelight-gyoza"),
-                                             new VisionIOLimelight("limelight-tempura"));
-  private CatzOuttake outtake;
-  private CatzElevator elevator = new CatzElevator();
-  private CatzClimb climb = new CatzClimb();
-  private CatzAlgaeRemover algaeRemover = new CatzAlgaeRemover();
-  private CatzAlgaePivot algaePivot = new CatzAlgaePivot();
-  private CatzRampPivot rampPivot = new CatzRampPivot();
-  private CatzIntakeRollers intakeRollers = new CatzIntakeRollers();
-  private CatzSuperstructure superstructure = new CatzSuperstructure(this);
 
   // ------------------------------------------------------------------------------------------------------------------
   // Drive Controller Declaration
@@ -91,7 +55,6 @@ public class RobotContainer {
   private final Trigger climbMode = xboxAux.povLeft();
 
   private CommandXboxController xboxTest = new CommandXboxController(3);
-  private TeleopPosSelector selector;
 
   // -------------------------------------------------------------------------------------------------------------------
   // Alert Declaration
@@ -103,17 +66,10 @@ public class RobotContainer {
   private final LoggedNetworkNumber endgameAlert2 = new LoggedNetworkNumber("Endgame Alert #2", 10.0);
 
   // -------------------------------------------------------------------------------------------------------------------
-  // Auto Declaration
+  // Subsystem Declaration
   // ---------------------------------------------------------------------------------------------------------------------
 
-  private CatzAutonomous auto;
-
-  public RobotContainer() {
-    outtake = new CatzOuttake(this);
-    selector = new TeleopPosSelector(xboxAux, this);
-    auto = new CatzAutonomous(this);
-
-
+  private RobotContainer() {
     // Drive And Aux Command Mapping
     configureBindings();
 
@@ -153,176 +109,138 @@ public class RobotContainer {
     // Reset odometry
     DoublePressTracker.createTrigger(xboxDrv.button(8).and(xboxDrv.button(7))).onTrue(new InstantCommand(() -> {
       if(AllianceFlipUtil.shouldFlipToRed()){
-        robotTracker.resetPose(new Pose2d(robotTracker.getEstimatedPose().getTranslation(), Rotation2d.k180deg));
+        CatzRobotTracker.Instance.resetPose(new Pose2d(CatzRobotTracker.Instance.getEstimatedPose().getTranslation(), Rotation2d.k180deg));
       }else{
-        robotTracker.resetPose(new Pose2d(robotTracker.getEstimatedPose().getTranslation(), new Rotation2d()));
+        CatzRobotTracker.Instance.resetPose(new Pose2d(CatzRobotTracker.Instance.getEstimatedPose().getTranslation(), new Rotation2d()));
       }
     }));
 
     // Climb
     Trigger climbMode = xboxDrv.povLeft();
-    xboxDrv.b().onTrue(CatzStateCommands.extendClimb(this));
-    climbMode.toggleOnTrue(Commands.startEnd(()->superstructure.setClimbOverride(()->true), ()->superstructure.setClimbOverride(()->false)));
+    xboxDrv.b().onTrue(CatzSuperstructure.Instance.extendClimb());
+    climbMode.toggleOnTrue(Commands.startEnd(()->CatzSuperstructure.Instance.setClimbOverride(()->true), ()->CatzSuperstructure.Instance.setClimbOverride(()->false)));
 
     //NBA
-    xboxDrv.rightTrigger().onTrue(selector.runToNearestBranch().alongWith(Commands.runOnce(()->led.setControllerState(ControllerLEDState.NBA)))
+    xboxDrv.rightTrigger().onTrue(TeleopPosSelector.Instance.runToNearestBranch().alongWith(Commands.runOnce(()->CatzLED.Instance.setControllerState(ControllerLEDState.NBA)))
+                                                               .onlyWhile(xboxDrv.rightTrigger())
                                                                .unless(()->CatzSuperstructure.isClimbEnabled())
-                                                               .alongWith(climb.ClimbManualMode(()-> ((-xboxDrv.getRightTriggerAxis()-0.5)*2.0))
+                                                               .alongWith(CatzClimb.Instance.ClimbManualMode(()-> ((-xboxDrv.getRightTriggerAxis()-0.5)*2.0))
                                                                .onlyIf(()-> CatzSuperstructure.isClimbEnabled()))
     );
-    xboxDrv.rightTrigger().onFalse(selector.cancelCurrentDrivetrainCommand(CancellationSource.NBA)
-                                           .alongWith(Commands.runOnce(()->led.setControllerState(ControllerLEDState.FULL_MANUAL)))
-                                           .alongWith(climb.CancelClimb())
+    xboxDrv.rightTrigger().onFalse(Commands.runOnce(()->CatzLED.Instance.setControllerState(ControllerLEDState.FULL_MANUAL))
+                                           .unless(()-> CatzSuperstructure.isClimbEnabled())
+                                           .alongWith(CatzClimb.Instance.CancelClimb())
     );
-
-    // NBA Barge
-    xboxDrv.leftTrigger().onTrue(selector.runToNetCommand()
-                                         .alongWith(Commands.runOnce(()->led.setControllerState(ControllerLEDState.NBA)))
-                                         .unless(()->CatzSuperstructure.isClimbEnabled())
-                                         .alongWith(climb.ClimbManualMode(()-> ((xboxDrv.getLeftTriggerAxis()-0.5)*2.0))
-                                         .onlyIf(()-> CatzSuperstructure.isClimbEnabled()))
-    );
-    xboxDrv.leftTrigger().onFalse(selector.cancelCurrentDrivetrainCommand(CancellationSource.NET)
-                                          .alongWith(Commands.runOnce(()->led.setControllerState(ControllerLEDState.FULL_MANUAL)))
-                                          .alongWith(climb.CancelClimb())
-    );
-
-    // BALLS
-
-    xboxDrv.y().onTrue(selector.runCoralStationCommand());
-    xboxDrv.y().onFalse(selector.cancelCurrentDrivetrainCommand(CancellationSource.NA));
-
-    // AQUA
-    xboxDrv.a().onTrue(new InstantCommand(() -> selector.runAutoCommand().schedule()));
-    xboxDrv.a().onFalse(selector.cancelAutoCommand());
 
     // Left Right
-    xboxDrv.leftBumper().onTrue(new InstantCommand(() -> selector.runLeftRight(LeftRight.LEFT)));
-    xboxDrv.rightBumper().onTrue(new InstantCommand(() -> selector.runLeftRight(LeftRight.RIGHT)));
-
-    xboxDrv.leftBumper().onFalse(selector.cancelCurrentDrivetrainCommand(CancellationSource.NA).alongWith(climb.CancelClimb()));
-    xboxDrv.rightBumper().onFalse(selector.cancelCurrentDrivetrainCommand(CancellationSource.NA).alongWith(climb.CancelClimb()));
-
-    // Coral Station Run Back
-    xboxDrv.button(7).onTrue(new InstantCommand(() -> selector.toggleLeftStation()).alongWith(Commands.runOnce(() -> led.setControllerState(ControllerLEDState.BALLS))));
-    xboxDrv.button(8).onTrue(new InstantCommand(() -> selector.toggleRightStation()).alongWith(Commands.runOnce(() -> led.setControllerState(ControllerLEDState.BALLS))));
-
+    xboxDrv.leftBumper().onTrue(TeleopPosSelector.Instance.runLeftRight(LeftRight.LEFT).unless(()->CatzSuperstructure.isClimbEnabled()));
+    xboxDrv.rightBumper().onTrue(TeleopPosSelector.Instance.runLeftRight(LeftRight.RIGHT).unless(()->CatzSuperstructure.isClimbEnabled()));
 
     //     // Manual Climb Control
-    // xboxDrv.povUp().onTrue(climb.ClimbManualMode(()-> 0.4));
-    // xboxDrv.povUp().onFalse(climb.CancelClimb());
-    // xboxDrv.povDown().onTrue(climb.ClimbManualMode(()-> -1.0));
-    // xboxDrv.povDown().onFalse(climb.CancelClimb());
+    // xboxDrv.povUp().onTrue(CatzClimb.Instance.ClimbManualMode(()-> 0.4));
+    // xboxDrv.povUp().onFalse(CatzClimb.Instance.CancelClimb());
+    // xboxDrv.povDown().onTrue(CatzClimb.Instance.ClimbManualMode(()-> -1.0));
+    // xboxDrv.povDown().onFalse(CatzClimb.Instance.CancelClimb());
 
 
     // Default driving
     Trigger escapeTrajectory = new Trigger(()->(xboxDrv.getLeftY() > 0.8));
 
-    escapeTrajectory.onTrue(getCatzDrivetrain().cancelTrajectory());
+    escapeTrajectory.onTrue(CatzDrivetrain.Instance.cancelTrajectory());
 
-    drive.setDefaultCommand(new TeleopDriveCmd(() -> xboxDrv.getLeftX(), () -> xboxDrv.getLeftY(), () -> xboxDrv.getRightX(), drive));
+    CatzDrivetrain.Instance.setDefaultCommand(new TeleopDriveCmd(() -> xboxDrv.getLeftX(), () -> xboxDrv.getLeftY(), () -> xboxDrv.getRightX(), CatzDrivetrain.Instance));
     //---------------------------------------------------------------------------------------------------------------------
     // XBOX AUX
-    //---------------------------------------------------------------------------------------------------------------------
-
-    // Scoring Level Aqua determination
-    xboxAux.rightTrigger().onTrue(Commands.runOnce(() -> selector.pathQueueAddBack(selector.getXBoxReefPos(), superstructure.getLevel()))
-                                          .alongWith(Commands.runOnce(() -> led.setControllerState(ControllerLEDState.AQUA))));
-    // xboxAux.leftBumper().onTrue(Commands.runOnce(() -> selector.pathQueuePopFront())
-    //                                     .alongWith(Commands.runOnce(() -> led.setControllerState(ControllerLEDState.AQUA))));
-    // xboxAux.rightBumper().onTrue(Commands.runOnce(() -> selector.pathQueuePopBack())
-    //                                      .alongWith(Commands.runOnce(() -> led.setControllerState(ControllerLEDState.AQUA))));
-    // xboxAux.rightStick().onTrue(Commands.runOnce(() -> selector.pathQueueClear()).unless(()->xboxAux.leftStick().getAsBoolean())
-    //                                     .alongWith(Commands.runOnce(() -> led.setControllerState(ControllerLEDState.AQUA))));
+    //------------------------------------------------------------------------------
 
     // Full Manual
-    xboxAux.leftStick().and(xboxAux.rightStick()).or(isElevatorFullManual).onTrue(elevator.elevatorFullManual(() -> -xboxAux.getLeftY()).alongWith(Commands.print("Elevator Manual"))); // TODO make an override button for comp
-    xboxAux.leftStick().and(xboxAux.rightStick()).or(isAlgaePivotFullManual).onTrue(algaePivot.AlgaePivotFullManualCommand(()->xboxAux.getRightY()).alongWith(Commands.print("Algae Manual")));
-    isRampPivotFullManual.onTrue(rampPivot.rampPivotManual(()->xboxAux.getLeftY()).alongWith(Commands.print("Manual Ramp")));
+    xboxAux.leftStick().and(xboxAux.rightStick()).onTrue(CatzElevator.Instance.elevatorFullManual(() -> -xboxAux.getLeftY()).alongWith(Commands.print("Elevator Manual"))); // TODO make an override button for
+    isElevatorFullManual.onTrue(CatzElevator.Instance.elevatorFullManual(() -> -xboxAux.getLeftY()).alongWith(Commands.print("Elevator Manual"))); // TODO make an override button for
+    xboxAux.leftStick().and(xboxAux.rightStick()).onTrue(CatzAlgaePivot.Instance.AlgaePivotFullManualCommand(()->xboxAux.getRightY()).alongWith(Commands.print("Algae Manual")));
+    isAlgaePivotFullManual.onTrue(CatzAlgaePivot.Instance.AlgaePivotFullManualCommand(()->xboxAux.getRightY()).alongWith(Commands.print("Algae Manual")));
+    isRampPivotFullManual.onTrue(CatzRampPivot.Instance.rampPivotManual(()->-xboxAux.getLeftY()).alongWith(Commands.print("Manual Ramp")));
 
     // Gamepiece Selection
     xboxAux.leftTrigger().onTrue(Commands.runOnce(()-> CatzSuperstructure.setChosenGamepiece(Gamepiece.CORAL)));
     xboxAux.rightTrigger().onTrue(Commands.runOnce(()-> CatzSuperstructure.setChosenGamepiece(Gamepiece.ALGAE)));
 
     // Scoring Action
-    xboxAux.x().onTrue(Commands.runOnce(() -> superstructure.setCurrentRobotAction(RobotAction.INTAKE, "container")).alongWith(Commands.print("INTAKE")));
-    xboxAux.y().onTrue(Commands.runOnce(() -> superstructure.setCurrentRobotAction(RobotAction.OUTTAKE, "container")).alongWith(Commands.print("OUTTAKE L" + superstructure.getLevel())));
-    xboxAux.a().onTrue(Commands.runOnce(() -> superstructure.setCurrentRobotAction(RobotAction.STOW, "container")).alongWith(Commands.print("STOWWW")));
-    xboxAux.b().onTrue(CatzStateCommands.algaeStow(this));
+    xboxAux.x().onTrue(CatzSuperstructure.Instance.intake().alongWith(Commands.print("INTAKE")));
+    xboxAux.y().onTrue(CatzSuperstructure.Instance.LXCoral().alongWith(Commands.print("OUTTAKE L" + CatzSuperstructure.Instance.getLevel())));
+    xboxAux.a().onTrue(CatzSuperstructure.Instance.stow().alongWith(Commands.print("STOWWW")));
+    xboxAux.b().onTrue(CatzSuperstructure.Instance.algaeStow());
 
 
     // algae punch
     DoublePressTracker.createTrigger(xboxAux.x())
-                      .onTrue(algaePivot.AlgaePivot_Stow()
+                      .onTrue(CatzAlgaePivot.Instance.AlgaePivot_Stow()
                                         .onlyIf(()->CatzSuperstructure.getChosenGamepiece() == Gamepiece.ALGAE)
                                         .alongWith(Commands.print("Algae Punch"))
     );
 
-    isClimbFullManualEnabled.onTrue(Commands.print("climb full man"));
+    isClimbFullManualEnabled.onTrue(Commands.print("CatzClimb.Instance full man"));
 
     // Scoring Level
-    xboxAux.povRight().onTrue(Commands.runOnce(()-> {superstructure.setLevel(1); SmartDashboard.putNumber("Reef Level", 1);}));
-    xboxAux.povUp().onTrue(Commands.runOnce(() -> {superstructure.setLevel(2); SmartDashboard.putNumber("Reef Level", 2);}));
-    xboxAux.povLeft().onTrue(Commands.runOnce(() -> {superstructure.setLevel(3); SmartDashboard.putNumber("Reef Level", 3);}));
-    xboxAux.povDown().onTrue(Commands.runOnce(() -> {superstructure.setLevel(4); SmartDashboard.putNumber("Reef Level", 4);}));
+    xboxAux.povRight().onTrue(Commands.runOnce(()-> {CatzSuperstructure.Instance.setLevel(1); SmartDashboard.putNumber("Reef Level", 1);}));
+    xboxAux.povUp().onTrue(Commands.runOnce(() -> {CatzSuperstructure.Instance.setLevel(2); SmartDashboard.putNumber("Reef Level", 2);}));
+    xboxAux.povLeft().onTrue(Commands.runOnce(() -> {CatzSuperstructure.Instance.setLevel(3); SmartDashboard.putNumber("Reef Level", 3);}));
+    xboxAux.povDown().onTrue(Commands.runOnce(() -> {CatzSuperstructure.Instance.setLevel(4); SmartDashboard.putNumber("Reef Level", 4);}));
     //------------------------------------------------------------------------------------------------------------------------------
     //  XBOX test controls
     //------------------------------------------------------------------------------------------------------------------------------
-    // xboxTest.povRight().toggleOnTrue(algaePivot.AlgaePivot_BotTop().alongWith(Commands.print("pressed POV Right"))); //TBD
+    // xboxTest.povRight().toggleOnTrue(CatzAlgaePivot.Instance.AlgaePivot_BotTop().alongWith(Commands.print("pressed POV Right"))); //TBD
 
-    // xboxTest.povUp().toggleOnTrue(rampPivot.Ramp_Intake_Pos().alongWith(Commands.print("pressed POV Up"))); //TBD
-    // xboxTest.povLeft().toggleOnTrue(rampPivot.Ramp_Climb_Pos().alongWith(Commands.print("pressed POV Left")));
-    xboxTest.x().onTrue(Commands.runOnce(() -> CatzStateCommands.algaeGrndIntk(this)).alongWith(Commands.print("Hi")));
-    xboxTest.a().onTrue(Commands.runOnce(() -> superstructure.setCurrentRobotAction(RobotAction.STOW, "container")).alongWith(Commands.print("STOWWW")));
+    // xboxTest.povUp().toggleOnTrue(CatzRampPivot.Instance.Ramp_Intake_Pos().alongWith(Commands.print("pressed POV Up"))); //TBD
+    // xboxTest.povLeft().toggleOnTrue(CatzRampPivot.Instance.Ramp_Climb_Pos().alongWith(Commands.print("pressed POV Left")));
+    xboxTest.a().onTrue(CatzSuperstructure.Instance.stow().alongWith(Commands.print("STOWWW")));
 
-    xboxTest.povDown().toggleOnTrue(algaePivot.AlgaePivot_NetAlgae().alongWith(Commands.print("pressed POV Right"))); //TBD
-    xboxTest.povUp().toggleOnTrue(algaePivot.AlgaePivot_Stow().alongWith(Commands.print("pressed POV Right"))); //TBD
-    xboxTest.povRight().toggleOnTrue(algaeRemover.eatAlgae().alongWith(Commands.print("pressed POV Right"))); //TBD
-    xboxTest.povLeft().toggleOnTrue(algaeRemover.vomitAlgae().alongWith(Commands.print("pressed POV Right"))); //TBD
+    xboxTest.povDown().toggleOnTrue(CatzAlgaePivot.Instance.AlgaePivot_NetAlgae().alongWith(Commands.print("pressed POV Right"))); //TBD
+    xboxTest.povUp().toggleOnTrue(CatzAlgaePivot.Instance.AlgaePivot_Stow().alongWith(Commands.print("pressed POV Right"))); //TBD
+    xboxTest.povRight().toggleOnTrue(CatzAlgaeRemover.Instance.eatAlgae().alongWith(Commands.print("pressed POV Right"))); //TBD
+    xboxTest.povLeft().toggleOnTrue(CatzAlgaeRemover.Instance.vomitAlgae().alongWith(Commands.print("pressed POV Right"))); //TBD
 
-    // xboxTest.x().onTrue(algaePivot.AlgaePivot_Horizontal().alongWith(Commands.print("AL:KDJF:LAKDJFLK:ADJF:LKKJAD:FLKJ")));
-    // xboxTest.y().onTrue(algaePivot.AlgaePivot_Stow().alongWith(Commands.print("LAKJDFLKJALKJLKJFLSKDJLKKJSDLFKJLKKJLKKJFDKLJSLKJ")));
+    // xboxTest.x().onTrue(CatzAlgaePivot.Instance.AlgaePivot_Horizontal().alongWith(Commands.print("AL:KDJF:LAKDJFLK:ADJF:LKKJAD:FLKJ")));
+    // xboxTest.y().onTrue(CatzAlgaePivot.Instance.AlgaePivot_Stow().alongWith(Commands.print("LAKJDFLKJALKJLKJFLSKDJLKKJSDLFKJLKKJLKKJFDKLJSLKJ")));
 
-    // xboxTest.a().onTrue(algaeRemover.eatAlgae().alongWith(Commands.print("ea")));
-    // xboxTest.b().onTrue(algaeRemover.vomitAlgae().alongWith(Commands.print("va")));
+    // xboxTest.a().onTrue(CatzAlgaeRemover.Instance.eatAlgae().alongWith(Commands.print("ea")));
+    // xboxTest.b().onTrue(CatzAlgaeRemover.Instance.vomitAlgae().alongWith(Commands.print("va")));
 
-    // xboxTest.rightBumper().toggleOnTrue(algaePivot.AlgaePivot_Stow().alongWith(Commands.print("stow")));
-    // xboxTest.leftBumper().toggleOnTrue(algaePivot.AlgaePivot_Horizontal().alongWith(Commands.print("eat")));
-    // xboxTest.rightTrigger().onTrue(algaeRemover.eatAlgae().alongWith(Commands.print("eating algae")));
-    // xboxTest.leftTrigger().onTrue(algaeRemover.vomitAlgae().alongWith(Commands.print("vomiting algae")));
-    // xboxTest.rightStick().onTrue(algaeRemover.stopAlgae().alongWith(Commands.print("stop algaeing")));
+    // xboxTest.rightBumper().toggleOnTrue(CatzAlgaePivot.Instance.AlgaePivot_Stow().alongWith(Commands.print("stow")));
+    // xboxTest.leftBumper().toggleOnTrue(CatzAlgaePivot.Instance.AlgaePivot_Horizontal().alongWith(Commands.print("eat")));
+    // xboxTest.rightTrigger().onTrue(CatzAlgaeRemover.Instance.eatAlgae().alongWith(Commands.print("eating algae")));
+    // xboxTest.leftTrigger().onTrue(CatzAlgaeRemover.Instance.vomitAlgae().alongWith(Commands.print("vomiting algae")));
+    // xboxTest.rightStick().onTrue(CatzAlgaeRemover.Instance.stopAlgae().alongWith(Commands.print("stop algaeing")));
 
     // xboxTest.a().onTrue(outtake.startIntaking().alongWith(Commands.print("INTAKEKKKEEKKEKEKEING")));
     //xboxTest.b().onTrue(outtake.startOuttake().alongWith(Commands.print("INTAKEKKKEEKKEKEKEING")));
     //xboxTest.x().onTrue(outtake.stopOuttake().alongWith(Commands.print("INTAKEKKKEEKKEKEKEING")));
 
     // STOWING INTAKE RAMP FOR WHATEVER REASON
-    //xboxTest.start().toggleOnTrue(rampPivot.Ramp_Stow_Pos().alongWith(Commands.print("pressed start"))); //TBD
-    // xboxTest.a().toggleOnTrue(elevator.Elevator_Stow().alongWith(Commands.print("L1")));
-    // xboxTest.b().toggleOnTrue(elevator.Elevator_L2().alongWith(Commands.print("L2")));
-    // xboxTest.x().toggleOnTrue(elevator.Elevator_L3().alongWith(Commands.print("L3")));
-    // xboxTest.y().toggleOnTrue(elevator.Elevator_L4().alongWith(Commands.print("L4")));
+    //xboxTest.start().toggleOnTrue(CatzRampPivot.Instance.Ramp_Stow_Pos().alongWith(Commands.print("pressed start"))); //TBD
+    // xboxTest.a().toggleOnTrue(CatzElevator.Instance.Elevator_Stow().alongWith(Commands.print("L1")));
+    // xboxTest.b().toggleOnTrue(CatzElevator.Instance.Elevator_L2().alongWith(Commands.print("L2")));
+    // xboxTest.x().toggleOnTrue(CatzElevator.Instance.Elevator_L3().alongWith(Commands.print("L3")));
+    // xboxTest.y().toggleOnTrue(CatzElevator.Instance.Elevator_L4().alongWith(Commands.print("L4")));
 
-    // xboxTest.rightStick().onTrue(elevator.elevatorFullManual(()->xboxTest.getRightY()));
+    // xboxTest.rightStick().onTrue(CatzElevator.Instance.elevatorFullManual(()->xboxTest.getRightY()));
 
-    xboxTest.rightStick().onTrue(climb.ClimbManualMode(() -> xboxTest.getLeftY()*5).alongWith(Commands.print("Using manual ramp pivot")));
-    xboxTest.rightStick().onFalse(climb.ClimbManualMode(()-> 0.0).alongWith(Commands.print("Nah - pivot motor")));
+    xboxTest.rightStick().onTrue(CatzClimb.Instance.ClimbManualMode(() -> xboxTest.getLeftY()*5).alongWith(Commands.print("Using manual ramp pivot")));
 
     // Climb
-    // xboxTest.back().and(xboxTest.b()).onTrue(CatzStateCommands.climb(this).alongWith(Commands.print("climb mode"))); // Setup Climb
-    // xboxTest.back().and(xboxTest.x()).onTrue(climb.fullClimb());
-    // xboxTest.back().and(xboxTest.start()).onTrue(climb.ClimbManualMode(()->0.0).alongWith(Commands.print("climb manual")));
+    // xboxTest.back().and(xboxTest.b()).onTrue(CatzStateCommands.CatzClimb.Instance(this).alongWith(Commands.print("CatzClimb.Instance mode"))); // Setup Climb
+    // xboxTest.back().and(xboxTest.x()).onTrue(CatzClimb.Instance.fullClimb());
+    // xboxTest.back().and(xboxTest.start()).onTrue(CatzClimb.Instance.ClimbManualMode(()->0.0).alongWith(Commands.print("CatzClimb.Instance manual")));
     // // Manual Climb Control
-    // xboxTest.back().and(xboxTest.leftStick()).onTrue(climb.ClimbManualMode(() -> xboxTest.getLeftY()).alongWith(Commands.print("Using manual climb")));
+    // xboxTest.back().and(xboxTest.leftStick()).onTrue(CatzClimb.Instance.ClimbManualMode(() -> xboxTest.getLeftY()).alongWith(Commands.print("Using manual CatzClimb.Instance")));
 
     // Climb SetPosition Control
-    // xboxTest.y().toggleOnTrue(climb.Climb_Retract().alongWith(Commands.print("pressed y")));
-    // xboxTest.x().toggleOnTrue(climb.Climb_Home().alongWith(Commands.print("pressed x")));
-    // xboxTest.b().toggleOnTrue(climb.Climb_Full().alongWith(Commands.print("pressed b")));
+    // xboxTest.y().toggleOnTrue(CatzClimb.Instance.Climb_Retract().alongWith(Commands.print("pressed y")));
+    // xboxTest.x().toggleOnTrue(CatzClimb.Instance.Climb_Home().alongWith(Commands.print("pressed x")));
+    // xboxTest.b().toggleOnTrue(CatzClimb.Instance.Climb_Full().alongWith(Commands.print("pressed b")));
 
-    // xboxTest.x().toggleOnTrue(rampPivot.Ramp_Stow().alongWith(Commands.print("pressed x"))); //TBD
-    // xboxTest.b().toggleOnTrue(rampPivot.Ramp_Climb().alongWith(Commands.print("pressed b"))); //TBD
-    // xboxTest.a().toggleOnTrue(rampPivot.Ramp_Intake().alongWith(Commands.print("pressed a")));
+    // xboxTest.x().toggleOnTrue(CatzRampPivot.Instance.Ramp_Stow().alongWith(Commands.print("pressed x"))); //TBD
+    // xboxTest.b().toggleOnTrue(CatzRampPivot.Instance.Ramp_Climb().alongWith(Commands.print("pressed b"))); //TBD
+    // xboxTest.a().toggleOnTrue(CatzRampPivot.Instance.Ramp_Intake().alongWith(Commands.print("pressed a")));
 
     // Manual Elevator Control
     Trigger leftJoystickTrigger = new Trigger(
@@ -330,12 +248,12 @@ public class RobotContainer {
     Trigger rightJoystickTrigger = new Trigger(
       () -> Math.abs(xboxTest.getRightY()) > 0.1);
 
-    leftJoystickTrigger.onTrue(rampPivot.rampPivotManual(() -> xboxTest.getLeftY()).alongWith(Commands.print("Using manual ramp pivot")));
-    leftJoystickTrigger.onFalse(rampPivot.rampPivotManual(()-> 0.0).alongWith(Commands.print("Nah - ramp motor")));
+    leftJoystickTrigger.onTrue(CatzRampPivot.Instance.rampPivotManual(() -> xboxTest.getLeftY()).alongWith(Commands.print("Using manual ramp pivot")));
+    leftJoystickTrigger.onFalse(CatzRampPivot.Instance.rampPivotManual(()-> 0.0).alongWith(Commands.print("Nah - ramp motor")));
 
-    //climb.ClimbManualMode(
-    // rightJoystickTrigger.onTrue(climb.ClimbManualMode(() -> xboxTest.getRightY()).alongWith(Commands.print("Using manual climb")));
-    // rightJoystickTrigger.onFalse(climb.ClimbManualMode(()-> 0.0).alongWith(Commands.print("Nah - climb motor")));
+    //CatzClimb.Instance.ClimbManualMode(
+    // rightJoystickTrigger.onTrue(CatzClimb.Instance.ClimbManualMode(() -> xboxTest.getRightY()).alongWith(Commands.print("Using manual CatzClimb.Instance")));
+    // rightJoystickTrigger.onFalse(CatzClimb.Instance.ClimbManualMode(()-> 0.0).alongWith(Commands.print("Nah - CatzClimb.Instance motor")));
 
   }
 
@@ -369,7 +287,7 @@ public class RobotContainer {
       new InstantCommand(() ->xboxDrv.getHID().setRumble(RumbleType.kBothRumble, strength)),
       new WaitCommand(duration),
       new InstantCommand(() ->xboxDrv.getHID().setRumble(RumbleType.kBothRumble, 0.0))
-    );
+    ).finallyDo(()->xboxDrv.getHID().setRumble(RumbleType.kBothRumble, 0.0));
   }
 
   public Command rumbleAuxController(double strength, double duration){
@@ -403,61 +321,17 @@ public class RobotContainer {
 
   }
 
+  public Command getAutonomousCommand(){
+    return CatzAutonomous.Instance.getCommand();
+  }
+
+  public CommandXboxController getXboxAux(){
+    return xboxAux;
+  }
 
   // ---------------------------------------------------------------------------
   //
   //      Subsystem getters
   //
   // ---------------------------------------------------------------------------
-  public CatzDrivetrain getCatzDrivetrain() {
-    return drive;
-  }
-
-  public CatzAlgaeRemover getCatzAlgaeRemover() {
-    return algaeRemover;
-  }
-
-  public CatzElevator getCatzElevator() {
-    return elevator;
-  }
-
-  public CatzClimb getCatzClimb() {
-    return climb;
-  }
-
-  public CatzOuttake getCatzOuttake() {
-    return outtake;
-  }
-
-  public Command getAutonomousCommand() {
-    return auto.getCommand();
-  }
-
-  public CatzAutonomous getAutonomous(){
-    return auto;
-  }
-
-  public TeleopPosSelector getSelector(){
-    return selector;
-  }
-
-  public CatzAlgaePivot getAlgaePivot(){
-    return algaePivot;
-  }
-
-  public CatzVision getCatzVision() {
-    return vision;
-  }
-
-  public CatzRampPivot getCatzRampPivot() {
-    return rampPivot;
-  }
-
-  public CatzIntakeRollers getIntakeRollers() {
-    return intakeRollers;
-  }
-
-  public CatzSuperstructure getSuperstructure(){
-    return superstructure;
-  }
 }

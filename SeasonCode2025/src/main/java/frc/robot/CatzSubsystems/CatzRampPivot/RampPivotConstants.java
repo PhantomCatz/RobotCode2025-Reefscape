@@ -1,14 +1,3 @@
-//------------------------------------------------------------------------------------
-// 2025 FRC 2637
-// https://github.com/PhantomCatz
-//
-// Use of this source code is governed by an MIT-style
-// license that can be found in the LICENSE file at
-// the root directory of this project. 
-//
-//        "6 hours of debugging can save you 5 minutes of reading documentation."
-//
-//------------------------------------------------------------------------------------
 package frc.robot.CatzSubsystems.CatzRampPivot;
 
 import frc.robot.CatzConstants;
@@ -26,7 +15,7 @@ public class RampPivotConstants {
     public static final int STALL_CURRENT_LIMIT = 30; //TODO
 
     public static final double RAMP_STOW = 0.0;
-    public static final double RAMP_INTAKE = 3.0;//7.5;//2.240625;//1.536;//2.240625;//4.9; // 0.536
+    public static final double RAMP_INTAKE = 5.07;//7.5;//2.240625;//1.536;//2.240625;//4.9; // 0.536
 
     public static final double RAMP_CLIMB = 34.810546;
     public static final double RAMP_L1_SCORE = 20.0;

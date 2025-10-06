@@ -1,10 +1,10 @@
 plugins {
-    id "java"
-    id "edu.wpi.first.GradleRIO" version "2025.3.2"
-    id "com.peterabeles.gversion" version "1.10"
-    id "com.diffplug.spotless" version "6.25.0"
-    id "io.freefair.lombok" version "8.4"
-    id "com.google.protobuf" version "0.9.4"
+    id 'java'
+    id 'edu.wpi.first.GradleRIO' version '2025.3.2'
+    id 'com.peterabeles.gversion' version '1.10'
+    id 'com.diffplug.spotless' version '6.25.0'
+    id 'io.freefair.lombok' version '8.4'
+    id 'com.google.protobuf' version '0.9.4'
 }
 
 def grpcVersion = '1.61.0' // Update this to the latest version
@@ -21,7 +21,7 @@ protobuf {
     }
     generateProtoTasks {
         all()*.plugins {
-            grpc {}
+            grpc { }
         }
     }
 }
@@ -40,7 +40,7 @@ java {
     targetCompatibility = JavaVersion.VERSION_17
 }
 
-def ROBOT_MAIN_CLASS = "frc.robot.Main"
+def ROBOT_MAIN_CLASS = 'frc.robot.Main'
 
 // Define my targets (RoboRIO) and artifacts (deployable files)
 // This is added by GradleRIO's backing project DeployUtils.
@@ -59,15 +59,25 @@ deploy {
                 // getTargetTypeClass is a shortcut to get the class type using a string
 
                 frcJava(getArtifactTypeClass('FRCJavaArtifact')) {
-                    jvmArgs.add("-XX:+UnlockExperimentalVMOptions")
-                    jvmArgs.add("-XX:GCTimeRatio=5")
-                    jvmArgs.add("-XX:+UseSerialGC")
-                    jvmArgs.add("-XX:MaxGCPauseMillis=50")
+                    jvmArgs.add('-XX:+UnlockExperimentalVMOptions')
+                    jvmArgs.add('-XX:GCTimeRatio=5')
+                    jvmArgs.add('-XX:+UseSerialGC')
+                    jvmArgs.add('-XX:MaxGCPauseMillis=50')
 
-                    final MAX_JAVA_HEAP_SIZE_MB = 100;
-                    jvmArgs.add("-Xmx" + MAX_JAVA_HEAP_SIZE_MB + "M")
-                    jvmArgs.add("-Xms" + MAX_JAVA_HEAP_SIZE_MB + "M")
-                    jvmArgs.add("-XX:+AlwaysPreTouch")
+                    final MAX_JAVA_HEAP_SIZE_MB = 100
+                    jvmArgs.add('-Xmx' + MAX_JAVA_HEAP_SIZE_MB + 'M')
+                    jvmArgs.add('-Xms' + MAX_JAVA_HEAP_SIZE_MB + 'M')
+                    jvmArgs.add('-XX:+AlwaysPreTouch')
+
+                    jvmArgs.add('-XX:+HeapDumpOnOutOfMemoryError')
+                    jvmArgs.add('-XX:HeapDumpPath=/u/frc-usercode.hprof')
+
+                    jvmArgs.add('-Dcom.sun.management.jmxremote=true')
+                    jvmArgs.add('-Dcom.sun.management.jmxremote.port=1198')
+                    jvmArgs.add('-Dcom.sun.management.jmxremote.local.only=false')
+                    jvmArgs.add('-Dcom.sun.management.jmxremote.ssl=false')
+                    jvmArgs.add('-Dcom.sun.management.jmxremote.authenticate=false')
+                    jvmArgs.add('-Djava.rmi.server.hostname=172.22.11.2')
                 }
 
                 // Static files artifact
@@ -91,7 +101,7 @@ def includeDesktopSupport = true
 
 // Configuration for AdvantageKit
 task(replayWatch, type: JavaExec) {
-    mainClass = "org.littletonrobotics.junction.ReplayWatch"
+    mainClass = 'org.littletonrobotics.junction.ReplayWatch'
     classpath = sourceSets.main.runtimeClasspath
 }
 
@@ -122,13 +132,13 @@ dependencies {
     implementation "io.grpc:grpc-protobuf:${grpcVersion}"
     implementation "io.grpc:grpc-services:${grpcVersion}"
     implementation "io.grpc:grpc-stub:${grpcVersion}"
-    implementation "javax.annotation:javax.annotation-api:1.3.2"
+    implementation 'javax.annotation:javax.annotation-api:1.3.2'
     runtimeOnly "io.grpc:grpc-netty-shaded:${grpcVersion}"
-    implementation "com.google.guava:guava:31.1-jre"
+    implementation 'com.google.guava:guava:31.1-jre'
 
     implementation 'gov.nist.math:jama:1.0.3'
 
-    def akitJson = new groovy.json.JsonSlurper().parseText(new File(projectDir.getAbsolutePath() + "/vendordeps/AdvantageKit.json").text)
+    def akitJson = new groovy.json.JsonSlurper().parseText(new File(projectDir.getAbsolutePath() + '/vendordeps/AdvantageKit.json').text)
     annotationProcessor "org.littletonrobotics.akit:akit-autolog:$akitJson.version"
 }
 
@@ -173,19 +183,19 @@ tasks.withType(JavaCompile) {
 // Create version file
 project.compileJava.dependsOn(createVersionFile)
 gversion {
-    srcDir       = "src/main/java/"
-    classPackage = "frc.robot"
-    className    = "BuildConstants"
-    dateFormat   = "yyyy-MM-dd HH:mm:ss z"
-    timeZone     = "America/New_York"
-    indent       = "  "
+    srcDir       = 'src/main/java/'
+    classPackage = 'frc.robot'
+    className    = 'BuildConstants'
+    dateFormat   = 'yyyy-MM-dd HH:mm:ss z'
+    timeZone     = 'America/New_York'
+    indent       = '  '
 }
 
 // Create commit with working changes on event branches
 task(eventDeploy) {
     doLast {
-        if (project.gradle.startParameter.taskNames.any({ it.toLowerCase().contains("deploy") })) {
-            def branchPrefix = "event"
+        if (project.gradle.startParameter.taskNames.any({ it.toLowerCase().contains('deploy') })) {
+            def branchPrefix = 'event'
             def branch = 'git branch --show-current'.execute().text.trim()
             def commitMessage = "Update at '${new Date().toString()}'"
 
@@ -205,10 +215,10 @@ task(eventDeploy) {
                 println "Committed to branch: '$branch'"
                 println "Commit message: '$commitMessage'"
             } else {
-                println "Not on an event branch, skipping commit"
+                println 'Not on an event branch, skipping commit'
             }
         } else {
-            println "Not running deploy task, skipping commit"
+            println 'Not running deploy task, skipping commit'
         }
     }
 }
@@ -218,21 +228,20 @@ createVersionFile.dependsOn(eventDeploy)
 project.compileJava.dependsOn(spotlessApply)
 spotless {
     java {
-        target fileTree(".") {
-            include "src/**/*.java"
-            exclude "**/build/**", "**/build-*/**", "src/main/java/frc/robot/BuildConstants.java", "**.vscode/launch.json**"
+        target fileTree('.') {
+            include 'src/**/*.java'
+            exclude '**/build/**', '**/build-*/**', 'src/main/java/frc/robot/BuildConstants.java', '**.vscode/launch.json**'
         }
         toggleOffOn()
-        removeUnusedImports()
         trimTrailingWhitespace()
         endWithNewline()
-        licenseHeader("//------------------------------------------------------------------------------------\n// 2025 FRC 2637\n// https://github.com/PhantomCatz\n//\n// Use of this source code is governed by an MIT-style\n// license that can be found in the LICENSE file at\n// the root directory of this project. \n//\n//        \"6 hours of debugging can save you 5 minutes of reading documentation.\"\n//\n//------------------------------------------------------------------------------------")
+        licenseHeader('')
         //licenseHeader("//\n//        \"6 hours of debugging can save you 5 minutes of reading documentation.\"\n//\n//------------------------------------------------------------------------------------")
     }
     groovyGradle {
-        target fileTree(".") {
-            include "**/*.gradle"
-            exclude "**/build/**", "**/build-*/**", "**.vscode/launch.json**"
+        target fileTree('.') {
+            include '**/*.gradle'
+            exclude '**/build/**', '**/build-*/**', '**.vscode/launch.json**'
         }
         greclipse()
         indentWithSpaces(4)
@@ -240,16 +249,16 @@ spotless {
         endWithNewline()
     }
     json {
-        target fileTree(".") {
-            include "**/*.json"
-            exclude "**/build/**", "**/build-*/**", "**.vscode/launch.json**"
+        target fileTree('.') {
+            include '**/*.json'
+            exclude '**/build/**', '**/build-*/**', '**.vscode/launch.json**'
         }
         gson().indentWithSpaces(2)
     }
-    format "misc", {
-        target fileTree(".") {
-            include "**/*.md", "**/.gitignore"
-            exclude "**/build/**", "**/build-*/**", "**.vscode/launch.json**"
+    format 'misc', {
+        target fileTree('.') {
+            include '**/*.md', '**/.gitignore'
+            exclude '**/build/**', '**/build-*/**', '**.vscode/launch.json**'
         }
         trimTrailingWhitespace()
         indentWithSpaces(2)

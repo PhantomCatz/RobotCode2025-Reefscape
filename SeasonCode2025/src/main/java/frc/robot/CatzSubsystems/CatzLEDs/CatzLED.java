@@ -1,14 +1,3 @@
-//------------------------------------------------------------------------------------
-// 2025 FRC 2637
-// https://github.com/PhantomCatz
-//
-// Use of this source code is governed by an MIT-style
-// license that can be found in the LICENSE file at
-// the root directory of this project. 
-//
-//        "6 hours of debugging can save you 5 minutes of reading documentation."
-//
-//------------------------------------------------------------------------------------
 package frc.robot.CatzSubsystems.CatzLEDs;
 
 import edu.wpi.first.math.MathUtil;
@@ -21,6 +10,7 @@ import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.util.Color;
 import frc.robot.CatzSubsystems.CatzSuperstructure;
 import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.CatzRobotTracker;
+import frc.robot.CatzSubsystems.CatzOuttake.CatzOuttake;
 import frc.robot.CatzSubsystems.CatzSuperstructure.CoralState;
 import frc.robot.CatzSubsystems.CatzSuperstructure.Gamepiece;
 import frc.robot.Utilities.VirtualSubsystem;
@@ -33,14 +23,7 @@ import java.util.Optional;
 import org.littletonrobotics.junction.AutoLogOutput;
 
 public class CatzLED extends VirtualSubsystem {
-  private static CatzLED instance = null;
-
-  public static CatzLED getInstance() {
-    if (instance == null) {
-      instance = new CatzLED();
-    }
-    return instance;
-  }
+  public static final CatzLED Instance = new CatzLED();
 
   // ----------------------------------------------------------------------------------------------
   // Robot state LED tracking
@@ -209,7 +192,7 @@ public class CatzLED extends VirtualSubsystem {
       }
       // MODE AUTON
     } else if (DriverStation.isAutonomous()) {
-      double timeLeft = CatzRobotTracker.getInstance().getCoralStationTrajectoryRemaining();
+      double timeLeft = CatzRobotTracker.Instance.getCoralStationTrajectoryRemaining();
       // count down to coral drop time with in half second intervals. Drop right when it turns green. If there is more than 1 second white.
       setSolidElevatorColor(autonCountdownColors[(int) Math.max(Math.min(Math.ceil((timeLeft-coralThrowTime)/0.5), 3.0), 0.0)]);
       // MODE ENABLED
@@ -226,7 +209,7 @@ public class CatzLED extends VirtualSubsystem {
           }
         break;
         case NBA:
-          if(!CatzRobotTracker.getInstance().isReachedGoal()) {
+          if(!CatzRobotTracker.Instance.isReachedGoal()) {
             wave(Color.kRed, Color.kBlack, waveFastCycleLength, waveFastDuration);
           } else {
             bigBubble((int) ((Timer.getFPGATimestamp() / bubbleTime) * LED_Sidebar_End_RT), 4, 10, Color.kWhite);

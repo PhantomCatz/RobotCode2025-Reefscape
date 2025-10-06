@@ -3,16 +3,16 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 1.6543032786885246,
-        "y": 0.722387295081968
+        "x": 1.4984631147540983,
+        "y": 0.5545594262295083
       },
       "prevControl": null,
       "nextControl": {
-        "x": 2.8539032244458684,
-        "y": 0.9821411768480334
+        "x": 2.698063060511443,
+        "y": 0.8143133079955736
       },
       "isLocked": false,
-      "linkedName": "Lower Station"
+      "linkedName": "TiltedLowerStation"
     },
     {
       "anchor": {
@@ -32,11 +32,11 @@
     },
     {
       "anchor": {
-        "x": 5.790061475409836,
+        "x": 5.84,
         "y": 4.186834016393442
       },
       "prevControl": {
-        "x": 6.3135949470957415,
+        "x": 6.363533471685906,
         "y": 3.3581214744637746
       },
       "nextControl": null,
@@ -49,10 +49,10 @@
   "pointTowardsZones": [],
   "eventMarkers": [],
   "globalConstraints": {
-    "maxVelocity": 17.0,
-    "maxAcceleration": 16.5,
-    "maxAngularVelocity": 600.0,
-    "maxAngularAcceleration": 60.0,
+    "maxVelocity": 4.3,
+    "maxAcceleration": 5.5,
+    "maxAngularVelocity": 540.0,
+    "maxAngularAcceleration": 720.0,
     "nominalVoltage": 12.0,
     "unlimited": false
   },
@@ -64,7 +64,7 @@
   "folder": "L4 H Paths",
   "idealStartingState": {
     "velocity": 0,
-    "rotation": 53.8
+    "rotation": 52.52382043863866
   },
   "useDefaultConstraints": true
 }

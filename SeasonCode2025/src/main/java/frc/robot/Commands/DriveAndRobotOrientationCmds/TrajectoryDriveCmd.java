@@ -1,14 +1,3 @@
-//------------------------------------------------------------------------------------
-// 2025 FRC 2637
-// https://github.com/PhantomCatz
-//
-// Use of this source code is governed by an MIT-style
-// license that can be found in the LICENSE file at
-// the root directory of this project. 
-//
-//        "6 hours of debugging can save you 5 minutes of reading documentation."
-//
-//------------------------------------------------------------------------------------
 package frc.robot.Commands.DriveAndRobotOrientationCmds;
 
 import com.pathplanner.lib.path.PathPlannerPath;
@@ -27,10 +16,10 @@ import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.FieldConstants;
 import frc.robot.Robot;
-import frc.robot.RobotContainer;
 import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.CatzRobotTracker;
 import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.Drivetrain.CatzDrivetrain;
 import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.Drivetrain.DriveConstants;
+import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.Vision.CatzVision;
 import frc.robot.Utilities.AllianceFlipUtil;
 
 import java.util.List;
@@ -52,20 +41,15 @@ import org.littletonrobotics.junction.Logger;
 public class TrajectoryDriveCmd extends Command {
   // Trajectory constants
   public static final double ALLOWABLE_POSE_ERROR = 0.05;
-  public static final double ALLOWABLE_AUTOAIM_ERROR = 0.025;
-  public static final double ALLOWABLE_ROTATION_ERROR = 3.0;
+  public static final double ALLOWABLE_AUTOAIM_ERROR = 0.018;
+  public static final double ALLOWABLE_ROTATION_ERROR = 1.5;
   public static final double ALLOWABLE_VEL_ERROR = 0.80; // m/s
   public static final double ALLOWABLE_OMEGA_ERROR = 10.0;
-  private static final double TIMEOUT_EXTRA = 2.0;
+  private static final double TIMEOUT_EXTRA = 1.0;
   private static final double CONVERGE_DISTANCE = 0.04;
   private static final double CONVERGE_ANGLE = 1.0;
   private static final double FACE_REEF_DIST = 2.0;
-  private final double ALLOWABLE_VISION_ADJUST = 2e-3; //TODO tune
-
-  // Subsystems
-  private CatzDrivetrain m_driveTrain;
-  private CatzRobotTracker tracker = CatzRobotTracker.getInstance();
-  private final RobotContainer container;
+  private final double ALLOWABLE_VISION_ADJUST = 4e-3; //TODO tune
 
   // Trajectory variables
   private HolonomicDriveController hocontroller;
@@ -86,43 +70,38 @@ public class TrajectoryDriveCmd extends Command {
 
   private boolean isBugged = false;
   private final boolean isTelop;
+  private Rotation2d startRot;
+
+  private final CatzDrivetrain drivetrain = CatzDrivetrain.Instance;
+  private final CatzRobotTracker tracker = CatzRobotTracker.Instance;
   // ---------------------------------------------------------------------------------------------
   //
   // Trajectory Drive Command Constructor
   //
   // ---------------------------------------------------------------------------------------------
-  public TrajectoryDriveCmd(PathPlannerPath newPath, CatzDrivetrain drivetrain, boolean autoalign, RobotContainer container, boolean isTeleop) {
+  public TrajectoryDriveCmd(PathPlannerPath newPath, boolean autoalign, boolean isTeleop) {
     this.path = newPath;
-    this.m_driveTrain = drivetrain;
     this.autoalign = autoalign;
-    this.container = container;
     this.isTelop = isTeleop;
-    addRequirements(m_driveTrain);
+
+    addRequirements(drivetrain);
   }
 
-  public TrajectoryDriveCmd(Supplier<PathPlannerPath> newPathSupplier, CatzDrivetrain drivetrain, boolean autoalign, RobotContainer container, boolean isTeleop) {
+  public TrajectoryDriveCmd(Supplier<PathPlannerPath> newPathSupplier, boolean autoalign, boolean isTeleop) {
     this.pathSupplier = newPathSupplier;
-    this.m_driveTrain = drivetrain;
     this.autoalign = autoalign;
-    this.container = container;
     this.isTelop = isTeleop;
-    addRequirements(m_driveTrain);
+
+    addRequirements(drivetrain);
   }
 
-  public void setPath(PathPlannerPath path){
-    this.path = path;
-  }
   private double prevTime;
   // ---------------------------------------------------------------------------------------------
   //
   // Initialize
   //
   // ---------------------------------------------------------------------------------------------
-  void printTime(String tag){
-    double curTime = Timer.getFPGATimestamp();
-    // System.out.println(tag + (curTime-prevTime));
-    prevTime = curTime;
-  }
+
   @Override
   public void initialize() {
     prevTime = Timer.getFPGATimestamp();
@@ -139,16 +118,7 @@ public class TrajectoryDriveCmd extends Command {
         usePath = path.flipPath();
       }
 
-      // Pose Reseting
-      if (Robot.isFirstPath && DriverStation.isAutonomous()) {
-        try {
-          tracker.resetPose(usePath.getStartingHolonomicPose().get());
-          Robot.isFirstPath = false;
-        } catch (NoSuchElementException e) {
-          e.printStackTrace();
-        }
-      }
-
+      startRot = tracker.getEstimatedPose().getRotation();
 
       // Collect current drive state
       ChassisSpeeds currentSpeeds = DriveConstants.SWERVE_KINEMATICS.toChassisSpeeds(tracker.getCurrentModuleStates());
@@ -242,7 +212,7 @@ public class TrajectoryDriveCmd extends Command {
     // Collect instananous variables
     double currentTime = timer.get();
     Pose2d currentPose = tracker.getEstimatedPose();
-    // ChassisSpeeds currentSpeeds = DriveConstants.SWERVE_KINEMATICS.toChassisSpeeds(m_driveTrain.getModuleStates());
+    // ChassisSpeeds currentSpeeds = DriveConstants.SWERVE_KINEMATICS.toChassisSpeeds(drivetrain.getModuleStates());
     // double currentVel = Math.hypot(currentSpeeds.vxMetersPerSecond, currentSpeeds.vyMetersPerSecond);
 
     // -------------------------------------------------------------------------------------
@@ -276,13 +246,18 @@ public class TrajectoryDriveCmd extends Command {
     // }else{
     // }
 
+    //TODO? only do this with trajectory follow with accuracy
     adjustedSpeeds = applyCusp(adjustedSpeeds, translationError, endRotation.minus(currentPose.getRotation()).getDegrees(), CONVERGE_DISTANCE, CONVERGE_ANGLE);
 
     // Logging
     Logger.recordOutput("CatzRobotTracker/Desired Auto Pose", goal.pose);
 
+    // if(Math.abs(startRot.minus(endRotation).getDegrees()) < 1){
+    //   adjustedSpeeds = new ChassisSpeeds(adjustedSpeeds.vxMetersPerSecond, adjustedSpeeds.vyMetersPerSecond, 0.0);
+    // }
+
     // send to drivetrain
-    m_driveTrain.drive(adjustedSpeeds);
+    drivetrain.drive(adjustedSpeeds);
 
     double currentPosX = tracker.getEstimatedPose().getX();
     double currentPosY = tracker.getEstimatedPose().getY();
@@ -295,9 +270,9 @@ public class TrajectoryDriveCmd extends Command {
 
     translationError = Math.hypot(xError, yError);
 
-    m_driveTrain.setDistanceError(translationError);
+    drivetrain.setDistanceError(translationError);
 
-    CatzRobotTracker.getInstance().setCoralStationTrajectoryRemaining(trajectory.getTotalTimeSeconds()-currentTime);
+    tracker.setCoralStationTrajectoryRemaining(trajectory.getTotalTimeSeconds()-currentTime);
 
     // Logging
     // debugLogsTrajectory();
@@ -318,8 +293,8 @@ public class TrajectoryDriveCmd extends Command {
     System.out.println("trajectory done");
 
     timer.stop(); // Stop timer
-    m_driveTrain.stopDriving();
-    m_driveTrain.drive(new ChassisSpeeds());
+    drivetrain.stopDriving();
+    drivetrain.drive(new ChassisSpeeds());
     Logger.recordOutput("CatzRobotTracker/Desired Auto Pose", new Pose2d());
 
     // PathPlannerAuto.currentPathName = "";
@@ -329,7 +304,7 @@ public class TrajectoryDriveCmd extends Command {
       System.out.println("OH NO I WAS INTERRUPTED HOW RUDE");
     }
 
-    m_driveTrain.setDistanceError(9999999.9);
+    drivetrain.setDistanceError(9999999.9);
   }
 
 
@@ -351,7 +326,7 @@ public class TrajectoryDriveCmd extends Command {
     }
 
     System.out.println("vision: " + tracker.getVisionPoseShift().getNorm());
-    if (container.getCatzVision().isSeeingApriltag() && autoalign && tracker.getVisionPoseShift().getNorm() > ALLOWABLE_VISION_ADJUST) {
+    if (CatzVision.Instance.isSeeingApriltag() && autoalign && tracker.getVisionPoseShift().getNorm() > ALLOWABLE_VISION_ADJUST) {
       // If trailing pose is within margin
       System.out.println("not visioning");
       return false;
@@ -408,7 +383,7 @@ public class TrajectoryDriveCmd extends Command {
     // System.out.println("omegaerr: " + (currentRPS));
     // System.out.println("speederr: " + (currentMPS));
 
-    CatzRobotTracker.getInstance().setReachedGoal(isPoseWithinThreshold(poseError));
+    CatzRobotTracker.Instance.setReachedGoal(isPoseWithinThreshold(poseError));
 
     return isPoseWithinThreshold(poseError) && rotationError < ALLOWABLE_ROTATION_ERROR &&
     (desiredMPS != 0.0 || (currentMPS < ALLOWABLE_VEL_ERROR && currentRPS < ALLOWABLE_OMEGA_ERROR));

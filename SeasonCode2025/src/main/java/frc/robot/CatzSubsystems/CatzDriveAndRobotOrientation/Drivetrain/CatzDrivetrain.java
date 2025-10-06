@@ -1,14 +1,3 @@
-//------------------------------------------------------------------------------------
-// 2025 FRC 2637
-// https://github.com/PhantomCatz
-//
-// Use of this source code is governed by an MIT-style
-// license that can be found in the LICENSE file at
-// the root directory of this project. 
-//
-//        "6 hours of debugging can save you 5 minutes of reading documentation."
-//
-//------------------------------------------------------------------------------------
 package frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.Drivetrain;
 
 import static frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.Drivetrain.DriveConstants.*;
@@ -16,13 +5,17 @@ import static frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.Drivetrain.D
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.pathplanner.lib.util.PathPlannerLogging;
 
+import choreo.auto.AutoTrajectory;
+import choreo.trajectory.SwerveSample;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Twist2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.wpilibj.*;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -32,7 +25,10 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.CatzConstants;
 import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.CatzRobotTracker;
 import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.CatzRobotTracker.OdometryObservation;
+import frc.robot.CatzSubsystems.CatzOuttake.CatzOuttake;
+import frc.robot.Commands.DriveAndRobotOrientationCmds.HolonomicDriveController;
 import frc.robot.Robot;
+import frc.robot.Autonomous.AutonConstants;
 import frc.robot.Utilities.Alert;
 import frc.robot.Utilities.EqualsUtil;
 import frc.robot.Utilities.SwerveSetpoint;
@@ -44,14 +40,16 @@ import org.littletonrobotics.junction.Logger;
 
 // Drive train subsystem for swerve drive implementation
 public class CatzDrivetrain extends SubsystemBase {
+  public static final CatzDrivetrain Instance = new CatzDrivetrain();
+
   private double distanceError = 999999.9; //meters
+
+  private Pose2d choreoGoal = new Pose2d();
+  private double choreoDistanceError = 9999999.9; //meters //set this to a high number initially just in case the trajectory thinks it's at goal as soon as it starts
 
   // Gyro input/output interface
   private final GyroIO gyroIO;
   private final GyroIOInputsAutoLogged gyroInputs = new GyroIOInputsAutoLogged();
-
-  // Position, odmetetry, and velocity estimator
-  private final CatzRobotTracker tracker = CatzRobotTracker.getInstance();
 
   // Alerts
   private final Alert gyroDisconnected;
@@ -66,6 +64,8 @@ public class CatzDrivetrain extends SubsystemBase {
   public final CatzSwerveModule LT_BACK_MODULE;
   public final CatzSwerveModule LT_FRNT_MODULE;
 
+  private HolonomicDriveController hoController = DriveConstants.getNewHolController();
+
   private SwerveSetpoint currentSetpoint =
       new SwerveSetpoint(
           new ChassisSpeeds(),
@@ -79,7 +79,7 @@ public class CatzDrivetrain extends SubsystemBase {
 
   private final Field2d field;
 
-  public CatzDrivetrain() {
+  private CatzDrivetrain() {
 
     // Gyro Instantiation
     switch (CatzConstants.hardwareMode) {
@@ -158,7 +158,7 @@ public class CatzDrivetrain extends SubsystemBase {
 
     Logger.recordOutput("Drive/DistanceError", distanceError);
 
-    pose = pose.interpolate(tracker.getEstimatedPose(), 0.05);
+    pose = pose.interpolate(CatzRobotTracker.Instance.getEstimatedPose(), 0.05);
     Logger.recordOutput("CatzRobotTracker/interlated pose", pose);
 
     // -----------------------------------------------------------------------------------------------------
@@ -193,7 +193,7 @@ public class CatzDrivetrain extends SubsystemBase {
                                                     gyroAngle2d,
                                                     Timer.getFPGATimestamp()
                                           );
-    CatzRobotTracker.getInstance().addOdometryObservation(observation);
+    CatzRobotTracker.Instance.addOdometryObservation(observation);
 
     // Update current velocities use gyro when possible
     Twist2d robotRelativeVelocity = getTwist2dSpeeds();
@@ -201,7 +201,7 @@ public class CatzDrivetrain extends SubsystemBase {
         gyroInputs.gyroConnected
             ? Math.toRadians(gyroInputs.gyroYawVel)
             : robotRelativeVelocity.dtheta;
-    CatzRobotTracker.getInstance().addVelocityData(robotRelativeVelocity);
+    CatzRobotTracker.Instance.addVelocityData(robotRelativeVelocity);
 
     // --------------------------------------------------------------
     // Logging
@@ -351,6 +351,14 @@ public class CatzDrivetrain extends SubsystemBase {
     }
   }
 
+  public boolean closeEnoughToRaiseElevator(){
+    return choreoDistanceError <= DriveConstants.PREDICT_DISTANCE_SCORE;
+  }
+
+  public boolean closeEnoughToStartIntake(){
+    return choreoDistanceError <= DriveConstants.PREDICT_DISTANCE_INTAKE;
+  }
+
   /** command to cancel running auto trajectories */
   public Command cancelTrajectory() {
     Command cancel = new InstantCommand();
@@ -362,6 +370,41 @@ public class CatzDrivetrain extends SubsystemBase {
     for (CatzSwerveModule module : m_swerveModules) {
       module.resetDriveEncs();
     }
+  }
+
+  /**
+   * Make sure to run this before every new trajectory
+   */
+  public void followChoreoTrajectoryInit(AutoTrajectory traj){
+    hoController = DriveConstants.getNewHolController();
+    choreoGoal = traj.getFinalPose().get();
+  }
+
+  /**
+   * This function only runs the "execute" portion of a command. Initialization and ending should be done elsewhere.
+   *
+   * @param sample
+   */
+  public void followChoreoTrajectoryExecute(SwerveSample sample){
+    Trajectory.State state = new Trajectory.State(
+      sample.t,
+      Math.hypot(sample.vx,sample.vy),
+      0.0,
+      new Pose2d(new Translation2d(sample.x, sample.y), Rotation2d.fromRadians(Math.atan2(sample.vy, sample.vx))),
+      0.0
+    );
+
+    Pose2d curPose = CatzRobotTracker.Instance.getEstimatedPose();
+    ChassisSpeeds adjustedSpeeds = hoController.calculate(curPose, state, Rotation2d.fromRadians(sample.heading));
+
+    choreoDistanceError = curPose.minus(choreoGoal).getTranslation().getNorm();
+
+    Logger.recordOutput("Target Auton Pose", new Pose2d(sample.x, sample.y, Rotation2d.fromRadians(sample.heading)));
+    drive(adjustedSpeeds);
+  }
+
+  public boolean isRobotAtPoseChoreo(){
+    return choreoDistanceError <= AutonConstants.ACCEPTABLE_DIST_METERS;
   }
 
   // -----------------------------------------------------------------------------------------------------------

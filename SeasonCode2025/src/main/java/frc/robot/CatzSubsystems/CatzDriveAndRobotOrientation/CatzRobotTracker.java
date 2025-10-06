@@ -1,14 +1,3 @@
-//------------------------------------------------------------------------------------
-// 2025 FRC 2637
-// https://github.com/PhantomCatz
-//
-// Use of this source code is governed by an MIT-style
-// license that can be found in the LICENSE file at
-// the root directory of this project. 
-//
-//        "6 hours of debugging can save you 5 minutes of reading documentation."
-//
-//------------------------------------------------------------------------------------
 package frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation;
 
 import edu.wpi.first.math.*;
@@ -24,6 +13,7 @@ import edu.wpi.first.wpilibj.DriverStation;
 import frc.robot.FieldConstants;
 import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.CatzRobotTracker.VisionObservation;
 import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.Drivetrain.DriveConstants;
+import frc.robot.CatzSubsystems.CatzOuttake.CatzOuttake;
 import frc.robot.Utilities.GeomUtil;
 
 import java.util.HashMap;
@@ -44,12 +34,7 @@ public class CatzRobotTracker {
   private static final Matrix<N3, N1> ODOMETRY_STD_DEVS =
       new Matrix<>(VecBuilder.fill(0.003, 0.003, 0.002));
 
-  private static CatzRobotTracker instance;
-
-  public static CatzRobotTracker getInstance() {
-    if (instance == null) instance = new CatzRobotTracker();
-    return instance;
-  }
+  public static final CatzRobotTracker Instance = new CatzRobotTracker();
 
   private static final Map<Integer, Pose2d> tagPoses2d = new HashMap<>();
 
@@ -75,8 +60,7 @@ public class CatzRobotTracker {
   private Pose2d odometryPose = new Pose2d();
 
   @Getter
-  @AutoLogOutput(key = "CatzRobotTracker/EstimatedPose")
-  private Pose2d estimatedPose = new Pose2d();
+  private Pose2d estimatedPose = new Pose2d(0, 0, Rotation2d.k180deg);
 
   @Getter
   @AutoLogOutput(key = "CatzRobotTracker/TxTyPose")
@@ -172,6 +156,8 @@ public class CatzRobotTracker {
             (chassisSpeeds.omegaRadiansPerSecond - m_lastChassisSpeeds.omegaRadiansPerSecond)
                 / observation.timestamp);
     m_lastChassisSpeeds = chassisSpeeds;
+
+    Logger.recordOutput("CatzRobotTracker/EstimatedPose", estimatedPose);
   } // end of addOdometryObservation
 
   /** Add Vision Observation */

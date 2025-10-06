@@ -1,14 +1,3 @@
-//------------------------------------------------------------------------------------
-// 2025 FRC 2637
-// https://github.com/PhantomCatz
-//
-// Use of this source code is governed by an MIT-style
-// license that can be found in the LICENSE file at
-// the root directory of this project. 
-//
-//        "6 hours of debugging can save you 5 minutes of reading documentation."
-//
-//------------------------------------------------------------------------------------
 package frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.Vision;
 
 import static frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.Vision.VisionConstants.*;
@@ -19,6 +8,7 @@ import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Alert.AlertType;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Robot;
 import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.CatzRobotTracker;
 import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.CatzRobotTracker.TxTyObservation;
 import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.CatzRobotTracker.VisionObservation;
@@ -33,13 +23,18 @@ import java.util.Map;
 import org.littletonrobotics.junction.Logger;
 
 public class CatzVision extends SubsystemBase {
+  public static final CatzVision Instance = new CatzVision(
+                                                new VisionIOLimelight("limelight-gyoza"),
+                                                new VisionIOLimelight("limelight-tempura")
+                                            );
+
   private final VisionIO[] io;
   private final VisionIOInputsAutoLogged[] inputs;
   private final Alert[] disconnectedAlerts;
 
   private PoseObservation[] poseObservations;
 
-  public CatzVision(VisionIO... io) {
+  private CatzVision(VisionIO... io) {
     this.io = io;
     // Initialize inputs
     this.inputs = new VisionIOInputsAutoLogged[io.length];
@@ -91,7 +86,7 @@ public class CatzVision extends SubsystemBase {
     List<Pose3d> allRobotPosesRejected = new LinkedList<>();
     Map<Integer, TxTyObservation> allTxTyObservations = new HashMap<>();
     Map<Integer, TxTyObservation> txTyObservations = new HashMap<>();
-    Pose2d robotPose = CatzRobotTracker.getInstance().getEstimatedPose();
+    Pose2d robotPose = CatzRobotTracker.Instance.getEstimatedPose();
 
     //------------------------------------------------------------------------------------------------------------------------------------
     // Get Global Pose observation data
@@ -147,7 +142,8 @@ public class CatzVision extends SubsystemBase {
                 || (observationPose.getY() < 0.0)
                 || (observationPose.getY() > aprilTagLayout.getFieldWidth()))
                 // Filter out megatag 1 observations
-                || (!VisionConstants.USE_MEGATAG1 && observation.type() == PoseObservationType.MEGATAG_1);
+                || (!VisionConstants.USE_MEGATAG1 && observation.type() == PoseObservationType.MEGATAG_1)
+                || observation.timestamp() < Robot.autoStart;
         // Add pose to log
         robotPoses.add(observationPose);
         if (rejectPose) {
@@ -165,7 +161,7 @@ public class CatzVision extends SubsystemBase {
         // Calculate standard deviations
         //------------------------------------------------------------------------------------------------------------------------------------
         double stdDevFactor = Math.pow(observation.averageTagDistance(), 2.0) / observation.tagCount(); //TODO tune
-      double linearStdDev = LINEAR_STD_DEV_BASELINE * stdDevFactor;
+        double linearStdDev = LINEAR_STD_DEV_BASELINE * stdDevFactor;
         double angularStdDev = ANGULAR_STD_DEV_BASELINE * stdDevFactor;
         if (observation.type() == PoseObservationType.MEGATAG_2) {
           linearStdDev *= LINEAR_STD_DEV_MEGATAG2_SCALE_FACTOR;
@@ -178,7 +174,7 @@ public class CatzVision extends SubsystemBase {
 
 
         // Send vision observation
-        CatzRobotTracker.getInstance()
+        CatzRobotTracker.Instance
             .addVisionObservation(
                 new VisionObservation(
                     inputs[cameraIndex].name,

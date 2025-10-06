@@ -1,14 +1,3 @@
-//------------------------------------------------------------------------------------
-// 2025 FRC 2637
-// https://github.com/PhantomCatz
-//
-// Use of this source code is governed by an MIT-style
-// license that can be found in the LICENSE file at
-// the root directory of this project. 
-//
-//        "6 hours of debugging can save you 5 minutes of reading documentation."
-//
-//------------------------------------------------------------------------------------
 package frc.robot.CatzSubsystems.CatzOuttake;
 
 import frc.robot.CatzConstants;
@@ -39,5 +28,5 @@ public class OuttakeConstants {
     static double INTAKE_SPD = 0.4;
     static double ADJ_SPD = 0.1;
     static double OUTTAKE_L1_RT = 0.05;
-    static double OUTTAKE_L1_LT = 0.4;
+    static double OUTTAKE_L1_LT = 0.25;
 }

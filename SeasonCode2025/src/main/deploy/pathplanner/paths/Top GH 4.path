@@ -3,45 +3,45 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 5.790061475409836,
+        "x": 5.84,
         "y": 4.186834016393442
       },
       "prevControl": null,
       "nextControl": {
-        "x": 6.3216828188812215,
-        "y": 5.621271355074895
+        "x": 8.930840163934425,
+        "y": 4.678329918032786
       },
       "isLocked": false,
       "linkedName": "Reef-H"
     },
     {
       "anchor": {
-        "x": 5.670184426229508,
-        "y": 7.219723360655737
+        "x": 5.84,
+        "y": 7.567366803278689
       },
       "prevControl": {
-        "x": 6.3961819945918705,
-        "y": 6.7688047914808624
+        "x": 7.313386512138291,
+        "y": 7.446540985382204
       },
       "nextControl": {
-        "x": 4.9000471313443805,
-        "y": 7.698057203923488
+        "x": 4.962909836065574,
+        "y": 7.639293032786885
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 2.0019467213114757,
-        "y": 7.399538934426229
+        "x": 1.846106557377049,
+        "y": 7.423514344262295
       },
       "prevControl": {
-        "x": 4.0997791301148325,
-        "y": 7.1026601419220246
+        "x": 3.967930327868852,
+        "y": 7.471465163934425
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": "Upper Station"
+      "linkedName": "TiltedUpperStation"
     }
   ],
   "rotationTargets": [],
@@ -50,7 +50,7 @@
   "eventMarkers": [],
   "globalConstraints": {
     "maxVelocity": 4.3,
-    "maxAcceleration": 4.3,
+    "maxAcceleration": 5.5,
     "maxAngularVelocity": 540.0,
     "maxAngularAcceleration": 720.0,
     "nominalVoltage": 12.0,
@@ -58,7 +58,7 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": -27.512002623851476
+    "rotation": -66.19405648154236
   },
   "reversed": false,
   "folder": "Top GH Paths",

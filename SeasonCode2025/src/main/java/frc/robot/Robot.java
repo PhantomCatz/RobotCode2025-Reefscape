@@ -1,29 +1,23 @@
-//------------------------------------------------------------------------------------
-// 2025 FRC 2637
-// https://github.com/PhantomCatz
-//
-// Use of this source code is governed by an MIT-style
-// license that can be found in the LICENSE file at
-// the root directory of this project. 
-//
-//        "6 hours of debugging can save you 5 minutes of reading documentation."
-//
-//------------------------------------------------------------------------------------
 package frc.robot;
 
 
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import frc.robot.Autonomous.AutoRoutineSelector;
 import frc.robot.CatzConstants.RobotHardwareMode;
 import frc.robot.CatzConstants.RobotID;
+import frc.robot.CatzSubsystems.CatzAlgaeEffector.CatzAlgaePivot.CatzAlgaePivot;
 import frc.robot.CatzSubsystems.CatzAlgaeEffector.CatzAlgaePivot.CatzAlgaePivot.AlgaePivotPosition;
 import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.CatzRobotTracker;
+import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.Vision.CatzVision;
 import frc.robot.CatzSubsystems.CatzLEDs.CatzLED;
 import frc.robot.CatzSubsystems.CatzLEDs.CatzLED.ControllerLEDState;
+import frc.robot.CatzSubsystems.CatzRampPivot.CatzRampPivot;
 import frc.robot.Utilities.Alert;
 import frc.robot.Utilities.Alert.AlertType;
 import frc.robot.Utilities.MotorUtil.NeutralMode;
@@ -52,7 +46,6 @@ public class Robot extends LoggedRobot {
   //  Essential Robot.java object declaration
   // --------------------------------------------------------------------------------------------------------------
   private Command m_autonomousCommand;
-  private RobotContainer m_robotContainer;
   private Optional<Alliance> alliance = Optional.empty();
 
   // -------------------------------------------------------------------------------------------------------------
@@ -72,7 +65,7 @@ public class Robot extends LoggedRobot {
 
   // Timer related variables
   private double teleStart;
-  private double autoStart;
+  public static double autoStart = 0.0;
   private boolean autoMessagePrinted;
   @Getter
   private static double teleElapsedTime = 0.0;
@@ -105,6 +98,9 @@ public class Robot extends LoggedRobot {
 
   // reset Position Logging
   public static boolean isResetPositionUsedInAuto = false;
+
+  private final RobotContainer container = RobotContainer.Instance;
+  private final CatzLED LED = CatzLED.Instance;
 
   // --------------------------------------------------------------------------------------------------------
   //
@@ -162,9 +158,6 @@ public class Robot extends LoggedRobot {
     // Start AdvantageKit logger //TODO enable this in autonomous and telop init for comp setting //
     // make advantage kit an on demand feature
     Logger.start();
-
-    // Instantiate robotContainer
-    m_robotContainer = new RobotContainer();
 
     // Log active commands
     Map<String, Integer> commandCounts = new HashMap<>();
@@ -234,6 +227,9 @@ public class Robot extends LoggedRobot {
     }
 
     DriverStation.silenceJoystickConnectionWarning(true);
+
+    SmartDashboard.putData("Auton Selector", AutoRoutineSelector.Instance.getAutoChooser());
+    // CommandScheduler.getInstance().setPeriod(CatzConstants.LOOP_TIME); //TODO should we add this?
   }
 
   @Override
@@ -259,16 +255,16 @@ public class Robot extends LoggedRobot {
               "*** Auto cancelled in %.2f secs ***%n", Timer.getFPGATimestamp() - autoStart);
         }
         autoMessagePrinted = true;
-        CatzLED.getInstance().autoFinishedTime = Timer.getFPGATimestamp();
+        LED.autoFinishedTime = Timer.getFPGATimestamp();
       }
     }
 
     //-------------------------------------------------------------------------------------------------
     // Robot container periodic methods
     //-------------------------------------------------------------------------------------------------
-    m_robotContainer.checkControllers();
-    m_robotContainer.updateDashboardOutputs();
-    m_robotContainer.updateAlerts();
+    container.checkControllers();
+    container.updateDashboardOutputs();
+    container.updateAlerts();
 
     //-------------------------------------------------------------------------------------------------
     // Check CAN status
@@ -295,7 +291,7 @@ public class Robot extends LoggedRobot {
     if (RobotController.getBatteryVoltage() <= LOW_BATTERY_VOLTAGE
         && DISABLED_TIMER.hasElapsed(LOW_BATTERY_DISABLED_TIME)) {
       LOW_BATTERY_ALERT.set(true);
-      CatzLED.getInstance().setControllerState(ControllerLEDState.lowBatteryAlert);
+      LED.setControllerState(ControllerLEDState.lowBatteryAlert);
     }
   }
 
@@ -306,7 +302,7 @@ public class Robot extends LoggedRobot {
   // --------------------------------------------------------------------------------------------------------
   @Override
   public void disabledInit() {
-    m_robotContainer.getCatzRampPivot().setNeutralMode(NeutralMode.COAST);
+    CatzRampPivot.Instance.setNeutralMode(NeutralMode.COAST);
     isResetPositionUsedInAuto = false;
   }
 
@@ -330,8 +326,8 @@ public class Robot extends LoggedRobot {
     garbageCollectionCounter++;
 
     // Checked leds
-    if(m_robotContainer.getCatzVision().getTagId(1) == 263 || m_robotContainer.getCatzVision().getTagId(0) == 263) {
-      CatzLED.getInstance().setControllerState(ControllerLEDState.ledChecked);
+    if(CatzVision.Instance.getTagId(1) == 263 || CatzVision.Instance.getTagId(0) == 263) {
+      LED.setControllerState(ControllerLEDState.ledChecked);
     }
   }
 
@@ -350,11 +346,11 @@ public class Robot extends LoggedRobot {
     isFirstPath = true;
     // deployment benchmark
     LAST_DEPLOYMENT_WARNING.set(true);
-    m_robotContainer.getCatzRampPivot().setNeutralMode(NeutralMode.BRAKE);
-    m_robotContainer.getAlgaePivot().setAlgaePivotPos(AlgaePivotPosition.STOW);
+    CatzRampPivot.Instance.setNeutralMode(NeutralMode.BRAKE);
+    CatzAlgaePivot.Instance.setAlgaePivotPos(AlgaePivotPosition.STOW);
     autoStart = Timer.getFPGATimestamp();
-    m_autonomousCommand = m_robotContainer.getAutonomousCommand();
-    m_robotContainer.getCatzRampPivot().Ramp_Intake_Pos().withTimeout(1.0);
+    m_autonomousCommand = AutoRoutineSelector.Instance.getSelectedCommand();
+    CatzRampPivot.Instance.Ramp_Intake_Pos().withTimeout(1.0);
     if (m_autonomousCommand != null) {
       m_autonomousCommand.schedule();
     }
@@ -380,25 +376,22 @@ public class Robot extends LoggedRobot {
     if (m_autonomousCommand != null) {
       m_autonomousCommand.cancel();
     } else {
-      m_robotContainer.getCatzRampPivot().Ramp_Intake_Pos().withTimeout(1.0);
+      CatzRampPivot.Instance.Ramp_Intake_Pos().withTimeout(1.0);
     }
 
 
 
     teleStart = Timer.getFPGATimestamp();
-    m_robotContainer.getCatzRampPivot().setNeutralMode(NeutralMode.BRAKE);
-    m_robotContainer.getAlgaePivot().setAlgaePivotPos(AlgaePivotPosition.STOW);
-    //CatzRobotTracker.getInstance().resetPose(m_robotContainer.getAutonomous().calculateReefPos(2, LeftRight.LEFT));
-    //For limelight error calculations CatzRobotTracker.getInstance().resetPose(FlippingUtil.flipFieldPose(new Pose2d(Reef.center.minus(new Translation2d(Units.inchesToMeters(32.305+14.5), 0)), Rotation2d.kZero)));
-    //CatzRobotTracker.getInstance().resetPose(new Pose2d());
+    CatzRampPivot.Instance.setNeutralMode(NeutralMode.BRAKE);
+    CatzAlgaePivot.Instance.setAlgaePivotPos(AlgaePivotPosition.STOW);
+    //CatzRobotTracker.Instance.resetPose(m_robotContainer.getAutonomous().calculateReefPos(2, LeftRight.LEFT));
+    //For limelight error calculations CatzRobotTracker.Instance.resetPose(FlippingUtil.flipFieldPose(new Pose2d(Reef.center.minus(new Translation2d(Units.inchesToMeters(32.305+14.5), 0)), Rotation2d.kZero)));
+    //CatzRobotTracker.Instance.resetPose(new Pose2d());
   }
 
   @Override
   public void teleopPeriodic() {
-
     teleElapsedTime = Timer.getFPGATimestamp() - teleStart;
-    m_robotContainer.getSelector().updateCurrentlySelected();
-
   }
 
   @Override
@@ -412,7 +405,7 @@ public class Robot extends LoggedRobot {
   @Override
   public void testInit() {
     CommandScheduler.getInstance().cancelAll();
-    CatzRobotTracker.getInstance().resetPose(m_robotContainer.getCatzVision().getPoseObservation()[0].pose().toPose2d());
+    CatzRobotTracker.Instance.resetPose(CatzVision.Instance.getPoseObservation()[0].pose().toPose2d());
   }
 
   @Override

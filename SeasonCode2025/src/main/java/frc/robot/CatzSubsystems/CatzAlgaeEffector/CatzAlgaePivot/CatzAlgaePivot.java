@@ -1,20 +1,10 @@
-//------------------------------------------------------------------------------------
-// 2025 FRC 2637
-// https://github.com/PhantomCatz
-//
-// Use of this source code is governed by an MIT-style
-// license that can be found in the LICENSE file at
-// the root directory of this project. 
-//
-//        "6 hours of debugging can save you 5 minutes of reading documentation."
-//
-//------------------------------------------------------------------------------------
 package frc.robot.CatzSubsystems.CatzAlgaeEffector.CatzAlgaePivot;
 
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.CatzConstants;
+import frc.robot.CatzSubsystems.CatzOuttake.CatzOuttake;
 import frc.robot.Utilities.LoggedTunableNumber;
 
 import static frc.robot.CatzSubsystems.CatzAlgaeEffector.CatzAlgaePivot.AlgaePivotConstants.*;
@@ -27,6 +17,7 @@ import lombok.RequiredArgsConstructor;
 import org.littletonrobotics.junction.Logger;
 
 public class CatzAlgaePivot extends SubsystemBase {
+  public static final CatzAlgaePivot Instance = new CatzAlgaePivot();
 
   private final AlgaePivotIO io;
   private final AlgaePivotIOInputsAutoLogged inputs = new AlgaePivotIOInputsAutoLogged();
@@ -43,6 +34,7 @@ public class CatzAlgaePivot extends SubsystemBase {
     HORIZONTAL(() -> -15.0), // TBD
     NetAlgae(() -> 60.0), // 80.0TBD
     MANUAL(() -> manualPow),
+    AlgaeBotTransition(() -> 20.112),
     BOTBOT(() -> -25.0),
     BOTTOP(() ->-15.0),
     PUNCH(() -> -12.0),
@@ -57,7 +49,7 @@ public class CatzAlgaePivot extends SubsystemBase {
     }
   }
 
-  public CatzAlgaePivot() {
+  private CatzAlgaePivot() {
     if(isAlgaePivotDisabled) { //Comes from Algae Pivot Constants
       io = new AlgaePivotIONull();
       System.out.println("Algae Pivot Unconfigured");
@@ -71,6 +63,10 @@ public class CatzAlgaePivot extends SubsystemBase {
           io = new AlgaePivotIOReal() {};
           System.out.println("Algae Pivot Configured for Replayed simulation");
         break;
+        case SIM:
+          io = new AlgaePivotIOSim() {};
+          System.out.println("Algae Pivot Configured for Simulation");
+          break;
         default:
           io = new AlgaePivotIONull();
           System.out.println("Algae Pivot Unconfigured");
@@ -198,6 +194,7 @@ public class CatzAlgaePivot extends SubsystemBase {
     return runOnce(() -> setAlgaePivotPos(AlgaePivotPosition.STOW));
   }
 
+
   public Command AlgaePivot_Horizontal() {
     return runOnce(() -> setAlgaePivotPos(AlgaePivotPosition.HORIZONTAL));
   }
@@ -210,6 +207,9 @@ public class CatzAlgaePivot extends SubsystemBase {
     return runOnce(() -> setAlgaePivotPos(AlgaePivotPosition.TUNNABLE));
   }
 
+  public Command Algae_Transition_Bot() {
+    return runOnce(() -> setAlgaePivotPos(AlgaePivotPosition.AlgaeBotTransition));
+  }
   public Command AlgaePivot_BotBot() {
     return runOnce(() -> setAlgaePivotPos(AlgaePivotPosition.BOTBOT));
   }

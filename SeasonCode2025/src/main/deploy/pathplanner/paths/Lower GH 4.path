@@ -3,41 +3,41 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 5.790061475409836,
-        "y": 4.186834016393442
+        "x": 5.84,
+        "y": 3.8511782786885242
       },
       "prevControl": null,
       "nextControl": {
-        "x": 5.896563507045867,
-        "y": 3.5752806274249513
+        "x": 7.5302663934426235,
+        "y": 3.8511782786885242
       },
       "isLocked": false,
-      "linkedName": "Reef-H"
+      "linkedName": "Reef-G"
     },
     {
       "anchor": {
-        "x": 5.694159836065573,
-        "y": 0.8542520491803282
+        "x": 6.952868852459017,
+        "y": 1.022079918032788
       },
       "prevControl": {
-        "x": 6.873362297441422,
-        "y": 1.6494876246266958
+        "x": 8.132071313834867,
+        "y": 1.8173154934791553
       },
       "nextControl": {
-        "x": 4.98369984881303,
-        "y": 0.37512901874228577
+        "x": 6.242408865206474,
+        "y": 0.5429568875947456
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 1.9779713114754096,
-        "y": 0.6864241803278684
+        "x": 1.4984631147540983,
+        "y": 0.5545594262295083
       },
       "prevControl": {
-        "x": 4.182517385697835,
-        "y": 0.8623658102119652
+        "x": 3.7030091889765235,
+        "y": 0.730501056113605
       },
       "nextControl": null,
       "isLocked": false,
@@ -50,7 +50,7 @@
   "eventMarkers": [],
   "globalConstraints": {
     "maxVelocity": 4.3,
-    "maxAcceleration": 4.3,
+    "maxAcceleration": 5.5,
     "maxAngularVelocity": 540.0,
     "maxAngularAcceleration": 720.0,
     "nominalVoltage": 12.0,
@@ -58,7 +58,7 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 14.931417178137481
+    "rotation": 52.52382043863866
   },
   "reversed": false,
   "folder": "Top GH Paths",

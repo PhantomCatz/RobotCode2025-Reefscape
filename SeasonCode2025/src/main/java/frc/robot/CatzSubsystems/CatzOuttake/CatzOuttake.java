@@ -1,14 +1,3 @@
-//------------------------------------------------------------------------------------
-// 2025 FRC 2637
-// https://github.com/PhantomCatz
-//
-// Use of this source code is governed by an MIT-style
-// license that can be found in the LICENSE file at
-// the root directory of this project. 
-//
-//        "6 hours of debugging can save you 5 minutes of reading documentation."
-//
-//------------------------------------------------------------------------------------
 package frc.robot.CatzSubsystems.CatzOuttake;
 import static frc.robot.CatzSubsystems.CatzOuttake.OuttakeConstants.*;
 
@@ -18,6 +7,7 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.CatzConstants;
 import frc.robot.RobotContainer;
+import frc.robot.TeleopPosSelector;
 import frc.robot.CatzSubsystems.CatzSuperstructure;
 import frc.robot.CatzSubsystems.CatzSuperstructure.CoralState;
 import lombok.Getter;
@@ -26,6 +16,7 @@ import lombok.Setter;
 import org.littletonrobotics.junction.Logger;
 
 public class CatzOuttake extends SubsystemBase {
+  public static final CatzOuttake Instance = new CatzOuttake();
 
   private final OuttakeIO io;
   private final OuttakeIOInputsAutoLogged inputs = new OuttakeIOInputsAutoLogged();
@@ -48,8 +39,7 @@ public class CatzOuttake extends SubsystemBase {
   public static outtakeStates currentState = outtakeStates.STOP;
   private outtakeStates previousState = outtakeStates.STOP;
 
-  public CatzOuttake(RobotContainer container) {
-    this.container = container;
+  private CatzOuttake() {
     if(isOuttakeDisabled) {
       io = new OuttakeIONull();
       System.out.println("Outtake Unconfigured");
@@ -78,11 +68,11 @@ public class CatzOuttake extends SubsystemBase {
    * @return
    */
   public boolean isDesiredCoralState(boolean isOuttaking){
-    if (container.getSelector().useFakeCoral){
+    if (TeleopPosSelector.Instance.useFakeCoral){
       if(isOuttaking){
-        return !container.getSelector().hasCoralSIM;
+        return !TeleopPosSelector.Instance.hasCoralSIM;
       }else{
-        return container.getSelector().hasCoralSIM;
+        return TeleopPosSelector.Instance.hasCoralSIM;
       }
     } else {
       boolean inOuttake = (inputs.bbreakBackTriggered || inputs.bbreakFrntTriggered);
@@ -166,7 +156,7 @@ public class CatzOuttake extends SubsystemBase {
     if(inputs.bbreakFrntTriggered) {
       io.runMotor(0.0, 0.0);
       intakeIterationCoutner++;
-      if(intakeIterationCoutner >= 3) {
+      if(intakeIterationCoutner >= 1) { //TODO was 3, trying new value 4/17 6:25pm
         if(inputs.bbreakBackTriggered) {
           intakeIterationCoutner = 0;
           currentState = outtakeStates.ADJ_FWD;

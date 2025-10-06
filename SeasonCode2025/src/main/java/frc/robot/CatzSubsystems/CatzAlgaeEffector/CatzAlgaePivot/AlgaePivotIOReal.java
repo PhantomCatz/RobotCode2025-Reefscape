@@ -1,14 +1,3 @@
-//------------------------------------------------------------------------------------
-// 2025 FRC 2637
-// https://github.com/PhantomCatz
-//
-// Use of this source code is governed by an MIT-style
-// license that can be found in the LICENSE file at
-// the root directory of this project. 
-//
-//        "6 hours of debugging can save you 5 minutes of reading documentation."
-//
-//------------------------------------------------------------------------------------
 package frc.robot.CatzSubsystems.CatzAlgaeEffector.CatzAlgaePivot;
 
 import com.ctre.phoenix6.BaseStatusSignal;
@@ -124,7 +113,6 @@ public class AlgaePivotIOReal implements AlgaePivotIO {
 
   @Override
   public void runSetpointUp(double targetDegrees, double feedforwardVolts) {
-    // algaePivotMotor.setControl()
 
     double setpointRotations = ((targetDegrees / 360.0) * ALGAE_PIVOT_GEAR_REDUCTION);
     algaePivotMotor.setControl(positionControl.withPosition(setpointRotations)

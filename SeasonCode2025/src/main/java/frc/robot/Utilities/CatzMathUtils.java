@@ -1,14 +1,3 @@
-//------------------------------------------------------------------------------------
-// 2025 FRC 2637
-// https://github.com/PhantomCatz
-//
-// Use of this source code is governed by an MIT-style
-// license that can be found in the LICENSE file at
-// the root directory of this project. 
-//
-//        "6 hours of debugging can save you 5 minutes of reading documentation."
-//
-//------------------------------------------------------------------------------------
 package frc.robot.Utilities;
 
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -60,7 +49,7 @@ public class CatzMathUtils {
     return newAngle;
   }
 
-  public static double Clamp(double min, double input, double max) {
+  public static double clamp(double min, double input, double max) {
     double clampedValue;
     if (input > max) {
       clampedValue = max;
@@ -71,6 +60,10 @@ public class CatzMathUtils {
     }
     return clampedValue;
   }
+
+  public static boolean inRange(double v, double min, double max) {
+		return v > min && v < max;
+	}
 
   public static double toUnitCircAngle(double angleRadians) {
     double rotations = angleRadians / (2 * Math.PI);

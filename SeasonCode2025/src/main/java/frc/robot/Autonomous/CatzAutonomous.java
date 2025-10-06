@@ -1,14 +1,3 @@
-//------------------------------------------------------------------------------------
-// 2025 FRC 2637
-// https://github.com/PhantomCatz
-//
-// Use of this source code is governed by an MIT-style
-// license that can be found in the LICENSE file at
-// the root directory of this project. 
-//
-//        "6 hours of debugging can save you 5 minutes of reading documentation."
-//
-//------------------------------------------------------------------------------------
 package frc.robot.Autonomous;
 
 import com.pathplanner.lib.auto.AutoBuilder;
@@ -29,10 +18,11 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.PrintCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.CatzSubsystems.CatzStateCommands;
+import frc.robot.CatzSubsystems.CatzSuperstructure;
 import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.*;
 import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.Drivetrain.CatzDrivetrain;
 import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.Drivetrain.DriveConstants;
+import frc.robot.CatzSubsystems.CatzOuttake.CatzOuttake;
 import frc.robot.CatzSubsystems.CatzSuperstructure.LeftRight;
 import frc.robot.Commands.CharacterizationCmds.WheelRadiusCharacterization;
 import frc.robot.Commands.CharacterizationCmds.WheelRadiusCharacterization.Direction;
@@ -55,7 +45,7 @@ import org.json.simple.parser.ParseException;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
 public class CatzAutonomous extends SubsystemBase {
-  private RobotContainer m_container;
+  public static final CatzAutonomous Instance = new CatzAutonomous();
 
   // ------------------------------------------------------------------------------------------------------------
   // Questionairre
@@ -73,12 +63,7 @@ public class CatzAutonomous extends SubsystemBase {
   private HashMap<String, DashboardCmd> dashboardCmds = new HashMap<>();
   private PathPlannerAuto lastProgram;
 
-  private CatzRobotTracker tracker = CatzRobotTracker.getInstance();
-  private CatzDrivetrain drivetrain;
-
-  public CatzAutonomous(RobotContainer container) {
-    this.m_container = container;
-    this.drivetrain = container.getCatzDrivetrain();
+  private CatzAutonomous() {
 
     SmartDashboard.putData("Wait For Coral?", waitForCoralChooser);
 
@@ -98,27 +83,27 @@ public class CatzAutonomous extends SubsystemBase {
         NamedCommands.registerCommand(
             pathName,
             new TrajectoryDriveCmd(
-                PathPlannerPath.fromChoreoTrajectory(pathName), drivetrain, true, container, false));
+                PathPlannerPath.fromChoreoTrajectory(pathName), true, false));
       } catch (FileVersionException | IOException | ParseException e) {
         e.printStackTrace();
       }
     }
-    TeleopPosSelector selector = container.getSelector();
+    TeleopPosSelector selector = TeleopPosSelector.Instance;
 
-    NamedCommands.registerCommand("Stow", CatzStateCommands.stow(container));
-    NamedCommands.registerCommand("IntakeCoralGround", CatzStateCommands.intakeCoralGround(container));
-    NamedCommands.registerCommand("IntakeCoralStation", CatzStateCommands.intakeCoralStation(container));
-    NamedCommands.registerCommand("IntakeAlgae", CatzStateCommands.intakeAlgae(container));
-    NamedCommands.registerCommand("L1Coral", CatzStateCommands.L1Coral(container));
-    NamedCommands.registerCommand("L2Coral", CatzStateCommands.L2Coral(container));
-    NamedCommands.registerCommand("L3Coral", CatzStateCommands.L3Coral(container));
-    NamedCommands.registerCommand("L4Coral", CatzStateCommands.L4Coral(container));
-    NamedCommands.registerCommand("Processor", CatzStateCommands.processor(container));
-    NamedCommands.registerCommand("BotAlgae", CatzStateCommands.intakeCoralGround(container));
-    NamedCommands.registerCommand("TopAlgae", CatzStateCommands.topAlgae(container));
-    NamedCommands.registerCommand("Climb", CatzStateCommands.fullClimb(container));
-    NamedCommands.registerCommand("RestPose", Commands.runOnce(()->tracker.resetPose(new Pose2d())));
-    NamedCommands.registerCommand("WheelCharacterization", new WheelRadiusCharacterization(drivetrain, Direction.CLOCKWISE));
+    NamedCommands.registerCommand("Stow", CatzSuperstructure.Instance.stow());
+    NamedCommands.registerCommand("IntakeCoralStation", CatzSuperstructure.Instance.intakeCoralStation());
+    NamedCommands.registerCommand("IntakeAlgae", CatzSuperstructure.Instance.intakeAlgae());
+    NamedCommands.registerCommand("L1Coral", CatzSuperstructure.Instance.L1Coral());
+    NamedCommands.registerCommand("L2Coral", CatzSuperstructure.Instance.L2Coral());
+    NamedCommands.registerCommand("L3Coral", CatzSuperstructure.Instance.L3Coral());
+    NamedCommands.registerCommand("L4Coral", CatzSuperstructure.Instance.L4Coral());
+    NamedCommands.registerCommand("BotAlgae", CatzSuperstructure.Instance.botAlgae());
+    NamedCommands.registerCommand("TopAlgae", CatzSuperstructure.Instance.topAlgae());
+    NamedCommands.registerCommand("RestPose", Commands.runOnce(()->CatzRobotTracker.Instance.resetPose(new Pose2d())));
+    NamedCommands.registerCommand("WheelCharacterization", new WheelRadiusCharacterization(CatzDrivetrain.Instance, Direction.CLOCKWISE));
+
+    NamedCommands.registerCommand("AlgaeTop", CatzSuperstructure.Instance.topAlgae());
+    NamedCommands.registerCommand("AlgaeBot", CatzSuperstructure.Instance.botAlgae());
 
     HashMap<String, Command> startPose = new HashMap<>();
     HashMap<String, Command> reefPose1 = new HashMap<>();
@@ -133,7 +118,7 @@ public class CatzAutonomous extends SubsystemBase {
     for(int i = 0; i < FieldConstants.StartPoses.startArray.length; i++){
       final int j = i;
       Supplier<Pose2d> startPoseSupplier = ()->AllianceFlipUtil.apply(new Pose2d(FieldConstants.StartPoses.startArray[j], Rotation2d.k180deg));
-      startPose.put(""+(i+1), new InstantCommand(()->CatzRobotTracker.getInstance().resetPose(startPoseSupplier)));
+      startPose.put(""+(i+1), new InstantCommand(()->CatzRobotTracker.Instance.resetPose(startPoseSupplier)));
     }
     dashboardCmds.put("StartChooser", new DashboardCmd("Start Where?", startPose));
 
@@ -142,11 +127,11 @@ public class CatzAutonomous extends SubsystemBase {
         String letter = selector.getPoseToLetter(""+side + " " + leftRight);
         final int s = side;
 
-        NamedCommands.registerCommand(letter, new SeqCmd(
-            CatzStateCommands.driveToScore(m_container, () ->selector.getPathfindingPath(()->selector.calculateReefPose(s, leftRight, false)), 4),
-            CatzStateCommands.driveToCoralStation(m_container, ()->selector.getPathfindingPath(()->selector.getBestCoralStation()), () -> waitForCoralChooser.getSelected())
-          )
-        );
+        // NamedCommands.registerCommand(letter, new SeqCmd(
+        //     CatzSuperstructure.Instance.driveToScore(() ->selector.getPathfindingPath(()->selector.calculateReefPose(s, leftRight, false)), 4),
+        //     CatzSuperstructure.Instance.driveToCoralStation(()->selector.getPathfindingPath(()->selector.getBestCoralStation()), () -> waitForCoralChooser.getSelected())
+        //   )
+        // );
 
         reefPose1.put(letter, NamedCommands.getCommand(letter));
         reefPose2.put(letter, NamedCommands.getCommand(letter));
@@ -201,14 +186,14 @@ public class CatzAutonomous extends SubsystemBase {
     // This is not used anywhere but the library wants it
     BooleanSupplier shouldFlip = () -> AllianceFlipUtil.shouldFlipToRed();
     AutoBuilder.configure(
-      tracker::getEstimatedPose,
-      tracker::resetPose,
-      tracker::getRobotChassisSpeeds,
-      container.getCatzDrivetrain()::d,
+      CatzRobotTracker.Instance::getEstimatedPose,
+      CatzRobotTracker.Instance::resetPose,
+      CatzRobotTracker.Instance::getRobotChassisSpeeds,
+      CatzDrivetrain.Instance::d,
       null,
       DriveConstants.TRAJ_ROBOT_CONFIG,
       shouldFlip,
-      container.getCatzDrivetrain()
+      CatzDrivetrain.Instance
     );
 
     // ------------------------------------------------------------------------------------------------------------
@@ -238,9 +223,9 @@ public class CatzAutonomous extends SubsystemBase {
               }
               else {
                 // Simple Trajectory Command
-                command = new TrajectoryDriveCmd(PathPlannerPath.fromPathFile(commandName), drivetrain, true, container, false);
+                command = new TrajectoryDriveCmd(PathPlannerPath.fromPathFile(commandName), false, false);
               }
-            } else if(components.length == 2){
+            } else if(components.length >= 2){
               // Command Trajectory with Mechanisms
               String name = components[0];
               String action = components[1];
@@ -248,15 +233,23 @@ public class CatzAutonomous extends SubsystemBase {
               PathPlannerPath path = PathPlannerPath.fromPathFile(name);
 
               if(action.equalsIgnoreCase("CS")) {
-                command = CatzStateCommands.driveToCoralStation(container, path, () -> waitForCoralChooser.getSelected());
+                command = CatzSuperstructure.Instance.driveToCoralStation(path, () -> waitForCoralChooser.getSelected());
               } else if(action.contains("ReefL")) {
-                command = CatzStateCommands.driveToScore(container, path, Integer.parseInt(action.substring("ReefL".length())));
+                if(components.length == 3){
+                  String d = components[2];
+                  double delay = Double.parseDouble(d.substring("d".length()));
+                  command = CatzSuperstructure.Instance.driveToScore(path, Integer.parseInt(action.substring("ReefL".length())), delay);
+                }else{
+                  command = CatzSuperstructure.Instance.driveToScore(path, Integer.parseInt(action.substring("ReefL".length())));
+                }
               }
+
+
             }
 
             if(command == null){
               System.out.println("****** typotypotypotypotypotypotypotypotypotypotypotypotypo       \n\n\n\n\nn\n\n\n\n \n\n\n typo in pathplanner reverting to drvive forward auto ********** ");
-              command = Commands.run(() -> drivetrain.drive(new ChassisSpeeds(0.5, 0.0, 0.0)), drivetrain).withTimeout(5.0); //TODO this only drives to the right(field relative). so make this different for blue alliance
+              command = Commands.run(() -> CatzDrivetrain.Instance.drive(new ChassisSpeeds(0.5, 0.0, 0.0)), CatzDrivetrain.Instance).withTimeout(5.0); //TODO this only drives to the right(field relative). so make this different for blue alliance
             }
             NamedCommands.registerCommand(commandName, command);
           } catch (FileVersionException | IOException | ParseException e) {
@@ -315,7 +308,7 @@ public class CatzAutonomous extends SubsystemBase {
   //
   //----------------------------------------------------------------------------------------------------------
   public Command wheelRadiusCharacterization() {
-    return new WheelRadiusCharacterization(drivetrain, Direction.COUNTER_CLOCKWISE);
+    return new WheelRadiusCharacterization(CatzDrivetrain.Instance, Direction.COUNTER_CLOCKWISE);
   }
 
   /** Getter for final autonomous Program */

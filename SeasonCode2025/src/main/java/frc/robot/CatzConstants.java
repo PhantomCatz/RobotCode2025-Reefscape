@@ -1,20 +1,13 @@
-//------------------------------------------------------------------------------------
-// 2025 FRC 2637
-// https://github.com/PhantomCatz
-//
-// Use of this source code is governed by an MIT-style
-// license that can be found in the LICENSE file at
-// the root directory of this project. 
-//
-//        "6 hours of debugging can save you 5 minutes of reading documentation."
-//
-//------------------------------------------------------------------------------------
 package frc.robot;
 
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.util.Color;
+import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.CatzRobotTracker;
+import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.Drivetrain.CatzDrivetrain;
 import frc.robot.Utilities.Alert;
 import frc.robot.Utilities.Alert.AlertType;
+
+import choreo.auto.AutoFactory;
 
 public final class CatzConstants {
 
@@ -30,6 +23,14 @@ public final class CatzConstants {
   public static boolean disableHAL = false;
 
   public static final double LOOP_TIME = 0.02;
+
+  public static final AutoFactory autoFactory = new AutoFactory(
+                                                  CatzRobotTracker.Instance::getEstimatedPose,
+                                                  CatzRobotTracker.Instance::resetPose,
+                                                  CatzDrivetrain.Instance::followChoreoTrajectoryExecute,
+                                                  true,
+                                                  CatzDrivetrain.Instance
+                                                );
 
   public static enum RobotScenario {
     TUNING, // In PID enviroment with logged tunable numbers

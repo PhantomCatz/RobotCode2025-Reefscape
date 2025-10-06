@@ -1,14 +1,3 @@
-//------------------------------------------------------------------------------------
-// 2025 FRC 2637
-// https://github.com/PhantomCatz
-//
-// Use of this source code is governed by an MIT-style
-// license that can be found in the LICENSE file at
-// the root directory of this project. 
-//
-//        "6 hours of debugging can save you 5 minutes of reading documentation."
-//
-//------------------------------------------------------------------------------------
 package frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.Drivetrain;
 
 import com.pathplanner.lib.config.ModuleConfig;
@@ -50,7 +39,7 @@ public class DriveConstants {
   public static final int GYRO_ID = 10;
 
 
-  public static final double PREDICT_DISTANCE_SCORE = 0.4;
+  public static final double PREDICT_DISTANCE_SCORE = 0.3;
   public static final double PREDICT_DISTANCE_INTAKE = 1.0;
 
   // ---------------------------------------------------------------------------------------------------------------
@@ -73,7 +62,7 @@ public class DriveConstants {
   public static final DriveConfig TRAJECTORY_CONFIG =
     DriveConfig.builder()
       .maxLinearVelocity(4.3)
-      .maxLinearAcceleration(4.3)
+      .maxLinearAcceleration(5.5)
       .maxAngularVelocity(Units.degreesToRadians(540))
       .maxAngularAcceleration(Units.degreesToRadians(720))
       .build();

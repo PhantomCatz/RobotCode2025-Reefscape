@@ -1,14 +1,3 @@
-//------------------------------------------------------------------------------------
-// 2025 FRC 2637
-// https://github.com/PhantomCatz
-//
-// Use of this source code is governed by an MIT-style
-// license that can be found in the LICENSE file at
-// the root directory of this project. 
-//
-//        "6 hours of debugging can save you 5 minutes of reading documentation."
-//
-//------------------------------------------------------------------------------------
 package frc.robot.CatzSubsystems.CatzElevator;
 
 import static frc.robot.CatzSubsystems.CatzElevator.ElevatorConstants.*;
@@ -18,17 +7,20 @@ import java.util.function.Supplier;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.PrintCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.CatzConstants;
+import frc.robot.Robot;
+import frc.robot.CatzSubsystems.CatzOuttake.CatzOuttake;
 import frc.robot.Utilities.LoggedTunableNumber;
 import lombok.RequiredArgsConstructor;
 import edu.wpi.first.wpilibj.DriverStation;
 
 import org.littletonrobotics.junction.Logger;
 
-
-
 public class CatzElevator extends SubsystemBase {
+  public static final CatzElevator Instance = new CatzElevator();
+
   private final ElevatorIO io;
   private final ElevatorIOInputsAutoLogged inputs = new ElevatorIOInputsAutoLogged();
 
@@ -48,11 +40,13 @@ public class CatzElevator extends SubsystemBase {
       //TO CHANGE HEIGHT GO TO ElevatorConstants.java
       PosLimitSwitchStow(() -> 0.0),
       PosStow(() -> STOW_HEIGHT),
+      PosCoastStow(() -> COAST_STOW_HEIGHT),
       PosL1(() -> L1_HEIGHT),
       PosL2(() -> L2_HEIGHT),
       PosL3(() -> L3_HEIGHT),
       PosL4(() -> L4_HEIGHT),
       PosL4Adj(() -> L4_CORAL_ADJ),
+      AlgaeBotTransition(() -> ALGAE_BOT),
       PosBotBot(() -> BOT_BOT_ALGAE),
       PosBotTop(() -> BOT_TOP_ALGAE),
       PosManual(new LoggedTunableNumber("Elevator/ScoreSourceSetpoint",0.0)),
@@ -65,7 +59,7 @@ public class CatzElevator extends SubsystemBase {
     }
   }
 
-  public CatzElevator() {
+  private CatzElevator() {
     if(isElevatorDisabled) {
       io = new ElevatorIONull();
       System.out.println("Elevator Unconfigured");
@@ -79,12 +73,17 @@ public class CatzElevator extends SubsystemBase {
           io = new ElevatorIOReal() {};
           System.out.println("Elevator Configured for Replayed simulation");
         break;
+        case SIM:
+          io = new ElevatorIOSim();
+          System.out.println("Elevator Configured for Simulation");
+        break;
         default:
           io = new ElevatorIONull();
           System.out.println("Elevator Unconfigured");
         break;
       }
     }
+    // SmartDashboard.putData("Mech2d", m_mech2d);
   }
 
   @Override
@@ -162,10 +161,12 @@ public class CatzElevator extends SubsystemBase {
       targetPosition = ElevatorPosition.PosNull;
     } else if(targetPosition != ElevatorPosition.PosNull &&
               targetPosition != ElevatorPosition.PosManual){
+      // if(targetPosition == ElevatorPosition.PosCoastStow) {
+      //   //hopefully a slow descent from algae intake positions to stow w an algae; regular PID effected desecent is too extreme for algae pivot arm
+      //   io.stop();
       // Setpoint PID
       if(targetPosition == ElevatorPosition.PosStow) {
         // Safety Stow
-
         if(getElevatorPositionInch() < 2.0) {
           io.stop();
         } else {
@@ -174,6 +175,8 @@ public class CatzElevator extends SubsystemBase {
       } else {
         //Setpoint PID
         io.runSetpointUp(targetPosition.getTargetPositionInch());
+
+
       }
     } else if (targetPosition == ElevatorPosition.PosManual) {
       io.runMotor(elevatorSpeed);
@@ -190,11 +193,12 @@ public class CatzElevator extends SubsystemBase {
     //----------------------------------------------------------------------------------------------------------------------------
 
 
-    Logger.recordOutput("Elevator/CurrentRadians", getElevatorPositionInch());
+    Logger.recordOutput("Elevator/CurrentPosition", getElevatorPositionInch());
     Logger.recordOutput("Elevator/prevtargetPosition", prevTargetPositon.getTargetPositionInch());
     Logger.recordOutput("Elevator/logged prev targetPosition", previousLoggedPosition.getTargetPositionInch());
     Logger.recordOutput("Elevator/isElevatorInPos", isElevatorInPosition());
     Logger.recordOutput("Elevator/targetPosition", targetPosition.getTargetPositionInch());
+
 
     // Target Postioin Logging
     previousLoggedPosition = targetPosition;
@@ -206,23 +210,32 @@ public class CatzElevator extends SubsystemBase {
   //
   //--------------------------------------------------------------------------------------------------------------------------
   public Command Elevator_LX(int level){
+    Command cmd;
+
     switch (level){
       case 1:
-        return Elevator_L1();
+        cmd = Elevator_L1();
+      break;
 
       case 2:
-        return Elevator_L2();
+        cmd = Elevator_L2();
+      break;
 
       case 3:
-        return Elevator_L3();
+        cmd = Elevator_L3();
+      break;
 
       case 4:
-        return Elevator_L4();
+        cmd = Elevator_L4();
+      break;
 
       default:
         System.out.println("Invalid elevator level!");
-        return new InstantCommand();
+        cmd = new InstantCommand();
+      break;
+
     }
+    return cmd.unless(() -> Robot.isSimulation()).alongWith(new PrintCommand("Elevator " + level));
   }
 
   public boolean isElevatorInPos(){
@@ -231,6 +244,10 @@ public class CatzElevator extends SubsystemBase {
 
   public Command Elevator_Stow() {
     return runOnce(() -> setElevatorPos(ElevatorPosition.PosStow));
+  }
+
+  public Command Elevator_Coast_Stow() {
+    return runOnce(() -> setElevatorPos(ElevatorPosition.PosCoastStow));
   }
 
   public Command Elevator_L1() {
@@ -253,6 +270,9 @@ public class CatzElevator extends SubsystemBase {
     return runOnce(() -> setElevatorPos(ElevatorPosition.PosL4Adj));
   }
 
+  public Command Elevator_Bot_Transition() {
+    return runOnce(() -> setElevatorPos(ElevatorPosition.AlgaeBotTransition));
+  }
   public Command Elevator_BOT_BOT() {
     return runOnce(() -> setElevatorPos(ElevatorPosition.PosBotBot));
   }
@@ -277,12 +297,15 @@ public class CatzElevator extends SubsystemBase {
     return inputs.positionInch;
   }
 
+
+  //TODO do the check with velocity so that we dont need counter
+  //or use a Debouncer
   private boolean isElevatorInPosition() {
     boolean isElevatorSettled = false;
     boolean isElevatorInPos = (Math.abs((getElevatorPositionInch() - targetPosition.getTargetPositionInch())) < 1.0);
     if(isElevatorInPos) {
       settlingCounter++;
-      if(settlingCounter >= 3) {
+      if(settlingCounter >= 1) {
          isElevatorSettled = true;
         // settlingCounter = 0;
          //System.out.println("////////////ELEVATOR SETTLED FOR .2 SECONDS///////////////////");

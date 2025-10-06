@@ -1,14 +1,3 @@
-//------------------------------------------------------------------------------------
-// 2025 FRC 2637
-// https://github.com/PhantomCatz
-//
-// Use of this source code is governed by an MIT-style
-// license that can be found in the LICENSE file at
-// the root directory of this project. 
-//
-//        "6 hours of debugging can save you 5 minutes of reading documentation."
-//
-//------------------------------------------------------------------------------------
 package frc.robot.CatzSubsystems.CatzIntakeRollers;
 import static frc.robot.CatzSubsystems.CatzIntakeRollers.IntakeRollersConstants.*;
 
@@ -18,21 +7,19 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.CatzConstants;
-import frc.robot.RobotContainer;
+import frc.robot.CatzSubsystems.CatzElevator.CatzElevator;
 import frc.robot.CatzSubsystems.CatzOuttake.CatzOuttake;
 import lombok.Getter;
 import lombok.Setter;
 
-import org.littletonrobotics.junction.Logger;
-
 public class CatzIntakeRollers extends SubsystemBase {
+    public static final CatzIntakeRollers Instance = new CatzIntakeRollers();
 
     private final IntakeRollersIO io;
     private final IntakeRollersIOInputsAutoLogged inputs = new IntakeRollersIOInputsAutoLogged();
     private int stuckCounter = 0;
     private int jamCounter = 0;
     private int beamBreakFaultCounter = 0;
-    private RobotContainer container;
 
     public enum intakeRollersStates {
         INTAKE,
@@ -45,7 +32,7 @@ public class CatzIntakeRollers extends SubsystemBase {
     private intakeRollersStates currentState = intakeRollersStates.STOP;
     private intakeRollersStates previousState = intakeRollersStates.STOP;
 
-    public CatzIntakeRollers() {
+    private CatzIntakeRollers() {
         if(isIntakeRollersDisabled) {
             io = new IntakeRollersIONull();
             System.out.println("Outtake Unconfigured");
@@ -85,7 +72,12 @@ public class CatzIntakeRollers extends SubsystemBase {
 
         switch (currentState) {
             case INTAKE:
-                case_rampRollersIn();
+                if(CatzElevator.Instance.getElevatorPositionInch() < 4.0 && !DriverStation.isAutonomous()){
+                    case_rampRollersIn();
+                }
+                if(DriverStation.isAutonomous()){
+                    case_rampRollersIn();
+                }
             break;
             case ANTIJAM:
                 // adj_rampIntake(ANTIJAM_ROLLER_ROTATIONS);

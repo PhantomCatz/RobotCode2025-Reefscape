@@ -1,16 +1,7 @@
-//------------------------------------------------------------------------------------
-// 2025 FRC 2637
-// https://github.com/PhantomCatz
-//
-// Use of this source code is governed by an MIT-style
-// license that can be found in the LICENSE file at
-// the root directory of this project. 
-//
-//        "6 hours of debugging can save you 5 minutes of reading documentation."
-//
-//------------------------------------------------------------------------------------
 package frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.Vision;
 
+
+import java.util.HashMap;
 
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
@@ -58,7 +49,7 @@ public class VisionConstants {
         1.0 // Camera 1
       };
 
-  public static Translation2d[] LIMELIGHT_ERROR = {
+  public static final Translation2d[] LIMELIGHT_ERROR = {
     new Translation2d(0.07647673800,0.0883352451).div(2.356170511),
     new Translation2d(0.01013154230126, -0.04330684940).div(2.356170511)
     // new Translation2d(-0.0290867, 0.070948).div(1.2907317),
@@ -66,9 +57,14 @@ public class VisionConstants {
   };
 
   public static final boolean USE_MEGATAG1 = false; // megatag 1 3d solve allows robot to fly
-  public static final double EXTRA_LATENCY_MS = 100;
+
+  public static final HashMap<String, Double> PING_MAP = new HashMap<>() {{
+    put("limelight-gyoza", 76.25);
+    put("limelight-udon", 76.25);
+
+  }};
 
   // Multipliers to apply for MegaTag 2 observations
-  public static final double LINEAR_STD_DEV_MEGATAG2_SCALE_FACTOR = 1.0;//1.0; // More stable than full 3D solve
+  public static final double LINEAR_STD_DEV_MEGATAG2_SCALE_FACTOR = 0.1;//1.0; // More stable than full 3D solve
   public static final double ANGULAR_STD_DEV_MEGATAG2_SCALE_FACTOR = Double.POSITIVE_INFINITY; // No rotation data available
 }

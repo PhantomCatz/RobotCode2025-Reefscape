@@ -1,14 +1,3 @@
-//------------------------------------------------------------------------------------
-// 2025 FRC 2637
-// https://github.com/PhantomCatz
-//
-// Use of this source code is governed by an MIT-style
-// license that can be found in the LICENSE file at
-// the root directory of this project. 
-//
-//        "6 hours of debugging can save you 5 minutes of reading documentation."
-//
-//------------------------------------------------------------------------------------
 package frc.robot.CatzSubsystems.CatzClimb;
 
 import edu.wpi.first.wpilibj.DriverStation;
@@ -18,6 +7,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.CatzConstants;
 import frc.robot.CatzSubsystems.CatzLEDs.CatzLED;
 import frc.robot.CatzSubsystems.CatzLEDs.CatzLED.WinchingState;
+import frc.robot.CatzSubsystems.CatzOuttake.CatzOuttake;
 import frc.robot.Utilities.LoggedTunableNumber;
 
 import static frc.robot.CatzSubsystems.CatzClimb.ClimbConstants.*;
@@ -29,6 +19,7 @@ import lombok.RequiredArgsConstructor;
 import org.littletonrobotics.junction.Logger;
 
 public class CatzClimb extends SubsystemBase {
+  public static final CatzClimb Instance = new CatzClimb();
 
   private final ClimbIO io;
   private final ClimbIOInputsAutoLogged inputs = new ClimbIOInputsAutoLogged();
@@ -46,13 +37,12 @@ public class CatzClimb extends SubsystemBase {
   static LoggedTunableNumber kV = new LoggedTunableNumber("Climb/kV", 0);
   static LoggedTunableNumber kA = new LoggedTunableNumber("Climb/kA", 0);
 
-
   @RequiredArgsConstructor
   public enum ClimbPosition { //In Rotations //TBD
     RETRACT(() -> 46), //TBD
     HOME(() -> -10.0), //TBD
-    EXTENDING(() -> -230.0), //TBD
-    MANUAL(() -> manualPow),
+    EXTENDING(() -> -320.0), //TBD
+    MANUAL(() -> 0.0),
     FULL_MANUAL(() -> 0.0),
     TUNNABLE(tunnablePos);
 
@@ -65,7 +55,7 @@ public class CatzClimb extends SubsystemBase {
 
   private ClimbPosition targetPosition = ClimbPosition.HOME;
 
-  public CatzClimb() {
+  private CatzClimb() {
     if(isClimbDisabled) { //Comes from Climb Constants
       io = new ClimbIONull();
       System.out.println("Climb Unconfigured");
@@ -112,11 +102,11 @@ public class CatzClimb extends SubsystemBase {
       }
 
       if(inputs.commandedOutput > 0.1) {
-        CatzLED.getInstance().setClimbDirection(WinchingState.EXTENDING);
+        CatzLED.Instance.setClimbDirection(WinchingState.EXTENDING);
       } else if(inputs.commandedOutput < -0.1) {
-        CatzLED.getInstance().setClimbDirection(WinchingState.RETRACTING);
+        CatzLED.Instance.setClimbDirection(WinchingState.RETRACTING);
       } else {
-        CatzLED.getInstance().setClimbDirection(WinchingState.IDLE);
+        CatzLED.Instance.setClimbDirection(WinchingState.IDLE);
       }
     }
 

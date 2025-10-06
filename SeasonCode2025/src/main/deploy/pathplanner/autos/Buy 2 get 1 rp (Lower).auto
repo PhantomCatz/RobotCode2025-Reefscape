@@ -13,7 +13,7 @@
         {
           "type": "named",
           "data": {
-            "name": "wait10.0"
+            "name": "wait1.0"
           }
         },
         {
@@ -25,13 +25,13 @@
         {
           "type": "named",
           "data": {
-            "name": "wait0.0"
+            "name": "G Lower to Reef+ReefL4"
           }
         },
         {
           "type": "named",
           "data": {
-            "name": "G Lower to Reef+ReefL4"
+            "name": "G Reef to Lower+CS"
           }
         }
       ]
