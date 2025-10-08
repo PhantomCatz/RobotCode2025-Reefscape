@@ -28,6 +28,7 @@ public class CatzElevator extends SubsystemBase {
   private double elevatorFeedForward = 0.0;
   private int settlingCounter = 0;
   private boolean breakModeEnabled = true;
+  private boolean auxControl = false;
 
   private ElevatorPosition targetPosition = ElevatorPosition.PosStow;
   private ElevatorPosition prevTargetPositon = ElevatorPosition.PosNull;
@@ -184,7 +185,7 @@ public class CatzElevator extends SubsystemBase {
         } else {
           io.runSetpointDown(targetPosition.getTargetPositionInch());
         }
-      } else if (canMoveElevator || DriverStation.isAutonomous()) {
+      } else if (((canMoveElevator || DriverStation.isAutonomous()) && CatzOuttake.Instance.isHoldingCoral()) || auxControl) {
         //Setpoint PID
         io.runSetpointUp(targetPosition.getTargetPositionInch());
 
@@ -388,5 +389,9 @@ public class CatzElevator extends SubsystemBase {
    */
   public void setElevatorTargetPosition(int setPosition) {
     targetPosition = scoringPositionsList[setPosition-1];
+  }
+
+  public void setAuxControl(boolean value) {
+    auxControl = value;
   }
 }

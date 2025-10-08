@@ -209,8 +209,8 @@ public class RobotContainer {
     // xboxAux.a().onTrue(CatzSuperstructure.Instance.topAlgae());
     xboxAux.rightStick().onTrue(CatzClimb.Instance.reZero());
 
-    // xboxAux.x().onTrue(CatzSuperstructure.Instance.stow());
-
+    xboxAux.x().onTrue(CatzSuperstructure.Instance.stow());
+    xboxAux.y().onTrue(CatzSuperstructure.Instance.LXElevator(CatzSuperstructure.Instance.getLevel()).alongWith(new InstantCommand(() -> CatzElevator.Instance.setAuxControl(true))));
 
     // Gamepiece Selection
     // xboxAux.leftTrigger().onTrue(Commands.runOnce(()-> CatzSuperstructure.setChosenGamepiece(Gamepiece.CORAL)));
