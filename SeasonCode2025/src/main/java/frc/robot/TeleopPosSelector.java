@@ -34,6 +34,7 @@ import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.Drivetrain.DriveCon
 import frc.robot.CatzSubsystems.CatzElevator.CatzElevator;
 import frc.robot.CatzSubsystems.CatzElevator.CatzElevator.ElevatorPosition;
 import frc.robot.Commands.DriveAndRobotOrientationCmds.PIDDriveCmd;
+import frc.robot.Commands.DriveAndRobotOrientationCmds.PIDDriveCmdAlgae;
 import frc.robot.Commands.DriveAndRobotOrientationCmds.TrajectoryDriveCmd;
 
 @SuppressWarnings({ "rawtypes", "unchecked" })
@@ -90,15 +91,15 @@ public class TeleopPosSelector { //TODO split up the file. it's too big and does
    * Iterate through all reef positions and find the closest one.
    * @return
    */
-  public Pair<Pair<Integer, LeftRight>, Integer> getClosestReefPos() {
+  public Pair<Pair<Integer, LeftRight>, Integer> getClosestReefPos(boolean isAlgae) {
     int closestSide = 0;
     LeftRight closestLeftRight = LeftRight.LEFT;
     Translation2d robotPos = CatzRobotTracker.Instance.getEstimatedPose().getTranslation();
 
     for (int side = 0; side < 6; side++) {
       for (LeftRight leftRight : LeftRight.values()) {
-        Pose2d reefPos = calculateReefPose(side, leftRight, false);
-        if (reefPos.getTranslation().getDistance(robotPos) < calculateReefPose(closestSide, closestLeftRight, false)
+        Pose2d reefPos = calculateReefPose(side, leftRight, false, isAlgae);
+        if (reefPos.getTranslation().getDistance(robotPos) < calculateReefPose(closestSide, closestLeftRight, false, isAlgae)
             .getTranslation().getDistance(robotPos)) {
           closestSide = side;
           closestLeftRight = leftRight;
@@ -108,15 +109,15 @@ public class TeleopPosSelector { //TODO split up the file. it's too big and does
     return new Pair(new Pair(closestSide, closestLeftRight), CatzSuperstructure.Instance.getLevel());
   }
 
-  public Pair<Integer, LeftRight> getClosestReefPos(Translation2d pose) {
+  public Pair<Integer, LeftRight> getClosestReefPos(Translation2d pose, boolean isAlgae) {
     int closestSide = 0;
     LeftRight closestLeftRight = LeftRight.LEFT;
     Translation2d robotPos = pose;
 
     for (int side = 0; side < 6; side++) {
       for (LeftRight leftRight : LeftRight.values()) {
-        Pose2d reefPos = calculateReefPose(side, leftRight, false);
-        if (reefPos.getTranslation().getDistance(robotPos) < calculateReefPose(closestSide, closestLeftRight, false)
+        Pose2d reefPos = calculateReefPose(side, leftRight, false, isAlgae);
+        if (reefPos.getTranslation().getDistance(robotPos) < calculateReefPose(closestSide, closestLeftRight, false, isAlgae)
             .getTranslation().getDistance(robotPos)) {
           closestSide = side;
           closestLeftRight = leftRight;
@@ -128,7 +129,7 @@ public class TeleopPosSelector { //TODO split up the file. it's too big and does
 
   // TODO calculate this on comptime and store it in an array
   @SuppressWarnings("static-access")
-  public Pose2d calculateReefPose(int reefAngle, LeftRight leftRightPos, boolean isDistanced) {
+  public Pose2d calculateReefPose(int reefAngle, LeftRight leftRightPos, boolean isDistanced, boolean isAlgae) {
     Rotation2d selectedAngle = Rotation2d.fromRotations(reefAngle / 6.0);
 
     //A unit vector with its origin placed at the center of the reef pointing orthogonally to the selected side.
@@ -154,19 +155,25 @@ public class TeleopPosSelector { //TODO split up the file. it's too big and does
     // if(CatzSuperstructure.Instance.getChosenGamepiece() == Gamepiece.ALGAE){
     //   leftRight = new Translation2d();
     // }
+    Translation2d scoringPos;
+    if(!isAlgae){
+      scoringPos = radius.plus(leftRight).plus(Reef.center);
+    }else{
+      scoringPos = radius.plus(Reef.center);
+      CatzSuperstructure.Instance.isAlgaeUp = reefAngle % 2 == 0;
+    }
 
-    Translation2d scoringPos = radius.plus(leftRight).plus(Reef.center);
     return AllianceFlipUtil.apply(new Pose2d(scoringPos, selectedAngle.plus(Rotation2d.k180deg)));
   }
 
-  public Pose2d calculateReefPose(Pair<Integer, LeftRight> pair, boolean isNBA, boolean isDistanced) {
+  public Pose2d calculateReefPose(Pair<Integer, LeftRight> pair, boolean isNBA, boolean isDistanced, boolean isAlgae) {
     if (isNBA) {
       recentNBAPos = pair;
     }
     if (pair == null) {
       return null;
     } else {
-      return calculateReefPose(pair.getFirst(), pair.getSecond(), isDistanced);
+      return calculateReefPose(pair.getFirst(), pair.getSecond(), isDistanced, isAlgae);
     }
   }
 
@@ -253,7 +260,7 @@ public class TeleopPosSelector { //TODO split up the file. it's too big and does
     return new DeferredCommand(() -> {
       if(recentNBAPos == null || !CatzSuperstructure.Instance.getIsScoring().get()) return new InstantCommand(); //the driver did not NBA yet, so there is no left right to go to
       //TODO only allow left right when the scoring sequence is activated
-      Pose2d goal = calculateReefPose(new Pair<Integer, LeftRight>(recentNBAPos.getFirst(), leftRight), true, false); //TODO decide whether or not to have distanced
+      Pose2d goal = calculateReefPose(new Pair<Integer, LeftRight>(recentNBAPos.getFirst(), leftRight), true, false, false); //TODO decide whether or not to have distanced
 
       return Commands.sequence(
                 Commands.defer(()-> {
@@ -276,7 +283,7 @@ public class TeleopPosSelector { //TODO split up the file. it's too big and does
   }
 
   public PathPlannerPath getMoveScorePath(){
-    Pose2d goalPose = calculateReefPose(getClosestReefPos().getFirst(), true, false);
+    Pose2d goalPose = calculateReefPose(getClosestReefPos(false).getFirst(), true, false, false);
 
     return getStraightLinePath(CatzRobotTracker.Instance.getEstimatedPose(), goalPose, DriveConstants.PATHFINDING_CONSTRAINTS);
   }
@@ -291,7 +298,7 @@ public class TeleopPosSelector { //TODO split up the file. it's too big and does
   public Command runToNearestBranch() {
 
     return new DeferredCommand(() -> {
-      recentNBAPos = getClosestReefPos().getFirst();
+      recentNBAPos = getClosestReefPos(false).getFirst();
 
       // PathPlannerPath path = getStraightLinePath(CatzRobotTracker.Instance.getEstimatedPose(), calculateReefPose(getClosestReefPos().getFirst(), true, false), DriveConstants.PATHFINDING_CONSTRAINTS);
 
@@ -300,10 +307,16 @@ public class TeleopPosSelector { //TODO split up the file. it's too big and does
       //                                   .andThen(RobotContainer.Instance.controllerRumbleCommand());
 
       Command prepareScorePos = Commands.sequence(
-                                  new PIDDriveCmd(calculateReefPose(getClosestReefPos().getFirst(), true, false)));
+                                  new PIDDriveCmd(calculateReefPose(getClosestReefPos(false).getFirst(), true, false, false)));
 
       return prepareScorePos;
     }, Set.of(CatzDrivetrain.Instance));
+  }
+
+  public Command runToNearestBranchAlgae(){
+    return new DeferredCommand(() -> {
+      return new PIDDriveCmdAlgae(calculateReefPose(getClosestReefPos(true).getFirst(), true, false, true));
+    }, Set.of());
   }
 
 
@@ -330,8 +343,8 @@ public class TeleopPosSelector { //TODO split up the file. it's too big and does
 
   public PathPlannerPath getSwipePath() {
     Pose2d startPos = CatzRobotTracker.Instance.getEstimatedPose();
-    Pair<Integer, LeftRight> closestReefBranch = getClosestReefPos().getFirst();
-    Pose2d closestReefPos = calculateReefPose(closestReefBranch, true, false);
+    Pair<Integer, LeftRight> closestReefBranch = getClosestReefPos(false).getFirst();
+    Pose2d closestReefPos = calculateReefPose(closestReefBranch, true, false, false);
     Rotation2d branchAngle = Rotation2d.fromRotations(closestReefBranch.getFirst() / 6.0);
     Rotation2d sideAngle = branchAngle.plus(Rotation2d.kCW_90deg);
     Rotation2d backAngle = branchAngle.plus(Rotation2d.k180deg);

@@ -69,6 +69,7 @@ public class ClimbIOReal implements ClimbIO {
     climbMotor.getConfigurator().apply(config, 1.0);
 
     climbMotor.setPosition(0);
+    
   }
 
   @Override
@@ -94,6 +95,8 @@ public class ClimbIOReal implements ClimbIO {
   @Override
   public void setPosition(double pos) // Set the motor position in mechanism rotations
   {
+    if(pos < ClimbConstants.CLIMB_EXTEND_LIMIT) return;
+
     climbMotor.setControl(positionControl.withPosition(pos));
     // System.out.println(pos);
   }
@@ -101,6 +104,8 @@ public class ClimbIOReal implements ClimbIO {
   @Override
   public void setPower(double power) {
     // System.out.println("climb set power: " + power);
+
+    if(climbPosition.getValueAsDouble() <= ClimbConstants.CLIMB_EXTEND_LIMIT) return;
     climbMotor.set(power);
   }
 

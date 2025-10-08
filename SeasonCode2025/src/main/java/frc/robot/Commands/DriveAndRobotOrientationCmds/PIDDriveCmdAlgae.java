@@ -18,7 +18,7 @@ import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.Drivetrain.CatzDriv
 import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.Vision.CatzVision;
 import frc.robot.CatzSubsystems.CatzElevator.CatzElevator;
 
-public class PIDDriveCmd extends Command{
+public class PIDDriveCmdAlgae extends Command{
 
     private final ProfiledPIDController translationController;
     private final ProfiledPIDController rotationController;
@@ -31,7 +31,7 @@ public class PIDDriveCmd extends Command{
     private Pose2d goalPos;
     private boolean readyToScore = false;
 
-    public PIDDriveCmd(Pose2d goal){
+    public PIDDriveCmdAlgae(Pose2d goal){
         addRequirements(CatzDrivetrain.Instance);
 
         CatzDrivetrain.Instance.setPIDGoalPose(goal);
@@ -94,13 +94,7 @@ public class PIDDriveCmd extends Command{
 
     @Override
     public boolean isFinished(){
-        readyToScore = isAtTargetState() && CatzVision.Instance.isSeeingApriltag() && CatzRobotTracker.Instance.getVisionPoseShift().getNorm() < ALLOWABLE_VISION_ADJUST;
-        if(readyToScore){
-            RobotContainer.Instance.rumbleDrvController(0.5);
-        }else{
-            RobotContainer.Instance.rumbleDrvController(0.0);
-        }
-        return (readyToScore && CatzSuperstructure.Instance.getCanShoot().get()) || CatzElevator.Instance.getRaiseOverride();
+        return isAtTargetState();
     }
 
     private boolean isAtTargetState(){

@@ -32,7 +32,7 @@ public class CatzRampPivot extends SubsystemBase {
   private BooleanSupplier manualSupplier = ()-> false;
 
   public NeutralMode currentNeutralMode = NeutralMode.COAST;
-  public NeutralMode prevNeutralMode = NeutralMode.COAST;
+public NeutralMode prevNeutralMode = NeutralMode.COAST;
 
   @RequiredArgsConstructor
   public static enum RampPivotPositions {

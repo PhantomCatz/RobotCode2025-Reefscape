@@ -71,6 +71,8 @@ public class CatzSuperstructure extends VirtualSubsystem {
     @Getter @Setter @AutoLogOutput(key = "CatzSuperstructure/canShoot")
     private Supplier<Boolean> canShoot = () -> false;
 
+    public boolean isAlgaeUp = false;
+
     //--------------------------------------------------------------------------------
     // RobotOperationalState Enums
     //--------------------------------------------------------------------------------
@@ -519,6 +521,25 @@ public class CatzSuperstructure extends VirtualSubsystem {
         }}, Set.of());
     }
 
+    private Command intakeAlgaeAuto(){
+        return new DeferredCommand(() -> {
+            if(isAlgaeUp){
+                return topAlgae();
+            }else{
+                return botAlgae();
+            }
+        }, Set.of());
+    }
+
+    public Command intakeAlgaeProcess(){
+        return new DeferredCommand(() -> {
+            return Commands.sequence(
+                TeleopPosSelector.Instance.runToNearestBranchAlgae(),
+                intakeAlgaeAuto()
+            );
+        }, Set.of());
+    }
+
     public Command LXElevator(int level){
 
         return new SequentialCommandGroup(
@@ -528,6 +549,13 @@ public class CatzSuperstructure extends VirtualSubsystem {
             Commands.print("LXElevator run"),
             CatzElevator.Instance.Elevator_LX(level)
         ).unless(()-> Robot.isSimulation()).alongWith(Commands.print("L" + level+" CatzElevator.Instance Raise")).unless(()-> Robot.isSimulation());
+    }
+
+    public Command LXElevator(){
+        return new DeferredCommand(() -> {
+            return CatzElevator.Instance.Elevator_LX(level);
+
+        }, Set.of());
     }
 
     //--------------------------------------------------------------------------------
@@ -553,9 +581,6 @@ public class CatzSuperstructure extends VirtualSubsystem {
     public Command topAlgae() {
 
         return new ParallelCommandGroup(
-            CatzOuttake.Instance.stopOuttake(),
-            CatzRampPivot.Instance.Ramp_Intake_Pos(),
-            CatzIntakeRollers.Instance.stopIntaking(),
             CatzElevator.Instance.Elevator_BOT_TOP(),
 
             new SequentialCommandGroup(

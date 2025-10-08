@@ -159,15 +159,13 @@ public class RobotContainer {
     xboxDrv.a().toggleOnTrue(CatzElevator.Instance.decrementElevatorPosition().onlyIf(()-> CatzSuperstructure.Instance.getIsScoring().get()));
     xboxDrv.y().toggleOnTrue(CatzElevator.Instance.incrementElevatorPosition().onlyIf(() -> CatzSuperstructure.Instance.getIsScoring().get()));
 
-    xboxDrv.b().toggleOnTrue(TeleopPosSelector.Instance.runLeftRight(LeftRight.RIGHT).unless(()->CatzSuperstructure.isClimbEnabled()));
-    xboxDrv.x().toggleOnTrue(TeleopPosSelector.Instance.runLeftRight(LeftRight.LEFT).unless(()->CatzSuperstructure.isClimbEnabled()));
-
-
     // cancel drive to reef
-  xboxDrv.x().onTrue(CatzDrivetrain.Instance.cancelTrajectory()
+    xboxDrv.x().onTrue(CatzDrivetrain.Instance.cancelTrajectory()
     .alongWith(new InstantCommand(() -> isScoring = false))
     .alongWith(Commands.print("cancelling path"))
     .alongWith(CatzSuperstructure.Instance.stow()));
+
+    xboxDrv.rightStick().onTrue(CatzSuperstructure.Instance.intakeAlgaeProcess());
 
     // override score
     xboxDrv.povUp().toggleOnTrue(CatzElevator.Instance.setRaiseOverride(true).unless(() -> CatzSuperstructure.isClimbEnabled()).alongWith(Commands.print("override score")));
@@ -209,17 +207,16 @@ public class RobotContainer {
     // xboxAux.a().onTrue(CatzSuperstructure.Instance.topAlgae());
     xboxAux.rightStick().onTrue(CatzClimb.Instance.reZero());
 
-    xboxAux.x().onTrue(CatzSuperstructure.Instance.stow());
-    xboxAux.y().onTrue(CatzSuperstructure.Instance.LXElevator(CatzSuperstructure.Instance.getLevel()).alongWith(new InstantCommand(() -> CatzElevator.Instance.setAuxControl(true))));
+    xboxAux.y().onTrue(CatzSuperstructure.Instance.LXElevator().alongWith(new InstantCommand(() -> CatzElevator.Instance.setAuxControl(true))));
+    xboxAux.x().onTrue(CatzSuperstructure.Instance.stow().alongWith(Commands.print("STOWWW")));
+    xboxAux.b().onTrue(CatzSuperstructure.Instance.intake().alongWith(Commands.print("INTAKE")));
+    
 
     // Gamepiece Selection
     // xboxAux.leftTrigger().onTrue(Commands.runOnce(()-> CatzSuperstructure.setChosenGamepiece(Gamepiece.CORAL)));
     // xboxAux.rightTrigger().onTrue(Commands.runOnce(()-> CatzSuperstructure.setChosenGamepiece(Gamepiece.ALGAE)));
 
     // // Scoring Action
-    xboxAux.x().onTrue(CatzSuperstructure.Instance.intake().alongWith(Commands.print("INTAKE")));
-    xboxAux.y().onTrue(CatzSuperstructure.Instance.LXCoral().alongWith(Commands.print("OUTTAKE L" + CatzSuperstructure.Instance.getLevel())));
-    xboxAux.a().onTrue(CatzSuperstructure.Instance.stow().alongWith(Commands.print("STOWWW")));
     // xboxAux.b().onTrue(CatzSuperstructure.Instance.algaeStow());
 
 
