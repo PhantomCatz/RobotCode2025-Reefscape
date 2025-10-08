@@ -210,6 +210,7 @@ public class RobotContainer {
     xboxAux.y().onTrue(CatzSuperstructure.Instance.LXElevator().alongWith(new InstantCommand(() -> CatzElevator.Instance.setAuxControl(true))));
     xboxAux.x().onTrue(CatzSuperstructure.Instance.stow().alongWith(Commands.print("STOWWW")));
     xboxAux.b().onTrue(CatzSuperstructure.Instance.intake().alongWith(Commands.print("INTAKE")));
+    xboxAux.leftBumper().onTrue(CatzSuperstructure.Instance.LXCoral().alongWith(new InstantCommand(() -> CatzElevator.Instance.setAuxControl(true))));
     
 
     // Gamepiece Selection

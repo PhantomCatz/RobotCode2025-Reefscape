@@ -13,11 +13,13 @@ import frc.robot.Autonomous.AutoRoutineSelector;
 import frc.robot.Autonomous.CatzAutonomous;
 import frc.robot.CatzConstants.RobotHardwareMode;
 import frc.robot.CatzConstants.RobotID;
+import frc.robot.CatzSubsystems.CatzSuperstructure;
 import frc.robot.CatzSubsystems.CatzAlgaeEffector.CatzAlgaePivot.CatzAlgaePivot;
 import frc.robot.CatzSubsystems.CatzAlgaeEffector.CatzAlgaePivot.CatzAlgaePivot.AlgaePivotPosition;
 import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.CatzRobotTracker;
 import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.Drivetrain.CatzDrivetrain;
 import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.Vision.CatzVision;
+import frc.robot.CatzSubsystems.CatzElevator.CatzElevator;
 import frc.robot.CatzSubsystems.CatzLEDs.CatzLED;
 import frc.robot.CatzSubsystems.CatzLEDs.CatzLED.ControllerLEDState;
 import frc.robot.CatzSubsystems.CatzOuttake.CatzOuttake;
@@ -333,6 +335,7 @@ public class Robot extends LoggedRobot {
   @Override
   public void disabledInit() {
     CatzRampPivot.Instance.setNeutralMode(NeutralMode.COAST);
+    CatzElevator.Instance.setAuxControl(false);
     isResetPositionUsedInAuto = false;
   }
 
