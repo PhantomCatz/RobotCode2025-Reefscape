@@ -258,11 +258,11 @@ public class CatzSuperstructure extends VirtualSubsystem {
     public Command intakeCoralStation() {
 
         return new ParallelCommandGroup(
-            CatzAlgaeRemover.Instance.stopAlgae(),
-            CatzAlgaePivot.Instance.AlgaePivot_Stow(),
+            // CatzAlgaeRemover.Instance.stopAlgae(),
+            // CatzAlgaePivot.Instance.AlgaePivot_Stow(),
             CatzOuttake.Instance.startIntaking(),
-            CatzElevator.Instance.Elevator_Stow(),
-            CatzRampPivot.Instance.Ramp_Intake_Pos(),
+            // CatzElevator.Instance.Elevator_Stow(),
+            // CatzRampPivot.Instance.Ramp_Intake_Pos(),
             CatzIntakeRollers.Instance.intake()
         ).unless(()-> Robot.isSimulation()).alongWith(Commands.print("Intake Coral Station")).andThen(new InstantCommand(() -> TeleopPosSelector.Instance.hasCoralSIM = true));
     }
@@ -391,6 +391,37 @@ public class CatzSuperstructure extends VirtualSubsystem {
                 currentRobotState = RobotState.L4_CORAL;
 
                 return L4Coral().andThen(new InstantCommand(()-> {selector.hasCoralSIM = false;}));
+
+                default:
+                System.out.println("Invalid Coral Scoring Level!");
+                return new InstantCommand();
+            }
+        }, Set.of());
+    }
+
+    public Command LXCoralAux(){
+        TeleopPosSelector selector = TeleopPosSelector.Instance;
+        return new DeferredCommand(() -> {
+            switch(level){
+                case 1:
+                currentRobotState = RobotState.L1_CORAL;
+
+                return CatzElevator.Instance.setCanMoveElevator(true).andThen(L1Coral().andThen(new InstantCommand(()-> {selector.hasCoralSIM = false;})));
+
+                case 2:
+                currentRobotState = RobotState.L2_CORAL;
+
+                return CatzElevator.Instance.setCanMoveElevator(true).andThen(L2Coral().andThen(new InstantCommand(()-> {selector.hasCoralSIM = false;})));
+
+                case 3:
+                currentRobotState = RobotState.L3_CORAL;
+
+                return CatzElevator.Instance.setCanMoveElevator(true).andThen(L3Coral().andThen(new InstantCommand(()-> {selector.hasCoralSIM = false;})));
+
+                case 4:
+                currentRobotState = RobotState.L4_CORAL;
+
+                return CatzElevator.Instance.setCanMoveElevator(true).andThen(L4Coral().andThen(new InstantCommand(()-> {selector.hasCoralSIM = false;})));
 
                 default:
                 System.out.println("Invalid Coral Scoring Level!");

@@ -39,10 +39,10 @@ public class CatzClimb extends SubsystemBase {
   static LoggedTunableNumber kA = new LoggedTunableNumber("Climb/kA", 0);
 
   @RequiredArgsConstructor
-  public enum ClimbPosition { //In Rotations //TBD
-    RETRACT(() -> 0.0), //TBD
-    HOME(() -> 0.0), //TBD
-    EXTENDING(() -> -160.0), //TBD
+  public enum ClimbPosition { //In Rotations
+    RETRACT(() -> 0.0),
+    HOME(() -> 0.0),
+    EXTENDING(() -> -330.0),
     MANUAL(() -> 0.0),
     FULL_MANUAL(() -> 0.0),
     TUNNABLE(tunnablePos);
