@@ -217,6 +217,7 @@ public class CatzSuperstructure extends VirtualSubsystem {
             Commands.runOnce(()-> {
                 isScoring = () -> true;
                 canShoot = () -> false;
+                CatzElevator.Instance.setAuxControl(false);
                 CatzElevator.Instance.setCanMoveElevator(false).asProxy();
                 CatzSuperstructure.Instance.setLevel(level);
                 CatzElevator.Instance.setElevatorTargetPosition(level);
