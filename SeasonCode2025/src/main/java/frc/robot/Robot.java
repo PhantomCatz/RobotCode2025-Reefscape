@@ -387,7 +387,7 @@ public class Robot extends LoggedRobot {
     // m_autonomousCommand = CatzSuperstructure.Instance.scoreLevelTwoAutomated();
     //m_autonomousCommand = AutoRoutineSelector.Instance.getSelectedCommand();
     m_autonomousCommand = CatzAutonomous.Instance.getCommand();
-    //CatzRampPivot.Instance.Ramp_Intake_Pos().withTimeout(1.0);
+    CatzRampPivot.Instance.Ramp_Intake_Pos().withTimeout(1.0);
     if (m_autonomousCommand != null) {
       m_autonomousCommand.schedule();
     }
@@ -413,7 +413,7 @@ public class Robot extends LoggedRobot {
     if (m_autonomousCommand != null) {
       m_autonomousCommand.cancel();
     } else {
-      //CatzRampPivot.Instance.Ramp_Intake_Pos().withTimeout(1.0);
+      CatzRampPivot.Instance.Ramp_Intake_Pos().withTimeout(1.0);
     }
 
 

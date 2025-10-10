@@ -197,7 +197,7 @@ public class RobotContainer {
 
 
     auxRampDown.toggleOnTrue(CatzRampPivot.Instance.Ramp_Climb_Pos());
-    auxRampUp.toggleOnTrue(CatzRampPivot.Instance.Ramp_Stow_Pos());
+    auxRampUp.toggleOnTrue(CatzRampPivot.Instance.Ramp_Intake_Pos());
 
     xboxAux.povUp().onTrue(CatzClimb.Instance.ClimbManualModeAux(()-> 0.4));
     xboxAux.povUp().onFalse(CatzClimb.Instance.CancelClimb());
