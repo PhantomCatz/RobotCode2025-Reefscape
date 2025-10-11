@@ -12,11 +12,8 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.RobotContainer;
-import frc.robot.CatzSubsystems.CatzSuperstructure;
 import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.CatzRobotTracker;
 import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.Drivetrain.CatzDrivetrain;
-import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.Vision.CatzVision;
-import frc.robot.CatzSubsystems.CatzElevator.CatzElevator;
 
 public class PIDDriveCmdAlgae extends Command{
 

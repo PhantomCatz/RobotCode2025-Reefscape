@@ -17,7 +17,7 @@ public class RampPivotConstants {
     public static final double RAMP_STOW = 0.0;
     public static final double RAMP_INTAKE = 2.1;//7.5;//2.240625;//1.536;//2.240625;//4.9; // 0.536
 
-    public static final double RAMP_CLIMB = 34.810546-5.0;
+    public static final double RAMP_CLIMB = 34.810546-3.0;
     public static final double RAMP_L1_SCORE = 20.0;
     public static final double heightPlaceholder = 10;
 

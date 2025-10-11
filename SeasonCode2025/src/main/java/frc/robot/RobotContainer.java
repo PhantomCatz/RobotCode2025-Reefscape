@@ -165,7 +165,7 @@ public class RobotContainer {
     .alongWith(Commands.print("cancelling path"))
     .alongWith(CatzSuperstructure.Instance.stow()));
 
-    xboxDrv.rightStick().onTrue(CatzSuperstructure.Instance.intakeAlgaeProcess());
+    // xboxDrv.rightStick().onTrue(CatzSuperstructure.Instance.intakeAlgaeProcess());
 
     // override score
     xboxDrv.povUp().toggleOnTrue(CatzElevator.Instance.setRaiseOverride(true).unless(() -> CatzSuperstructure.isClimbEnabled()).alongWith(Commands.print("override score")));
@@ -211,7 +211,7 @@ public class RobotContainer {
     xboxAux.x().onTrue(CatzSuperstructure.Instance.stow().alongWith(Commands.print("STOWWW")));
     xboxAux.b().onTrue(CatzSuperstructure.Instance.intakeCoralStation().alongWith(Commands.print("INTAKE")));
     xboxAux.leftBumper().onTrue(CatzSuperstructure.Instance.LXCoral().alongWith(new InstantCommand(() -> CatzElevator.Instance.setAuxControl(true))));
-    
+
 
     // Gamepiece Selection
     // xboxAux.leftTrigger().onTrue(Commands.runOnce(()-> CatzSuperstructure.setChosenGamepiece(Gamepiece.CORAL)));

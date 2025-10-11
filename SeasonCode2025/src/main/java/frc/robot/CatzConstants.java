@@ -17,7 +17,7 @@ public final class CatzConstants {
   //  Robot Modes
   //
   // --------------------------------------------------/
-  public static final RobotScenario robotScenario = RobotScenario.TUNING;
+  public static final RobotScenario robotScenario = RobotScenario.COMPETITION;
   public static final RobotHardwareMode hardwareMode = RobotHardwareMode.REAL;
   private static RobotID robotType = RobotID.SN2;
   private static AlertPriority alertWarningPriority = AlertPriority.ONE;

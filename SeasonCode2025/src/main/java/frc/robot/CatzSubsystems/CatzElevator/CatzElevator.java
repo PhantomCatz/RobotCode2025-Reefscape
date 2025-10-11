@@ -12,7 +12,6 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.PrintCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.CatzConstants;
-import frc.robot.CatzSubsystems.CatzOuttake.CatzOuttake;
 import frc.robot.Utilities.LoggedTunableNumber;
 import lombok.RequiredArgsConstructor;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -106,6 +105,7 @@ public class CatzElevator extends SubsystemBase {
     Logger.processInputs("RealInputs/Elevator", inputs);
 
     isElevatorInPos = isElevatorInPosition();
+    Logger.recordOutput("Aux Control", auxControl);
 
     //--------------------------------------------------------------------------------------------------------
     // Update controllers when user specifies
@@ -186,7 +186,7 @@ public class CatzElevator extends SubsystemBase {
         } else {
           io.runSetpointDown(targetPosition.getTargetPositionInch());
         }
-      } else if (((canMoveElevator || DriverStation.isAutonomous()) && CatzOuttake.Instance.isHoldingCoral()) || auxControl) {
+      } else if (((canMoveElevator || DriverStation.isAutonomous()) )) {
         //Setpoint PID
         io.runSetpointUp(targetPosition.getTargetPositionInch());
 

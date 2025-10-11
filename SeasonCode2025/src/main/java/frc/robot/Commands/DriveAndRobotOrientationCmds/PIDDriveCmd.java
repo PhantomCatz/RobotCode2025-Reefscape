@@ -100,6 +100,10 @@ public class PIDDriveCmd extends Command{
         }else{
             RobotContainer.Instance.rumbleDrvController(0.0);
         }
+
+        Logger.recordOutput("Is At Target State", isAtTargetState());
+        Logger.recordOutput("Is Seeing Apriltag", CatzVision.Instance.isSeeingApriltag());
+        Logger.recordOutput("Vision Pose Shift", CatzRobotTracker.Instance.getVisionPoseShift().getNorm() < ALLOWABLE_VISION_ADJUST);
         return (readyToScore && CatzSuperstructure.Instance.getCanShoot().get()) || CatzElevator.Instance.getRaiseOverride();
     }
 
