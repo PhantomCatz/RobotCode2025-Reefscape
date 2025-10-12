@@ -1,5 +1,6 @@
 package frc.robot.Commands.DriveAndRobotOrientationCmds;
 
+import org.checkerframework.checker.units.qual.N;
 import org.littletonrobotics.junction.Logger;
 
 
@@ -67,7 +68,10 @@ public class PIDDriveCmd extends Command{
         Pose2d currentPose = CatzRobotTracker.Instance.getEstimatedPose();
         Translation2d poseError = goalPos.minus(currentPose).getTranslation();
 
-        if(poseError.getNorm() < 0.0001) return;
+        if(poseError.getNorm() < 0.0001) {
+            System.out.println("Pose error very small!!");
+            return;
+        }
 
         double currentDistance = poseError.getNorm();
         Logger.recordOutput("Current Distance", currentDistance);
@@ -127,7 +131,7 @@ public class PIDDriveCmd extends Command{
 
     @Override
     public void end(boolean interrupted) {
-        System.out.println("finished!!!!!! yayayay");
+        System.out.println("finished!!!!!! yayayay " + interrupted);
         RobotContainer.Instance.rumbleDrvController(0.0);
         CatzDrivetrain.Instance.drive(new ChassisSpeeds());
     }
