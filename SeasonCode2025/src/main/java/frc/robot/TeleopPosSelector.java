@@ -160,7 +160,7 @@ public class TeleopPosSelector { //TODO split up the file. it's too big and does
       scoringPos = radius.plus(leftRight).plus(Reef.center);
     }else{
       scoringPos = radius.plus(Reef.center);
-      CatzSuperstructure.Instance.isAlgaeUp = reefAngle % 2 == 0;
+      CatzSuperstructure.Instance.isAlgaeUp = reefAngle % 2 == 1;
     }
 
     return AllianceFlipUtil.apply(new Pose2d(scoringPos, selectedAngle.plus(Rotation2d.k180deg)));

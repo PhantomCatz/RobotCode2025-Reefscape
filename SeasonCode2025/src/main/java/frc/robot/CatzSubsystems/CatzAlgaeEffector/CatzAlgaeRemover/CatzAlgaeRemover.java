@@ -13,6 +13,8 @@ public class CatzAlgaeRemover extends SubsystemBase {
   private final AlgaeRemoverIO io;
   private final AlgaeEffectorIOInputsAutoLogged inputs = new AlgaeEffectorIOInputsAutoLogged();
 
+  public boolean algaeRemove = false;
+
   private CatzAlgaeRemover() {
     if(isAlgaeRemoverDisabled) { //Comes from Algae Remover Constants
       io = new AlgaeRemoverIONull();

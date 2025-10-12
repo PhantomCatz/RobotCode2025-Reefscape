@@ -70,6 +70,7 @@ public class PIDDriveCmd extends Command{
         if(poseError.getNorm() < 0.0001) return;
 
         double currentDistance = poseError.getNorm();
+        Logger.recordOutput("Current Distance", currentDistance);
         Rotation2d direction = poseError.getAngle();
         double angleError = MathUtil.inputModulus(goalPos.getRotation().getDegrees() - currentPose.getRotation().getDegrees(), -180.0, 180.0);
 
@@ -101,7 +102,7 @@ public class PIDDriveCmd extends Command{
             RobotContainer.Instance.rumbleDrvController(0.0);
         }
 
-        Logger.recordOutput("Is At Target State", isAtTargetState());
+        // Logger.recordOutput("Is At Target State", isAtTargetState());
         Logger.recordOutput("Is Seeing Apriltag", CatzVision.Instance.isSeeingApriltag());
         Logger.recordOutput("Vision Pose Shift", CatzRobotTracker.Instance.getVisionPoseShift().getNorm() < ALLOWABLE_VISION_ADJUST);
         return (readyToScore && CatzSuperstructure.Instance.getCanShoot().get()) || CatzElevator.Instance.getRaiseOverride();
@@ -116,9 +117,9 @@ public class PIDDriveCmd extends Command{
         double linearVelocity = Math.hypot(currentSpeed.vxMetersPerSecond, currentSpeed.vyMetersPerSecond);
 
         double rotationError = Math.abs(MathUtil.inputModulus(goalPos.getRotation().getDegrees() - currentPose.getRotation().getDegrees(), -180.0, 180.0));
-        // Logger.recordOutput("Rotation Error", rotationError < ANGLE_TOLERANCE_DEGREES);
-        // Logger.recordOutput("Distance Error", distanceError < POSITION_TOLERANCE_METERS);
-        // Logger.recordOutput("Linear Velocity", linearVelocity < VELOCITY_TOLERANCE_MPS);
+        Logger.recordOutput("Rotation Error", rotationError < ANGLE_TOLERANCE_DEGREES);
+        Logger.recordOutput("Distance Error", distanceError < POSITION_TOLERANCE_METERS);
+        Logger.recordOutput("Linear Velocity", linearVelocity < VELOCITY_TOLERANCE_MPS);
         return distanceError < POSITION_TOLERANCE_METERS &&
                linearVelocity < VELOCITY_TOLERANCE_MPS &&
                rotationError < ANGLE_TOLERANCE_DEGREES;

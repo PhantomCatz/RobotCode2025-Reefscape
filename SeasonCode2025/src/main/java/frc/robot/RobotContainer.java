@@ -165,7 +165,7 @@ public class RobotContainer {
     .alongWith(Commands.print("cancelling path"))
     .alongWith(CatzSuperstructure.Instance.stow()));
 
-    // xboxDrv.rightStick().onTrue(CatzSuperstructure.Instance.intakeAlgaeProcess());
+    xboxDrv.rightStick().onTrue(CatzSuperstructure.Instance.intakeAlgaeProcess());
 
     // override score
     xboxDrv.povUp().toggleOnTrue(CatzElevator.Instance.setRaiseOverride(true).unless(() -> CatzSuperstructure.isClimbEnabled()).alongWith(Commands.print("override score")));
