@@ -62,7 +62,10 @@ public class PIDDriveCmd extends Command{
 
     @Override
     public void execute(){
-        if(readyToScore) return;
+        if(readyToScore) {
+            CatzDrivetrain.Instance.drive(new ChassisSpeeds());
+            return;
+        };
 
         goalPos = CatzDrivetrain.Instance.getPIDGoalPose();
         Pose2d currentPose = CatzRobotTracker.Instance.getEstimatedPose();
@@ -134,5 +137,6 @@ public class PIDDriveCmd extends Command{
         System.out.println("finished!!!!!! yayayay " + interrupted);
         RobotContainer.Instance.rumbleDrvController(0.0);
         CatzDrivetrain.Instance.drive(new ChassisSpeeds());
+        CatzDrivetrain.Instance.setDistanceError(9999999.9);
     }
 }

@@ -108,8 +108,9 @@ public class CatzElevator extends SubsystemBase {
 
     isElevatorInPos = isElevatorInPosition();
     Logger.recordOutput("Aux Control", auxControl);
+    Logger.recordOutput("Elevator Raise Override", raiseOverride);
 
-    //--------------------------------------------------------------------------------------------------------
+  //--------------------------------------------------------------------------------------------------------
     // Update controllers when user specifies
     //--------------------------------------------------------------------------------------------------------
     LoggedTunableNumber.ifChanged(

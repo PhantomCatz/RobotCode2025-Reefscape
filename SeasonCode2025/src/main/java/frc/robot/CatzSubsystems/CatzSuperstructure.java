@@ -214,6 +214,7 @@ public class CatzSuperstructure extends VirtualSubsystem {
     //--------------------------------------------------------------------------------
     public Command scoreLevelXAutomated(int level){
         return Commands.sequence(
+            CatzElevator.Instance.setRaiseOverride(false).asProxy(),
             Commands.runOnce(()-> {
                 isScoring = () -> true;
                 canShoot = () -> false;
