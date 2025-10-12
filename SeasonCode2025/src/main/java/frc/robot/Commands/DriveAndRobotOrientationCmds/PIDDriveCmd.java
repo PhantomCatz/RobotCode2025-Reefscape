@@ -32,6 +32,8 @@ public class PIDDriveCmd extends Command{
     private Pose2d goalPos;
     private boolean readyToScore = false;
 
+    private int counter = 0; //I'm sorry the issue is likely some weird race condition and this is the best way to prevent it.
+
     public PIDDriveCmd(Pose2d goal){
         addRequirements(CatzDrivetrain.Instance);
 
@@ -58,10 +60,13 @@ public class PIDDriveCmd extends Command{
     public void initialize(){
         goalPos = CatzDrivetrain.Instance.getPIDGoalPose();
         Logger.recordOutput("PID Target Pose", goalPos);
+
+        counter = 0;
     }
 
     @Override
     public void execute(){
+        counter++;
         if(readyToScore) {
             CatzDrivetrain.Instance.drive(new ChassisSpeeds());
             return;
@@ -86,6 +91,16 @@ public class PIDDriveCmd extends Command{
 
         // The goal of the translation controller is to drive the distance error to zero
         double targetVel = Math.abs(translationController.calculate(currentDistance, 0.0));
+
+        if(Math.abs(targetVel) > 0.05){ //only apply feed forward when you actually have a target velocity
+            ChassisSpeeds currentSpeed = CatzRobotTracker.Instance.getRobotChassisSpeeds();
+
+            double linearVelocity = Math.hypot(currentSpeed.vxMetersPerSecond, currentSpeed.vyMetersPerSecond);
+            if(linearVelocity < 0.05){ //only apply feedfoward when you're not already moving
+                targetVel += Math.signum(targetVel) * 0.05;
+            }
+        }
+
         // Logger.recordOutput("Pose Error Target Vel", targetVel);
         // Logger.recordOutput("Pose Error Cosine", direction.getCos());
         // Logger.recordOutput("Pose Error Sine", direction.getSin());
@@ -109,10 +124,12 @@ public class PIDDriveCmd extends Command{
             RobotContainer.Instance.rumbleDrvController(0.0);
         }
 
+        
+
         // Logger.recordOutput("Is At Target State", isAtTargetState());
         Logger.recordOutput("Is Seeing Apriltag", CatzVision.Instance.isSeeingApriltag());
         Logger.recordOutput("Vision Pose Shift", CatzRobotTracker.Instance.getVisionPoseShift().getNorm() < ALLOWABLE_VISION_ADJUST);
-        return (readyToScore && CatzSuperstructure.Instance.getCanShoot().get()) || CatzElevator.Instance.getRaiseOverride();
+        return ((readyToScore && CatzSuperstructure.Instance.getCanShoot().get()) || CatzElevator.Instance.getRaiseOverride()) && counter > 10;
     }
 
     private boolean isAtTargetState(){
