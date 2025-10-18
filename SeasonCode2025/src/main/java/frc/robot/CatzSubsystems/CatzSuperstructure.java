@@ -227,8 +227,8 @@ public class CatzSuperstructure extends VirtualSubsystem {
             Commands.print("start score level"+level+" auto"),
             Commands.parallel(
                 TeleopPosSelector.Instance.runToNearestBranch(),
-                new WaitUntilCommand(() -> (CatzDrivetrain.Instance.getDistanceError() < 0.1 || CatzElevator.Instance.getRaiseOverride()))
-                .andThen(CatzElevator.Instance.setCanMoveElevator(true).asProxy().alongWith(Commands.print("set from superstructure")))
+                new WaitCommand(0.4).andThen(new WaitUntilCommand(() -> (CatzDrivetrain.Instance.getDistanceError() < 0.1 || CatzElevator.Instance.getRaiseOverride()))
+                .andThen(CatzElevator.Instance.setCanMoveElevator(true).asProxy().alongWith(Commands.print("set from superstructure"))))
             ),
             Commands.print("finish running"),
             new InstantCommand(() -> System.out.println("isScoring: " + isScoring.get())),

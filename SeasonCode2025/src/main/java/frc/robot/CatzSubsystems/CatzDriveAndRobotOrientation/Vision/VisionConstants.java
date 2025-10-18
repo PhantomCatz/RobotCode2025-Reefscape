@@ -59,7 +59,7 @@ public class VisionConstants {
   public static final boolean USE_MEGATAG1 = false; // megatag 1 3d solve allows robot to fly
 
   public static final HashMap<String, Double> PING_MAP = new HashMap<>() {{
-    put("limelight-gyoza", 76.25);
+    put("limelight-ramen", 76.25);
     put("limelight-soba", 76.25);
 
   }};

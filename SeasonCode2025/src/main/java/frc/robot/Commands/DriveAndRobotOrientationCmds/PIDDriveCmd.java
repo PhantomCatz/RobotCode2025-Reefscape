@@ -1,6 +1,5 @@
 package frc.robot.Commands.DriveAndRobotOrientationCmds;
 
-import org.checkerframework.checker.units.qual.N;
 import org.littletonrobotics.junction.Logger;
 
 
@@ -96,8 +95,8 @@ public class PIDDriveCmd extends Command{
             ChassisSpeeds currentSpeed = CatzRobotTracker.Instance.getRobotChassisSpeeds();
 
             double linearVelocity = Math.hypot(currentSpeed.vxMetersPerSecond, currentSpeed.vyMetersPerSecond);
-            if(linearVelocity < 0.05){ //only apply feedfoward when you're not already moving
-                targetVel += Math.signum(targetVel) * 0.05;
+            if(linearVelocity < 0.20){ //only apply feedfoward when you're not already moving
+                targetVel += Math.signum(targetVel) * 0.2;
             }
         }
 
@@ -124,7 +123,7 @@ public class PIDDriveCmd extends Command{
             RobotContainer.Instance.rumbleDrvController(0.0);
         }
 
-        
+
 
         // Logger.recordOutput("Is At Target State", isAtTargetState());
         Logger.recordOutput("Is Seeing Apriltag", CatzVision.Instance.isSeeingApriltag());

@@ -28,6 +28,8 @@ public class PIDDriveCmdAlgae extends Command{
     private Pose2d goalPos;
     private boolean readyToScore = false;
 
+    private int counter = 0; //I'm sorry the issue is likely some weird race condition and this is the best way to prevent it.
+
     public PIDDriveCmdAlgae(Pose2d goal){
         addRequirements(CatzDrivetrain.Instance);
 
@@ -54,10 +56,14 @@ public class PIDDriveCmdAlgae extends Command{
     public void initialize(){
         goalPos = CatzDrivetrain.Instance.getPIDGoalPose();
         Logger.recordOutput("PID Target Pose", goalPos);
+        counter = 0;
+
     }
 
     @Override
     public void execute(){
+
+        counter++;
         if(readyToScore) return;
 
         goalPos = CatzDrivetrain.Instance.getPIDGoalPose();
@@ -91,7 +97,7 @@ public class PIDDriveCmdAlgae extends Command{
 
     @Override
     public boolean isFinished(){
-        return isAtTargetState();
+        return isAtTargetState() && counter > 10;
     }
 
     private boolean isAtTargetState(){
@@ -116,5 +122,6 @@ public class PIDDriveCmdAlgae extends Command{
         System.out.println("finished!!!!!! yayayay");
         RobotContainer.Instance.rumbleDrvController(0.0);
         CatzDrivetrain.Instance.drive(new ChassisSpeeds());
+        CatzDrivetrain.Instance.setDistanceError(9999999.9);
     }
 }

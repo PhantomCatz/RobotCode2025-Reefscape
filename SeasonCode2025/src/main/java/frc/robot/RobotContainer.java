@@ -189,7 +189,7 @@ public class RobotContainer {
     xboxAux.leftStick().and(xboxAux.rightStick()).onTrue(CatzElevator.Instance.elevatorFullManual(() -> -xboxAux.getLeftY()).alongWith(Commands.print("Elevator Manual"))); // TODO make an override button for
     isElevatorFullManual.onTrue(CatzElevator.Instance.elevatorFullManual(() -> -xboxAux.getLeftY()).alongWith(Commands.print("Elevator Manual"))); // TODO make an override button for
     xboxAux.leftStick().and(xboxAux.rightStick()).onTrue(CatzAlgaePivot.Instance.AlgaePivotFullManualCommand(()->xboxAux.getRightY()).alongWith(Commands.print("Algae Manual")));
-    isAlgaePivotFullManual.onTrue(CatzAlgaePivot.Instance.AlgaePivotFullManualCommand(()->xboxAux.getRightY()).alongWith(Commands.print("Algae Manual")));
+    // isAlgaePivotFullManual.onTrue(CatzAlgaePivot.Instance.AlgaePivotFullManualCommand(()->xboxAux.getRightY()).alongWith(Commands.print("Algae Manual")));
     isRampPivotFullManual.onTrue(CatzRampPivot.Instance.rampPivotManual(()->-xboxAux.getLeftY()).alongWith(Commands.print("Manual Ramp")));
 
     Trigger auxRampDown = DoublePressTracker.createTrigger(xboxAux.start());
