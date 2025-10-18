@@ -28,7 +28,7 @@ public class LimelightConstants {
 			new Pose3d(new Translation3d(0.25, 0.281, 0.232), new Rotation3d(0.8, 15.0, 18.0))
 		))
 	};
-
+ 
 	//TODO Use this instead of vision shift for auto aim
 	public static final int agreedTranslationUpdatesThreshold = 100;
 	public static final Distance agreedTranslationUpdateEpsilon = Units.Centimeters.of(10.0);
