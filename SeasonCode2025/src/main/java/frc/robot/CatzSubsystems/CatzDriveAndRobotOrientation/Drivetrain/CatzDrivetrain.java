@@ -3,6 +3,7 @@ package frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.Drivetrain;
 import static frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.Drivetrain.DriveConstants.*;
 
 import com.ctre.phoenix6.signals.NeutralModeValue;
+import com.ctre.phoenix6.swerve.SwerveDrivetrain;
 import com.pathplanner.lib.util.PathPlannerLogging;
 
 import choreo.auto.AutoTrajectory;
@@ -210,6 +211,7 @@ public class CatzDrivetrain extends SubsystemBase {
     Logger.recordOutput("Drive/Odometry module states", getModuleStates());
     Logger.recordOutput("Drive/Odometry wheel positions", wheelPositions);
     Logger.recordOutput("Drive/Odometry robot velocity", robotRelativeVelocity);
+
   } // end of drivetrain periodic
 
   // --------------------------------------------------------------------------------------------------------------------------

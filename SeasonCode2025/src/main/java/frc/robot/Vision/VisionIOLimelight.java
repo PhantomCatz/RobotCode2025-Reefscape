@@ -3,8 +3,6 @@ package frc.robot.Vision;
 import com.ctre.phoenix6.Utils;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.networktables.NetworkTableInstance;
-import edu.wpi.first.networktables.StructPublisher;
 import edu.wpi.first.units.Units;
 import edu.wpi.first.units.measure.Time;
 import edu.wpi.first.wpilibj.Timer;
@@ -13,18 +11,18 @@ import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.CatzRobotTracker;
 import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.CatzRobotTracker.VisionObservation;
 import frc.robot.Utilities.LimelightHelpers;
 import frc.robot.Utilities.LimelightHelpers.PoseEstimate;
-import frc.robot.Vision.LimelightSubsystem.LimelightConfig;
-import frc.robot.Vision.LimelightConstants;
+import frc.robot.Vision.LimelightConstants.LimelightConfig;
 
-public class VisionIOLimelight extends VisionIO {
+public class VisionIOLimelight implements VisionIO {
 	private Pose2d latestEstimate = new Pose2d();
 	private Time latestEstimateTime = Units.Seconds.of(0.0);
     private int latestEstimateNumTags = 0;
 	private LimelightConfig config = new LimelightConfig();
-	protected StructPublisher<Pose2d> visPose = NetworkTableInstance.getDefault()
-			.getTable("SmartDashboard/Vision")
-			.getStructTopic("", Pose2d.struct)
-			.publish();
+
+
+	public VisionIOLimelight(LimelightConfig config){
+		this.config = config;
+	}
 
 	@Override
 	public void setLatestEstimate(PoseEstimate poseEstimate, int minTagNum) {
@@ -36,9 +34,9 @@ public class VisionIOLimelight extends VisionIO {
 		if (poseEstimate.tagCount >= minTagNum) {
 			latestEstimate = poseEstimate.pose;
 			latestEstimateTime = Units.Seconds.of(poseEstimate.timestampSeconds);
-			visPose.set(poseEstimate.pose);
 			CatzRobotTracker.Instance.addVisionObservation(
-                new VisionObservation(, poseEstimate.pose, Units.Seconds.of(poseEstimate.timestampSeconds), LimelightConstants.enabledVisionStdDevs.times(poseEstimate.avgTagDist)));
+                new VisionObservation(config.name, poseEstimate.pose, poseEstimate.timestampSeconds, LimelightConstants.enabledVisionStdDevs.times(poseEstimate.avgTagDist))
+			);
 		}
 	}
 
@@ -58,28 +56,29 @@ public class VisionIOLimelight extends VisionIO {
 	public void update() {
 		updateGyro();
 		setLatestEstimate(LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2(config.name), 1);
-
-		SmartDashboard.putBoolean(config.name + "/Disabled", disabled);
 	}
 
 	@Override
-	public void disable(boolean disable) {
-		super.disable(disable);
+	public void updateInputs(VisionIOInputs inputs){
+		inputs.hasTargets = latestEstimateNumTags > 0;
+		inputs.calculatedPose = latestEstimate;
+	}
 
-		if (disabled) {
-			LimelightHelpers.setPipelineIndex(config.name, LimelightConstants.kDisabledPipeline);
-		} else {
-			LimelightHelpers.setPipelineIndex(config.name, LimelightConstants.kEnabledPipeline);
-		}
+	@Override
+	public int getNumTags(){
+		return latestEstimateNumTags;
 	}
 
 	private void updateGyro() {
-
 		Rotation2d theta = CatzRobotTracker.Instance.getEstimatedPose().getRotation();
 		LimelightHelpers.SetRobotOrientation(config.name, theta.getDegrees(), 0, 0, 0, 0, 0);
 	}
 
 	public void updateConfig(LimelightConfig config) {
 		this.config = config;
+	}
+
+	public LimelightConfig getConfig(){
+		return config;
 	}
 }

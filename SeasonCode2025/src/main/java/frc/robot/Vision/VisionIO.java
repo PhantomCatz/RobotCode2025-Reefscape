@@ -1,19 +1,23 @@
 package frc.robot.Vision;
 
+import org.littletonrobotics.junction.AutoLog;
+
+import edu.wpi.first.math.geometry.Pose2d;
 import frc.robot.Utilities.LimelightHelpers.PoseEstimate;
 
-public abstract class VisionIO {
-	protected boolean disabled = false;
+public interface VisionIO {
 
-	public void disable(boolean disable) {
-		disabled = disable;
-	}
+	public default void setLatestEstimate(PoseEstimate poseEstimate, int minTagNum) {};
 
-	public abstract void setLatestEstimate(PoseEstimate poseEstimate, int minTagNum);
+	public default void update() {};
+	
+	public default void updateInputs(VisionIOInputs inputs) {}
 
-	public abstract void update();
+	int getNumTags();
 
-	public boolean getDisabled() {
-		return disabled;
+	@AutoLog
+	public static class VisionIOInputs {
+		public boolean hasTargets = false;
+		public Pose2d calculatedPose = new Pose2d();
 	}
 }

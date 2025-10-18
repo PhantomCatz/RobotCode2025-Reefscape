@@ -26,7 +26,6 @@ import lombok.experimental.ExtensionMethod;
 import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 
-
 @ExtensionMethod({GeomUtil.class})
 public class CatzRobotTracker {
   private static final double POSE_BUFFER_SIZE_SEC = 2.0;
@@ -98,6 +97,7 @@ public class CatzRobotTracker {
   private ChassisSpeeds m_lastChassisSpeeds = new ChassisSpeeds();
   private Translation2d visionPoseShift = new Translation2d();
 
+
   @Getter @Setter @AutoLogOutput(key = "CatzRobotTracker/trajectory completed")
   private double coralStationTrajectoryRemaining;
 
@@ -107,6 +107,7 @@ public class CatzRobotTracker {
   //
   // ------------------------------------------------------------------------------------------------------
   private CatzRobotTracker() {
+
     for (int i = 0; i < 3; ++i) {
       TRACKER_STD_DEVS.set(i, 0, Math.pow(ODOMETRY_STD_DEVS.get(i, 0), 2));
     }
@@ -125,6 +126,7 @@ public class CatzRobotTracker {
     // disabled
     Twist2d twist = KINEMATICS.toTwist2d(lastWheelPositions, observation.wheelPositions());
     lastWheelPositions = observation.wheelPositions();
+    
     //Check gyro connected
     if (observation.gyroAngle != null) {
       // Update dtheta for twist if gyro connected

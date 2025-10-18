@@ -16,8 +16,8 @@ import frc.robot.RobotContainer;
 import frc.robot.CatzSubsystems.CatzSuperstructure;
 import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.CatzRobotTracker;
 import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.Drivetrain.CatzDrivetrain;
-import frc.robot.Vision.Limelight;
 import frc.robot.CatzSubsystems.CatzElevator.CatzElevator;
+import frc.robot.Vision.LimelightSubsystem;
 
 public class PIDDriveCmd extends Command{
 
@@ -99,7 +99,7 @@ public class PIDDriveCmd extends Command{
 
     @Override
     public boolean isFinished(){
-        readyToScore = isAtTargetState() && Limelight.Instance.isSeeingApriltag() && CatzRobotTracker.Instance.getVisionPoseShift().getNorm() < ALLOWABLE_VISION_ADJUST;
+        readyToScore = isAtTargetState() && LimelightSubsystem.Instance.isSeeingApriltag() && CatzRobotTracker.Instance.getVisionPoseShift().getNorm() < ALLOWABLE_VISION_ADJUST;
         if(readyToScore){
             RobotContainer.Instance.rumbleDrvController(0.5);
         }else{
@@ -107,7 +107,7 @@ public class PIDDriveCmd extends Command{
         }
 
         // Logger.recordOutput("Is At Target State", isAtTargetState());
-        Logger.recordOutput("Is Seeing Apriltag", Limelight.Instance.isSeeingApriltag());
+        Logger.recordOutput("Is Seeing Apriltag", LimelightSubsystem.Instance.isSeeingApriltag());
         Logger.recordOutput("Vision Pose Shift", CatzRobotTracker.Instance.getVisionPoseShift().getNorm() < ALLOWABLE_VISION_ADJUST);
         return (readyToScore && CatzSuperstructure.Instance.getCanShoot().get()) || CatzElevator.Instance.getRaiseOverride();
     }

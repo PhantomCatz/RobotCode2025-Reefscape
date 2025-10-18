@@ -19,7 +19,7 @@ import frc.robot.Robot;
 import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.CatzRobotTracker;
 import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.Drivetrain.CatzDrivetrain;
 import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.Drivetrain.DriveConstants;
-import frc.robot.Vision.Limelight;
+import frc.robot.Vision.LimelightSubsystem;
 import frc.robot.Utilities.AllianceFlipUtil;
 
 import java.util.List;
@@ -336,7 +336,7 @@ public class TrajectoryDriveCmd extends Command {
     }
 
    // System.out.println("vision: " + tracker.getVisionPoseShift().getNorm());
-    if (Limelight.Instance.isSeeingApriltag() && autoalign && tracker.getVisionPoseShift().getNorm() > ALLOWABLE_VISION_ADJUST) {
+    if (LimelightSubsystem.Instance.isSeeingApriltag() && autoalign && tracker.getVisionPoseShift().getNorm() > ALLOWABLE_VISION_ADJUST) {
       // If trailing pose is within margin
       System.out.println("not visioning");
       return false;
