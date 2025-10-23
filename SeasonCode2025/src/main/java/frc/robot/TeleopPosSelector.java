@@ -23,6 +23,7 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.DeferredCommand;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
+import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import frc.robot.FieldConstants.Reef;
 import frc.robot.Utilities.AllianceFlipUtil;
 import frc.robot.Utilities.CornerTrackingPathfinder;
@@ -35,6 +36,7 @@ import frc.robot.CatzSubsystems.CatzElevator.CatzElevator;
 import frc.robot.CatzSubsystems.CatzElevator.CatzElevator.ElevatorPosition;
 import frc.robot.Commands.DriveAndRobotOrientationCmds.PIDDriveCmd;
 import frc.robot.Commands.DriveAndRobotOrientationCmds.PIDDriveCmdAlgae;
+import frc.robot.Commands.DriveAndRobotOrientationCmds.PIDDriveInitialCmd;
 import frc.robot.Commands.DriveAndRobotOrientationCmds.TrajectoryDriveCmd;
 
 @SuppressWarnings({ "rawtypes", "unchecked" })
@@ -307,8 +309,9 @@ public class TeleopPosSelector { //TODO split up the file. it's too big and does
       //                                   .andThen(RobotContainer.Instance.controllerRumbleCommand());
 
       Command prepareScorePos = Commands.sequence(
-                                  // new PIDDriveCmd(calculateReefPose(getClosestReefPos(false).getFirst(), true, false, false)));
-                                  new PIDDriveCmd(calculateReefPose(getClosestReefPos(false).getFirst(), true, true, false)));
+                                  new PIDDriveInitialCmd(calculateReefPose(getClosestReefPos(false).getFirst(), true, true, false)),
+                                  new WaitUntilCommand(() -> CatzDrivetrain.Instance.getDistanceError() < 0.2),
+                                  new PIDDriveCmd(calculateReefPose(getClosestReefPos(false).getFirst(), true, false, false)));
 
                             
       return prepareScorePos;
