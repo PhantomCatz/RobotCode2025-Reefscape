@@ -16,9 +16,7 @@ import frc.robot.CatzSubsystems.CatzSuperstructure;
 import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.CatzRobotTracker;
 import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.Drivetrain.CatzDrivetrain;
 import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.Vision.CatzVision;
-import frc.robot.CatzSubsystems.CatzElevator.CatzElevator;
-
-public class PIDDriveCmd extends Command{
+public class PIDDriveInitialCmd extends Command{
 
     private final ProfiledPIDController translationController;
     private final ProfiledPIDController rotationController;
@@ -26,12 +24,11 @@ public class PIDDriveCmd extends Command{
     private final double POSITION_TOLERANCE_METERS = 0.02;
     private final double VELOCITY_TOLERANCE_MPS = 0.1;
     private final double ANGLE_TOLERANCE_DEGREES = 3.0;
-    private final double ALLOWABLE_VISION_ADJUST = 4e-3; //TODO tune
 
     private Pose2d goalPos;
     private boolean readyToScore = false;
 
-    public PIDDriveCmd(Pose2d goal){
+    public PIDDriveInitialCmd(Pose2d goal){
         addRequirements(CatzDrivetrain.Instance);
 
         CatzDrivetrain.Instance.setPIDGoalPose(goal);
@@ -98,17 +95,12 @@ public class PIDDriveCmd extends Command{
 
     @Override
     public boolean isFinished(){
-        readyToScore = isAtTargetState() && CatzVision.Instance.isSeeingApriltag() && CatzRobotTracker.Instance.getVisionPoseShift().getNorm() < ALLOWABLE_VISION_ADJUST;
-        if(readyToScore){
-            RobotContainer.Instance.rumbleDrvController(0.5);
-        }else{
-            RobotContainer.Instance.rumbleDrvController(0.0);
-        }
+        readyToScore = CatzVision.Instance.isSeeingApriltag();
 
-        // Logger.recordOutput("Is At Target State", isAtTargetState());
+        // Logger.recordOutput("Is At Initial Target State", isAtTargetState());
         Logger.recordOutput("Is Seeing Apriltag", CatzVision.Instance.isSeeingApriltag());
-        Logger.recordOutput("Vision Pose Shift", CatzRobotTracker.Instance.getVisionPoseShift().getNorm() < ALLOWABLE_VISION_ADJUST);
-        return (readyToScore && CatzSuperstructure.Instance.getCanShoot().get()) || CatzElevator.Instance.getRaiseOverride();
+        // Logger.recordOutput("Vision Pose Shift", CatzRobotTracker.Instance.getVisionPoseShift().getNorm() < ALLOWABLE_VISION_ADJUST);
+        return readyToScore;
     }
 
     private boolean isAtTargetState(){

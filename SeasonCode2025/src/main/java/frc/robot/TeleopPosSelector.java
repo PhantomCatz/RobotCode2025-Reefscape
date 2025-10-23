@@ -307,8 +307,10 @@ public class TeleopPosSelector { //TODO split up the file. it's too big and does
       //                                   .andThen(RobotContainer.Instance.controllerRumbleCommand());
 
       Command prepareScorePos = Commands.sequence(
-                                  new PIDDriveCmd(calculateReefPose(getClosestReefPos(false).getFirst(), true, false, false)));
+                                  // new PIDDriveCmd(calculateReefPose(getClosestReefPos(false).getFirst(), true, false, false)));
+                                  new PIDDriveCmd(calculateReefPose(getClosestReefPos(false).getFirst(), true, true, false)));
 
+                            
       return prepareScorePos;
     }, Set.of(CatzDrivetrain.Instance));
   }

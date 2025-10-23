@@ -4,7 +4,6 @@ import static frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.Drivetrain.D
 
 import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.StatusSignal;
-import com.ctre.phoenix6.configs.GyroTrimConfigs;
 import com.ctre.phoenix6.configs.Pigeon2Configuration;
 import com.ctre.phoenix6.hardware.Pigeon2;
 import edu.wpi.first.math.util.Units;
@@ -25,7 +24,7 @@ public class GyroIOPigeon implements GyroIO {
 
     pigeon.getConfigurator().apply(new Pigeon2Configuration());
     pigeon.getConfigurator().setYaw(0.0);
-    pigeon.getConfigurator().apply(new GyroTrimConfigs().withGyroScalarZ(-3)); //brute force gyro correction code
+    // pigeon.getConfigurator().apply(new GyroTrimConfigs().withGyroScalarZ(-3)); //brute force gyro correction code
 
     yaw.setUpdateFrequency(DriveConstants.GYRO_UPDATE_FREQUENCY);
     yawVelocity.setUpdateFrequency(100.0);
