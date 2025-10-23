@@ -10,7 +10,7 @@ public interface VisionIO {
 	public default void setLatestEstimate(PoseEstimate poseEstimate, int minTagNum) {};
 
 	public default void update() {};
-	
+
 	public default void updateInputs(VisionIOInputs inputs) {}
 
 	int getNumTags();

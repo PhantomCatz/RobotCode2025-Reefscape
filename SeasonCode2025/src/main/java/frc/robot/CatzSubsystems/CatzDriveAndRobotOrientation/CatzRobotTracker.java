@@ -126,7 +126,7 @@ public class CatzRobotTracker {
     // disabled
     Twist2d twist = KINEMATICS.toTwist2d(lastWheelPositions, observation.wheelPositions());
     lastWheelPositions = observation.wheelPositions();
-    
+
     //Check gyro connected
     if (observation.gyroAngle != null) {
       // Update dtheta for twist if gyro connected

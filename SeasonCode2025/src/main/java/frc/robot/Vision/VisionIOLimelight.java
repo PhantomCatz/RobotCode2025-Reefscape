@@ -26,6 +26,7 @@ public class VisionIOLimelight implements VisionIO {
 
 	@Override
 	public void setLatestEstimate(PoseEstimate poseEstimate, int minTagNum) {
+		if(poseEstimate == null) return;
 		SmartDashboard.putNumber(config.name + "/Tag Count", poseEstimate.tagCount);
 		SmartDashboard.putNumber(config.name + "/FGPA Timestamp", Timer.getFPGATimestamp());
 		SmartDashboard.putNumber(
