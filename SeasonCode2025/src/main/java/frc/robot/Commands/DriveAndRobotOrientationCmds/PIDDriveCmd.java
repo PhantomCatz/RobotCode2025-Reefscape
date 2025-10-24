@@ -98,7 +98,7 @@ public class PIDDriveCmd extends Command{
 
     @Override
     public boolean isFinished(){
-        readyToScore = isAtTargetState() && CatzVision.Instance.isSeeingApriltag() && CatzRobotTracker.Instance.getVisionPoseShift().getNorm() < ALLOWABLE_VISION_ADJUST;
+        readyToScore = isAtTargetState();// && CatzVision.Instance.isSeeingApriltag() && CatzRobotTracker.Instance.getVisionPoseShift().getNorm() < ALLOWABLE_VISION_ADJUST;
         if(readyToScore){
             RobotContainer.Instance.rumbleDrvController(0.5);
         }else{

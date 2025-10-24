@@ -23,7 +23,6 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.DeferredCommand;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
-import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import frc.robot.FieldConstants.Reef;
 import frc.robot.Utilities.AllianceFlipUtil;
 import frc.robot.Utilities.CornerTrackingPathfinder;
@@ -310,10 +309,11 @@ public class TeleopPosSelector { //TODO split up the file. it's too big and does
 
       Command prepareScorePos = Commands.sequence(
                                   new PIDDriveInitialCmd(calculateReefPose(getClosestReefPos(false).getFirst(), true, true, false)),
-                                  new WaitUntilCommand(() -> CatzDrivetrain.Instance.getDistanceError() < 0.2),
-                                  new PIDDriveCmd(calculateReefPose(getClosestReefPos(false).getFirst(), true, false, false)));
+                                  Commands.print("============================== \n\nIT HAS BEEN DONE.\n\n ============================"),
+                                  new PIDDriveCmd(calculateReefPose(getClosestReefPos(false).getFirst(), true, false, false)),
+                                  Commands.print("============================== \n\n67 \n\n ============================"));
 
-                            
+
       return prepareScorePos;
     }, Set.of(CatzDrivetrain.Instance));
   }

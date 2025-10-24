@@ -12,7 +12,6 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.RobotContainer;
-import frc.robot.CatzSubsystems.CatzSuperstructure;
 import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.CatzRobotTracker;
 import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.Drivetrain.CatzDrivetrain;
 import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.Vision.CatzVision;
@@ -95,8 +94,8 @@ public class PIDDriveInitialCmd extends Command{
 
     @Override
     public boolean isFinished(){
-        readyToScore = CatzVision.Instance.isSeeingApriltag();
-
+        // readyToScore = CatzVision.Instance.isSeeingApriltag();
+        readyToScore = isAtTargetState();
         // Logger.recordOutput("Is At Initial Target State", isAtTargetState());
         Logger.recordOutput("Is Seeing Apriltag", CatzVision.Instance.isSeeingApriltag());
         // Logger.recordOutput("Vision Pose Shift", CatzRobotTracker.Instance.getVisionPoseShift().getNorm() < ALLOWABLE_VISION_ADJUST);
@@ -122,7 +121,7 @@ public class PIDDriveInitialCmd extends Command{
 
     @Override
     public void end(boolean interrupted) {
-        System.out.println("finished!!!!!! yayayay " + interrupted);
+        System.out.println("sybau!!!!!! 67676767 " + interrupted);
         RobotContainer.Instance.rumbleDrvController(0.0);
         CatzDrivetrain.Instance.drive(new ChassisSpeeds());
     }
