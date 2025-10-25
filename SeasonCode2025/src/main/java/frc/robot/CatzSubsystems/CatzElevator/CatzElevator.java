@@ -2,16 +2,17 @@ package frc.robot.CatzSubsystems.CatzElevator;
 
 import static frc.robot.CatzSubsystems.CatzElevator.ElevatorConstants.*;
 
+import java.util.HashMap;
 import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
 
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.PrintCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.CatzConstants;
-import frc.robot.Robot;
-import frc.robot.CatzSubsystems.CatzOuttake.CatzOuttake;
+import frc.robot.CatzSubsystems.CatzAlgaeEffector.CatzAlgaeRemover.CatzAlgaeRemover;
 import frc.robot.Utilities.LoggedTunableNumber;
 import lombok.RequiredArgsConstructor;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -28,12 +29,26 @@ public class CatzElevator extends SubsystemBase {
   private double elevatorFeedForward = 0.0;
   private int settlingCounter = 0;
   private boolean breakModeEnabled = true;
+  private boolean auxControl = false;
 
   private ElevatorPosition targetPosition = ElevatorPosition.PosStow;
   private ElevatorPosition prevTargetPositon = ElevatorPosition.PosNull;
   private ElevatorPosition previousLoggedPosition = ElevatorPosition.PosNull;
 
   private boolean isElevatorInPos = false;
+
+  private boolean canMoveElevator = false;
+  private boolean raiseOverride = false;
+
+
+  private final ElevatorPosition[] scoringPositionsList = {ElevatorPosition.PosL1, ElevatorPosition.PosL2, ElevatorPosition.PosL3, ElevatorPosition.PosL4};
+
+  private final HashMap<ElevatorPosition, Integer> scoringPositions  = new HashMap<>() {{
+    put(ElevatorPosition.PosL1, 0);
+    put(ElevatorPosition.PosL2, 1);
+    put(ElevatorPosition.PosL3, 2);
+    put(ElevatorPosition.PosL4, 3);
+}};;
 
   @RequiredArgsConstructor
   public static enum ElevatorPosition {
@@ -53,7 +68,7 @@ public class CatzElevator extends SubsystemBase {
       PosNull(() -> -1.0);
 
     private final DoubleSupplier elevatorSetpointSupplier;
-
+    private final double[] scoreHeights = {L1_HEIGHT, L2_HEIGHT, L3_HEIGHT, L4_HEIGHT, BOT_BOT_ALGAE, BOT_TOP_ALGAE};
     private double getTargetPositionInch() {
       return elevatorSetpointSupplier.getAsDouble();
     }
@@ -92,6 +107,7 @@ public class CatzElevator extends SubsystemBase {
     Logger.processInputs("RealInputs/Elevator", inputs);
 
     isElevatorInPos = isElevatorInPosition();
+    Logger.recordOutput("Aux Control", auxControl);
 
     //--------------------------------------------------------------------------------------------------------
     // Update controllers when user specifies
@@ -172,7 +188,7 @@ public class CatzElevator extends SubsystemBase {
         } else {
           io.runSetpointDown(targetPosition.getTargetPositionInch());
         }
-      } else {
+      } else if (((canMoveElevator || DriverStation.isAutonomous())) || CatzAlgaeRemover.Instance.algaeRemove) {//(((canMoveElevator || DriverStation.isAutonomous()) && CatzOuttake.Instance.isHoldingCoral()) || auxControl || CatzAlgaeRemover.Instance.algaeRemove) {
         //Setpoint PID
         io.runSetpointUp(targetPosition.getTargetPositionInch());
 
@@ -198,7 +214,6 @@ public class CatzElevator extends SubsystemBase {
     Logger.recordOutput("Elevator/logged prev targetPosition", previousLoggedPosition.getTargetPositionInch());
     Logger.recordOutput("Elevator/isElevatorInPos", isElevatorInPosition());
     Logger.recordOutput("Elevator/targetPosition", targetPosition.getTargetPositionInch());
-
 
     // Target Postioin Logging
     previousLoggedPosition = targetPosition;
@@ -235,7 +250,7 @@ public class CatzElevator extends SubsystemBase {
       break;
 
     }
-    return cmd.unless(() -> Robot.isSimulation()).alongWith(new PrintCommand("Elevator " + level));
+    return cmd.alongWith(new PrintCommand("Elevator " + level)); // TODO this part is redundant
   }
 
   public boolean isElevatorInPos(){
@@ -335,5 +350,51 @@ public class CatzElevator extends SubsystemBase {
   public Command elevatorFullManual(Supplier<Double> manuaSupplier) {
 
     return run(() -> elevatorFullManual(manuaSupplier.get()));
+  }
+
+  public Command setCanMoveElevator(boolean setValue) {
+    return runOnce(() -> this.canMoveElevator = setValue).alongWith(Commands.print("set can move elevator"+setValue));
+  }
+
+  public Command setRaiseOverride(boolean setValue) {
+    return runOnce(() -> this.raiseOverride = setValue).alongWith(Commands.print("set raise override"+setValue));
+  }
+
+  public boolean getRaiseOverride() {
+    return raiseOverride;
+  }
+
+  public Command incrementElevatorPosition() {
+    return runOnce(() -> {
+      System.out.println("increment from "+targetPosition);
+      if (targetPosition != ElevatorPosition.PosL4) {
+        targetPosition = scoringPositionsList[scoringPositions.get(targetPosition)+1];
+      }
+    });
+  }
+
+  public Command decrementElevatorPosition() {
+    return runOnce(() -> {
+      System.out.println("decrement from "+targetPosition);
+      if (targetPosition != ElevatorPosition.PosL1) {
+        targetPosition = scoringPositionsList[scoringPositions.get(targetPosition)-1];
+      }
+    });
+  }
+
+  public ElevatorPosition getElevatorTargetPosition() {
+    return targetPosition;
+  }
+
+  /**
+   *
+   * @param setPosition 1-4 for level 1-4
+   */
+  public void setElevatorTargetPosition(int setPosition) {
+    targetPosition = scoringPositionsList[setPosition-1];
+  }
+
+  public void setAuxControl(boolean value) {
+    auxControl = value;
   }
 }

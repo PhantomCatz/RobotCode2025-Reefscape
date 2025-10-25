@@ -2,7 +2,6 @@ package frc.robot.CatzSubsystems.CatzAlgaeEffector.CatzAlgaeRemover;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.CatzConstants;
-import frc.robot.CatzSubsystems.CatzOuttake.CatzOuttake;
 
 import static frc.robot.CatzSubsystems.CatzAlgaeEffector.CatzAlgaeRemover.AlgaeRemoverConstants.*;
 
@@ -13,6 +12,8 @@ public class CatzAlgaeRemover extends SubsystemBase {
 
   private final AlgaeRemoverIO io;
   private final AlgaeEffectorIOInputsAutoLogged inputs = new AlgaeEffectorIOInputsAutoLogged();
+
+  public boolean algaeRemove = false;
 
   private CatzAlgaeRemover() {
     if(isAlgaeRemoverDisabled) { //Comes from Algae Remover Constants

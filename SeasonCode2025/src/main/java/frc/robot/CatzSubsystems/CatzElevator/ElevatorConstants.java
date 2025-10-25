@@ -1,6 +1,7 @@
 package frc.robot.CatzSubsystems.CatzElevator;
 
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.util.Units;
 import frc.robot.CatzConstants;
 import frc.robot.Utilities.LoggedTunableNumber;
@@ -35,6 +36,7 @@ public class ElevatorConstants {
 
     public static final int BOT_LIMIT_SWITCH = 2;
 
+    public static final Translation3d ELEVATOR_SIM_OFFSET = new Translation3d(0, 0, 0);
 
     public static final double elevatorLength =
         switch (CatzConstants.getRobotType()) {

@@ -245,4 +245,8 @@ public class CatzOuttake extends SubsystemBase {
   public Command stopOuttake() {
     return runOnce(() -> currentState = outtakeStates.STOP);
   }
+
+  public boolean isHoldingCoral() {
+    return inputs.bbreakBackTriggered && inputs.bbreakFrntTriggered;
+  }
 }

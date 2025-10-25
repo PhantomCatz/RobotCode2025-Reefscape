@@ -12,6 +12,8 @@ public class ClimbConstants {
     public static final double CLIMB_RETRACT = 0.0;
     public static final double CLIMB_CATCH = 0.0;
 
+    public static final double CLIMB_EXTEND_LIMIT = -290.0;
+
     // Positive is winching in negative is winching out
 
     public static final Gains gains =

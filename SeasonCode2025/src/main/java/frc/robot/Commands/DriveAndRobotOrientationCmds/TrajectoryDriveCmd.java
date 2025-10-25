@@ -19,7 +19,7 @@ import frc.robot.Robot;
 import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.CatzRobotTracker;
 import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.Drivetrain.CatzDrivetrain;
 import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.Drivetrain.DriveConstants;
-import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.Vision.CatzVision;
+import frc.robot.Vision.Limelight;
 import frc.robot.Utilities.AllianceFlipUtil;
 
 import java.util.List;
@@ -116,6 +116,16 @@ public class TrajectoryDriveCmd extends Command {
       }
       if(AllianceFlipUtil.shouldFlipToRed()) {
         usePath = path.flipPath();
+      }
+
+       // Pose Reseting
+      if (Robot.isFirstPath && DriverStation.isAutonomous()) {
+        try {
+          tracker.resetPose(usePath.getStartingHolonomicPose().get());
+          Robot.isFirstPath = false;
+        } catch (NoSuchElementException e) {
+          e.printStackTrace();
+        }
       }
 
       startRot = tracker.getEstimatedPose().getRotation();
@@ -325,8 +335,8 @@ public class TrajectoryDriveCmd extends Command {
       return false;
     }
 
-    System.out.println("vision: " + tracker.getVisionPoseShift().getNorm());
-    if (CatzVision.Instance.isSeeingApriltag() && autoalign && tracker.getVisionPoseShift().getNorm() > ALLOWABLE_VISION_ADJUST) {
+   // System.out.println("vision: " + tracker.getVisionPoseShift().getNorm());
+    if (Limelight.Instance.isSeeingApriltag() && autoalign && tracker.getVisionPoseShift().getNorm() > ALLOWABLE_VISION_ADJUST) {
       // If trailing pose is within margin
       System.out.println("not visioning");
       return false;
@@ -369,8 +379,8 @@ public class TrajectoryDriveCmd extends Command {
     double currentRPS = Units.radiansToDegrees(currentChassisSpeeds.omegaRadiansPerSecond);
 
     double rotationError = Math.abs(desiredRotation - currentRotation);
-    if (rotationError > 180) {
-      rotationError = 360 - rotationError;
+    if (rotationError > 180.0) {
+      rotationError = 360.0 - rotationError;
     }
 
     // Desperate Throwing
@@ -385,8 +395,9 @@ public class TrajectoryDriveCmd extends Command {
 
     CatzRobotTracker.Instance.setReachedGoal(isPoseWithinThreshold(poseError));
 
-    return isPoseWithinThreshold(poseError) && rotationError < ALLOWABLE_ROTATION_ERROR &&
-    (desiredMPS != 0.0 || (currentMPS < ALLOWABLE_VEL_ERROR && currentRPS < ALLOWABLE_OMEGA_ERROR));
+    return isPoseWithinThreshold(poseError) &&
+           rotationError < ALLOWABLE_ROTATION_ERROR &&
+          (desiredMPS != 0.0 || (currentMPS < ALLOWABLE_VEL_ERROR && currentRPS < ALLOWABLE_OMEGA_ERROR));
   }
 
   public boolean isPoseWithinThreshold(double poseError) {

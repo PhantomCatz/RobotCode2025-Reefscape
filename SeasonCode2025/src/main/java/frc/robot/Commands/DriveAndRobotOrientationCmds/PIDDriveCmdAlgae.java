@@ -1,6 +1,5 @@
 package frc.robot.Commands.DriveAndRobotOrientationCmds;
 
-import org.checkerframework.checker.units.qual.N;
 import org.littletonrobotics.junction.Logger;
 
 
@@ -13,18 +12,15 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.RobotContainer;
-import frc.robot.CatzSubsystems.CatzSuperstructure;
 import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.CatzRobotTracker;
 import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.Drivetrain.CatzDrivetrain;
-import frc.robot.Vision.Limelight;
-import frc.robot.CatzSubsystems.CatzElevator.CatzElevator;
 
-public class PIDDriveCmd extends Command{
+public class PIDDriveCmdAlgae extends Command{
 
     private final ProfiledPIDController translationController;
     private final ProfiledPIDController rotationController;
 
-    private final double POSITION_TOLERANCE_METERS = 0.02;
+    private final double POSITION_TOLERANCE_METERS = 0.04;
     private final double VELOCITY_TOLERANCE_MPS = 0.1;
     private final double ANGLE_TOLERANCE_DEGREES = 3.0;
     private final double ALLOWABLE_VISION_ADJUST = 4e-3; //TODO tune
@@ -32,7 +28,7 @@ public class PIDDriveCmd extends Command{
     private Pose2d goalPos;
     private boolean readyToScore = false;
 
-    public PIDDriveCmd(Pose2d goal){
+    public PIDDriveCmdAlgae(Pose2d goal){
         addRequirements(CatzDrivetrain.Instance);
 
         CatzDrivetrain.Instance.setPIDGoalPose(goal);
@@ -68,13 +64,9 @@ public class PIDDriveCmd extends Command{
         Pose2d currentPose = CatzRobotTracker.Instance.getEstimatedPose();
         Translation2d poseError = goalPos.minus(currentPose).getTranslation();
 
-        if(poseError.getNorm() < 0.0001) {
-            System.out.println("Pose error very small!!");
-            return;
-        }
+        if(poseError.getNorm() < 0.0001) return;
 
         double currentDistance = poseError.getNorm();
-        Logger.recordOutput("Current Distance", currentDistance);
         Rotation2d direction = poseError.getAngle();
         double angleError = MathUtil.inputModulus(goalPos.getRotation().getDegrees() - currentPose.getRotation().getDegrees(), -180.0, 180.0);
 
@@ -99,17 +91,7 @@ public class PIDDriveCmd extends Command{
 
     @Override
     public boolean isFinished(){
-        readyToScore = isAtTargetState() && Limelight.Instance.isSeeingApriltag() && CatzRobotTracker.Instance.getVisionPoseShift().getNorm() < ALLOWABLE_VISION_ADJUST;
-        if(readyToScore){
-            RobotContainer.Instance.rumbleDrvController(0.5);
-        }else{
-            RobotContainer.Instance.rumbleDrvController(0.0);
-        }
-
-        // Logger.recordOutput("Is At Target State", isAtTargetState());
-        Logger.recordOutput("Is Seeing Apriltag", Limelight.Instance.isSeeingApriltag());
-        Logger.recordOutput("Vision Pose Shift", CatzRobotTracker.Instance.getVisionPoseShift().getNorm() < ALLOWABLE_VISION_ADJUST);
-        return (readyToScore && CatzSuperstructure.Instance.getCanShoot().get()) || CatzElevator.Instance.getRaiseOverride();
+        return isAtTargetState();
     }
 
     private boolean isAtTargetState(){
@@ -121,9 +103,9 @@ public class PIDDriveCmd extends Command{
         double linearVelocity = Math.hypot(currentSpeed.vxMetersPerSecond, currentSpeed.vyMetersPerSecond);
 
         double rotationError = Math.abs(MathUtil.inputModulus(goalPos.getRotation().getDegrees() - currentPose.getRotation().getDegrees(), -180.0, 180.0));
-        Logger.recordOutput("Rotation Error", rotationError < ANGLE_TOLERANCE_DEGREES);
-        Logger.recordOutput("Distance Error", distanceError < POSITION_TOLERANCE_METERS);
-        Logger.recordOutput("Linear Velocity", linearVelocity < VELOCITY_TOLERANCE_MPS);
+        // Logger.recordOutput("Rotation Error", rotationError < ANGLE_TOLERANCE_DEGREES);
+        // Logger.recordOutput("Distance Error", distanceError < POSITION_TOLERANCE_METERS);
+        // Logger.recordOutput("Linear Velocity", linearVelocity < VELOCITY_TOLERANCE_MPS);
         return distanceError < POSITION_TOLERANCE_METERS &&
                linearVelocity < VELOCITY_TOLERANCE_MPS &&
                rotationError < ANGLE_TOLERANCE_DEGREES;
@@ -131,7 +113,7 @@ public class PIDDriveCmd extends Command{
 
     @Override
     public void end(boolean interrupted) {
-        System.out.println("finished!!!!!! yayayay " + interrupted);
+        System.out.println("finished!!!!!! yayayay");
         RobotContainer.Instance.rumbleDrvController(0.0);
         CatzDrivetrain.Instance.drive(new ChassisSpeeds());
     }
