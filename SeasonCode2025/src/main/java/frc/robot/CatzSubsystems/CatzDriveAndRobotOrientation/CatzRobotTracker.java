@@ -13,7 +13,6 @@ import edu.wpi.first.wpilibj.DriverStation;
 import frc.robot.FieldConstants;
 import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.CatzRobotTracker.VisionObservation;
 import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.Drivetrain.DriveConstants;
-import frc.robot.CatzSubsystems.CatzOuttake.CatzOuttake;
 import frc.robot.Utilities.GeomUtil;
 
 import java.util.HashMap;
@@ -60,8 +59,7 @@ public class CatzRobotTracker {
   private Pose2d odometryPose = new Pose2d();
 
   @Getter
-  private Pose2d estimatedPose = new Pose2d(0, 0, Rotation2d.k180deg);
-
+  private Pose2d estimatedPose = new Pose2d(8.0, 4.0, Rotation2d.k180deg);
   @Getter
   @AutoLogOutput(key = "CatzRobotTracker/TxTyPose")
   private Pose2d txTyPose = new Pose2d();

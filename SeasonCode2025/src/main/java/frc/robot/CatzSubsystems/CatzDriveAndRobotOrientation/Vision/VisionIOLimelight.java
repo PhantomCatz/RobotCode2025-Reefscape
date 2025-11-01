@@ -48,6 +48,8 @@ public class VisionIOLimelight implements VisionIO {
    * @param rotationSupplier Supplier for the current estimated rotation, used for MegaTag 2.
    */
   public VisionIOLimelight(String name) {
+    System.out.println("initialization!!!!!\n\n\n\n\nsdfosdjfoisjdfoisdjfio]\n\n\n\n\n\n\noisjdfoijsdofijsodifjsodfjsodifj\n\n\n\n\n\nosidjfosjdfojsodfijsodifjosidfjoisjdfiojsdfio\n\n\n\n\n\nsidfoijsdofijosidfjoijsdf");
+
     this.name = name;
     var table            = NetworkTableInstance.getDefault().getTable(name);
     orientationPublisher = table.getDoubleArrayTopic("robot_orientation_set").publish();
@@ -110,6 +112,7 @@ public class VisionIOLimelight implements VisionIO {
           //----------------------------------------------------------------------------------------------
           // Megatag 1 estimation
           //----------------------------------------------------------------------------------------------
+          // TODO Remove this
           // for (var rawSample : megatag1Subscriber.readQueue()) {
           //   // if sample is invalid, skip
           //   if (rawSample.value.length == 0) continue;

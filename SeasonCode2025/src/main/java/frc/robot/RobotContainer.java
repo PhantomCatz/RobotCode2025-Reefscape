@@ -13,7 +13,6 @@ import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
-import frc.robot.Autonomous.CatzAutonomous;
 import frc.robot.CatzSubsystems.CatzSuperstructure;
 import frc.robot.CatzSubsystems.CatzAlgaeEffector.CatzAlgaePivot.CatzAlgaePivot;
 import frc.robot.CatzSubsystems.CatzAlgaeEffector.CatzAlgaeRemover.CatzAlgaeRemover;
@@ -23,9 +22,6 @@ import frc.robot.CatzSubsystems.CatzClimb.CatzClimb;
 import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.CatzRobotTracker;
 import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.Drivetrain.CatzDrivetrain;
 import frc.robot.CatzSubsystems.CatzElevator.*;
-import frc.robot.CatzSubsystems.CatzLEDs.CatzLED;
-import frc.robot.CatzSubsystems.CatzLEDs.CatzLED.ControllerLEDState;
-import frc.robot.CatzSubsystems.CatzOuttake.CatzOuttake;
 import frc.robot.CatzSubsystems.CatzRampPivot.CatzRampPivot;
 import frc.robot.Commands.DriveAndRobotOrientationCmds.TeleopDriveCmd;
 import frc.robot.Utilities.Alert;
@@ -41,6 +37,9 @@ public class RobotContainer {
   public static final RobotContainer Instance = new RobotContainer();
 
   private final double SCORE_TRIGGER_THRESHHOLD = 0.8;
+
+  private boolean isScoring = false;
+  private boolean canShoot = false;
 
   // ------------------------------------------------------------------------------------------------------------------
   // Drive Controller Declaration
@@ -107,7 +106,7 @@ public class RobotContainer {
     // XBOX Drive
     //---------------------------------------------------------------------------------------------------------------------
     // Reset odometry
-    DoublePressTracker.createTrigger(xboxDrv.button(8).and(xboxDrv.button(7))).onTrue(new InstantCommand(() -> {
+    DoublePressTracker.createTrigger(xboxDrv.back()).onTrue(new InstantCommand(() -> {
       if(AllianceFlipUtil.shouldFlipToRed()){
         CatzRobotTracker.Instance.resetPose(new Pose2d(CatzRobotTracker.Instance.getEstimatedPose().getTranslation(), Rotation2d.k180deg));
       }else{
@@ -116,42 +115,75 @@ public class RobotContainer {
     }));
 
     // Climb
-    Trigger climbMode = xboxDrv.povLeft();
-    xboxDrv.b().onTrue(CatzSuperstructure.Instance.extendClimb());
+    Trigger climbMode = DoublePressTracker.createTrigger(xboxDrv.start()); //the trigger value is reset when robot is disabled.
     climbMode.toggleOnTrue(Commands.startEnd(()->CatzSuperstructure.Instance.setClimbOverride(()->true), ()->CatzSuperstructure.Instance.setClimbOverride(()->false)));
 
-    //NBA
-    xboxDrv.rightTrigger().onTrue(TeleopPosSelector.Instance.runToNearestBranch().alongWith(Commands.runOnce(()->CatzLED.Instance.setControllerState(ControllerLEDState.NBA)))
-                                                               .onlyWhile(xboxDrv.rightTrigger())
-                                                               .unless(()->CatzSuperstructure.isClimbEnabled())
-                                                               .alongWith(CatzClimb.Instance.ClimbManualMode(()-> ((-xboxDrv.getRightTriggerAxis()-0.5)*2.0))
-                                                               .onlyIf(()-> CatzSuperstructure.isClimbEnabled()))
-    );
-    xboxDrv.rightTrigger().onFalse(Commands.runOnce(()->CatzLED.Instance.setControllerState(ControllerLEDState.FULL_MANUAL))
-                                           .unless(()-> CatzSuperstructure.isClimbEnabled())
-                                           .alongWith(CatzClimb.Instance.CancelClimb())
-    );
+    // Manual Climb Control
+    xboxDrv.povUp().onTrue(CatzClimb.Instance.ClimbManualMode(()-> 0.4));
+    xboxDrv.povUp().onFalse(CatzClimb.Instance.CancelClimb());
+    xboxDrv.povDown().onTrue(CatzClimb.Instance.ClimbManualMode(()-> -1.0));
+    xboxDrv.povDown().onFalse(CatzClimb.Instance.CancelClimb());
+
+    climbMode.toggleOnTrue(CatzSuperstructure.Instance.extendClimb());
 
     // Left Right
-    xboxDrv.leftBumper().onTrue(TeleopPosSelector.Instance.runLeftRight(LeftRight.LEFT).unless(()->CatzSuperstructure.isClimbEnabled()));
-    xboxDrv.rightBumper().onTrue(TeleopPosSelector.Instance.runLeftRight(LeftRight.RIGHT).unless(()->CatzSuperstructure.isClimbEnabled()));
+    xboxDrv.povLeft().onTrue(TeleopPosSelector.Instance.runLeftRight(LeftRight.LEFT).unless(()->CatzSuperstructure.isClimbEnabled()));
+    xboxDrv.povRight().onTrue(TeleopPosSelector.Instance.runLeftRight(LeftRight.RIGHT).unless(()->CatzSuperstructure.isClimbEnabled()));
 
-    //     // Manual Climb Control
-    // xboxDrv.povUp().onTrue(CatzClimb.Instance.ClimbManualMode(()-> 0.4));
-    // xboxDrv.povUp().onFalse(CatzClimb.Instance.CancelClimb());
-    // xboxDrv.povDown().onTrue(CatzClimb.Instance.ClimbManualMode(()-> -1.0));
-    // xboxDrv.povDown().onFalse(CatzClimb.Instance.CancelClimb());
+    // Drive to Reef
+    xboxDrv.rightTrigger().onTrue(CatzSuperstructure.Instance.scoreLevelXAutomated(1));
+    xboxDrv.leftTrigger().onTrue(CatzSuperstructure.Instance.scoreLevelXAutomated(2));
+    xboxDrv.rightBumper().onTrue(CatzSuperstructure.Instance.scoreLevelXAutomated(3));
+    xboxDrv.leftBumper().onTrue(CatzSuperstructure.Instance.scoreLevelXAutomated(4));
+
+    xboxDrv.leftTrigger().onFalse(new InstantCommand(() -> {
+      CatzSuperstructure.Instance.setCanShoot(() -> true);
+      CatzSuperstructure.Instance.setIsScoring(() -> false);
+    }));
+
+    xboxDrv.rightTrigger().onFalse(new InstantCommand(() -> {
+      CatzSuperstructure.Instance.setCanShoot(() -> true);
+      CatzSuperstructure.Instance.setIsScoring(() -> false);
+    }));
+
+    xboxDrv.leftBumper().onFalse(new InstantCommand(() -> {
+      CatzSuperstructure.Instance.setCanShoot(() -> true);
+      CatzSuperstructure.Instance.setIsScoring(() -> false);
+    }));
+
+    xboxDrv.rightBumper().onFalse(new InstantCommand(() -> {
+      CatzSuperstructure.Instance.setCanShoot(() -> true);
+      CatzSuperstructure.Instance.setIsScoring(() -> false);
+    }));
+
+    xboxDrv.a().toggleOnTrue(CatzElevator.Instance.decrementElevatorPosition().onlyIf(()-> CatzSuperstructure.Instance.getIsScoring().get()));
+    xboxDrv.y().toggleOnTrue(CatzElevator.Instance.incrementElevatorPosition().onlyIf(() -> CatzSuperstructure.Instance.getIsScoring().get()));
+
+    // cancel drive to reef
+    xboxDrv.x().onTrue(CatzDrivetrain.Instance.cancelTrajectory()
+    .alongWith(new InstantCommand(() -> isScoring = false))
+    .alongWith(Commands.print("cancelling path"))
+    .alongWith(CatzSuperstructure.Instance.stow()));
+
+    // xboxDrv.rightStick().onTrue(CatzSuperstructure.Instance.intakeAlgaeProcess());
+
+    // override score
+    xboxDrv.povUp().toggleOnTrue(CatzElevator.Instance.setRaiseOverride(true).unless(() -> CatzSuperstructure.isClimbEnabled()).alongWith(Commands.print("override score")));
+
+    // swipe
+    // xboxDrv.povDown().toggleOnTrue(TeleopPosSelector.Instance.runSwipe().alongWith(Commands.print("hello swipe")).unless(()->CatzSuperstructure.isClimbEnabled()));
+
+    xboxDrv.b().onTrue(CatzSuperstructure.Instance.intake().alongWith(Commands.print("INTAKE")));
 
 
     // Default driving
-    Trigger escapeTrajectory = new Trigger(()->(xboxDrv.getLeftY() > 0.8));
-
-    escapeTrajectory.onTrue(CatzDrivetrain.Instance.cancelTrajectory());
+    // Trigger escapeTrajectory = new Trigger(()->(xboxDrv.getLeftY() > 0.8));
+    // escapeTrajectory.onTrue(CatzDrivetrain.Instance.cancelTrajectory());
 
     CatzDrivetrain.Instance.setDefaultCommand(new TeleopDriveCmd(() -> xboxDrv.getLeftX(), () -> xboxDrv.getLeftY(), () -> xboxDrv.getRightX(), CatzDrivetrain.Instance));
     //---------------------------------------------------------------------------------------------------------------------
     // XBOX AUX
-    //------------------------------------------------------------------------------
+    //---------------------------------------------------------------------------------------------------------------------
 
     // Full Manual
     xboxAux.leftStick().and(xboxAux.rightStick()).onTrue(CatzElevator.Instance.elevatorFullManual(() -> -xboxAux.getLeftY()).alongWith(Commands.print("Elevator Manual"))); // TODO make an override button for
@@ -160,15 +192,33 @@ public class RobotContainer {
     isAlgaePivotFullManual.onTrue(CatzAlgaePivot.Instance.AlgaePivotFullManualCommand(()->xboxAux.getRightY()).alongWith(Commands.print("Algae Manual")));
     isRampPivotFullManual.onTrue(CatzRampPivot.Instance.rampPivotManual(()->-xboxAux.getLeftY()).alongWith(Commands.print("Manual Ramp")));
 
-    // Gamepiece Selection
-    xboxAux.leftTrigger().onTrue(Commands.runOnce(()-> CatzSuperstructure.setChosenGamepiece(Gamepiece.CORAL)));
-    xboxAux.rightTrigger().onTrue(Commands.runOnce(()-> CatzSuperstructure.setChosenGamepiece(Gamepiece.ALGAE)));
+    Trigger auxRampDown = DoublePressTracker.createTrigger(xboxAux.start());
+    Trigger auxRampUp = DoublePressTracker.createTrigger(xboxAux.back());
 
-    // Scoring Action
-    xboxAux.x().onTrue(CatzSuperstructure.Instance.intake().alongWith(Commands.print("INTAKE")));
-    xboxAux.y().onTrue(CatzSuperstructure.Instance.LXCoral().alongWith(Commands.print("OUTTAKE L" + CatzSuperstructure.Instance.getLevel())));
-    xboxAux.a().onTrue(CatzSuperstructure.Instance.stow().alongWith(Commands.print("STOWWW")));
-    xboxAux.b().onTrue(CatzSuperstructure.Instance.algaeStow());
+
+    auxRampDown.toggleOnTrue(CatzRampPivot.Instance.Ramp_Climb_Pos());
+    auxRampUp.toggleOnTrue(CatzRampPivot.Instance.Ramp_Intake_Pos());
+
+    xboxAux.povUp().onTrue(CatzClimb.Instance.ClimbManualModeAux(()-> 0.4));
+    xboxAux.povUp().onFalse(CatzClimb.Instance.CancelClimb());
+    xboxAux.povDown().onTrue(CatzClimb.Instance.ClimbManualModeAux(()-> -1.0));
+    xboxAux.povDown().onFalse(CatzClimb.Instance.CancelClimb());
+
+    // xboxAux.a().onTrue(CatzSuperstructure.Instance.topAlgae());
+    xboxAux.rightStick().onTrue(CatzClimb.Instance.reZero());
+
+    xboxAux.y().onTrue(CatzSuperstructure.Instance.LXElevator().alongWith(new InstantCommand(() -> CatzElevator.Instance.setAuxControl(true))));
+    xboxAux.x().onTrue(CatzSuperstructure.Instance.stow().alongWith(Commands.print("STOWWW")));
+    xboxAux.b().onTrue(CatzSuperstructure.Instance.intakeCoralStation().alongWith(Commands.print("INTAKE")));
+    xboxAux.leftBumper().onTrue(CatzSuperstructure.Instance.LXCoral().alongWith(new InstantCommand(() -> CatzElevator.Instance.setAuxControl(true))));
+
+
+    // Gamepiece Selection
+    // xboxAux.leftTrigger().onTrue(Commands.runOnce(()-> CatzSuperstructure.setChosenGamepiece(Gamepiece.CORAL)));
+    // xboxAux.rightTrigger().onTrue(Commands.runOnce(()-> CatzSuperstructure.setChosenGamepiece(Gamepiece.ALGAE)));
+
+    // // Scoring Action
+    // xboxAux.b().onTrue(CatzSuperstructure.Instance.algaeStow());
 
 
     // algae punch
@@ -279,10 +329,15 @@ public class RobotContainer {
         () -> {
           xboxDrv.getHID().setRumble(RumbleType.kBothRumble, 0.0);
           xboxAux.getHID().setRumble(RumbleType.kBothRumble, 0.0);
-        });
+        }).withTimeout(1.0);
   }
 
-  public Command rumbleDrvController(double strength, double duration){
+  public void rumbleDrvController(double strength){
+    xboxDrv.getHID().setRumble(RumbleType.kBothRumble, strength);
+  }
+
+
+  public Command rumbleDrvControllerCmd(double strength, double duration){
     return new SequentialCommandGroup(
       new InstantCommand(() ->xboxDrv.getHID().setRumble(RumbleType.kBothRumble, strength)),
       new WaitCommand(duration),
@@ -290,7 +345,7 @@ public class RobotContainer {
     ).finallyDo(()->xboxDrv.getHID().setRumble(RumbleType.kBothRumble, 0.0));
   }
 
-  public Command rumbleAuxController(double strength, double duration){
+  public Command rumbleAuxControllerCmd(double strength, double duration){
     return new SequentialCommandGroup(
       new InstantCommand(() ->xboxAux.getHID().setRumble(RumbleType.kBothRumble, strength)),
       new WaitCommand(duration),
@@ -300,8 +355,8 @@ public class RobotContainer {
 
   public Command rumbleDrvAuxController(double strength, double duration){
     return new ParallelCommandGroup(
-      rumbleAuxController(strength, duration),
-      rumbleDrvController(strength, duration)
+      rumbleAuxControllerCmd(strength, duration),
+      rumbleDrvControllerCmd(strength, duration)
     );
   }
 
@@ -319,10 +374,6 @@ public class RobotContainer {
       !overrideHID.getAuxSwitch(2)
     );
 
-  }
-
-  public Command getAutonomousCommand(){
-    return CatzAutonomous.Instance.getCommand();
   }
 
   public CommandXboxController getXboxAux(){

@@ -3,11 +3,12 @@ package frc.robot.CatzSubsystems.CatzClimb;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.PrintCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.CatzConstants;
+import frc.robot.CatzSubsystems.CatzSuperstructure;
 import frc.robot.CatzSubsystems.CatzLEDs.CatzLED;
 import frc.robot.CatzSubsystems.CatzLEDs.CatzLED.WinchingState;
-import frc.robot.CatzSubsystems.CatzOuttake.CatzOuttake;
 import frc.robot.Utilities.LoggedTunableNumber;
 
 import static frc.robot.CatzSubsystems.CatzClimb.ClimbConstants.*;
@@ -38,10 +39,10 @@ public class CatzClimb extends SubsystemBase {
   static LoggedTunableNumber kA = new LoggedTunableNumber("Climb/kA", 0);
 
   @RequiredArgsConstructor
-  public enum ClimbPosition { //In Rotations //TBD
-    RETRACT(() -> 46), //TBD
-    HOME(() -> -10.0), //TBD
-    EXTENDING(() -> -320.0), //TBD
+  public enum ClimbPosition { //In Rotations
+    RETRACT(() -> 0.0),
+    HOME(() -> 0.0),
+    EXTENDING(() -> -330.0),
     MANUAL(() -> 0.0),
     FULL_MANUAL(() -> 0.0),
     TUNNABLE(tunnablePos);
@@ -53,7 +54,7 @@ public class CatzClimb extends SubsystemBase {
     }
   }
 
-  private ClimbPosition targetPosition = ClimbPosition.HOME;
+  private ClimbPosition targetPosition = ClimbPosition.FULL_MANUAL;
 
   private CatzClimb() {
     if(isClimbDisabled) { //Comes from Climb Constants
@@ -84,12 +85,13 @@ public class CatzClimb extends SubsystemBase {
     if (DriverStation.isDisabled()) {
       io.setPower(0.0);
       manualPow = 0.0;
-      targetPosition = ClimbPosition.MANUAL;
+      // targetPosition = ClimbPosition.MANUAL;
+      targetPosition = ClimbPosition.FULL_MANUAL;
 
     } else {
       if(isManual || targetPosition == ClimbPosition.FULL_MANUAL) {
         io.setPower(manualPow);
-        System.out.println(manualPow);
+        // System.out.println(manualPow);
         //System.out.println("full");
       } else if(targetPosition == ClimbPosition.MANUAL) {
         io.setPosition(position);
@@ -117,12 +119,16 @@ public class CatzClimb extends SubsystemBase {
     return runOnce(() -> setClimbPos(ClimbPosition.HOME));
   }
 
+  public Command reZero(){
+    return runOnce(() -> io.setZero());
+  }
+
   public Command fullClimb() {
     return runOnce(() -> setClimbPos(ClimbPosition.RETRACT));
   }
 
   public Command extendClimb() {
-    return runOnce(() -> setClimbPos(ClimbPosition.EXTENDING));
+    return runOnce(() -> setClimbPos(ClimbPosition.EXTENDING)).alongWith(new PrintCommand("Extending Climb!"));
   }
 
   public Command Climb_Tunnable() {
@@ -150,7 +156,11 @@ public class CatzClimb extends SubsystemBase {
   }
 
   public Command ClimbManualMode(Supplier<Double> manualSupplier) {
-    return run(() -> climbFullManual(manualSupplier.get())).alongWith(Commands.print("hi"));
+    return run(() -> climbFullManual(manualSupplier.get())).alongWith(Commands.print("hi")).onlyIf(() -> CatzSuperstructure.isClimbEnabled());
+  }
+
+  public Command ClimbManualModeAux(Supplier<Double> manualSupplier) {
+    return run(() -> climbFullManual(manualSupplier.get()));
   }
 
   public Command CancelClimb() {
