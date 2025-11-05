@@ -309,9 +309,7 @@ public class TeleopPosSelector { //TODO split up the file. it's too big and does
 
       Command prepareScorePos = Commands.sequence(
                                   new PIDDriveInitialCmd(calculateReefPose(getClosestReefPos(false).getFirst(), true, true, false)),
-                                  Commands.print("============================== \n\nIT HAS BEEN DONE.\n\n ============================"),
-                                  new PIDDriveCmd(calculateReefPose(getClosestReefPos(false).getFirst(), true, false, false)),
-                                  Commands.print("============================== \n\n67 \n\n ============================"));
+                                  new PIDDriveCmd(calculateReefPose(getClosestReefPos(false).getFirst(), true, false, false)));
 
 
       return prepareScorePos;
