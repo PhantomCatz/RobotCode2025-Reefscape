@@ -10,10 +10,12 @@ import frc.robot.Robot;
 import frc.robot.Utilities.LimelightHelpers;
 import frc.robot.Vision.LimelightConstants.LimelightConfig;
 import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.CatzRobotTracker;
+import org.littletonrobotics.junction.Logger;
 
 public class DetectionSubsystem<IO extends DetectionIOLimelight> extends SubsystemBase {
 	protected final IO io;
 	private LimelightConfig config = new LimelightConfig();
+	private final DetectionIOInputsAutoLogged inputs = new DetectionIOInputsAutoLogged();
 
 	public DetectionSubsystem(LimelightConfig config, IO io) {
 		this.io = io;
@@ -37,8 +39,10 @@ public class DetectionSubsystem<IO extends DetectionIOLimelight> extends Subsyst
 
 	@Override
 	public void periodic() {
-		io.update();
+		io.updateInputs(inputs);
+		Logger.processInputs("RealInputs/Detection", inputs);
 		outputTelemetry();
+		Logger.recordOutput("Detection/nearestCoral", inputs.nearestCoral);
 	}
 
 	public boolean getDisabled() {

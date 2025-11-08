@@ -78,7 +78,9 @@ public class DetectionIOLimelight extends DetectionIO {
 	}
 
 	@Override
-	public void update() {
+	public void updateInputs(DetectionIOInputs inputs) {
+		inputs.nearestCoral = getCoralPose(new Translation2d());
+		System.out.println(latestEstimate);
 		mStopwatch.startIfNotRunning();
 		if (pipelineToSet == LimelightHelpers.getCurrentPipelineIndex(config.name)) {
 			if (pipelineToSet == DetectionMode.AUTO.index) {

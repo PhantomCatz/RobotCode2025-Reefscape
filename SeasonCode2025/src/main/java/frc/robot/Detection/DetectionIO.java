@@ -1,17 +1,23 @@
 package frc.robot.Detection;
 
+import org.littletonrobotics.junction.AutoLog;
+
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import frc.robot.Robot;
 
 public abstract class DetectionIO {
+	@AutoLog
+	public static class DetectionIOInputs {
+		public Pose2d nearestCoral;
+	}
 	protected boolean disabled = Robot.isSimulation();
 
 	public void disable(boolean disable) {
 		disabled = disable;
 	}
 
-	public abstract void update();
+	public abstract void updateInputs(DetectionIOInputs inputs);
 
 	public abstract Pose2d getCoralPose(Translation2d base);
 
