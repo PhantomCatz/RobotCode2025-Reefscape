@@ -11,8 +11,8 @@ public final class BuildConstants {
   public static final String GIT_SHA = "a13f1cd5eb31f668218a5d6331f7b952da1dd9f0";
   public static final String GIT_DATE = "2025-10-17 20:30:02 EDT";
   public static final String GIT_BRANCH = "add-limelight-helpers";
-  public static final String BUILD_DATE = "2025-11-07 19:31:23 EST";
-  public static final long BUILD_UNIX_TIME = 1762561883783L;
+  public static final String BUILD_DATE = "2025-10-22 20:44:00 EDT";
+  public static final long BUILD_UNIX_TIME = 1761180240682L;
   public static final int DIRTY = 1;
 
   private BuildConstants(){}

@@ -17,8 +17,6 @@ public class LimelightConstants {
 
 	//offsets are forward/back, left/right, up/down
 	// roll (along robot y axis), pitch (along robot x axis), yaw (along robot z axis)
-
-
 	public static final VisionIOLimelight[] LIMELIGHT_ARRAY = new VisionIOLimelight[] {
 		new VisionIOLimelight(new LimelightConfig("limelight-sushi",
 			new Pose3d(new Translation3d(8.23178, -0.2794, 0.23114), new Rotation3d(0.0, 15.0, -18.0))
