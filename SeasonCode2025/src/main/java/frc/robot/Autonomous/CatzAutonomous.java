@@ -74,18 +74,18 @@ public class CatzAutonomous extends SubsystemBase {
     // ------------------------------------------------------------------------------------------------------------
     // Path Configuration
     // ------------------------------------------------------------------------------------------------------------
-    for (File pathFile : choreoPathsDirectory.listFiles()) {
-      // to get rid of the extensions trailing the path names
-      String pathName = pathFile.getName().replaceFirst("[.][^.]+$", "");
-      try {
-        NamedCommands.registerCommand(
-            pathName,
-            new TrajectoryDriveCmd(
-                PathPlannerPath.fromChoreoTrajectory(pathName), true, false));
-      } catch (FileVersionException | IOException | ParseException e) {
-        e.printStackTrace();
-      }
-    }
+    // for (File pathFile : choreoPathsDirectory.listFiles()) {
+    //   // to get rid of the extensions trailing the path names
+    //   String pathName = pathFile.getName().replaceFirst("[.][^.]+$", "");
+    //   try {
+    //     NamedCommands.registerCommand(
+    //         pathName,
+    //         new TrajectoryDriveCmd(
+    //             PathPlannerPath.fromChoreoTrajectory(pathName), true, false));
+    //   } catch (FileVersionException | IOException | ParseException e) {
+    //     e.printStackTrace();
+    //   }
+    // }
     TeleopPosSelector selector = TeleopPosSelector.Instance;
 
     NamedCommands.registerCommand("Stow", CatzSuperstructure.Instance.stow());
