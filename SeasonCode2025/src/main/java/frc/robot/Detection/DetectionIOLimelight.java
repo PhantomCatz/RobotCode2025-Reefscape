@@ -14,16 +14,16 @@ import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.units.measure.Time;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import frc.robot.Vision.LimelightSubsystem;
-import frc.lib.logging.LogUtil;
-import frc.lib.util.FieldLayout;
-import frc.lib.util.LimelightHelpers;
-import frc.lib.util.LimelightHelpers.PoseEstimate;
-import frc.lib.util.LimelightHelpers.RawDetection;
-import frc.lib.util.Stopwatch;
-import frc.lib.util.Util;
-import frc.robot.subsystems.detection.DetectionConstants;
-import frc.robot.subsystems.drive.Drive;
+import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.CatzRobotTracker;
+import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.CatzRobotTracker.VisionObservation;
+import frc.robot.Utilities.FieldLayout;
+import frc.robot.Utilities.LimelightHelpers;
+import frc.robot.Utilities.LimelightHelpers.PoseEstimate;
+import frc.robot.Utilities.LimelightHelpers.RawDetection;
+import frc.robot.Utilities.Stopwatch;
+import frc.robot.Utilities.Util;
+import frc.robot.Vision.LimelightConstants;
+import frc.robot.Vision.LimelightConstants.LimelightConfig;
 import java.util.ArrayList;
 
 public class DetectionIOLimelight extends DetectionIO {
@@ -82,7 +82,7 @@ public class DetectionIOLimelight extends DetectionIO {
 		mStopwatch.startIfNotRunning();
 		if (pipelineToSet == LimelightHelpers.getCurrentPipelineIndex(config.name)) {
 			if (pipelineToSet == DetectionMode.AUTO.index) {
-				Translation2d base = Drive.mInstance.getPose().getTranslation();
+				Translation2d base = CatzRobotTracker.Instance.getEstimatedPose().getTranslation();
 				RawDetection[] all = LimelightHelpers.getRawDetections(config.name);
 				Translation2d bestTranslation = null;
 				Pose2d bestCoralPose = null;
@@ -100,10 +100,10 @@ public class DetectionIOLimelight extends DetectionIO {
 					Translation2d coralTranslation = calcDistToCoral(tx, ty)
 							.minus(config.robotToCameraOffset.getTranslation().toTranslation2d());
 					Pose2d coralPose =
-							Drive.mInstance.getPose().transformBy(new Transform2d(coralTranslation, new Rotation2d()));
+						CatzRobotTracker.Instance.getEstimatedPose().transformBy(new Transform2d(coralTranslation, new Rotation2d()));
 					if (FieldLayout.outsideField(coralPose)) {
 						SmartDashboard.putBoolean("Outside Field", FieldLayout.outsideField(coralPose));
-						LogUtil.recordPose2d(config.name + "Last Coral Pose Outside Field", coralPose);
+						// LogUtil.recordPose2d(config.name + "Last Coral Pose Outside Field", coralPose);
 						continue;
 					}
 					tracker.add(new Coral(coralPose, coralTranslation, now));
@@ -201,7 +201,7 @@ public class DetectionIOLimelight extends DetectionIO {
 	}
 
 	private void updateGyro() {
-		Rotation2d theta = Drive.mInstance.getPose().getRotation();
+		Rotation2d theta = CatzRobotTracker.Instance.getEstimatedPose().getRotation();
 		LimelightHelpers.SetRobotOrientation(config.name, theta.getDegrees(), 0, 0, 0, 0, 0);
 	}
 
@@ -219,11 +219,9 @@ public class DetectionIOLimelight extends DetectionIO {
 			latestEstimate = poseEstimate.pose;
 			latestEstimateTime = edu.wpi.first.units.Units.Seconds.of(poseEstimate.timestampSeconds);
 			aprilTagPose.set(poseEstimate.pose);
-			Drive.mInstance.getGeneratedDrive();
-			Drive.mInstance.addVisionUpdate(
-					poseEstimate.pose,
-					edu.wpi.first.units.Units.Seconds.of(poseEstimate.timestampSeconds),
-					config.aprilTagVisionStdDevs);
+			CatzRobotTracker.Instance.addVisionObservation(
+                new VisionObservation(config.name, poseEstimate.pose, poseEstimate.timestampSeconds, LimelightConstants.enabledVisionStdDevs.times(poseEstimate.avgTagDist))
+			);
 		}
 	}
 }

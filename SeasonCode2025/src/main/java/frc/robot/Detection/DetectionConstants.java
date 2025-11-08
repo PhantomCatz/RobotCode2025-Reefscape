@@ -1,4 +1,4 @@
-package frc.robot.subsystems.detection;
+package frc.robot.Detection;
 
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.geometry.Pose3d;
@@ -6,10 +6,8 @@ import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.units.Units;
 import edu.wpi.first.units.measure.Distance;
-import frc.lib.bases.LimelightSubsystem.LimelightConfig;
-import frc.lib.io.DetectionIOLimelight;
-import frc.lib.io.DetectionIOLimelightSim;
 import frc.robot.Robot;
+import frc.robot.Vision.LimelightConstants.LimelightConfig;
 
 public class DetectionConstants {
 	public static final String kLimelightName = "limelight-coral";
@@ -35,7 +33,7 @@ public class DetectionConstants {
 		if (Robot.isReal()) {
 			return new DetectionIOLimelight();
 		} else {
-			return new DetectionIOLimelightSim();
+			return null;
 		}
 	}
 }

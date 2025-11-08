@@ -1,9 +1,5 @@
 package frc.robot.Detection;
 
-import frc.lib.bases.DetectionSubsystem;
-import frc.lib.io.DetectionIOLimelight;
-import frc.lib.logging.LogUtil;
-import frc.lib.util.LimelightHelpers;
 
 public class Detection extends DetectionSubsystem<DetectionIOLimelight> {
 	public static final Detection mInstance = new Detection();
@@ -15,8 +11,8 @@ public class Detection extends DetectionSubsystem<DetectionIOLimelight> {
 	@Override
 	public void periodic() {
 		super.periodic();
-		LogUtil.recordPose3d(
-				"Detection/ Camera Pose Robot Space",
-				LimelightHelpers.getCameraPose3d_RobotSpace(DetectionConstants.kLimelightName));
+		// LogUtil.recordPose3d(
+				// "Detection/ Camera Pose Robot Space",
+				// LimelightHelpers.getCameraPose3d_RobotSpace(DetectionConstants.kLimelightName));
 	}
 }
