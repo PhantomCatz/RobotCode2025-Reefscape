@@ -3,7 +3,6 @@ package frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.Drivetrain;
 import static frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.Drivetrain.DriveConstants.*;
 
 import com.ctre.phoenix6.signals.NeutralModeValue;
-import com.ctre.phoenix6.swerve.SwerveDrivetrain;
 import com.pathplanner.lib.util.PathPlannerLogging;
 
 import choreo.auto.AutoTrajectory;

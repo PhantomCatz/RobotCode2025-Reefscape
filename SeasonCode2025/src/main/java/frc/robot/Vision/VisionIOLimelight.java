@@ -1,12 +1,9 @@
 package frc.robot.Vision;
 
-import com.ctre.phoenix6.Utils;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.units.Units;
 import edu.wpi.first.units.measure.Time;
-import edu.wpi.first.wpilibj.Timer;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.CatzRobotTracker;
 import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.CatzRobotTracker.VisionObservation;
 import frc.robot.Utilities.LimelightHelpers;
@@ -26,10 +23,11 @@ public class VisionIOLimelight implements VisionIO {
 
 	@Override
 	public void setLatestEstimate(PoseEstimate poseEstimate, int minTagNum) {
-		SmartDashboard.putNumber(config.name + "/Tag Count", poseEstimate.tagCount);
-		SmartDashboard.putNumber(config.name + "/FGPA Timestamp", Timer.getFPGATimestamp());
-		SmartDashboard.putNumber(
-				config.name + "/Estimate to FGPA Timestamp", Utils.fpgaToCurrentTime(poseEstimate.timestampSeconds));
+		if(poseEstimate == null) return;
+		// SmartDashboard.putNumber(config.name + "/Tag Count", poseEstimate.tagCount);
+		// SmartDashboard.putNumber(config.name + "/FGPA Timestamp", Timer.getFPGATimestamp());
+		// SmartDashboard.putNumber(
+		// 		config.name + "/Estimate to FGPA Timestamp", Utils.fpgaToCurrentTime(poseEstimate.timestampSeconds));
         latestEstimateNumTags = poseEstimate.tagCount;
 		if (poseEstimate.tagCount >= minTagNum) {
 			latestEstimate = poseEstimate.pose;

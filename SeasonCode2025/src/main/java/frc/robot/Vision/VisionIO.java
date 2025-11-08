@@ -10,7 +10,7 @@ public interface VisionIO {
 	public default void setLatestEstimate(PoseEstimate poseEstimate, int minTagNum) {};
 
 	public default void update() {};
-	
+
 	public default void updateInputs(VisionIOInputs inputs) {}
 
 	int getNumTags();
@@ -19,5 +19,6 @@ public interface VisionIO {
 	public static class VisionIOInputs {
 		public boolean hasTargets = false;
 		public Pose2d calculatedPose = new Pose2d();
+		public double temperatureCelcius = 0.0;
 	}
 }

@@ -30,6 +30,13 @@ public class LimelightSubsystem extends SubsystemBase {
 								config.robotToCameraOffset.getRotation().getY()),
 						Units.radiansToDegrees(
 								config.robotToCameraOffset.getRotation().getZ()));
+
+				System.out.println("Configured " + config.name + "'s offset");
+				System.out.println("NK DEBUG: " + limelight.getConfig().robotToCameraOffset);
+				System.out.println("NK DEBUG " + ios.length);
+
+				LimelightHelpers.setLEDMode_ForceOn(config.name);
+
 			}
 		}
 	}

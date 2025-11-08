@@ -43,7 +43,6 @@ import org.littletonrobotics.junction.rlog.RLOGServer;
 import org.littletonrobotics.junction.wpilog.WPILOGReader;
 import org.littletonrobotics.junction.wpilog.WPILOGWriter;
 
-import com.ctre.phoenix6.swerve.SwerveDrivetrain;
 
 import choreo.auto.AutoFactory;
 
