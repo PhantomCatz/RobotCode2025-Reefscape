@@ -236,6 +236,7 @@ public class CatzRobotTracker {
 
   public void addTrajectoryVelocityData(Twist2d robotVelocity) {
     trajectoryVelocity = robotVelocity;
+
   }
 
   /**

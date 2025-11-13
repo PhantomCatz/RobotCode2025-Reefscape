@@ -9,6 +9,9 @@ import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
+import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Config;
+import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Mechanism;
 import frc.robot.CatzConstants;
 import frc.robot.Utilities.Alert;
 import frc.robot.Utilities.CatzMathUtils;
@@ -31,6 +34,10 @@ public class CatzSwerveModule {
   // Alerts
   private final Alert driveMotorDisconnected;
   private final Alert steerMotorDisconnected;
+
+  //SysID stuff
+  private SysIdRoutine sysID = new SysIdRoutine(new Config(), new Mechanism(null, null, null, "hello"));
+
 
   // ----------------------------------------------------------------------------------------------
   //
