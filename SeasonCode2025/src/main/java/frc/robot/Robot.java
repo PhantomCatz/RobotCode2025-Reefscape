@@ -22,6 +22,7 @@ import frc.robot.CatzSubsystems.CatzLEDs.CatzLED;
 import frc.robot.CatzSubsystems.CatzLEDs.CatzLED.ControllerLEDState;
 import frc.robot.CatzSubsystems.CatzOuttake.CatzOuttake;
 import frc.robot.CatzSubsystems.CatzRampPivot.CatzRampPivot;
+import frc.robot.Detection.Detection;
 import frc.robot.Utilities.Alert;
 import frc.robot.Utilities.Alert.AlertType;
 import frc.robot.Utilities.MotorUtil.NeutralMode;
@@ -250,6 +251,7 @@ public class Robot extends LoggedRobot {
     System.out.println("Initializing " + CatzLED.Instance);
     System.out.println("Initializing " + CatzOuttake.Instance.getName());
     System.out.println("Initializing " + CatzAutonomous.Instance.getName());
+    System.out.println("Initializing " + Detection.Instance.getName());
 
     CatzConstants.autoFactory = new AutoFactory(
                                                   CatzRobotTracker.Instance::getEstimatedPose,

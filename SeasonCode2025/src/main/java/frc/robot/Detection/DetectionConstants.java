@@ -10,7 +10,7 @@ import frc.robot.Robot;
 import frc.robot.Vision.LimelightConstants.LimelightConfig;
 
 public class DetectionConstants {
-	public static final String kLimelightName = "limelight-coral";
+	public static final String kLimelightName = "limelight-sushi";
 	public static final Pose3d kRobotToCameraOffset = new Pose3d(
 			// forward/back, left/right, up/down
 			new Translation3d(Units.Inches.of(-0.109), Units.Inches.of(-4.550), Units.Inches.of(39.230)),

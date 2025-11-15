@@ -2,7 +2,7 @@ package frc.robot.Detection;
 
 
 public class Detection extends DetectionSubsystem<DetectionIOLimelight> {
-	public static final Detection mInstance = new Detection();
+	public static final Detection Instance = new Detection();
 
 	private Detection() {
 		super(DetectionConstants.getDetectionIOConfig(), DetectionConstants.getDetectionIO());
