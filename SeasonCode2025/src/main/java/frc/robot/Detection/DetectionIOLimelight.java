@@ -24,6 +24,9 @@ import frc.robot.Utilities.Stopwatch;
 import frc.robot.Utilities.Util;
 import frc.robot.Vision.LimelightConstants;
 import frc.robot.Vision.LimelightConstants.LimelightConfig;
+
+import static edu.wpi.first.units.Units.Seconds;
+
 import java.util.ArrayList;
 
 public class DetectionIOLimelight extends DetectionIO {
@@ -127,7 +130,7 @@ public class DetectionIOLimelight extends DetectionIO {
 			} else if (pipelineToSet == DetectionMode.TELE.index) {
 				updateAprilTagDetection();
 			}
-		} else if (mStopwatch.getTime().gte(edu.wpi.first.units.Units.Seconds.of(0.5))) {
+		} else if (mStopwatch.getTime().gte(Seconds.of(0.5))) {
 			LimelightHelpers.setPipelineIndex(config.name, (int) LimelightHelpers.getCurrentPipelineIndex(config.name));
 			mResetStopwatch.resetAndStart();
 			mStopwatch.reset();
