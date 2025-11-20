@@ -16,7 +16,7 @@ import frc.robot.CatzSubsystems.CatzSuperstructure;
 import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.CatzRobotTracker;
 import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.Drivetrain.CatzDrivetrain;
 import frc.robot.CatzSubsystems.CatzElevator.CatzElevator;
-import frc.robot.Vision.LimelightSubsystem;
+import frc.robot.CatzSubsystems.CatzVision.ApriltagScanning.LimelightSubsystem;
 
 public class PIDDriveCmd extends Command{
 

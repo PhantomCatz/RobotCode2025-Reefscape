@@ -1,4 +1,4 @@
-package frc.robot.Vision;
+package frc.robot.CatzSubsystems.CatzVision.ApriltagScanning;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -6,18 +6,18 @@ import edu.wpi.first.units.Units;
 import edu.wpi.first.units.measure.Time;
 import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.CatzRobotTracker;
 import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.CatzRobotTracker.VisionObservation;
+import frc.robot.CatzSubsystems.CatzVision.ApriltagScanning.LimelightConstants.LimelightConfig;
 import frc.robot.Utilities.LimelightHelpers;
 import frc.robot.Utilities.LimelightHelpers.PoseEstimate;
-import frc.robot.Vision.LimelightConstants.LimelightConfig;
 
-public class VisionIOLimelight implements VisionIO {
+public class ApriltagScanningIOLimelight implements ApriltagScanningIO {
 	private Pose2d latestEstimate = new Pose2d();
 	private Time latestEstimateTime = Units.Seconds.of(0.0);
     private int latestEstimateNumTags = 0;
 	private LimelightConfig config = new LimelightConfig();
 
 
-	public VisionIOLimelight(LimelightConfig config){
+	public ApriltagScanningIOLimelight(LimelightConfig config){
 		this.config = config;
 	}
 
@@ -53,7 +53,7 @@ public class VisionIOLimelight implements VisionIO {
 	@Override
 	public void update() {
 		updateGyro();
-		setLatestEstimate(LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2(config.name), 1);
+		// setLatestEstimate(LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2(config.name), 1);
 	}
 
 	@Override

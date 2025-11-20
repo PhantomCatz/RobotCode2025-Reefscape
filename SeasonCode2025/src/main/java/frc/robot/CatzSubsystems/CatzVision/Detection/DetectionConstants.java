@@ -1,4 +1,4 @@
-package frc.robot.Detection;
+package frc.robot.CatzSubsystems.CatzVision.Detection;
 
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.geometry.Pose3d;
@@ -7,15 +7,15 @@ import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.units.Units;
 import edu.wpi.first.units.measure.Distance;
 import frc.robot.Robot;
-import frc.robot.Vision.LimelightConstants.LimelightConfig;
+import frc.robot.CatzSubsystems.CatzVision.ApriltagScanning.LimelightConstants.LimelightConfig;
 
 public class DetectionConstants {
 	public static final String kLimelightName = "limelight-sushi";
 	public static final Pose3d kRobotToCameraOffset = new Pose3d(
 			// forward/back, left/right, up/down
-			new Translation3d(Units.Inches.of(-0.109), Units.Inches.of(-4.550), Units.Inches.of(39.230)),
+			new Translation3d(Units.Inches.of(0), Units.Inches.of(0.0), Units.Inches.of(29.0)),
 			// roll (along robot y axis), pitch (along robot x axis), yaw (along robot z axis)
-			new Rotation3d(Units.Degree.of(0.0), Units.Degree.of(-33.0), Units.Degree.of(0.0)));
+			new Rotation3d(Units.Degree.of(0.0), Units.Degree.of(0), Units.Degree.of(0.0)));
 	public static final int kTelePipeline = 3;
 	public static final int kAutoPipeline = 0;
 	public static final int kDisabledPipeline = 1;

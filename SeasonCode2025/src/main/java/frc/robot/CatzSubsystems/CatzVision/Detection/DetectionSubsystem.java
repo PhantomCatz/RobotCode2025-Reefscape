@@ -1,4 +1,4 @@
-package frc.robot.Detection;
+package frc.robot.CatzSubsystems.CatzVision.Detection;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -8,8 +8,9 @@ import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Robot;
 import frc.robot.Utilities.LimelightHelpers;
-import frc.robot.Vision.LimelightConstants.LimelightConfig;
 import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.CatzRobotTracker;
+import frc.robot.CatzSubsystems.CatzVision.ApriltagScanning.LimelightConstants.LimelightConfig;
+
 import org.littletonrobotics.junction.Logger;
 
 public class DetectionSubsystem<IO extends DetectionIOLimelight> extends SubsystemBase {

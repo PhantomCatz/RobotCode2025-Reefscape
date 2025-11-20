@@ -1,11 +1,11 @@
-package frc.robot.Vision;
+package frc.robot.CatzSubsystems.CatzVision.ApriltagScanning;
 
 import org.littletonrobotics.junction.AutoLog;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import frc.robot.Utilities.LimelightHelpers.PoseEstimate;
 
-public interface VisionIO {
+public interface ApriltagScanningIO {
 
 	public default void setLatestEstimate(PoseEstimate poseEstimate, int minTagNum) {};
 

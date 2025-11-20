@@ -1,41 +1,42 @@
-package frc.robot.Vision;
+package frc.robot.CatzSubsystems.CatzVision.ApriltagScanning;
 
-import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Robot;
+import frc.robot.CatzSubsystems.CatzVision.ApriltagScanning.LimelightConstants.LimelightConfig;
 import frc.robot.Utilities.LimelightHelpers;
-import frc.robot.Vision.LimelightConstants.LimelightConfig;
 
 public class LimelightSubsystem extends SubsystemBase {
 
 	public static LimelightSubsystem Instance = new LimelightSubsystem();
 
-	private final VisionIO[] ios;
+	private final ApriltagScanningIO[] ios;
 
 	private LimelightSubsystem() {
 		ios = LimelightConstants.LIMELIGHT_ARRAY;
 
 		if (Robot.isReal()) {
-			for(VisionIOLimelight limelight : LimelightConstants.LIMELIGHT_ARRAY){
+			for(ApriltagScanningIOLimelight limelight : LimelightConstants.LIMELIGHT_ARRAY){
 				LimelightConfig config = limelight.getConfig();
 
-				LimelightHelpers.setCameraPose_RobotSpace(
-						config.name,
-						config.robotToCameraOffset.getX(),
-						config.robotToCameraOffset.getY(),
-						config.robotToCameraOffset.getZ(),
-						Units.radiansToDegrees(
-								config.robotToCameraOffset.getRotation().getX()),
-						Units.radiansToDegrees(
-								config.robotToCameraOffset.getRotation().getY()),
-						Units.radiansToDegrees(
-								config.robotToCameraOffset.getRotation().getZ()));
+				// LimelightHelpers.setCameraPose_RobotSpace(
+				// 		config.name,
+				// 		config.robotToCameraOffset.getX(),
+				// 		config.robotToCameraOffset.getY(),
+				// 		config.robotToCameraOffset.getZ(),
+				// 		Units.radiansToDegrees(
+				// 				config.robotToCameraOffset.getRotation().getX()),
+				// 		Units.radiansToDegrees(
+				// 				config.robotToCameraOffset.getRotation().getY()),
+				// 		Units.radiansToDegrees(
+				// 				config.robotToCameraOffset.getRotation().getZ()));
 
 				System.out.println("Configured " + config.name + "'s offset");
 				System.out.println("NK DEBUG: " + limelight.getConfig().robotToCameraOffset);
 				System.out.println("NK DEBUG " + ios.length);
 
 				LimelightHelpers.setLEDMode_ForceOn(config.name);
+
+
 
 			}
 		}
@@ -50,7 +51,7 @@ public class LimelightSubsystem extends SubsystemBase {
 	}
 
 	public boolean isSeeingApriltag(){
-		for(VisionIO io : ios){
+		for(ApriltagScanningIO io : ios){
 			return io.getNumTags() > 0;
 		}
 		System.out.println("Missing VisionIOs!!!!!!");

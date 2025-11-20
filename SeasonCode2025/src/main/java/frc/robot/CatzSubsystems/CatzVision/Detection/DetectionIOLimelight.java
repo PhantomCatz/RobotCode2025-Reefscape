@@ -1,4 +1,4 @@
-package frc.robot.Detection;
+package frc.robot.CatzSubsystems.CatzVision.Detection;
 
 import com.ctre.phoenix6.Utils;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -16,18 +16,20 @@ import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.CatzRobotTracker;
 import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.CatzRobotTracker.VisionObservation;
+import frc.robot.CatzSubsystems.CatzVision.ApriltagScanning.LimelightConstants;
+import frc.robot.CatzSubsystems.CatzVision.ApriltagScanning.LimelightConstants.LimelightConfig;
 import frc.robot.Utilities.FieldLayout;
 import frc.robot.Utilities.LimelightHelpers;
 import frc.robot.Utilities.LimelightHelpers.PoseEstimate;
 import frc.robot.Utilities.LimelightHelpers.RawDetection;
 import frc.robot.Utilities.Stopwatch;
 import frc.robot.Utilities.Util;
-import frc.robot.Vision.LimelightConstants;
-import frc.robot.Vision.LimelightConstants.LimelightConfig;
 
 import static edu.wpi.first.units.Units.Seconds;
 
 import java.util.ArrayList;
+
+import org.littletonrobotics.junction.Logger;
 
 public class DetectionIOLimelight extends DetectionIO {
 	private final NetworkTableInstance ntInstance = NetworkTableInstance.getDefault();
@@ -191,10 +193,10 @@ public class DetectionIOLimelight extends DetectionIO {
 
 		SmartDashboard.putNumber(config.name + "/tx", tx);
 		SmartDashboard.putNumber(config.name + "/ty", ty);
-		SmartDashboard.putNumber(config.name + "/Distance Away Y", distAwayY.in(edu.wpi.first.units.Units.Meters));
-		SmartDashboard.putNumber(config.name + "/Distance Away X", distAwayX.in(edu.wpi.first.units.Units.Meters));
-		SmartDashboard.putNumber(
-				config.name + "/Distance Away Hyp ", distHypotenuseYToGround.in(edu.wpi.first.units.Units.Meters));
+		Logger.recordOutput(config.name + "/Distance Away Y", distAwayY.in(edu.wpi.first.units.Units.Meters));
+		Logger.recordOutput(config.name + "/Distance Away X", distAwayX.in(edu.wpi.first.units.Units.Meters));
+		Logger.recordOutput(
+				config.name + "Detection/Distance Away Hyp ", distHypotenuseYToGround.in(edu.wpi.first.units.Units.Meters));
 
 		return new Translation2d(distAwayY, distAwayX);
 	}

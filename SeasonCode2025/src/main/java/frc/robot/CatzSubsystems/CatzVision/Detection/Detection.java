@@ -1,4 +1,4 @@
-package frc.robot.Detection;
+package frc.robot.CatzSubsystems.CatzVision.Detection;
 
 
 public class Detection extends DetectionSubsystem<DetectionIOLimelight> {

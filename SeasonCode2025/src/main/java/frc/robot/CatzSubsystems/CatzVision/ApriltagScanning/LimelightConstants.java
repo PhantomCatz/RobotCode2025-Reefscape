@@ -1,4 +1,4 @@
-package frc.robot.Vision;
+package frc.robot.CatzSubsystems.CatzVision.ApriltagScanning;
 
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.Vector;
@@ -17,12 +17,12 @@ public class LimelightConstants {
 
 	//offsets are forward/back, left/right, up/down
 	// roll (along robot y axis), pitch (along robot x axis), yaw (along robot z axis)
-	public static final VisionIOLimelight[] LIMELIGHT_ARRAY = new VisionIOLimelight[] {
-		new VisionIOLimelight(new LimelightConfig("limelight-sushi",
+	public static final ApriltagScanningIOLimelight[] LIMELIGHT_ARRAY = new ApriltagScanningIOLimelight[] {
+		new ApriltagScanningIOLimelight(new LimelightConfig("limelight-sushi",
 			new Pose3d(new Translation3d(8.23178, -0.2794, 0.23114), new Rotation3d(0.0, 15.0, -18.0))
 		)),
 
-		new VisionIOLimelight(new LimelightConfig("limelight-soba",
+		new ApriltagScanningIOLimelight(new LimelightConfig("limelight-soba",
 			new Pose3d(new Translation3d(8.25, 0.281, 0.232), new Rotation3d(0.8, 15.0, 18.0))
 		// new Pose3d(new Translation3d(0.25, 0.281, 0.232), new Rotation3d(0.8, 15.0, 18.0))
 		))
