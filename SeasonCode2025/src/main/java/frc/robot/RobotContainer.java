@@ -54,7 +54,7 @@ public class RobotContainer {
   private final Trigger climbMode = xboxAux.povLeft();
 
   private CommandXboxController xboxTest = new CommandXboxController(3);
-  private CommandXboxController xboxSysID = new CommandXboxController(6);
+  // private CommandXboxController xboxSysID = new CommandXboxController(6);
 
   // -------------------------------------------------------------------------------------------------------------------
   // Alert Declaration
