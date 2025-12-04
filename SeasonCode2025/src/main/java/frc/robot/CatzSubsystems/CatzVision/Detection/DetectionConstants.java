@@ -13,7 +13,7 @@ public class DetectionConstants {
 	public static final String kLimelightName = "limelight-sushi";
 	public static final Pose3d kRobotToCameraOffset = new Pose3d(
 			// forward/back, left/right, up/down
-			new Translation3d(Units.Inches.of(0), Units.Inches.of(0.0), Units.Inches.of(29.0)),
+			new Translation3d(Units.Inches.of(-15.8), Units.Inches.of(1.0), Units.Inches.of(5.0)),
 			// roll (along robot y axis), pitch (along robot x axis), yaw (along robot z axis)
 			new Rotation3d(Units.Degree.of(0.0), Units.Degree.of(0), Units.Degree.of(0.0)));
 	public static final int kTelePipeline = 3;
