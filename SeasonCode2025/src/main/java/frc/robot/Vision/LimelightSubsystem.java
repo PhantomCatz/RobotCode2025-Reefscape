@@ -1,9 +1,7 @@
 package frc.robot.Vision;
 
-import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Robot;
-import frc.robot.Utilities.LimelightHelpers;
 import frc.robot.Vision.LimelightConstants.LimelightConfig;
 
 public class LimelightSubsystem extends SubsystemBase {
@@ -19,17 +17,18 @@ public class LimelightSubsystem extends SubsystemBase {
 			for(VisionIOLimelight limelight : LimelightConstants.LIMELIGHT_ARRAY){
 				LimelightConfig config = limelight.getConfig();
 
-				LimelightHelpers.setCameraPose_RobotSpace(
-						config.name,
-						config.robotToCameraOffset.getX(),
-						config.robotToCameraOffset.getY(),
-						config.robotToCameraOffset.getZ(),
-						Units.radiansToDegrees(
-								config.robotToCameraOffset.getRotation().getX()),
-						Units.radiansToDegrees(
-								config.robotToCameraOffset.getRotation().getY()),
-						Units.radiansToDegrees(
-								config.robotToCameraOffset.getRotation().getZ()));
+				//setting limelight offsets thru code; ll4 only
+				// LimelightHelpers.setCameraPose_RobotSpace(
+				// 		config.name,
+				// 		config.robotToCameraOffset.getX(),
+				// 		config.robotToCameraOffset.getY(),
+				// 		config.robotToCameraOffset.getZ(),
+				// 		Units.radiansToDegrees(
+				// 				config.robotToCameraOffset.getRotation().getX()),
+				// 		Units.radiansToDegrees(
+				// 				config.robotToCameraOffset.getRotation().getY()),
+				// 		Units.radiansToDegrees(
+				// 				config.robotToCameraOffset.getRotation().getZ()));
 			}
 		}
 	}

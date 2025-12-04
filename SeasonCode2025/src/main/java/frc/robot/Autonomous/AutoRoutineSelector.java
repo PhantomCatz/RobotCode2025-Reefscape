@@ -15,6 +15,7 @@ public class AutoRoutineSelector {
         autoSelector.addRoutine("Open House", () -> new OpenHouse().getRoutine());
         autoSelector.addRoutine("JLKA", () -> new JLKA().getRoutine());
         autoSelector.addRoutine("testinggg", () -> new testinggg().getRoutine());
+        autoSelector.addRoutine("JKLATesting", () -> new JLKATesting().getRoutine());
 
         SmartDashboard.putData(autoSelector);
     }
