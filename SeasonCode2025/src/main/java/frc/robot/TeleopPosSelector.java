@@ -33,8 +33,10 @@ import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.Drivetrain.CatzDriv
 import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.Drivetrain.DriveConstants;
 import frc.robot.CatzSubsystems.CatzElevator.CatzElevator;
 import frc.robot.CatzSubsystems.CatzElevator.CatzElevator.ElevatorPosition;
+import frc.robot.CatzSubsystems.CatzVision.Detection.Detection;
 import frc.robot.Commands.DriveAndRobotOrientationCmds.PIDDriveCmd;
 import frc.robot.Commands.DriveAndRobotOrientationCmds.PIDDriveCmdAlgae;
+import frc.robot.Commands.DriveAndRobotOrientationCmds.PIDDriveCmdCoral;
 import frc.robot.Commands.DriveAndRobotOrientationCmds.TrajectoryDriveCmd;
 
 @SuppressWarnings({ "rawtypes", "unchecked" })
@@ -319,6 +321,11 @@ public class TeleopPosSelector { //TODO split up the file. it's too big and does
     }, Set.of());
   }
 
+  public Command runToNearestCoral() {
+    return new DeferredCommand(() -> {
+      return new PIDDriveCmdCoral(Detection.Instance.getCoralPose());
+    }, Set.of());
+  }
 
   public PathPlannerPath getStraightLinePath(Pose2d start, Pose2d goal, PathConstraints constraints){
     Translation2d currentPose = start.getTranslation();

@@ -249,6 +249,8 @@ public class RobotContainer {
     xboxTest.povRight().toggleOnTrue(CatzAlgaeRemover.Instance.eatAlgae().alongWith(Commands.print("pressed POV Right"))); //TBD
     xboxTest.povLeft().toggleOnTrue(CatzAlgaeRemover.Instance.vomitAlgae().alongWith(Commands.print("pressed POV Right"))); //TBD
 
+    xboxTest.b().onTrue(TeleopPosSelector.Instance.runToNearestCoral());
+
     // xboxTest.x().onTrue(CatzAlgaePivot.Instance.AlgaePivot_Horizontal().alongWith(Commands.print("AL:KDJF:LAKDJFLK:ADJF:LKKJAD:FLKJ")));
     // xboxTest.y().onTrue(CatzAlgaePivot.Instance.AlgaePivot_Stow().alongWith(Commands.print("LAKJDFLKJALKJLKJFLSKDJLKKJSDLFKJLKKJLKKJFDKLJSLKJ")));
 

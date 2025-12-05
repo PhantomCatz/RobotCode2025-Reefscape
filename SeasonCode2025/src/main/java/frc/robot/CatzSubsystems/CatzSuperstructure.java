@@ -241,8 +241,6 @@ public class CatzSuperstructure extends VirtualSubsystem {
         ).withInterruptBehavior(InterruptionBehavior.kCancelSelf);
     }
 
-
-
     //--------------------------------------------------------------------------------
     // Mechanism Action Commands
     //--------------------------------------------------------------------------------
