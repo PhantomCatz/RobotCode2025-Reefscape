@@ -185,7 +185,11 @@ public class DetectionIOLimelight extends DetectionIO {
 				- config.robotToCameraOffset.getRotation().getY();
 		Distance distAwayY = heightFromCoral.times(Math.tan(totalAngleY)); // robot x. forward/backward
 
-		distAwayY = distAwayY.times(-1); //because the LL4 facing backwards
+		//if the limelight is facing backwards, you need to flip dist away because this value is calculated relative to the limelight but the actual distance needs to be relative to the robot.
+		if(Math.abs(Math.toDegrees(config.robotToCameraOffset.getRotation().getZ())) > 90.0){ 
+			distAwayY = distAwayY.times(-1); //because the LL4 facing backwards
+		}
+
 
 		Distance distHypotenuseYToGround = BaseUnits.DistanceUnit.of(Math.hypot( //distance from lens to coral only in the y-axis
 				distAwayY.in(BaseUnits.DistanceUnit),
