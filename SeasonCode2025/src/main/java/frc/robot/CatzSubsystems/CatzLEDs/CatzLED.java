@@ -91,7 +91,7 @@ public class CatzLED extends VirtualSubsystem {
   private final int LEADER_LED_PWM_PORT = 0;
 
   // Constants
-  private static final boolean paradeLeds = false;
+  private static final boolean paradeLeds = true;
   private static final int minLoopCycleCount = 10;
   private static final int length = 54;
   //24 7 23
@@ -174,6 +174,13 @@ public class CatzLED extends VirtualSubsystem {
     // -----------------------------------------------------------------------------------------------
     // Set Elevator LED state
     // -----------------------------------------------------------------------------------------------
+    if(paradeLeds){
+      christmas((int) ((((Timer.getFPGATimestamp() - lastEnabledTime) % bubbleTime)) / bubbleTime * LED_Sidebar_End_RT));
+
+      ledStrip.setData(buffer);
+      return;
+    }
+
     if (estopped) {
       setSolidElevatorColor(Color.kRed);
       // MODE DISABLED
@@ -343,6 +350,18 @@ public class CatzLED extends VirtualSubsystem {
     }
   }
 
+  private void christmas(int colored){
+    for (int i=0; i<LED_Crossbar_Start; i++) {
+      if (i <= colored && i % 3 == colored % 3) {
+        buffer.setLED(i, Color.kRed);
+        buffer.setLED(LED_Sidebar_End_LT-i, Color.kRed);
+      }
+      else {
+        buffer.setLED(i, Color.kDarkGreen);
+        buffer.setLED(LED_Sidebar_End_LT-i, Color.kDarkGreen);
+      }
+    }
+  }
 
   // LED STROBE
   private void strobe(Color c1, Color c2, double duration) {
