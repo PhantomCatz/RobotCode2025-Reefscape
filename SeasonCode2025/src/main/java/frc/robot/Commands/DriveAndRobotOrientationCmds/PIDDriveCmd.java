@@ -15,8 +15,8 @@ import frc.robot.RobotContainer;
 import frc.robot.CatzSubsystems.CatzSuperstructure;
 import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.CatzRobotTracker;
 import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.Drivetrain.CatzDrivetrain;
-import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.Vision.CatzVision;
 import frc.robot.CatzSubsystems.CatzElevator.CatzElevator;
+import frc.robot.Vision.LimelightSubsystem;
 
 public class PIDDriveCmd extends Command{
 
@@ -25,7 +25,7 @@ public class PIDDriveCmd extends Command{
 
     private final double POSITION_TOLERANCE_METERS = 0.02;
     private final double VELOCITY_TOLERANCE_MPS = 0.1;
-    private final double ANGLE_TOLERANCE_DEGREES = 2.0;
+    private final double ANGLE_TOLERANCE_DEGREES = 3.0;
     private final double ALLOWABLE_VISION_ADJUST = 4e-3; //TODO tune
 
     private Pose2d goalPos;
@@ -67,9 +67,13 @@ public class PIDDriveCmd extends Command{
         Pose2d currentPose = CatzRobotTracker.Instance.getEstimatedPose();
         Translation2d poseError = goalPos.minus(currentPose).getTranslation();
 
-        if(poseError.getNorm() < 0.0001) return;
+        if(poseError.getNorm() < 0.0001) {
+            System.out.println("Pose error very small!!");
+            return;
+        }
 
         double currentDistance = poseError.getNorm();
+        Logger.recordOutput("Current Distance", currentDistance);
         Rotation2d direction = poseError.getAngle();
         double angleError = MathUtil.inputModulus(goalPos.getRotation().getDegrees() - currentPose.getRotation().getDegrees(), -180.0, 180.0);
 
@@ -94,15 +98,15 @@ public class PIDDriveCmd extends Command{
 
     @Override
     public boolean isFinished(){
-        readyToScore = isAtTargetState() && CatzVision.Instance.isSeeingApriltag() && CatzRobotTracker.Instance.getVisionPoseShift().getNorm() < ALLOWABLE_VISION_ADJUST;
+        readyToScore = isAtTargetState() && LimelightSubsystem.Instance.isSeeingApriltag() && CatzRobotTracker.Instance.getVisionPoseShift().getNorm() < ALLOWABLE_VISION_ADJUST;
         if(readyToScore){
             RobotContainer.Instance.rumbleDrvController(0.5);
         }else{
             RobotContainer.Instance.rumbleDrvController(0.0);
         }
 
-        Logger.recordOutput("Is At Target State", isAtTargetState());
-        Logger.recordOutput("Is Seeing Apriltag", CatzVision.Instance.isSeeingApriltag());
+        // Logger.recordOutput("Is At Target State", isAtTargetState());
+        Logger.recordOutput("Is Seeing Apriltag", LimelightSubsystem.Instance.isSeeingApriltag());
         Logger.recordOutput("Vision Pose Shift", CatzRobotTracker.Instance.getVisionPoseShift().getNorm() < ALLOWABLE_VISION_ADJUST);
         return (readyToScore && CatzSuperstructure.Instance.getCanShoot().get()) || CatzElevator.Instance.getRaiseOverride();
     }
@@ -116,9 +120,9 @@ public class PIDDriveCmd extends Command{
         double linearVelocity = Math.hypot(currentSpeed.vxMetersPerSecond, currentSpeed.vyMetersPerSecond);
 
         double rotationError = Math.abs(MathUtil.inputModulus(goalPos.getRotation().getDegrees() - currentPose.getRotation().getDegrees(), -180.0, 180.0));
-        // Logger.recordOutput("Rotation Error", rotationError < ANGLE_TOLERANCE_DEGREES);
-        // Logger.recordOutput("Distance Error", distanceError < POSITION_TOLERANCE_METERS);
-        // Logger.recordOutput("Linear Velocity", linearVelocity < VELOCITY_TOLERANCE_MPS);
+        Logger.recordOutput("Rotation Error", rotationError < ANGLE_TOLERANCE_DEGREES);
+        Logger.recordOutput("Distance Error", distanceError < POSITION_TOLERANCE_METERS);
+        Logger.recordOutput("Linear Velocity", linearVelocity < VELOCITY_TOLERANCE_MPS);
         return distanceError < POSITION_TOLERANCE_METERS &&
                linearVelocity < VELOCITY_TOLERANCE_MPS &&
                rotationError < ANGLE_TOLERANCE_DEGREES;
@@ -126,7 +130,7 @@ public class PIDDriveCmd extends Command{
 
     @Override
     public void end(boolean interrupted) {
-        System.out.println("finished!!!!!! yayayay");
+        System.out.println("finished!!!!!! yayayay " + interrupted);
         RobotContainer.Instance.rumbleDrvController(0.0);
         CatzDrivetrain.Instance.drive(new ChassisSpeeds());
     }

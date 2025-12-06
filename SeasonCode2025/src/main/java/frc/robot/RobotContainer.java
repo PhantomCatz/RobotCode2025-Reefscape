@@ -54,6 +54,7 @@ public class RobotContainer {
   private final Trigger climbMode = xboxAux.povLeft();
 
   private CommandXboxController xboxTest = new CommandXboxController(3);
+  // private CommandXboxController xboxSysID = new CommandXboxController(6);
 
   // -------------------------------------------------------------------------------------------------------------------
   // Alert Declaration
@@ -165,7 +166,7 @@ public class RobotContainer {
     .alongWith(Commands.print("cancelling path"))
     .alongWith(CatzSuperstructure.Instance.stow()));
 
-    // xboxDrv.rightStick().onTrue(CatzSuperstructure.Instance.intakeAlgaeProcess());
+    xboxDrv.rightStick().onTrue(CatzSuperstructure.Instance.intakeAlgaeProcess());
 
     // override score
     xboxDrv.povUp().toggleOnTrue(CatzElevator.Instance.setRaiseOverride(true).unless(() -> CatzSuperstructure.isClimbEnabled()).alongWith(Commands.print("override score")));

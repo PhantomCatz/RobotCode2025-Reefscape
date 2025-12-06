@@ -27,6 +27,6 @@ public class OuttakeConstants {
     static double OUTTAKE_L4 = 0.24;
     static double INTAKE_SPD = 0.4;
     static double ADJ_SPD = 0.1;
-    static double OUTTAKE_L1_RT = 0.05;
-    static double OUTTAKE_L1_LT = 0.25;
+    static double OUTTAKE_L1_RT = 0.075;//0.1;//0.05;
+    static double OUTTAKE_L1_LT = 0.375;//0.5;//0.25;
 }

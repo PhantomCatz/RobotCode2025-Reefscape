@@ -35,7 +35,7 @@ public class AutoRoutineBase {
         (
             Commands.sequence
             (
-                Commands.print("hello???"),
+                Commands.print(trajectory.toString()),
                 Commands.waitUntil(CatzDrivetrain.Instance::closeEnoughToRaiseElevator),
                 CatzSuperstructure.Instance.LXElevator(level),
                 CatzSuperstructure.Instance.scoreInAuto(level)

@@ -17,7 +17,6 @@ import frc.robot.CatzSubsystems.CatzAlgaeEffector.CatzAlgaePivot.CatzAlgaePivot;
 import frc.robot.CatzSubsystems.CatzAlgaeEffector.CatzAlgaePivot.CatzAlgaePivot.AlgaePivotPosition;
 import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.CatzRobotTracker;
 import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.Drivetrain.CatzDrivetrain;
-import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.Vision.CatzVision;
 import frc.robot.CatzSubsystems.CatzElevator.CatzElevator;
 import frc.robot.CatzSubsystems.CatzLEDs.CatzLED;
 import frc.robot.CatzSubsystems.CatzLEDs.CatzLED.ControllerLEDState;
@@ -26,6 +25,7 @@ import frc.robot.CatzSubsystems.CatzRampPivot.CatzRampPivot;
 import frc.robot.Utilities.Alert;
 import frc.robot.Utilities.Alert.AlertType;
 import frc.robot.Utilities.MotorUtil.NeutralMode;
+import frc.robot.Vision.LimelightSubsystem;
 import lombok.Getter;
 import frc.robot.Utilities.VirtualSubsystem;
 import java.text.SimpleDateFormat;
@@ -42,6 +42,7 @@ import org.littletonrobotics.junction.networktables.NT4Publisher;
 import org.littletonrobotics.junction.rlog.RLOGServer;
 import org.littletonrobotics.junction.wpilog.WPILOGReader;
 import org.littletonrobotics.junction.wpilog.WPILOGWriter;
+
 
 import choreo.auto.AutoFactory;
 
@@ -241,16 +242,14 @@ public class Robot extends LoggedRobot {
     // CommandScheduler.getInstance().setPeriod(CatzConstants.LOOP_TIME); //TODO should we add this?
 
 
-    System.out.println("We need to access this from somewhere to activate it"+CatzVision.Instance.getName());
     System.out.println("Initializing " + CatzDrivetrain.Instance.getName());
     System.out.println("Initializing " + CatzAlgaePivot.Instance.getName());
     System.out.println("Initializing " + CatzRampPivot.Instance.getName());
     System.out.println("Initializing " + CatzRobotTracker.Instance);
-    System.out.println("Initializing " + CatzVision.Instance.getName());
+    System.out.println("Initializing " + LimelightSubsystem.Instance.getName());
     System.out.println("Initializing " + CatzLED.Instance);
     System.out.println("Initializing " + CatzOuttake.Instance.getName());
     System.out.println("Initializing " + CatzAutonomous.Instance.getName());
-
 
     CatzConstants.autoFactory = new AutoFactory(
                                                   CatzRobotTracker.Instance::getEstimatedPose,
@@ -384,8 +383,8 @@ public class Robot extends LoggedRobot {
 
     autoStart = Timer.getFPGATimestamp();
     // m_autonomousCommand = CatzSuperstructure.Instance.scoreLevelTwoAutomated();
-    //m_autonomousCommand = AutoRoutineSelector.Instance.getSelectedCommand();
-    m_autonomousCommand = CatzAutonomous.Instance.getCommand();
+    m_autonomousCommand = AutoRoutineSelector.Instance.getSelectedCommand();
+    // m_autonomousCommand = CatzAutonomous.Instance.getCommand();
     CatzRampPivot.Instance.Ramp_Intake_Pos().withTimeout(1.0);
     if (m_autonomousCommand != null) {
       m_autonomousCommand.schedule();
@@ -442,7 +441,6 @@ public class Robot extends LoggedRobot {
   @Override
   public void testInit() {
     CommandScheduler.getInstance().cancelAll();
-    CatzRobotTracker.Instance.resetPose(CatzVision.Instance.getPoseObservation()[0].pose().toPose2d());
   }
 
   @Override

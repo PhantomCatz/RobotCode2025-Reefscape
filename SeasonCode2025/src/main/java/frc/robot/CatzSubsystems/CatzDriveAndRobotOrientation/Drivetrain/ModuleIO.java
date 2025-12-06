@@ -33,6 +33,8 @@ public interface ModuleIO {
     public double steerVelocityRadsPerSec;
   }
 
+
+
   /** Updates the set of loggable inputs. */
   public default void updateInputs(ModuleIOInputs inputs) {}
 

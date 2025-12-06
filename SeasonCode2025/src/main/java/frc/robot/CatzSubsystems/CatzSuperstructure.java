@@ -205,7 +205,7 @@ public class CatzSuperstructure extends VirtualSubsystem {
             new TrajectoryDriveCmd(path, false, false).deadlineFor(
                 new RepeatCommand(intakeCoralStation().onlyIf(() -> CatzDrivetrain.Instance.getDistanceError() < DriveConstants.PREDICT_DISTANCE_INTAKE))
             ),
-            Commands.waitUntil(() -> (waitForCoralSupplier.get() ? CatzOuttake.Instance.isDesiredCoralState(false) : true)).withTimeout(0.6)
+            Commands.waitUntil(() -> (waitForCoralSupplier.get() ? CatzOuttake.Instance.isDesiredCoralState(false) : true)).withTimeout(3.0)
         );
     }
 
@@ -254,6 +254,7 @@ public class CatzSuperstructure extends VirtualSubsystem {
             CatzRampPivot.Instance.Ramp_Intake_Pos(),  //TODO? intake ramp pivot holds at intaking position for the duration of the match
             CatzIntakeRollers.Instance.stopIntaking(),
             CatzElevator.Instance.Elevator_Stow(),
+            new InstantCommand(() -> CatzAlgaeRemover.Instance.algaeRemove = false),
             new InstantCommand(() -> currentRobotState = RobotState.STOW)
         ).unless(()-> Robot.isSimulation()).alongWith(Commands.print("Stow"));
     }
@@ -535,6 +536,7 @@ public class CatzSuperstructure extends VirtualSubsystem {
     public Command intakeAlgaeProcess(){
         return new DeferredCommand(() -> {
             return Commands.sequence(
+                new InstantCommand(() -> CatzAlgaeRemover.Instance.algaeRemove = true),
                 TeleopPosSelector.Instance.runToNearestBranchAlgae(),
                 intakeAlgaeAuto()
             );
@@ -621,10 +623,12 @@ public class CatzSuperstructure extends VirtualSubsystem {
     public Command scoreInAuto(int level){
         return Commands.sequence
         (
-            CatzElevator.Instance.Elevator_LX(level),
+            Commands.print("\nStart Scoring"),
+            // CatzElevator.Instance.Elevator_LX(level),
             Commands.waitUntil(() -> readyToScoreAuton()),
             LXShoot(level),
-            Commands.waitUntil(() -> CatzOuttake.Instance.isDesiredCoralState(true))
+            Commands.waitUntil(() -> CatzOuttake.Instance.isDesiredCoralState(true)),
+            Commands.print("\nDone with Scoring")
         );
     }
 

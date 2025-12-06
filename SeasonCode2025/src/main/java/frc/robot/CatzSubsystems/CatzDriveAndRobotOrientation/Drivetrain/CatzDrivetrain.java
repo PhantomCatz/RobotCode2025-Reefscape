@@ -210,6 +210,7 @@ public class CatzDrivetrain extends SubsystemBase {
     Logger.recordOutput("Drive/Odometry module states", getModuleStates());
     Logger.recordOutput("Drive/Odometry wheel positions", wheelPositions);
     Logger.recordOutput("Drive/Odometry robot velocity", robotRelativeVelocity);
+
   } // end of drivetrain periodic
 
   // --------------------------------------------------------------------------------------------------------------------------
@@ -352,6 +353,7 @@ public class CatzDrivetrain extends SubsystemBase {
   }
 
   public boolean closeEnoughToRaiseElevator(){
+    System.out.println((choreoDistanceError <= DriveConstants.PREDICT_DISTANCE_SCORE) + "\n"+ choreoDistanceError);
     return choreoDistanceError <= DriveConstants.PREDICT_DISTANCE_SCORE;
   }
 
@@ -386,9 +388,10 @@ public class CatzDrivetrain extends SubsystemBase {
    * @param sample
    */
   public void followChoreoTrajectoryExecute(SwerveSample sample){
+    double targetVelocity = Math.hypot(sample.vx,sample.vy);
     Trajectory.State state = new Trajectory.State(
       sample.t,
-      Math.hypot(sample.vx,sample.vy),
+      0.0,
       0.0,
       new Pose2d(new Translation2d(sample.x, sample.y), Rotation2d.fromRadians(Math.atan2(sample.vy, sample.vx))),
       0.0
@@ -397,9 +400,13 @@ public class CatzDrivetrain extends SubsystemBase {
     Pose2d curPose = CatzRobotTracker.Instance.getEstimatedPose();
     ChassisSpeeds adjustedSpeeds = hoController.calculate(curPose, state, Rotation2d.fromRadians(sample.heading));
 
+
     choreoDistanceError = curPose.minus(choreoGoal).getTranslation().getNorm();
 
-    Logger.recordOutput("Target Auton Pose", new Pose2d(sample.x, sample.y, Rotation2d.fromRadians(sample.heading)));
+    Logger.recordOutput("Auton/Target Auton Pose", new Pose2d(sample.x, sample.y, Rotation2d.fromRadians(sample.heading)));
+    Logger.recordOutput("Auton/Target velocity", targetVelocity);
+    Logger.recordOutput("Auton/Adjusted Speeds", Math.hypot(adjustedSpeeds.vxMetersPerSecond, adjustedSpeeds.vyMetersPerSecond));
+    // Logger.recordOutput("Auton Applied Speeds")
     drive(adjustedSpeeds);
   }
 

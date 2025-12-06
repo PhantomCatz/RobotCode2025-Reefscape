@@ -32,6 +32,10 @@ public class CatzSwerveModule {
   private final Alert driveMotorDisconnected;
   private final Alert steerMotorDisconnected;
 
+  //SysID stuff
+  // private SysIdRoutine sysID = new SysIdRoutine(new Config(), new Mechanism(null, null, null, "hello"));
+
+
   // ----------------------------------------------------------------------------------------------
   //
   //  CatzServeModule() - Constructor
