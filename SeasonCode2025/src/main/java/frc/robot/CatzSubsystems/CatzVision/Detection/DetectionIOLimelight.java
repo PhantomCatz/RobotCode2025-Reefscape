@@ -85,6 +85,8 @@ public class DetectionIOLimelight extends DetectionIO {
 
 	@Override
 	public void updateInputs(DetectionIOInputs inputs) {
+		//TODO there is a slight delay/fall-behind of the coral as soon as the robot moves because of latency. We can add a "feedforward" to the position of the coral when the robot moves to eliminate this maybe
+
 		inputs.nearestCoral = getCoralPose();
 		System.out.println("nearest coral "+inputs.nearestCoral);
 		mStopwatch.startIfNotRunning();
