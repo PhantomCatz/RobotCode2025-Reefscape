@@ -88,7 +88,7 @@ public class DetectionIOLimelight extends DetectionIO {
 		//TODO there is a slight delay/fall-behind of the coral as soon as the robot moves because of latency. We can add a "feedforward" to the position of the coral when the robot moves to eliminate this maybe
 
 		inputs.nearestCoral = getCoralPose();
-		System.out.println("nearest coral "+inputs.nearestCoral);
+		// System.out.println("nearest coral "+inputs.nearestCoral);
 		mStopwatch.startIfNotRunning();
 		if (pipelineToSet == LimelightHelpers.getCurrentPipelineIndex(config.name)) {
 			if (pipelineToSet == DetectionMode.AUTO.index) {
@@ -107,8 +107,8 @@ public class DetectionIOLimelight extends DetectionIO {
 					if (detection.classId == 0) continue;
 					double tx = detection.txnc;
 					double ty = detection.tync;
-					Translation2d coralTranslation = calcDistToCoral(tx, ty)
-							.plus(config.robotToCameraOffset.getTranslation().toTranslation2d());
+					Translation2d coralTranslation = calcDistToCoral(tx, ty);
+						//	.plus(config.robotToCameraOffset.getTranslation().toTranslation2d()); keep the coral pose relative to the limelight so the robot's "intake" lines up to the coral
 
 					Pose2d coralPose =
 						CatzRobotTracker.Instance.getEstimatedPose().transformBy(new Transform2d(coralTranslation, new Rotation2d()));
@@ -186,7 +186,7 @@ public class DetectionIOLimelight extends DetectionIO {
 		Distance distAwayY = heightFromCoral.times(Math.tan(totalAngleY)); // robot x. forward/backward
 
 		//if the limelight is facing backwards, you need to flip dist away because this value is calculated relative to the limelight but the actual distance needs to be relative to the robot.
-		if(Math.abs(Math.toDegrees(config.robotToCameraOffset.getRotation().getZ())) > 90.0){ 
+		if(Math.abs(Math.toDegrees(config.robotToCameraOffset.getRotation().getZ())) > 90.0){
 			distAwayY = distAwayY.times(-1); //because the LL4 facing backwards
 		}
 

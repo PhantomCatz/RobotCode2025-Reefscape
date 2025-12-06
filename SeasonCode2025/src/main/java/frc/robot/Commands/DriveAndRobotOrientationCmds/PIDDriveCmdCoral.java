@@ -60,8 +60,7 @@ public class PIDDriveCmdCoral extends Command{
     @Override
     public void execute(){
         if(readyToScore) return;
-
-        goalPos = Detection.Instance.getCoralPose();
+        if (Detection.Instance.getCoralPose() != null) goalPos = Detection.Instance.getCoralPose();
         Pose2d currentPose = CatzRobotTracker.Instance.getEstimatedPose();
         Translation2d poseError = goalPos.minus(currentPose).getTranslation();
 
