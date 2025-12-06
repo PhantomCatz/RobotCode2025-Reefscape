@@ -108,7 +108,7 @@ public class CatzElevator extends SubsystemBase {
 
     isElevatorInPos = isElevatorInPosition();
     Logger.recordOutput("Aux Control", auxControl);
-
+    System.out.println(targetPosition);
     //--------------------------------------------------------------------------------------------------------
     // Update controllers when user specifies
     //--------------------------------------------------------------------------------------------------------
@@ -242,6 +242,7 @@ public class CatzElevator extends SubsystemBase {
 
       case 4:
         cmd = Elevator_L4();
+        // return runOnce(() -> setElevatorPos(ElevatorPosition.PosL4));
       break;
 
       default:

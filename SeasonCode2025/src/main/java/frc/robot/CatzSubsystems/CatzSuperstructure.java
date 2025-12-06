@@ -623,10 +623,12 @@ public class CatzSuperstructure extends VirtualSubsystem {
     public Command scoreInAuto(int level){
         return Commands.sequence
         (
-            CatzElevator.Instance.Elevator_LX(level),
+            Commands.print("\nStart Scoring"),
+            // CatzElevator.Instance.Elevator_LX(level),
             Commands.waitUntil(() -> readyToScoreAuton()),
             LXShoot(level),
-            Commands.waitUntil(() -> CatzOuttake.Instance.isDesiredCoralState(true))
+            Commands.waitUntil(() -> CatzOuttake.Instance.isDesiredCoralState(true)),
+            Commands.print("\nDone with Scoring")
         );
     }
 

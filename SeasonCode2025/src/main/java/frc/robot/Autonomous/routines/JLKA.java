@@ -20,6 +20,7 @@ public class JLKA extends AutoRoutineBase{
 
         prepRoutine(
             Start2ToJ,
+
             followTrajectoryAndScore(Start2ToJ, 4),
             followTrajectoryAndIntake(JToTopLoad),
             waitUntilCoralIntaked(),

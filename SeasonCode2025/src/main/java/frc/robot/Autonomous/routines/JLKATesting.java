@@ -20,6 +20,8 @@ public class JLKATesting extends AutoRoutineBase{
 
         prepRoutine(
             Start2ToJ,
+            // followTrajectoryWithAccuracy(Start2ToJ),
+            // followTrajectoryWithAccuracy(JToTopLoad),
             followTrajectoryAndScore(Start2ToJ, 4),
             followTrajectoryAndIntake(JToTopLoad),
             waitUntilCoralIntaked(),

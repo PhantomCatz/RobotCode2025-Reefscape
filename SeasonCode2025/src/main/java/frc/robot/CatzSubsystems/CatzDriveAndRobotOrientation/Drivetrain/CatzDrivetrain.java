@@ -353,6 +353,7 @@ public class CatzDrivetrain extends SubsystemBase {
   }
 
   public boolean closeEnoughToRaiseElevator(){
+    System.out.println((choreoDistanceError <= DriveConstants.PREDICT_DISTANCE_SCORE) + "\n"+ choreoDistanceError);
     return choreoDistanceError <= DriveConstants.PREDICT_DISTANCE_SCORE;
   }
 
