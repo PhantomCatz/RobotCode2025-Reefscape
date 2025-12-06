@@ -1,6 +1,7 @@
 package frc.robot.CatzSubsystems.CatzVision.Detection;
 
 import com.ctre.phoenix6.Utils;
+
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
@@ -84,7 +85,7 @@ public class DetectionIOLimelight extends DetectionIO {
 
 	@Override
 	public void updateInputs(DetectionIOInputs inputs) {
-		inputs.nearestCoral = getCoralPose(new Translation2d());
+		inputs.nearestCoral = getCoralPose();
 		System.out.println("nearest coral "+inputs.nearestCoral);
 		mStopwatch.startIfNotRunning();
 		if (pipelineToSet == LimelightHelpers.getCurrentPipelineIndex(config.name)) {
@@ -105,9 +106,12 @@ public class DetectionIOLimelight extends DetectionIO {
 					double tx = detection.txnc;
 					double ty = detection.tync;
 					Translation2d coralTranslation = calcDistToCoral(tx, ty)
-							.minus(config.robotToCameraOffset.getTranslation().toTranslation2d());
+							.plus(config.robotToCameraOffset.getTranslation().toTranslation2d());
+
 					Pose2d coralPose =
 						CatzRobotTracker.Instance.getEstimatedPose().transformBy(new Transform2d(coralTranslation, new Rotation2d()));
+
+
 					if (FieldLayout.outsideField(coralPose)) {
 						SmartDashboard.putBoolean("Outside Field", FieldLayout.outsideField(coralPose));
 						// LogUtil.recordPose2d(config.name + "Last Coral Pose Outside Field", coralPose);
@@ -146,13 +150,14 @@ public class DetectionIOLimelight extends DetectionIO {
 	}
 
 	@Override
-	public Pose2d getCoralPose(Translation2d base) {
+	public Pose2d getCoralPose() {
 		Translation2d bestTranslation = null;
 		Pose2d bestCoralPose = null;
+		Translation2d robotPose = CatzRobotTracker.Instance.getEstimatedPose().getTranslation();
 		for (Coral coral : tracker) {
 			if (bestTranslation == null
-					|| bestCoralPose.getTranslation().getDistance(base)
-							> coral.coralPose.getTranslation().getDistance(base)) {
+					|| bestCoralPose.getTranslation().getDistance(robotPose)
+							> coral.coralPose.getTranslation().getDistance(robotPose)) {
 				bestTranslation = coral.coralTranslation;
 				bestCoralPose = coral.coralPose;
 			}
@@ -172,29 +177,28 @@ public class DetectionIOLimelight extends DetectionIO {
 
 	@Override
 	public Translation2d calcDistToCoral(double tx, double ty) {
-		double totalAngleY = Units.degreesToRadians(-ty)
-				- config.robotToCameraOffset.getRotation().getY();
-		Distance distAwayY = config.robotToCameraOffset
-				.getMeasureZ()
-				.minus(DetectionConstants.kCoralRadius)
-				.div(Math.tan(totalAngleY)); // robot x
+		final Distance heightFromCoral = config.robotToCameraOffset.getMeasureZ().minus(DetectionConstants.kCoralRadius);
 
-		Distance distHypotenuseYToGround = BaseUnits.DistanceUnit.of(Math.hypot(
+		double totalAngleY = Units.degreesToRadians(ty) //pitch
+				- config.robotToCameraOffset.getRotation().getY();
+		Distance distAwayY = heightFromCoral.times(Math.tan(totalAngleY)); // robot x. forward/backward
+
+		distAwayY = distAwayY.times(-1); //because the LL4 facing backwards
+
+		Distance distHypotenuseYToGround = BaseUnits.DistanceUnit.of(Math.hypot( //distance from lens to coral only in the y-axis
 				distAwayY.in(BaseUnits.DistanceUnit),
-				config.robotToCameraOffset
-						.getMeasureZ()
-						.minus(DetectionConstants.kCoralRadius)
-						.in(BaseUnits.DistanceUnit)));
+				heightFromCoral.in(BaseUnits.DistanceUnit)));
 
 		double totalAngleX = Units.degreesToRadians(-tx)
 				+ config.robotToCameraOffset.getRotation().getZ();
 
-		Distance distAwayX = distHypotenuseYToGround.times(Math.tan(totalAngleX)); // robot y
+		Distance distAwayX = distHypotenuseYToGround.times(-Math.tan(totalAngleX)); // robot y. left/right
 
 		SmartDashboard.putNumber(config.name + "/tx", tx);
 		SmartDashboard.putNumber(config.name + "/ty", ty);
 		Logger.recordOutput(config.name + "/Distance Away Y", distAwayY.in(edu.wpi.first.units.Units.Meters));
 		Logger.recordOutput(config.name + "/Distance Away X", distAwayX.in(edu.wpi.first.units.Units.Meters));
+		Logger.recordOutput(config.name + "/Total Angle Y", Units.radiansToDegrees(totalAngleY));
 		Logger.recordOutput(
 				config.name + "Detection/Distance Away Hyp ", distHypotenuseYToGround.in(edu.wpi.first.units.Units.Meters));
 

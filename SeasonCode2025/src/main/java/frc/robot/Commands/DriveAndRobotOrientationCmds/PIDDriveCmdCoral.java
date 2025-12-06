@@ -100,7 +100,6 @@ public class PIDDriveCmdCoral extends Command{
     }
 
     private boolean isAtTargetState(){
-        goalPos = CatzDrivetrain.Instance.getPIDGoalPose();
         Pose2d currentPose = CatzRobotTracker.Instance.getEstimatedPose();
         ChassisSpeeds currentSpeed = CatzRobotTracker.Instance.getRobotChassisSpeeds();
 

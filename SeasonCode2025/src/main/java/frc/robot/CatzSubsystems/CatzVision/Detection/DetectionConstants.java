@@ -15,7 +15,7 @@ public class DetectionConstants {
 			// forward/back, left/right, up/down
 			new Translation3d(Units.Inches.of(-17.9), Units.Inches.of(0.0), Units.Inches.of(28.0)),
 			// roll (along robot y axis), pitch (along robot x axis), yaw (along robot z axis)
-			new Rotation3d(Units.Degree.of(0.0), Units.Degree.of(-45.0), Units.Degree.of(0.0)));
+			new Rotation3d(Units.Degree.of(0.0), Units.Degree.of(-45.0), Units.Degree.of(180.0)));
 	public static final int kTelePipeline = 3;
 	public static final int kAutoPipeline = 0;
 	public static final int kDisabledPipeline = 1;

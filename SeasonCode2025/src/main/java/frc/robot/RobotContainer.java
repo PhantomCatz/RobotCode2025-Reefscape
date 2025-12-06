@@ -156,7 +156,8 @@ public class RobotContainer {
       CatzSuperstructure.Instance.setIsScoring(() -> false);
     }));
 
-    xboxDrv.a().toggleOnTrue(CatzElevator.Instance.decrementElevatorPosition().onlyIf(()-> CatzSuperstructure.Instance.getIsScoring().get()));
+    // xboxDrv.a().toggleOnTrue(CatzElevator.Instance.decrementElevatorPosition().onlyIf(()-> CatzSuperstructure.Instance.getIsScoring().get()));
+    xboxDrv.a().onTrue(TeleopPosSelector.Instance.runToNearestCoral());
     xboxDrv.y().toggleOnTrue(CatzElevator.Instance.incrementElevatorPosition().onlyIf(() -> CatzSuperstructure.Instance.getIsScoring().get()));
 
     // cancel drive to reef
@@ -173,7 +174,7 @@ public class RobotContainer {
     // swipe
     // xboxDrv.povDown().toggleOnTrue(TeleopPosSelector.Instance.runSwipe().alongWith(Commands.print("hello swipe")).unless(()->CatzSuperstructure.isClimbEnabled()));
 
-    xboxDrv.b().onTrue(CatzSuperstructure.Instance.intake().alongWith(Commands.print("INTAKE")));
+    xboxDrv.b().onTrue(new InstantCommand(()->CatzRobotTracker.Instance.resetPose(new Pose2d(5,5,new Rotation2d()))));
 
 
     // Default driving

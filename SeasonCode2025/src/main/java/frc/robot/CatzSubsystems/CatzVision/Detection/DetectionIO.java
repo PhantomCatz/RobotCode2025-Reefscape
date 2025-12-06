@@ -19,7 +19,7 @@ public abstract class DetectionIO {
 
 	public abstract void updateInputs(DetectionIOInputs inputs);
 
-	public abstract Pose2d getCoralPose(Translation2d base);
+	public abstract Pose2d getCoralPose();
 
 	public boolean getDisabled() {
 		return disabled;

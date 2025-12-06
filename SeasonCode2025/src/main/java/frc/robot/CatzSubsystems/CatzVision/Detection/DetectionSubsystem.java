@@ -15,7 +15,7 @@ import org.littletonrobotics.junction.Logger;
 
 public class DetectionSubsystem<IO extends DetectionIOLimelight> extends SubsystemBase {
 	protected final IO io;
-	private LimelightConfig config = new LimelightConfig();
+	private final LimelightConfig config;
 	private final DetectionIOInputsAutoLogged inputs = new DetectionIOInputsAutoLogged();
 
 	public DetectionSubsystem(LimelightConfig config, IO io) {
@@ -54,16 +54,7 @@ public class DetectionSubsystem<IO extends DetectionIOLimelight> extends Subsyst
 	 * @return The closest coral pose.
 	 */
 	public Pose2d getCoralPose() {
-		return io.getCoralPose(CatzRobotTracker.Instance.getEstimatedPose().getTranslation());
-	}
-
-	/**
-	 * @param base The translation to evaluate the closest coral relative to
-	 *
-	 * @return The closest coral pose.
-	 */
-	public Pose2d getCoralPose(Translation2d base) {
-		return io.getCoralPose(base);
+		return io.getCoralPose();
 	}
 
 	/**
@@ -71,18 +62,11 @@ public class DetectionSubsystem<IO extends DetectionIOLimelight> extends Subsyst
 	 *
 	 * @return A pose with a rotation component equal to the angle to face the coral and the translation component of the closest coral.
 	 */
-	public Pose2d getCoralTranslationAndPoint(Translation2d base) {
-		Translation2d t = getCoralPose(base).getTranslation();
+	public Pose2d getCoralTranslationAndPoint() {
+		Translation2d t = getCoralPose().getTranslation();
 		Rotation2d r = t.minus(CatzRobotTracker.Instance.getEstimatedPose().getTranslation()).getAngle();
 		// LogUtil.recordPose2d("Detection PID/Coral Translation And Point", new Pose2d(t, r));
 		return new Pose2d(t, r);
-	}
-
-	/**
-	 * @return A pose with a rotation component equal to the angle to face the coral and the translation component of the closest coral based on the drivetrain.
-	 */
-	public Pose2d getCoralTranslationAndPoint() {
-		return getCoralTranslationAndPoint(CatzRobotTracker.Instance.getEstimatedPose().getTranslation());
 	}
 
 	public int coralCount() {

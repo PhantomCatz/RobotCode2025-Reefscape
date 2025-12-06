@@ -33,6 +33,18 @@ public final class CatzConstants {
     COMPETITION // Competition Setting
   }
 
+
+
+
+
+
+
+
+
+
+
+
+
   public static enum RobotHardwareMode {
     REAL,
     SIM,

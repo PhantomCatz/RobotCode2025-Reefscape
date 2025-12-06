@@ -138,7 +138,7 @@ public class DriveConstants {
             MODULE_CONFIGS[INDEX_FR] = new ModuleIDs(1, 2, 11, -0.15454+0.5, false);
             MODULE_CONFIGS[INDEX_BR] = new ModuleIDs(3, 4, 12, 0.138183, false);
             MODULE_CONFIGS[INDEX_BL] = new ModuleIDs(5, 6, 13, -0.020507 , false);
-            MODULE_CONFIGS[INDEX_FL] = new ModuleIDs(7, 8, 14, 0.2780761+0.5, false);
+            MODULE_CONFIGS[INDEX_FL] = new ModuleIDs(7, 8, 14, -0.413, false);
         break;
 
         case SN_TEST:
