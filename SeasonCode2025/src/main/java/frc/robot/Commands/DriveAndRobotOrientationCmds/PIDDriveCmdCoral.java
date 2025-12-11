@@ -21,7 +21,7 @@ public class PIDDriveCmdCoral extends Command{
     private final ProfiledPIDController translationController;
     private final ProfiledPIDController rotationController;
 
-    private final double POSITION_TOLERANCE_METERS = 0.02;
+    private final double POSITION_TOLERANCE_METERS = 0.3;
     private final double VELOCITY_TOLERANCE_MPS = 0.1;
     private final double ANGLE_TOLERANCE_DEGREES = 3.0;
     private final double ALLOWABLE_VISION_ADJUST = 4e-3; //TODO tune

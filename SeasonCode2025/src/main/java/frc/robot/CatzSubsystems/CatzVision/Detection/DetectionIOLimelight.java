@@ -107,11 +107,13 @@ public class DetectionIOLimelight extends DetectionIO {
 					if (detection.classId == 0) continue;
 					double tx = detection.txnc;
 					double ty = detection.tync;
-					Translation2d coralTranslation = calcDistToCoral(tx, ty);
-						//	.plus(config.robotToCameraOffset.getTranslation().toTranslation2d()); keep the coral pose relative to the limelight so the robot's "intake" lines up to the coral
-
+					Translation2d coralTranslation = calcDistToCoral(tx, ty)
+					// Logger.recordOutput("Detection/coralTranslation", coralTranslation);
+							.plus(config.robotToCameraOffset.getTranslation().toTranslation2d());
+					Rotation2d coralRotation = coralTranslation.getAngle().plus(Rotation2d.k180deg);
+					System.out.println(coralRotation);
 					Pose2d coralPose =
-						CatzRobotTracker.Instance.getEstimatedPose().transformBy(new Transform2d(coralTranslation, new Rotation2d()));
+						CatzRobotTracker.Instance.getEstimatedPose().transformBy(new Transform2d(coralTranslation, coralRotation));
 
 
 					if (FieldLayout.outsideField(coralPose)) {
