@@ -19,7 +19,7 @@ public class OuttakeConstants {
         switch (CatzConstants.getRobotType()) {
             case SN2 -> new Gains(7.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0); //TODO fix gains
             case SN1 -> new Gains(75.0, 0.0, 0.0, 0.175, 0.13, 0.013, 0.4); //
-            case SN_TEST, SN1_2024 -> new Gains(7000.0, 0.0, 250.0, 8.4, 0.2, 0.2, 22.9);
+            case SN_TEST, SN1_2024, SN1_2026 -> new Gains(7000.0, 0.0, 250.0, 8.4, 0.2, 0.2, 22.9);
         };
 
     static double OUTTAKE_RT = 0.4;

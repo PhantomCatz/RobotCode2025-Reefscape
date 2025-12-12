@@ -21,6 +21,6 @@ public class ClimbConstants {
             //(100.0, 0.0, 0.0, 0.25, 0.12, 0.01, 0.0);
             case SN2 -> new Gains(12.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0); //TBD FOR GODSAKE
             case SN1 -> new Gains(12.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0);
-            case SN_TEST, SN1_2024 -> new Gains(7000.0, 0.0, 250.0, 8.4, 0.2, 0.2, 22.9);
+            case SN_TEST, SN1_2024, SN1_2026 -> new Gains(7000.0, 0.0, 250.0, 8.4, 0.2, 0.2, 22.9);
         };
 }

@@ -59,7 +59,7 @@ public class ElevatorConstants {
 
             case SN1 -> new Gains(3.0, 0.0, 0.0, 0.175, 0.3, 0.013, 0.4); //
 
-            case SN_TEST, SN1_2024 -> new Gains(4.0, 0.0, 0.0, 0.065, 0.379, 0.015, 0.0);
+            case SN_TEST, SN1_2024, SN1_2026 -> new Gains(4.0, 0.0, 0.0, 0.065, 0.379, 0.015, 0.0);
         };
 
     public static final Gains slot1_gains =
@@ -67,14 +67,14 @@ public class ElevatorConstants {
             case SN2 -> new Gains(3.0, 0.0, 0.0, 0.175, 0.130, 0.009, 0.4);
                                // v 75.0 vv 0.1 v
             case SN1 -> new Gains(3.0, 0.0, 0.0, 0.175, 0.13, 0.013, 0.4); //TODO
-            case SN_TEST, SN1_2024 -> new Gains(7000.0, 0.0, 250.0, 8.4, 0.2, 0.2, 22.9);
+            case SN_TEST, SN1_2024, SN1_2026 -> new Gains(7000.0, 0.0, 250.0, 8.4, 0.2, 0.2, 22.9);
         };
 
     public static final MotionMagicParameters motionMagicParameters =
         switch (CatzConstants.getRobotType()) {
             case SN2, SN1 -> new MotionMagicParameters(500, 300, 4000);
 
-            case SN_TEST, SN1_2024 -> new MotionMagicParameters(0.0, 0.0, 0.0);
+            case SN_TEST, SN1_2024, SN1_2026 -> new MotionMagicParameters(0.0, 0.0, 0.0);
         };
 
     // Adjustable Dashboard PIDF values

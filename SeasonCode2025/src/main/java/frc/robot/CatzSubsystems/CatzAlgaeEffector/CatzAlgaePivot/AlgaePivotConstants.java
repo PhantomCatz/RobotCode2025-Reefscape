@@ -23,20 +23,20 @@ public class AlgaePivotConstants {
         switch (CatzConstants.getRobotType()) {
             case SN2 -> new Gains(20.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0);
             case SN1 -> new Gains(10.0, 0.0, 0.1, 0.00, 0.0, 0.0, 3.0); //kg1.5
-            case SN_TEST, SN1_2024 -> new Gains(7000.0, 0.0, 250.0, 8.4, 0.2, 0.2, 22.9);
+            case SN_TEST, SN1_2024, SN1_2026 -> new Gains(7000.0, 0.0, 250.0, 8.4, 0.2, 0.2, 22.9);
         };
 
     public static final Gains slot1_gains =
         switch (CatzConstants.getRobotType()) {
             case SN2 -> new Gains(2.0, 0.0, 0.0, 0.175, 0.130, 0.013, 0.4);
             case SN1 -> new Gains(1.0, 0.1, 0.0, 0.175, 0.13, 0.013, 0.4); //
-            case SN_TEST, SN1_2024 -> new Gains(7000.0, 0.0, 250.0, 8.4, 0.2, 0.2, 22.9);
+            case SN_TEST, SN1_2024, SN1_2026 -> new Gains(7000.0, 0.0, 250.0, 8.4, 0.2, 0.2, 22.9);
         };
 
     public static final MotionMagicParameters motionMagicParameters =
         switch (CatzConstants.getRobotType()) {
             case SN2, SN1 -> new MotionMagicParameters(100.0, 200.0, 800.0);
-            case SN_TEST, SN1_2024 -> new MotionMagicParameters(0.0, 0.0, 0.0);
+            case SN_TEST, SN1_2024, SN1_2026 -> new MotionMagicParameters(0.0, 0.0, 0.0);
         };
 
 

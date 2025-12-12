@@ -98,8 +98,8 @@ public class CatzLED extends VirtualSubsystem {
   private static final int LED_Sidebar_Start_RT = 0;
   private static final int LED_Sidebar_End_RT   = 23;
   private static final int LED_Crossbar_Start   = 24;
-  private static final int LED_Crossbar_End     = 30;
-  private static final int LED_Sidebar_Start_LT = 31;
+  private static final int LED_Crossbar_End     = 31;
+  private static final int LED_Sidebar_Start_LT = 32;
   private static final int LED_Sidebar_End_LT   = 53;
 
   private static final double strobeDuration = 0.1;
@@ -176,7 +176,7 @@ public class CatzLED extends VirtualSubsystem {
     // -----------------------------------------------------------------------------------------------
     if(paradeLeds){
       christmas((int) ((((Timer.getFPGATimestamp() - lastEnabledTime) % bubbleTime)) / bubbleTime * LED_Sidebar_End_RT));
-
+      strobeCrossbar(Color.kYellow, Color.kBlack, 0.5);
       ledStrip.setData(buffer);
       return;
     }

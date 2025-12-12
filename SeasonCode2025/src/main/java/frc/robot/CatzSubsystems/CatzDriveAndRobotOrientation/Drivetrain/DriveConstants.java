@@ -69,6 +69,18 @@ public class DriveConstants {
 
   public static final ModuleGainsAndRatios MODULE_GAINS_AND_RATIOS =
       switch (CatzConstants.getRobotType()) {
+        case SN1_2026 ->
+          new ModuleGainsAndRatios(
+            5.0,
+            0.45,
+            1.0 / DCMotor.getKrakenX60Foc(1).KtNMPerAmp, // A/(N*m)
+            6.0,
+            0.0,
+            0.006,
+            0.005,
+            Mk4iReductions.L2_16t.reduction,
+            Mk4iReductions.STEER_2026.reduction);
+
         case SN1, SN2 ->
             new ModuleGainsAndRatios(
                 5.0,
@@ -76,10 +88,10 @@ public class DriveConstants {
                 1.0 / DCMotor.getKrakenX60Foc(1).KtNMPerAmp, // A/(N*m)
                 6.0,
                 0.0,
-                0.50,
+                0.006,
                 0.005,
                 Mk4iReductions.L2_16t.reduction,
-                Mk4iReductions.steer.reduction);
+                Mk4iReductions.STEER_BUBBLE.reduction);
         case SN_TEST ->
             new ModuleGainsAndRatios(
                 0.014,
@@ -90,7 +102,7 @@ public class DriveConstants {
                 1.0,
                 0.0,
                 Mk4iReductions.L2_16t.reduction,
-                Mk4iReductions.steer.reduction);
+                Mk4iReductions.STEER_BUBBLE.reduction);
         case SN1_2024 ->
             new ModuleGainsAndRatios(
                 5.0,
@@ -101,7 +113,7 @@ public class DriveConstants {
                 0.3,
                 0.005,
                 Mk4iReductions.L2_PLUS.reduction,
-                Mk4iReductions.steer.reduction);
+                Mk4iReductions.STEER_BUBBLE.reduction);
       };
   // -------------------------------------------------------------------------------
   // Odometry Constants
@@ -110,7 +122,7 @@ public class DriveConstants {
   public static final double GYRO_UPDATE_FREQUENCY =
       switch (CatzConstants.getRobotType()) {
         case SN_TEST -> 50.0;
-        case SN2, SN1, SN1_2024 -> 100.0;
+        case SN2, SN1, SN1_2024, SN1_2026 -> 100.0;
         //case SN2 -> 250.0;
       };
 
@@ -127,6 +139,14 @@ public class DriveConstants {
   public static final ModuleIDs[] MODULE_CONFIGS = new ModuleIDs[4];
   static{
     switch(CatzConstants.getRobotType()){
+
+        case SN1_2026:
+            MODULE_CONFIGS[INDEX_FR] = new ModuleIDs(1, 2, 11, 0.601, false);
+            MODULE_CONFIGS[INDEX_BR] = new ModuleIDs(3, 4, 12, -0.018+0.5, false);
+            MODULE_CONFIGS[INDEX_BL] = new ModuleIDs(5, 6, 13, -0.336, false);
+            MODULE_CONFIGS[INDEX_FL] = new ModuleIDs(7, 8, 14, 0.064+0.5, false);
+        break;
+
         case SN2:
             MODULE_CONFIGS[INDEX_FR] = new ModuleIDs(1, 2, 11, 9.115966796875 - 9.0, false);//-0.539306640625, false);
             MODULE_CONFIGS[INDEX_BR] = new ModuleIDs(3, 4, 12, 8.167724609375 - 8.0, false);//0.083251953125, false);
@@ -292,7 +312,9 @@ public class DriveConstants {
 
     L2_PLUS(6.75 * (14.0 / 16.0)),
 
-    steer((150.0 / 7.0));
+    STEER_BUBBLE((150.0 / 7.0)),
+
+    STEER_2026((25.9 / 1.0));
 
     final double reduction;
 
