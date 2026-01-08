@@ -18,6 +18,7 @@ import frc.robot.Utilities.GeomUtil;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.NoSuchElementException;
+import java.util.Optional;
 import java.util.function.Supplier;
 
 import lombok.Getter;
@@ -271,6 +272,10 @@ public class CatzRobotTracker {
 
   public Translation2d getVisionPoseShift(){
     return visionPoseShift;
+  }
+
+  public Optional<Pose2d> getRobotPoseAtTime(double timestamp) {
+    return POSE_BUFFER.getSample(timestamp);
   }
 
   /**

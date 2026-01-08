@@ -29,6 +29,7 @@ import frc.robot.Utilities.Util;
 import static edu.wpi.first.units.Units.Seconds;
 
 import java.util.ArrayList;
+import java.util.Optional;
 
 import org.littletonrobotics.junction.Logger;
 
@@ -94,9 +95,15 @@ public class DetectionIOLimelight extends DetectionIO {
 			if (pipelineToSet == DetectionMode.AUTO.index) {
 				Translation2d base = CatzRobotTracker.Instance.getEstimatedPose().getTranslation();
 				RawDetection[] all = LimelightHelpers.getRawDetections(config.name);
+				double latencyMs = LimelightHelpers.getLatency_Capture(config.name) + LimelightHelpers.getLatency_Pipeline(config.name);
 				Translation2d bestTranslation = null;
 				Pose2d bestCoralPose = null;
-				double now = Timer.getFPGATimestamp();
+				double now = Timer.getFPGATimestamp() - (latencyMs / 1000); // Account for latency in storing timestamp
+				Optional<Pose2d> poseFromCapture = CatzRobotTracker.Instance.getRobotPoseAtTime(now);
+				if (poseFromCapture != null && poseFromCapture.isEmpty()) {
+					System.out.println("failing detection"+now);
+					return;
+				}
 				tracker.removeIf((coral) -> now - coral.detectionTime > 0.2);
 
 				while (tracker.size() > 20) {
@@ -113,7 +120,7 @@ public class DetectionIOLimelight extends DetectionIO {
 					Rotation2d coralRotation = coralTranslation.getAngle().plus(Rotation2d.k180deg);
 					System.out.println(coralRotation);
 					Pose2d coralPose =
-						CatzRobotTracker.Instance.getEstimatedPose().transformBy(new Transform2d(coralTranslation, coralRotation));
+						poseFromCapture.get().transformBy(new Transform2d(coralTranslation, coralRotation));
 
 
 					if (FieldLayout.outsideField(coralPose)) {
