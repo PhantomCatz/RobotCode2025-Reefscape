@@ -6,6 +6,7 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.interpolation.TimeInterpolatableBuffer;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
@@ -56,6 +57,10 @@ public class DetectionIOLimelight extends DetectionIO {
 			.getStructTopic("", Pose2d.struct)
 			.publish();
 
+	private static final double POSE_BUFFER_SIZE_SEC = 2.0;
+	private final TimeInterpolatableBuffer<Pose2d> POSE_BUFFER =
+      TimeInterpolatableBuffer.createBuffer(POSE_BUFFER_SIZE_SEC);
+
 	class Coral {
 		Pose2d coralPose;
 		Translation2d coralTranslation;
@@ -98,8 +103,10 @@ public class DetectionIOLimelight extends DetectionIO {
 				double latencyMs = LimelightHelpers.getLatency_Capture(config.name) + LimelightHelpers.getLatency_Pipeline(config.name);
 				Translation2d bestTranslation = null;
 				Pose2d bestCoralPose = null;
-				double now = Timer.getFPGATimestamp() - (latencyMs / 1000); // Account for latency in storing timestamp
-				Optional<Pose2d> poseFromCapture = CatzRobotTracker.Instance.getRobotPoseAtTime(now);
+				double now = Timer.getFPGATimestamp(); // Account for latency in storing timestamp
+				Pose2d curPose = CatzRobotTracker.Instance.getEstimatedPose();
+				POSE_BUFFER.addSample(now, curPose);
+				Optional<Pose2d> poseFromCapture = POSE_BUFFER.getSample(now - latencyMs/1000.0);
 				if (poseFromCapture != null && poseFromCapture.isEmpty()) {
 					System.out.println("failing detection"+now);
 					return;
@@ -128,7 +135,7 @@ public class DetectionIOLimelight extends DetectionIO {
 						// LogUtil.recordPose2d(config.name + "Last Coral Pose Outside Field", coralPose);
 						continue;
 					}
-					tracker.add(new Coral(coralPose, coralTranslation, now));
+					tracker.add(new Coral(coralPose, coralTranslation, now - (latencyMs / 1000)));
 				}
 
 				for (Coral coral : tracker) {
