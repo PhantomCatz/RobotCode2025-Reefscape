@@ -211,7 +211,7 @@ public class ModuleIORealFoc implements ModuleIO {
   public void runDriveVelocityRPSIO(double velocityMetersPerSec) {
     // System.out.println("power " + driveTorqueCurrent.getValueAsDouble());
     // System.out.println("speed " + velocityMetersPerSec);
-    driveTalon.setControl(velocityTorqueCurrentFOC.withVelocity(velocityMetersPerSec));
+    driveTalon.setControl(velocityVoltage.withVelocity(velocityMetersPerSec));
   }
 
   public void runSteerPercentOutput(double percentOutput) {
@@ -222,7 +222,7 @@ public class ModuleIORealFoc implements ModuleIO {
   public void runSteerPositionSetpoint(double currentAngleRads, double targetAngleRads) {
     steerTalon.setControl(
         dutyCycleOutControl.withOutput(
-            -steerFeedback.calculate(currentAngleRads, targetAngleRads))
+            steerFeedback.calculate(currentAngleRads, targetAngleRads))
     );
 
     Logger.recordOutput("Module " + MODULE_NAME + "/steer Target Angle", targetAngleRads);

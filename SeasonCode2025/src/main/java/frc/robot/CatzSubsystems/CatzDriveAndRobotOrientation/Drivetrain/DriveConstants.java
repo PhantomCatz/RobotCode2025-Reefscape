@@ -71,13 +71,13 @@ public class DriveConstants {
       switch (CatzConstants.getRobotType()) {
         case SN1_2026 ->
           new ModuleGainsAndRatios(
-            5.0,
+            5.0/100.0,
             0.45,
             1.0 / DCMotor.getKrakenX60Foc(1).KtNMPerAmp, // A/(N*m)
-            6.0,
+            6.0/100.0,
             0.0,
-            0.006,
-            0.005,
+            1.0,
+            0.0,
             Mk4iReductions.L2_16t.reduction,
             Mk4iReductions.STEER_2026.reduction);
 
