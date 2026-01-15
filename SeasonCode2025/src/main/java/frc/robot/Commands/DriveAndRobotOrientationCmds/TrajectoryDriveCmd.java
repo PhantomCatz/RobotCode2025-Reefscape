@@ -260,7 +260,6 @@ public class TrajectoryDriveCmd extends Command {
     adjustedSpeeds = applyCusp(adjustedSpeeds, translationError, endRotation.minus(currentPose.getRotation()).getDegrees(), CONVERGE_DISTANCE, CONVERGE_ANGLE);
 
     // Logging
-    Logger.recordOutput("CatzRobotTracker/Desired Auto Pose", goal.pose);
 
     // if(Math.abs(startRot.minus(endRotation).getDegrees()) < 1){
     //   adjustedSpeeds = new ChassisSpeeds(adjustedSpeeds.vxMetersPerSecond, adjustedSpeeds.vyMetersPerSecond, 0.0);

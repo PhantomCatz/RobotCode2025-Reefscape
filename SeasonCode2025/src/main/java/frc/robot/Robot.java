@@ -128,6 +128,15 @@ public class Robot extends LoggedRobot {
     Logger.recordMetadata("GitSHA", BuildConstants.GIT_SHA);
     Logger.recordMetadata("GitDate", BuildConstants.GIT_DATE);
     Logger.recordMetadata("GitBranch", BuildConstants.GIT_BRANCH);
+    CatzConstants.autoFactory = new AutoFactory(
+                                                  CatzRobotTracker.Instance::getEstimatedPose,
+                                                  CatzRobotTracker.Instance::resetPose,
+                                                  CatzDrivetrain.Instance::followChoreoTrajectoryExecute,
+                                                  true,
+                                                  CatzDrivetrain.Instance
+                                                ); //it is apparently a good idea to initialize these variables not statically because there can be race conditions
+    AutoRoutineSelector.Instance.getSelectedCommand();
+
     switch (BuildConstants.DIRTY) {
       case 0:
         Logger.recordMetadata("GitDirty", "All changes committed");
@@ -253,13 +262,6 @@ public class Robot extends LoggedRobot {
     System.out.println("Initializing " + CatzAutonomous.Instance.getName());
     System.out.println("Initializing " + Detection.Instance.getName());
 
-    CatzConstants.autoFactory = new AutoFactory(
-                                                  CatzRobotTracker.Instance::getEstimatedPose,
-                                                  CatzRobotTracker.Instance::resetPose,
-                                                  CatzDrivetrain.Instance::followChoreoTrajectoryExecute,
-                                                  true,
-                                                  CatzDrivetrain.Instance
-                                                ); //it is apparently a good idea to initialize these variables not statically because there can be race conditions
 
   }
 
@@ -385,8 +387,7 @@ public class Robot extends LoggedRobot {
 
     autoStart = Timer.getFPGATimestamp();
     // m_autonomousCommand = CatzSuperstructure.Instance.scoreLevelTwoAutomated();
-    //m_autonomousCommand = AutoRoutineSelector.Instance.getSelectedCommand();
-    m_autonomousCommand = CatzAutonomous.Instance.getCommand();
+    m_autonomousCommand = AutoRoutineSelector.Instance.getSelectedCommand();
     CatzRampPivot.Instance.Ramp_Intake_Pos().withTimeout(1.0);
     if (m_autonomousCommand != null) {
       m_autonomousCommand.schedule();

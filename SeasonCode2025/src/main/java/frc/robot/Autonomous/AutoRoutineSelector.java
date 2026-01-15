@@ -9,10 +9,13 @@ public class AutoRoutineSelector {
     public static final AutoRoutineSelector Instance = new AutoRoutineSelector();
 
     private AutoChooser autoSelector = new AutoChooser();
-
     private AutoRoutineSelector(){
+
         autoSelector.addRoutine("Test 2 Piece", () -> new Test2Piece().getRoutine());
         autoSelector.addRoutine("Open House", () -> new OpenHouse().getRoutine());
+        autoSelector.addRoutine("JLKA", () -> new JLKA().getRoutine());
+        autoSelector.addRoutine("testinggg", () -> new testinggg().getRoutine());
+        autoSelector.addRoutine("JKLATesting", () -> new JLKATesting().getRoutine());
 
         SmartDashboard.putData(autoSelector);
     }
