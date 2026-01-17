@@ -157,7 +157,7 @@ public class RobotContainer {
     }));
 
     // xboxDrv.a().toggleOnTrue(CatzElevator.Instance.decrementElevatorPosition().onlyIf(()-> CatzSuperstructure.Instance.getIsScoring().get()));
-    xboxDrv.a().onTrue(TeleopPosSelector.Instance.autoIntakeMode());
+    xboxDrv.a().onTrue(TeleopPosSelector.Instance.autoIntakeGroupMode());
     xboxDrv.y().toggleOnTrue(CatzElevator.Instance.incrementElevatorPosition().onlyIf(() -> CatzSuperstructure.Instance.getIsScoring().get()));
 
     // cancel drive to reef

@@ -336,6 +336,14 @@ public class TeleopPosSelector { //TODO split up the file. it's too big and does
     );
   }
 
+  public Command autoIntakeGroupMode() {
+    return new SequentialCommandGroup(
+      Commands.waitUntil(Detection.Instance::hasCoral),
+      Commands.print("can see now"),
+      new PIDDriveCmdCoral(Detection.Instance.getNearestGroupPose()).asProxy()
+    );
+  }
+
   public PathPlannerPath getStraightLinePath(Pose2d start, Pose2d goal, PathConstraints constraints){
     Translation2d currentPose = start.getTranslation();
     Translation2d goalPos = goal.getTranslation();

@@ -57,6 +57,10 @@ public class DetectionSubsystem<IO extends DetectionIOLimelight> extends Subsyst
 		return io.getCoralPose();
 	}
 
+	public Pose2d getNearestGroupPose() {
+		return io.getNearestGroupPose();
+	}
+
 	/**
 	 * @param base The translation to evaluate the closest coral relative to
 	 *

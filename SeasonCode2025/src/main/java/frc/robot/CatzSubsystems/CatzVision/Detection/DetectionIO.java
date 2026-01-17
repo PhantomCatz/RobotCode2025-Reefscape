@@ -10,6 +10,7 @@ public abstract class DetectionIO {
 	@AutoLog
 	public static class DetectionIOInputs {
 		public Pose2d nearestCoral;
+		public Pose2d nearestGroupCoral;
 	}
 	protected boolean disabled = Robot.isSimulation();
 
@@ -20,6 +21,8 @@ public abstract class DetectionIO {
 	public abstract void updateInputs(DetectionIOInputs inputs);
 
 	public abstract Pose2d getCoralPose();
+
+	public abstract Pose2d getNearestGroupPose();
 
 	public boolean getDisabled() {
 		return disabled;
