@@ -19,7 +19,7 @@ import frc.robot.Robot;
 import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.CatzRobotTracker;
 import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.Drivetrain.CatzDrivetrain;
 import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.Drivetrain.DriveConstants;
-import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.Vision.CatzVision;
+import frc.robot.CatzSubsystems.CatzVision.ApriltagScanning.LimelightSubsystem;
 import frc.robot.Utilities.AllianceFlipUtil;
 
 import java.util.List;
@@ -260,7 +260,6 @@ public class TrajectoryDriveCmd extends Command {
     adjustedSpeeds = applyCusp(adjustedSpeeds, translationError, endRotation.minus(currentPose.getRotation()).getDegrees(), CONVERGE_DISTANCE, CONVERGE_ANGLE);
 
     // Logging
-    Logger.recordOutput("CatzRobotTracker/Desired Auto Pose", goal.pose);
 
     // if(Math.abs(startRot.minus(endRotation).getDegrees()) < 1){
     //   adjustedSpeeds = new ChassisSpeeds(adjustedSpeeds.vxMetersPerSecond, adjustedSpeeds.vyMetersPerSecond, 0.0);
@@ -336,7 +335,7 @@ public class TrajectoryDriveCmd extends Command {
     }
 
    // System.out.println("vision: " + tracker.getVisionPoseShift().getNorm());
-    if (CatzVision.Instance.isSeeingApriltag() && autoalign && tracker.getVisionPoseShift().getNorm() > ALLOWABLE_VISION_ADJUST) {
+    if (LimelightSubsystem.Instance.isSeeingApriltag() && autoalign && tracker.getVisionPoseShift().getNorm() > ALLOWABLE_VISION_ADJUST) {
       // If trailing pose is within margin
       System.out.println("not visioning");
       return false;

@@ -210,6 +210,7 @@ public class CatzDrivetrain extends SubsystemBase {
     Logger.recordOutput("Drive/Odometry module states", getModuleStates());
     Logger.recordOutput("Drive/Odometry wheel positions", wheelPositions);
     Logger.recordOutput("Drive/Odometry robot velocity", robotRelativeVelocity);
+
   } // end of drivetrain periodic
 
   // --------------------------------------------------------------------------------------------------------------------------

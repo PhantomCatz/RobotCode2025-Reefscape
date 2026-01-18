@@ -19,7 +19,7 @@ public final class CatzConstants {
   // --------------------------------------------------/
   public static final RobotScenario robotScenario = RobotScenario.COMPETITION;
   public static final RobotHardwareMode hardwareMode = RobotHardwareMode.REAL;
-  private static RobotID robotType = RobotID.SN2;
+  private static RobotID robotType = RobotID.SN1;
   private static AlertPriority alertWarningPriority = AlertPriority.ONE;
   public static boolean disableHAL = false;
 
@@ -32,6 +32,18 @@ public final class CatzConstants {
     PRACTICE, // Driver Practice + Testing
     COMPETITION // Competition Setting
   }
+
+
+
+
+
+
+
+
+
+
+
+
 
   public static enum RobotHardwareMode {
     REAL,

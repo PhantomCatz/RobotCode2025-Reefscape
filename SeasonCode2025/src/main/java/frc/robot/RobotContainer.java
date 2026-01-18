@@ -156,7 +156,8 @@ public class RobotContainer {
       CatzSuperstructure.Instance.setIsScoring(() -> false);
     }));
 
-    xboxDrv.a().toggleOnTrue(CatzElevator.Instance.decrementElevatorPosition().onlyIf(()-> CatzSuperstructure.Instance.getIsScoring().get()));
+    // xboxDrv.a().toggleOnTrue(CatzElevator.Instance.decrementElevatorPosition().onlyIf(()-> CatzSuperstructure.Instance.getIsScoring().get()));
+    xboxDrv.a().onTrue(TeleopPosSelector.Instance.autoIntakeGroupMode());
     xboxDrv.y().toggleOnTrue(CatzElevator.Instance.incrementElevatorPosition().onlyIf(() -> CatzSuperstructure.Instance.getIsScoring().get()));
 
     // cancel drive to reef
@@ -165,7 +166,7 @@ public class RobotContainer {
     .alongWith(Commands.print("cancelling path"))
     .alongWith(CatzSuperstructure.Instance.stow()));
 
-    // xboxDrv.rightStick().onTrue(CatzSuperstructure.Instance.intakeAlgaeProcess());
+    xboxDrv.rightStick().onTrue(CatzSuperstructure.Instance.intakeAlgaeProcess());
 
     // override score
     xboxDrv.povUp().toggleOnTrue(CatzElevator.Instance.setRaiseOverride(true).unless(() -> CatzSuperstructure.isClimbEnabled()).alongWith(Commands.print("override score")));
@@ -173,7 +174,7 @@ public class RobotContainer {
     // swipe
     // xboxDrv.povDown().toggleOnTrue(TeleopPosSelector.Instance.runSwipe().alongWith(Commands.print("hello swipe")).unless(()->CatzSuperstructure.isClimbEnabled()));
 
-    xboxDrv.b().onTrue(CatzSuperstructure.Instance.intake().alongWith(Commands.print("INTAKE")));
+    xboxDrv.b().onTrue(new InstantCommand(()->CatzRobotTracker.Instance.resetPose(new Pose2d(5,5,new Rotation2d()))));
 
 
     // Default driving
@@ -248,6 +249,8 @@ public class RobotContainer {
     xboxTest.povUp().toggleOnTrue(CatzAlgaePivot.Instance.AlgaePivot_Stow().alongWith(Commands.print("pressed POV Right"))); //TBD
     xboxTest.povRight().toggleOnTrue(CatzAlgaeRemover.Instance.eatAlgae().alongWith(Commands.print("pressed POV Right"))); //TBD
     xboxTest.povLeft().toggleOnTrue(CatzAlgaeRemover.Instance.vomitAlgae().alongWith(Commands.print("pressed POV Right"))); //TBD
+
+    xboxTest.b().onTrue(TeleopPosSelector.Instance.runToNearestCoral());
 
     // xboxTest.x().onTrue(CatzAlgaePivot.Instance.AlgaePivot_Horizontal().alongWith(Commands.print("AL:KDJF:LAKDJFLK:ADJF:LKKJAD:FLKJ")));
     // xboxTest.y().onTrue(CatzAlgaePivot.Instance.AlgaePivot_Stow().alongWith(Commands.print("LAKJDFLKJALKJLKJFLSKDJLKKJSDLFKJLKKJLKKJFDKLJSLKJ")));

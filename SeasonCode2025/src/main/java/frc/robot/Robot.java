@@ -3,6 +3,7 @@ package frc.robot;
 
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.Notifier;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.RobotController;
@@ -17,12 +18,13 @@ import frc.robot.CatzSubsystems.CatzAlgaeEffector.CatzAlgaePivot.CatzAlgaePivot;
 import frc.robot.CatzSubsystems.CatzAlgaeEffector.CatzAlgaePivot.CatzAlgaePivot.AlgaePivotPosition;
 import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.CatzRobotTracker;
 import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.Drivetrain.CatzDrivetrain;
-import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.Vision.CatzVision;
 import frc.robot.CatzSubsystems.CatzElevator.CatzElevator;
 import frc.robot.CatzSubsystems.CatzLEDs.CatzLED;
 import frc.robot.CatzSubsystems.CatzLEDs.CatzLED.ControllerLEDState;
 import frc.robot.CatzSubsystems.CatzOuttake.CatzOuttake;
 import frc.robot.CatzSubsystems.CatzRampPivot.CatzRampPivot;
+import frc.robot.CatzSubsystems.CatzVision.ApriltagScanning.LimelightSubsystem;
+import frc.robot.CatzSubsystems.CatzVision.Detection.Detection;
 import frc.robot.Utilities.Alert;
 import frc.robot.Utilities.Alert.AlertType;
 import frc.robot.Utilities.MotorUtil.NeutralMode;
@@ -42,6 +44,7 @@ import org.littletonrobotics.junction.networktables.NT4Publisher;
 import org.littletonrobotics.junction.rlog.RLOGServer;
 import org.littletonrobotics.junction.wpilog.WPILOGReader;
 import org.littletonrobotics.junction.wpilog.WPILOGWriter;
+
 
 import choreo.auto.AutoFactory;
 
@@ -126,6 +129,15 @@ public class Robot extends LoggedRobot {
     Logger.recordMetadata("GitSHA", BuildConstants.GIT_SHA);
     Logger.recordMetadata("GitDate", BuildConstants.GIT_DATE);
     Logger.recordMetadata("GitBranch", BuildConstants.GIT_BRANCH);
+    CatzConstants.autoFactory = new AutoFactory(
+                                                  CatzRobotTracker.Instance::getEstimatedPose,
+                                                  CatzRobotTracker.Instance::resetPose,
+                                                  CatzDrivetrain.Instance::followChoreoTrajectoryExecute,
+                                                  true,
+                                                  CatzDrivetrain.Instance
+                                                ); //it is apparently a good idea to initialize these variables not statically because there can be race conditions
+    AutoRoutineSelector.Instance.getSelectedCommand();
+
     switch (BuildConstants.DIRTY) {
       case 0:
         Logger.recordMetadata("GitDirty", "All changes committed");
@@ -241,24 +253,20 @@ public class Robot extends LoggedRobot {
     // CommandScheduler.getInstance().setPeriod(CatzConstants.LOOP_TIME); //TODO should we add this?
 
 
-    System.out.println("We need to access this from somewhere to activate it"+CatzVision.Instance.getName());
     System.out.println("Initializing " + CatzDrivetrain.Instance.getName());
     System.out.println("Initializing " + CatzAlgaePivot.Instance.getName());
     System.out.println("Initializing " + CatzRampPivot.Instance.getName());
     System.out.println("Initializing " + CatzRobotTracker.Instance);
-    System.out.println("Initializing " + CatzVision.Instance.getName());
+    System.out.println("Initializing " + LimelightSubsystem.Instance.getName());
     System.out.println("Initializing " + CatzLED.Instance);
     System.out.println("Initializing " + CatzOuttake.Instance.getName());
     System.out.println("Initializing " + CatzAutonomous.Instance.getName());
+    System.out.println("Initializing " + Detection.Instance.getName());
 
-
-    CatzConstants.autoFactory = new AutoFactory(
-                                                  CatzRobotTracker.Instance::getEstimatedPose,
-                                                  CatzRobotTracker.Instance::resetPose,
-                                                  CatzDrivetrain.Instance::followChoreoTrajectoryExecute,
-                                                  true,
-                                                  CatzDrivetrain.Instance
-                                                ); //it is apparently a good idea to initialize these variables not statically because there can be race conditions
+    Notifier coralDetectionThread = new Notifier(Detection.Instance::setNearestGroupPose);
+    Notifier.setHALThreadPriority(false, 0);
+    System.out.println("Starting deteciton threaadf==================");
+		coralDetectionThread.startPeriodic(0.1);
 
   }
 
@@ -384,8 +392,7 @@ public class Robot extends LoggedRobot {
 
     autoStart = Timer.getFPGATimestamp();
     // m_autonomousCommand = CatzSuperstructure.Instance.scoreLevelTwoAutomated();
-    //m_autonomousCommand = AutoRoutineSelector.Instance.getSelectedCommand();
-    m_autonomousCommand = CatzAutonomous.Instance.getCommand();
+    m_autonomousCommand = AutoRoutineSelector.Instance.getSelectedCommand();
     CatzRampPivot.Instance.Ramp_Intake_Pos().withTimeout(1.0);
     if (m_autonomousCommand != null) {
       m_autonomousCommand.schedule();
@@ -442,7 +449,6 @@ public class Robot extends LoggedRobot {
   @Override
   public void testInit() {
     CommandScheduler.getInstance().cancelAll();
-    CatzRobotTracker.Instance.resetPose(CatzVision.Instance.getPoseObservation()[0].pose().toPose2d());
   }
 
   @Override

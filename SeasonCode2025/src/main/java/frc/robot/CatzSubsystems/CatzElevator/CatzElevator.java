@@ -12,6 +12,7 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.PrintCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.CatzConstants;
+import frc.robot.CatzSubsystems.CatzAlgaeEffector.CatzAlgaeRemover.CatzAlgaeRemover;
 import frc.robot.Utilities.LoggedTunableNumber;
 import lombok.RequiredArgsConstructor;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -38,6 +39,7 @@ public class CatzElevator extends SubsystemBase {
 
   private boolean canMoveElevator = false;
   private boolean raiseOverride = false;
+
 
   private final ElevatorPosition[] scoringPositionsList = {ElevatorPosition.PosL1, ElevatorPosition.PosL2, ElevatorPosition.PosL3, ElevatorPosition.PosL4};
 
@@ -186,7 +188,7 @@ public class CatzElevator extends SubsystemBase {
         } else {
           io.runSetpointDown(targetPosition.getTargetPositionInch());
         }
-      } else if (((canMoveElevator || DriverStation.isAutonomous()) )) {
+      } else if (((canMoveElevator || DriverStation.isAutonomous())) || CatzAlgaeRemover.Instance.algaeRemove) {//(((canMoveElevator || DriverStation.isAutonomous()) && CatzOuttake.Instance.isHoldingCoral()) || auxControl || CatzAlgaeRemover.Instance.algaeRemove) {
         //Setpoint PID
         io.runSetpointUp(targetPosition.getTargetPositionInch());
 

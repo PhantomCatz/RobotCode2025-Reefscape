@@ -27,7 +27,20 @@ public class AutoRoutineBase {
         routine.active().onTrue(
             new InstantCommand(() -> CatzRobotTracker.Instance.resetPose(startTraj.getInitialPose().get()))
             .andThen(Commands.sequence(sequence))
-        );
+            );
+        }
+    protected Command followTrajectoryWithAccuracy(AutoTrajectory traj){
+        Command trajCmd = traj.cmd();
+        return Commands.defer(() ->
+                                new FunctionalCommand
+                                (
+                                    () -> {CatzDrivetrain.Instance.followChoreoTrajectoryInit(traj); trajCmd.initialize();},
+                                    trajCmd::execute,
+                                    trajCmd::end,
+                                    () -> isAtPose(traj)
+                                ),
+                                Set.of(CatzDrivetrain.Instance)
+                                );
     }
 
     protected Command followTrajectoryAndScore(AutoTrajectory trajectory, int level){
@@ -35,7 +48,7 @@ public class AutoRoutineBase {
         (
             Commands.sequence
             (
-                Commands.print("hello???"),
+                Commands.print(trajectory.toString()),
                 Commands.waitUntil(CatzDrivetrain.Instance::closeEnoughToRaiseElevator),
                 CatzSuperstructure.Instance.LXElevator(level),
                 CatzSuperstructure.Instance.scoreInAuto(level)
@@ -61,18 +74,6 @@ public class AutoRoutineBase {
         return Commands.waitUntil(() -> CatzOuttake.Instance.isDesiredCoralState(false));
     }
 
-    protected Command followTrajectoryWithAccuracy(AutoTrajectory traj){
-        return Commands.defer(() ->
-                                new FunctionalCommand
-                                (
-                                    () -> {CatzDrivetrain.Instance.followChoreoTrajectoryInit(traj); traj.cmd().initialize();},
-                                    traj.cmd()::execute,
-                                    traj.cmd()::end,
-                                    () -> isAtPose(traj)
-                                ),
-                                Set.of(CatzDrivetrain.Instance)
-                             );
-    }
 
     private boolean isAtPose(AutoTrajectory trajectory){
         boolean isAtTrans = translationIsFinished(trajectory, AutonConstants.ACCEPTABLE_DIST_METERS);

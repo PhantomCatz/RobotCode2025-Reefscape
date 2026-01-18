@@ -22,6 +22,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.DeferredCommand;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.FieldConstants.Reef;
 import frc.robot.Utilities.AllianceFlipUtil;
@@ -33,8 +34,10 @@ import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.Drivetrain.CatzDriv
 import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.Drivetrain.DriveConstants;
 import frc.robot.CatzSubsystems.CatzElevator.CatzElevator;
 import frc.robot.CatzSubsystems.CatzElevator.CatzElevator.ElevatorPosition;
+import frc.robot.CatzSubsystems.CatzVision.Detection.Detection;
 import frc.robot.Commands.DriveAndRobotOrientationCmds.PIDDriveCmd;
 import frc.robot.Commands.DriveAndRobotOrientationCmds.PIDDriveCmdAlgae;
+import frc.robot.Commands.DriveAndRobotOrientationCmds.PIDDriveCmdCoral;
 import frc.robot.Commands.DriveAndRobotOrientationCmds.TrajectoryDriveCmd;
 
 @SuppressWarnings({ "rawtypes", "unchecked" })
@@ -160,7 +163,7 @@ public class TeleopPosSelector { //TODO split up the file. it's too big and does
       scoringPos = radius.plus(leftRight).plus(Reef.center);
     }else{
       scoringPos = radius.plus(Reef.center);
-      CatzSuperstructure.Instance.isAlgaeUp = reefAngle % 2 == 0;
+      CatzSuperstructure.Instance.isAlgaeUp = reefAngle % 2 == 1;
     }
 
     return AllianceFlipUtil.apply(new Pose2d(scoringPos, selectedAngle.plus(Rotation2d.k180deg)));
@@ -319,6 +322,27 @@ public class TeleopPosSelector { //TODO split up the file. it's too big and does
     }, Set.of());
   }
 
+  public Command runToNearestCoral() {
+    return new DeferredCommand(() -> {
+      return new PIDDriveCmdCoral(Detection.Instance.getCoralPose());
+    }, Set.of());
+  }
+
+  public Command autoIntakeMode() {
+    return new SequentialCommandGroup(
+      Commands.waitUntil(Detection.Instance::hasCoral),
+      Commands.print("can see now"),
+      new PIDDriveCmdCoral(Detection.Instance.getCoralPose()).asProxy()
+    );
+  }
+
+  public Command autoIntakeGroupMode() {
+    return new SequentialCommandGroup(
+      Commands.waitUntil(Detection.Instance::hasCoral),
+      Commands.print("can see now"),
+      new PIDDriveCmdCoral(Detection.Instance.getNearestGroupPose()).asProxy()
+    );
+  }
 
   public PathPlannerPath getStraightLinePath(Pose2d start, Pose2d goal, PathConstraints constraints){
     Translation2d currentPose = start.getTranslation();
