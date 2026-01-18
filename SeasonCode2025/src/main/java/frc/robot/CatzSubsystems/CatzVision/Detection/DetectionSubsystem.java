@@ -13,7 +13,7 @@ import frc.robot.CatzSubsystems.CatzVision.ApriltagScanning.LimelightConstants.L
 
 import org.littletonrobotics.junction.Logger;
 
-public class DetectionSubsystem<IO extends DetectionIOLimelight> extends SubsystemBase {
+public class DetectionSubsystem<IO extends DetectionIOLimelight> extends SubsystemBase implements Runnable {
 	protected final IO io;
 	private final LimelightConfig config;
 	private final DetectionIOInputsAutoLogged inputs = new DetectionIOInputsAutoLogged();
@@ -61,6 +61,10 @@ public class DetectionSubsystem<IO extends DetectionIOLimelight> extends Subsyst
 		return io.getNearestGroupPose();
 	}
 
+	public void setNearestGroupPose() {
+		io.setNearestGroupPose();
+	}
+
 	/**
 	 * @param base The translation to evaluate the closest coral relative to
 	 *
@@ -96,5 +100,13 @@ public class DetectionSubsystem<IO extends DetectionIOLimelight> extends Subsyst
 				config.name + "/Latest Pipeline Index",
 				() -> LimelightHelpers.getCurrentPipelineIndex(config.name),
 				null);
+	}
+
+	@Override
+	public void run() {
+		while (true) {
+			System.out.println("thread running");
+			setNearestGroupPose();
+		}
 	}
 }

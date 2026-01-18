@@ -24,6 +24,8 @@ public abstract class DetectionIO {
 
 	public abstract Pose2d getNearestGroupPose();
 
+	public abstract void setNearestGroupPose();
+
 	public boolean getDisabled() {
 		return disabled;
 	}

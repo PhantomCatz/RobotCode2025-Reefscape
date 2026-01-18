@@ -3,6 +3,7 @@ package frc.robot;
 
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.Notifier;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.RobotController;
@@ -262,6 +263,10 @@ public class Robot extends LoggedRobot {
     System.out.println("Initializing " + CatzAutonomous.Instance.getName());
     System.out.println("Initializing " + Detection.Instance.getName());
 
+    Notifier coralDetectionThread = new Notifier(Detection.Instance::setNearestGroupPose);
+    Notifier.setHALThreadPriority(false, 0);
+    System.out.println("Starting deteciton threaadf==================");
+		coralDetectionThread.startPeriodic(0.1);
 
   }
 

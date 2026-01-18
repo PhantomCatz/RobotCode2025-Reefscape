@@ -41,8 +41,9 @@ public class DetectionIOLimelight extends DetectionIO {
 	private final NetworkTableInstance ntInstance = NetworkTableInstance.getDefault();
 	private int maxI = 0;
 	private ArrayList<StructPublisher<Pose2d>> publishers = new ArrayList<StructPublisher<Pose2d>>();
-	private AtomicReference<ArrayList<Coral>> tracker;
-	private ArrayList<Coral> newDet;
+	private ArrayList<Coral> newDet = new ArrayList<>();
+	private AtomicReference<ArrayList<Coral>> tracker = new AtomicReference<>(newDet);
+	private Pose2d closestCoralGroupPose = null;
 	//private ArrayList<Coral> tracker = new ArrayList<Coral>();
 	private Stopwatch mStopwatch = new Stopwatch();
 	private int pipelineToSet = 0;
@@ -196,8 +197,11 @@ public class DetectionIOLimelight extends DetectionIO {
 	}
 
 	@Override
-	public Pose2d getNearestGroupPose() {
+	public synchronized void setNearestGroupPose() {
 		ArrayList<Coral> currentCoral = tracker.get();
+		if (currentCoral.size() == 0) { // if can't see, use old pose
+			return;
+		}
 		double now = Timer.getFPGATimestamp();
 		Pose2d bestGroupCoralPose = null;
 		Boolean[] visited = new Boolean[currentCoral.size()];
@@ -251,7 +255,12 @@ public class DetectionIOLimelight extends DetectionIO {
 		}
 		double timeUsed = Timer.getFPGATimestamp() - now;
 		System.out.println("group function time used: "+timeUsed);
-		return bestGroupCoralPose; // will retrun null if no coral
+		closestCoralGroupPose = bestGroupCoralPose;
+	}
+
+	@Override
+	public synchronized Pose2d getNearestGroupPose() {
+		return closestCoralGroupPose;
 	}
 
 	@Override

@@ -6,6 +6,7 @@ public class Detection extends DetectionSubsystem<DetectionIOLimelight> {
 
 	private Detection() {
 		super(DetectionConstants.getDetectionIOConfig(), DetectionConstants.getDetectionIO());
+
 	}
 
 	@Override
