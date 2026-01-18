@@ -218,17 +218,23 @@ public class CatzDrivetrain extends SubsystemBase {
   //          Driving methods
   //
   // --------------------------------------------------------------------------------------------------------------------------
+
+  public boolean driveSlow = false;
   public void drive(ChassisSpeeds chassisSpeeds) {
     // System.out.println("speeed; " + chassisSpeeds);
     ChassisSpeeds descreteSpeeds = ChassisSpeeds.discretize(chassisSpeeds, CatzConstants.LOOP_TIME);
     // --------------------------------------------------------
     // Convert chassis speeds to individual module states and set module states
     // --------------------------------------------------------
+    if(driveSlow){
+      descreteSpeeds = new ChassisSpeeds(descreteSpeeds.vxMetersPerSecond * 0.5, descreteSpeeds.vxMetersPerSecond * 0.5, descreteSpeeds.omegaRadiansPerSecond * 0.5);
+    }
     SwerveModuleState[] unoptimizedModuleStates = DriveConstants.SWERVE_KINEMATICS.toSwerveModuleStates(descreteSpeeds);
     // --------------------------------------------------------
     // Scale down wheel speeds
     // --------------------------------------------------------
     SwerveDriveKinematics.desaturateWheelSpeeds(unoptimizedModuleStates, DriveConstants.DRIVE_CONFIG.maxLinearVelocity());
+
     // --------------------------------------------------------
     // Optimize Wheel Angles
     // --------------------------------------------------------

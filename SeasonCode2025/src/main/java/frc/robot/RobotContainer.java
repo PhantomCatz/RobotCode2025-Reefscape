@@ -17,7 +17,6 @@ import frc.robot.CatzSubsystems.CatzSuperstructure;
 import frc.robot.CatzSubsystems.CatzAlgaeEffector.CatzAlgaePivot.CatzAlgaePivot;
 import frc.robot.CatzSubsystems.CatzAlgaeEffector.CatzAlgaeRemover.CatzAlgaeRemover;
 import frc.robot.CatzSubsystems.CatzSuperstructure.Gamepiece;
-import frc.robot.CatzSubsystems.CatzSuperstructure.LeftRight;
 import frc.robot.CatzSubsystems.CatzClimb.CatzClimb;
 import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.CatzRobotTracker;
 import frc.robot.CatzSubsystems.CatzDriveAndRobotOrientation.Drivetrain.CatzDrivetrain;
@@ -119,62 +118,66 @@ public class RobotContainer {
     climbMode.toggleOnTrue(Commands.startEnd(()->CatzSuperstructure.Instance.setClimbOverride(()->true), ()->CatzSuperstructure.Instance.setClimbOverride(()->false)));
 
     // Manual Climb Control
-    xboxDrv.povUp().onTrue(CatzClimb.Instance.ClimbManualMode(()-> 0.4));
-    xboxDrv.povUp().onFalse(CatzClimb.Instance.CancelClimb());
-    xboxDrv.povDown().onTrue(CatzClimb.Instance.ClimbManualMode(()-> -1.0));
-    xboxDrv.povDown().onFalse(CatzClimb.Instance.CancelClimb());
+    // xboxDrv.povUp().onTrue(CatzClimb.Instance.ClimbManualMode(()-> 0.4));
+    // xboxDrv.povUp().onFalse(CatzClimb.Instance.CancelClimb());
+    // xboxDrv.povDown().onTrue(CatzClimb.Instance.ClimbManualMode(()-> -1.0));
+    // xboxDrv.povDown().onFalse(CatzClimb.Instance.CancelClimb());
 
     climbMode.toggleOnTrue(CatzSuperstructure.Instance.extendClimb());
 
+    xboxDrv.leftBumper().onTrue(new InstantCommand(() -> {CatzDrivetrain.Instance.driveSlow = true;}));
+    xboxDrv.x().onTrue(new InstantCommand(() -> {CatzDrivetrain.Instance.driveSlow = false;}));
+
+
     // Left Right
-    xboxDrv.povLeft().onTrue(TeleopPosSelector.Instance.runLeftRight(LeftRight.LEFT).unless(()->CatzSuperstructure.isClimbEnabled()));
-    xboxDrv.povRight().onTrue(TeleopPosSelector.Instance.runLeftRight(LeftRight.RIGHT).unless(()->CatzSuperstructure.isClimbEnabled()));
+    // xboxDrv.povLeft().onTrue(TeleopPosSelector.Instance.runLeftRight(LeftRight.LEFT).unless(()->CatzSuperstructure.isClimbEnabled()));
+    // xboxDrv.povRight().onTrue(TeleopPosSelector.Instance.runLeftRight(LeftRight.RIGHT).unless(()->CatzSuperstructure.isClimbEnabled()));
 
     // Drive to Reef
-    xboxDrv.rightTrigger().onTrue(CatzSuperstructure.Instance.scoreLevelXAutomated(1));
-    xboxDrv.leftTrigger().onTrue(CatzSuperstructure.Instance.scoreLevelXAutomated(2));
-    xboxDrv.rightBumper().onTrue(CatzSuperstructure.Instance.scoreLevelXAutomated(3));
-    xboxDrv.leftBumper().onTrue(CatzSuperstructure.Instance.scoreLevelXAutomated(4));
+    // xboxDrv.rightTrigger().onTrue(CatzSuperstructure.Instance.scoreLevelXAutomated(1));
+    // xboxDrv.leftTrigger().onTrue(CatzSuperstructure.Instance.scoreLevelXAutomated(2));
+    // xboxDrv.rightBumper().onTrue(CatzSuperstructure.Instance.scoreLevelXAutomated(3));
+    // xboxDrv.leftBumper().onTrue(CatzSuperstructure.Instance.scoreLevelXAutomated(4));
 
-    xboxDrv.leftTrigger().onFalse(new InstantCommand(() -> {
-      CatzSuperstructure.Instance.setCanShoot(() -> true);
-      CatzSuperstructure.Instance.setIsScoring(() -> false);
-    }));
+    // xboxDrv.leftTrigger().onFalse(new InstantCommand(() -> {
+    //   CatzSuperstructure.Instance.setCanShoot(() -> true);
+    //   CatzSuperstructure.Instance.setIsScoring(() -> false);
+    // }));
 
-    xboxDrv.rightTrigger().onFalse(new InstantCommand(() -> {
-      CatzSuperstructure.Instance.setCanShoot(() -> true);
-      CatzSuperstructure.Instance.setIsScoring(() -> false);
-    }));
+    // xboxDrv.rightTrigger().onFalse(new InstantCommand(() -> {
+    //   CatzSuperstructure.Instance.setCanShoot(() -> true);
+    //   CatzSuperstructure.Instance.setIsScoring(() -> false);
+    // }));
 
-    xboxDrv.leftBumper().onFalse(new InstantCommand(() -> {
-      CatzSuperstructure.Instance.setCanShoot(() -> true);
-      CatzSuperstructure.Instance.setIsScoring(() -> false);
-    }));
+    // xboxDrv.leftBumper().onFalse(new InstantCommand(() -> {
+    //   CatzSuperstructure.Instance.setCanShoot(() -> true);
+    //   CatzSuperstructure.Instance.setIsScoring(() -> false);
+    // }));
 
-    xboxDrv.rightBumper().onFalse(new InstantCommand(() -> {
-      CatzSuperstructure.Instance.setCanShoot(() -> true);
-      CatzSuperstructure.Instance.setIsScoring(() -> false);
-    }));
+    // xboxDrv.rightBumper().onFalse(new InstantCommand(() -> {
+    //   CatzSuperstructure.Instance.setCanShoot(() -> true);
+    //   CatzSuperstructure.Instance.setIsScoring(() -> false);
+    // }));
 
     // xboxDrv.a().toggleOnTrue(CatzElevator.Instance.decrementElevatorPosition().onlyIf(()-> CatzSuperstructure.Instance.getIsScoring().get()));
-    xboxDrv.a().onTrue(TeleopPosSelector.Instance.autoIntakeGroupMode());
-    xboxDrv.y().toggleOnTrue(CatzElevator.Instance.incrementElevatorPosition().onlyIf(() -> CatzSuperstructure.Instance.getIsScoring().get()));
+    // xboxDrv.a().onTrue(TeleopPosSelector.Instance.autoIntakeGroupMode());
+    // xboxDrv.y().toggleOnTrue(CatzElevator.Instance.incrementElevatorPosition().onlyIf(() -> CatzSuperstructure.Instance.getIsScoring().get()));
 
     // cancel drive to reef
-    xboxDrv.x().onTrue(CatzDrivetrain.Instance.cancelTrajectory()
-    .alongWith(new InstantCommand(() -> isScoring = false))
-    .alongWith(Commands.print("cancelling path"))
-    .alongWith(CatzSuperstructure.Instance.stow()));
+    // xboxDrv.x().onTrue(CatzDrivetrain.Instance.cancelTrajectory()
+    // .alongWith(new InstantCommand(() -> isScoring = false))
+    // .alongWith(Commands.print("cancelling path"))
+    // .alongWith(CatzSuperstructure.Instance.stow()));
 
-    xboxDrv.rightStick().onTrue(CatzSuperstructure.Instance.intakeAlgaeProcess());
+    // xboxDrv.rightStick().onTrue(CatzSuperstructure.Instance.intakeAlgaeProcess());
 
     // override score
-    xboxDrv.povUp().toggleOnTrue(CatzElevator.Instance.setRaiseOverride(true).unless(() -> CatzSuperstructure.isClimbEnabled()).alongWith(Commands.print("override score")));
+    // xboxDrv.povUp().toggleOnTrue(CatzElevator.Instance.setRaiseOverride(true).unless(() -> CatzSuperstructure.isClimbEnabled()).alongWith(Commands.print("override score")));
 
-    // swipe
-    // xboxDrv.povDown().toggleOnTrue(TeleopPosSelector.Instance.runSwipe().alongWith(Commands.print("hello swipe")).unless(()->CatzSuperstructure.isClimbEnabled()));
+    // // swipe
+    // // xboxDrv.povDown().toggleOnTrue(TeleopPosSelector.Instance.runSwipe().alongWith(Commands.print("hello swipe")).unless(()->CatzSuperstructure.isClimbEnabled()));
 
-    xboxDrv.b().onTrue(new InstantCommand(()->CatzRobotTracker.Instance.resetPose(new Pose2d(5,5,new Rotation2d()))));
+    // xboxDrv.b().onTrue(new InstantCommand(()->CatzRobotTracker.Instance.resetPose(new Pose2d(5,5,new Rotation2d()))));
 
 
     // Default driving
